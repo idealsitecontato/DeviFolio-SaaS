@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Entre ou crie sua conta na Devifolio e transforme seu GitHub em um portfólio profissional.">
+  <title>Entrar ou criar conta — Devifolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="auth.css">
+</head>
+<body class="auth-body">
+
+  <main class="auth-shell">
+
+    <!-- Esquerda: visual -->
+    <aside class="auth-right">
+      <h2 class="auth-right-heading">Seu portfólio<br>de forma descomplicada.</h2>
+      <img src="./assets/pastamockup.png" alt="" class="auth-folder-mockup" aria-hidden="true">
+    </aside>
+
+    <!-- Direita: formulário -->
+    <section class="auth-left">
+      <a class="auth-brand" href="index.html" aria-label="Devifolio, início">
+        <img src="./assets/devifolio-logo.png" alt="Devifolio">
+      </a>
+
+      <div class="auth-form-wrap">
+
+
+        <!-- Login -->
+        <div class="auth-panel is-active" id="panel-login" role="tabpanel" aria-labelledby="tab-login">
+          <h1>Bem-vindo de volta!</h1>
+          <p class="auth-sub">Entre com seus dados para continuar.</p>
+
+          <form id="form-login">
+            <div class="auth-field">
+              <label for="login-email">E-mail</label>
+              <input type="email" id="login-email" placeholder="Digite seu e-mail" autocomplete="email" required>
+            </div>
+            <div class="auth-field">
+              <label for="login-senha">Senha</label>
+              <input type="password" id="login-senha" placeholder="Digite sua senha" autocomplete="current-password" required>
+            </div>
+            <div class="auth-row-between">
+              <label class="auth-remember"><input type="checkbox"> Lembrar de mim</label>
+              <a class="auth-forgot" href="#">Esqueci a senha</a>
+            </div>
+            <button class="button button-submit" type="submit">Entrar</button>
+          </form>
+
+          <div class="auth-divider">ou continue com</div>
+
+          <a class="button button-github" href="#" id="github-login">
+            <svg viewBox="0 0 98 98" role="img" aria-hidden="true"><path fill="currentColor" d="M49 0C21.94 0 0 21.94 0 49c0 21.64 14.03 39.99 33.47 46.47 2.45.45 3.35-1.06 3.35-2.36 0-1.17-.04-4.27-.07-8.37-13.62 2.96-16.5-6.56-16.5-6.56-2.23-5.66-5.45-7.17-5.45-7.17-4.45-3.04.34-2.98.34-2.98 4.92.35 7.51 5.05 7.51 5.05 4.38 7.5 11.48 5.34 14.28 4.09.44-3.18 1.71-5.34 3.11-6.57-10.87-1.24-22.3-5.44-22.3-24.2 0-5.35 1.91-9.71 5.05-13.13-.5-1.24-2.19-6.23.48-12.97 0 0 4.12-1.32 13.49 5.02a46.7 46.7 0 0 1 12.29-1.66c4.17.02 8.37.56 12.29 1.66 9.37-6.34 13.49-5.02 13.49-5.02 2.67 6.74.99 11.73.48 12.97 3.14 3.42 5.05 7.78 5.05 13.13 0 18.82-11.46 22.94-22.37 24.15 1.76 1.52 3.33 4.51 3.33 9.1 0 6.57-.06 11.87-.06 13.49 0 1.31.89 2.84 3.38 2.35C83.99 88.95 98 70.62 98 49 98 21.94 76.06 0 49 0Z"/></svg>
+            Entrar com GitHub
+          </a>
+
+          <p class="auth-switch">Novo por aqui? <button type="button" data-switch="cadastro">Criar conta</button></p>
+        </div>
+
+        <!-- Cadastro -->
+        <div class="auth-panel" id="panel-cadastro" role="tabpanel" aria-labelledby="tab-cadastro">
+          <h1>Crie seu portfólio</h1>
+          <p class="auth-sub">Crie sua conta para começar.</p>
+
+          <form id="form-cadastro">
+            <div class="auth-field">
+              <label for="cad-nome">Nome</label>
+              <input type="text" id="cad-nome" placeholder="Seu nome" autocomplete="name" required>
+            </div>
+            <div class="auth-field">
+              <label for="cad-email">E-mail</label>
+              <input type="email" id="cad-email" placeholder="voce@email.com" autocomplete="email" required>
+            </div>
+            <div class="auth-field">
+              <label for="cad-senha">Senha</label>
+              <input type="password" id="cad-senha" placeholder="Crie uma senha" autocomplete="new-password" required>
+            </div>
+            <button class="button button-submit" type="submit">Criar conta</button>
+          </form>
+
+          <div class="auth-divider">ou continue com</div>
+
+          <a class="button button-github" href="#" id="github-cadastro">
+            <svg viewBox="0 0 98 98" role="img" aria-hidden="true"><path fill="currentColor" d="M49 0C21.94 0 0 21.94 0 49c0 21.64 14.03 39.99 33.47 46.47 2.45.45 3.35-1.06 3.35-2.36 0-1.17-.04-4.27-.07-8.37-13.62 2.96-16.5-6.56-16.5-6.56-2.23-5.66-5.45-7.17-5.45-7.17-4.45-3.04.34-2.98.34-2.98 4.92.35 7.51 5.05 7.51 5.05 4.38 7.5 11.48 5.34 14.28 4.09.44-3.18 1.71-5.34 3.11-6.57-10.87-1.24-22.3-5.44-22.3-24.2 0-5.35 1.91-9.71 5.05-13.13-.5-1.24-2.19-6.23.48-12.97 0 0 4.12-1.32 13.49 5.02a46.7 46.7 0 0 1 12.29-1.66c4.17.02 8.37.56 12.29 1.66 9.37-6.34 13.49-5.02 13.49-5.02 2.67 6.74.99 11.73.48 12.97 3.14 3.42 5.05 7.78 5.05 13.13 0 18.82-11.46 22.94-22.37 24.15 1.76 1.52 3.33 4.51 3.33 9.1 0 6.57-.06 11.87-.06 13.49 0 1.31.89 2.84 3.38 2.35C83.99 88.95 98 70.62 98 49 98 21.94 76.06 0 49 0Z"/></svg>
+            Continuar com GitHub
+          </a>
+
+          <p class="auth-terms">Ao criar sua conta, você concorda com os <a href="#">Termos de Uso</a> e a <a href="#">Política de Privacidade</a>.</p>
+
+          <p class="auth-switch">Já tem conta? <button type="button" data-switch="login">Entrar</button></p>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const panels = {
+      login: document.getElementById('panel-login'),
+      cadastro: document.getElementById('panel-cadastro')
+    };
+
+    function showPanel(name, updateHash){
+      if (name !== 'login' && name !== 'cadastro') name = 'login';
+      Object.keys(panels).forEach(key => {
+        panels[key].classList.toggle('is-active', key === name);
+      });
+      if (updateHash) history.replaceState(null, '', '#' + name);
+    }
+
+    document.querySelectorAll('[data-switch]').forEach(btn => {
+      btn.addEventListener('click', () => showPanel(btn.dataset.switch, true));
+    });
+
+    showPanel(window.location.hash.replace('#', '') || 'login', false);
+    window.addEventListener('hashchange', () => {
+      showPanel(window.location.hash.replace('#', ''), false);
+    });
+
+    ['form-login', 'form-cadastro'].forEach(id => {
+      document.getElementById(id).addEventListener('submit', e => e.preventDefault());
+    });
+    ['github-login', 'github-cadastro'].forEach(id => {
+      document.getElementById(id).addEventListener('click', e => e.preventDefault());
+    });
+  </script>
+
+</body>
+</html>
