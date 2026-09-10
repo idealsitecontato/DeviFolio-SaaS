@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Gerencie seus projetos, portfólio e resultados no Devifolio.">
+  <meta name="theme-color" content="#07121d">
+  <title>Início — Devifolio</title>
+  <link rel="icon" type="image/png" href="assets/devifolio-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="Menu principal">
+      <div class="brand-crop"><img src="assets/devifolio-logo.png" alt="Devifolio"></div>
+      <nav class="side-nav" id="side-nav">
+        <a class="nav-item active" href="#inicio" data-route="inicio"><span data-icon="home"></span><span>Início</span></a>
+        <a class="nav-item" href="#projetos" data-route="projetos"><span data-icon="folder"></span><span>Projetos</span></a>
+        <a class="nav-item" href="#portfolio" data-route="portfolio"><span data-icon="user"></span><span>Meu portfólio</span></a>
+        <a class="nav-item" href="#github" data-route="github"><span data-icon="github"></span><span>GitHub</span></a>
+        <a class="nav-item" href="#analise" data-route="analise"><span data-icon="chart"></span><span>Análise</span></a>
+        <a class="nav-item" href="#perfil" data-route="perfil"><span data-icon="profile"></span><span>Perfil</span></a>
+        <div class="nav-divider"></div>
+        <a class="nav-item" href="#configuracoes" data-route="configuracoes"><span data-icon="settings"></span><span>Configurações</span></a>
+        <a class="nav-item" href="cadastro.html#login" data-logout><span data-icon="logout"></span><span>Sair</span></a>
+      </nav>
+      <div class="sidebar-spacer"></div>
+      <a class="referral-mini" href="#indicacao" data-route="indicacao">
+        <span class="circle-icon" data-icon="users"></span><span><b>Indicação</b><small>Ganhe benefícios<br>indicando amigos.</small></span><span data-icon="chevron"></span>
+      </a>
+      <button class="user-mini" type="button" data-route-button="perfil">
+        <span class="avatar">FJ</span><span><b>Felype</b><small>@felype</small></span><span data-icon="chevron"></span>
+      </button>
+    </aside>
+
+    <div class="mobile-topbar">
+      <button class="icon-button" id="menu-toggle" aria-label="Abrir menu" aria-expanded="false"><span data-icon="menu"></span></button>
+      <div class="brand-crop brand-mobile"><img src="assets/devifolio-logo.png" alt="Devifolio"></div>
+      <span class="avatar avatar-small">FJ</span>
+    </div>
+
+    <main class="main-content">
+      <header class="top-actions">
+        <button class="plan-button" type="button" aria-label="Plano Pro"><span data-icon="crown"></span></button>
+        <button class="avatar" type="button" data-route-button="perfil">FJ</button>
+      </header>
+      <div id="page-content" class="page-content" aria-live="polite"></div>
+    </main>
+  </div>
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+  <div id="modal-root"></div>
+  <div class="toast-stack" id="toast-stack" aria-live="polite"></div>
+  <script src="dashboard.js"></script>
+</body>
+</html>
