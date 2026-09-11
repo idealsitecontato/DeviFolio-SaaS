@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR" data-theme="dark">
+<html lang="pt-BR" data-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,11 +11,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="dashboard.css">
+  <link rel="stylesheet" href="dashboard-v2.css">
 </head>
 <body>
   <div class="app-shell">
     <aside class="sidebar" id="sidebar" aria-label="Menu principal">
-      <div class="brand-crop"><img src="assets/devifolio-logo.png" alt="Devifolio"></div>
+      <div class="brand-crop" aria-label="Devifolio"><span class="brand-mark"><img src="assets/devifolio-logo.png" alt=""></span><span class="brand-name">Devifolio</span></div>
       <nav class="side-nav" id="side-nav">
         <a class="nav-item active" href="#inicio" data-route="inicio"><span data-icon="home"></span><span>Início</span></a>
         <a class="nav-item" href="#projetos" data-route="projetos"><span data-icon="folder"></span><span>Projetos</span></a>
@@ -23,7 +24,7 @@
         <a class="nav-item" href="#github" data-route="github"><span data-icon="github"></span><span>GitHub</span></a>
         <a class="nav-item" href="#analise" data-route="analise"><span data-icon="chart"></span><span>Análise</span></a>
         <a class="nav-item" href="#perfil" data-route="perfil"><span data-icon="profile"></span><span>Perfil</span></a>
-        <div class="nav-divider"></div>
+        <a class="nav-item" href="#planos" data-route="planos"><span data-icon="crown"></span><span>Planos</span></a>
         <a class="nav-item" href="#configuracoes" data-route="configuracoes"><span data-icon="settings"></span><span>Configurações</span></a>
         <a class="nav-item" href="cadastro.html#login" data-logout><span data-icon="logout"></span><span>Sair</span></a>
       </nav>
@@ -31,22 +32,23 @@
       <a class="referral-mini" href="#indicacao" data-route="indicacao">
         <span class="circle-icon" data-icon="users"></span><span><b>Indicação</b><small>Ganhe benefícios<br>indicando amigos.</small></span><span data-icon="chevron"></span>
       </a>
-      <button class="user-mini" type="button" data-route-button="perfil">
-        <span class="avatar">FJ</span><span><b>Felype</b><small>@felype</small></span><span data-icon="chevron"></span>
+      <button class="user-mini" id="user-menu-toggle" type="button" aria-expanded="false" aria-controls="user-menu">
+        <span class="avatar">M</span><span><b>Mário</b><small>@mario</small></span><span data-icon="chevron"></span>
       </button>
+      <div class="user-menu" id="user-menu" hidden>
+        <button type="button" data-route-button="perfil"><span data-icon="profile"></span>Perfil</button>
+        <button type="button" data-route-button="configuracoes"><span data-icon="settings"></span>Configurações</button>
+        <a href="cadastro.html#login" data-logout><span data-icon="logout"></span>Sair</a>
+      </div>
     </aside>
 
     <div class="mobile-topbar">
       <button class="icon-button" id="menu-toggle" aria-label="Abrir menu" aria-expanded="false"><span data-icon="menu"></span></button>
-      <div class="brand-crop brand-mobile"><img src="assets/devifolio-logo.png" alt="Devifolio"></div>
-      <span class="avatar avatar-small">FJ</span>
+      <div class="brand-crop brand-mobile" aria-label="Devifolio"><span class="brand-mark"><img src="assets/devifolio-logo.png" alt=""></span><span class="brand-name">Devifolio</span></div>
+      <button class="avatar avatar-small" type="button" data-route-button="perfil">M</button>
     </div>
 
     <main class="main-content">
-      <header class="top-actions">
-        <button class="plan-button" type="button" aria-label="Plano Pro"><span data-icon="crown"></span></button>
-        <button class="avatar" type="button" data-route-button="perfil">FJ</button>
-      </header>
       <div id="page-content" class="page-content" aria-live="polite"></div>
     </main>
   </div>
