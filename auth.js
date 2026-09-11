@@ -1,11 +1,17 @@
-import { supabase } from './src/lib/supabase.js'
-
 const panels = {
   login: document.getElementById('panel-login'),
   cadastro: document.getElementById('panel-cadastro'),
 }
 
 let redirecting = false
+let supabasePromise
+
+function getSupabase() {
+  if (!supabasePromise) {
+    supabasePromise = import('./src/lib/supabase.js').then(module => module.supabase)
+  }
+  return supabasePromise
+}
 
 function showPanel(name, updateHash = false) {
   const selected = name === 'cadastro' ? 'cadastro' : 'login'
@@ -100,6 +106,7 @@ document.getElementById('form-login').addEventListener('submit', async event => 
 
   setLoading(button, true, 'Entrando...')
   try {
+    const supabase = await getSupabase()
     const { data, error } = await supabase.auth.signInWithPassword({
       email: email.value.trim(),
       password: password.value,
@@ -132,6 +139,7 @@ document.getElementById('form-cadastro').addEventListener('submit', async event 
 
   setLoading(button, true, 'Criando conta...')
   try {
+    const supabase = await getSupabase()
     const { data, error } = await supabase.auth.signUp({
       email: email.value.trim(),
       password: password.value,
@@ -155,11 +163,16 @@ document.querySelectorAll('#github-login, #github-cadastro').forEach(button => {
   button.addEventListener('click', async event => {
     event.preventDefault()
     clearMessage()
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'github',
-      options: { redirectTo: `${window.location.origin}/dashboard.html#inicio` },
-    })
-    if (error) reportAuthError('Falha no login com GitHub', error)
+    try {
+      const supabase = await getSupabase()
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'github',
+        options: { redirectTo: `${window.location.origin}/dashboard.html#inicio` },
+      })
+      if (error) reportAuthError('Falha no login com GitHub', error)
+    } catch (error) {
+      reportAuthError('Erro inesperado no login com GitHub', error)
+    }
   })
 })
 
@@ -167,17 +180,27 @@ document.querySelector('.auth-forgot')?.addEventListener('click', async event =>
   event.preventDefault()
   const email = document.getElementById('login-email')
   if (!email.value.trim() || !email.reportValidity()) return
-  const { error } = await supabase.auth.resetPasswordForEmail(email.value.trim(), {
-    redirectTo: `${window.location.origin}/cadastro.html#login`,
+  try {
+    const supabase = await getSupabase()
+    const { error } = await supabase.auth.resetPasswordForEmail(email.value.trim(), {
+      redirectTo: `${window.location.origin}/cadastro.html#login`,
+    })
+    if (error) return reportAuthError('Falha na recuperação de senha', error)
+    showMessage('Enviamos as instruções para o seu e-mail.', 'success')
+  } catch (error) {
+    reportAuthError('Erro inesperado na recuperação de senha', error)
+  }
+})
+
+try {
+  const supabase = await getSupabase()
+  const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
+  if (sessionError) reportAuthError('Falha ao recuperar a sessão', sessionError)
+  if (sessionData.session) goToDashboard()
+
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session) goToDashboard()
   })
-  if (error) return reportAuthError('Falha na recuperação de senha', error)
-  showMessage('Enviamos as instruções para o seu e-mail.', 'success')
-})
-
-const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
-if (sessionError) reportAuthError('Falha ao recuperar a sessão', sessionError)
-if (sessionData.session) goToDashboard()
-
-supabase.auth.onAuthStateChange((event, session) => {
-  if (event === 'SIGNED_IN' && session) goToDashboard()
-})
+} catch (error) {
+  reportAuthError('Falha ao inicializar a autenticação', error)
+}
