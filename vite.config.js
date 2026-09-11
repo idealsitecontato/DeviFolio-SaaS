@@ -15,6 +15,7 @@ export default defineConfig(({ mode }) => {
           landing: resolve(import.meta.dirname, 'index.html'),
           auth: resolve(import.meta.dirname, 'cadastro.html'),
           dashboard: resolve(import.meta.dirname, 'dashboard.html'),
+          portfolio: resolve(import.meta.dirname, 'portfolio.html'),
         },
       },
     },

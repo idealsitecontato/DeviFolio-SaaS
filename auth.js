@@ -5,6 +5,7 @@ const panels = {
 
 let redirecting = false
 let supabasePromise
+const referralUsername = new URLSearchParams(window.location.search).get('ref')?.trim().toLowerCase() || ''
 
 function getSupabase() {
   if (!supabasePromise) {
@@ -165,7 +166,13 @@ document.getElementById('form-cadastro').addEventListener('submit', async event 
     })
 
     if (error) return reportAuthError('Falha no cadastro', error)
-    if (data.session) return goToDashboard()
+    if (data.session) {
+      if (referralUsername) {
+        const { registerReferral } = await import('./src/lib/user-data.js')
+        await registerReferral(referralUsername)
+      }
+      return goToDashboard()
+    }
     showMessage('Conta criada. Confirme seu e-mail para entrar.', 'success')
   } catch (error) {
     reportAuthError('Erro inesperado no cadastro', error)

@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/portfolio/:username", "destination": "/portfolio.html?username=:username" }
+  ]
+}

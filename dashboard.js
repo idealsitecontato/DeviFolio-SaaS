@@ -1,137 +1,533 @@
 import { supabase } from './src/lib/supabase.js'
-import { loadWorkspace, syncWorkspace } from './src/lib/user-data.js'
+import {
+  deleteCurrentAccount,
+  loadWorkspace,
+  removeProject,
+  saveProfile,
+  saveProject,
+  saveSettings,
+  uploadAvatar,
+} from './src/lib/user-data.js'
 import QRCode from 'qrcode'
 
-const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
-const icons={
-home:'<path d="M3 11.5 12 4l9 7.5"/><path d="M5 10.5V21h14V10.5M9 21v-6h6v6"/>',folder:'<path d="M3 6.5A2.5 2.5 0 0 1 5.5 4H10l2 2h6.5A2.5 2.5 0 0 1 21 8.5v9A2.5 2.5 0 0 1 18.5 20h-13A2.5 2.5 0 0 1 3 17.5z"/>',user:'<circle cx="12" cy="7" r="4"/><path d="M4 21v-2a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v2z"/>',profile:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0z"/>',users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',github:'<path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3.3-.36 6.8-1.62 6.8-7.25A5.7 5.7 0 0 0 19.3 3.3 5.3 5.3 0 0 0 19.15 0S18 0 15 1.5a13.4 13.4 0 0 0-7 0C5 0 3.85 0 3.85 0a5.3 5.3 0 0 0-.15 3.3 5.7 5.7 0 0 0-1.5 3.95c0 5.62 3.5 6.88 6.8 7.25A4.8 4.8 0 0 0 8 18v4"/><path d="M8 19c-3 .9-3-1.5-4.2-2"/>',chart:'<path d="M4 20V10M10 20V4M16 20v-7M22 20V7"/><path d="M2 20h22"/>',settings:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56V21h-4v-.08A1.7 1.7 0 0 0 8.95 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15 1.7 1.7 0 0 0 3 14H3v-4h.08A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6 1.7 1.7 0 0 0 10 3.08V3h4v.08A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9 1.7 1.7 0 0 0 20.92 10H21v4h-.08A1.7 1.7 0 0 0 19.4 15z"/>',logout:'<path d="M10 17l5-5-5-5M15 12H3"/><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>',chevron:'<path d="m9 18 6-6-6-6"/>',menu:'<path d="M4 7h16M4 12h16M4 17h16"/>',crown:'<path d="m3 7 4 4 5-7 5 7 4-4-2 12H5z"/>',eye:'<path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',plusUser:'<path d="M15 21v-2a6 6 0 0 0-6-6H5a5 5 0 0 0-5 5v3"/><circle cx="7" cy="6" r="4"/><path d="M19 8v6M16 11h6"/>',link:'<path d="M10 13a5 5 0 0 0 7.07.07l2-2A5 5 0 0 0 12 4l-1.15 1.15"/><path d="M14 11a5 5 0 0 0-7.07-.07l-2 2A5 5 0 0 0 12 20l1.15-1.15"/>',copy:'<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',arrow:'<path d="M5 12h14m-5-5 5 5-5 5"/>',plus:'<path d="M12 5v14M5 12h14"/>',search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/>',edit:'<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4z"/>',trash:'<path d="M3 6h18M8 6V4h8v2M19 6l-1 15H6L5 6M10 11v6M14 11v6"/>',external:'<path d="M14 3h7v7M10 14 21 3"/><path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/>',check:'<path d="m5 12 4 4L19 6"/>',upload:'<path d="M12 16V4m-5 5 5-5 5 5M4 20h16"/>',refresh:'<path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/>',repo:'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M8 7h6"/>',bell:'<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/>',shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',palette:'<path d="M12 3a9 9 0 0 0 0 18h1.5a2.5 2.5 0 0 0 0-5H12a1 1 0 0 1 0-2h2a7 7 0 0 0-2-11z"/><circle cx="7.5" cy="10" r=".7"/><circle cx="10" cy="6.5" r=".7"/><circle cx="15" cy="7" r=".7"/>',lock:'<rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',save:'<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/>',x:'<path d="m6 6 12 12M18 6 6 18"/>',calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/>',trending:'<path d="m3 17 6-6 4 4 8-8"/><path d="M15 7h6v6"/>',mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',more:'<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>'
-};
-function hydrateIcons(scope=document){$$('[data-icon]',scope).forEach(el=>{const p=icons[el.dataset.icon];if(p)el.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;});}
-const defaults={projects:[{id:1,name:'CondoDmi',description:'Plataforma de gestão para condomínios.',tech:'React, Node.js',link:'https://condodmi.dev',github:'felype/condodmi',status:'published'},{id:2,name:'Roofte',description:'Plataforma para organização de tarefas e equipes.',tech:'Next.js, TypeScript',link:'https://roofte.dev',github:'felype/roofte',status:'published'},{id:3,name:'Landing Mais',description:'Landing page para produtos digitais.',tech:'HTML, CSS, JavaScript',link:'https://landingmais.dev',github:'felype/landing-mais',status:'published'},{id:4,name:'TaskFlow',description:'App de produtividade pessoal.',tech:'Vue.js, Firebase',link:'',github:'felype/taskflow',status:'progress'},{id:5,name:'Portfólio API',description:'API para gerenciamento de portfólios.',tech:'Node.js, PostgreSQL',link:'',github:'felype/portfolio-api',status:'draft'},{id:6,name:'CommerceKit',description:'Vitrine headless para lojas digitais.',tech:'Next.js, Stripe',link:'https://commercekit.dev',github:'felype/commercekit',status:'published'},{id:7,name:'DevNotes',description:'Notas técnicas rápidas para equipes.',tech:'React, Supabase',link:'https://devnotes.app',github:'felype/devnotes',status:'published'},{id:8,name:'Finanly',description:'Controle financeiro simples e visual.',tech:'TypeScript, Chart.js',link:'https://finanly.dev',github:'felype/finanly',status:'published'},{id:9,name:'UI Library',description:'Biblioteca de componentes acessíveis.',tech:'React, Storybook',link:'https://ui.felype.dev',github:'felype/ui-library',status:'published'},{id:10,name:'EventHub',description:'Agenda colaborativa para comunidades.',tech:'Vue.js, Node.js',link:'https://eventhub.dev',github:'felype/eventhub',status:'published'}],profile:{name:'Felype José',username:'felype',email:'felype@devifolio.com',role:'Desenvolvedor Full Stack',bio:'Desenvolvedor focado em criar produtos digitais simples, rápidos e úteis.',skills:'JavaScript, TypeScript, React, Node.js, UI Design',linkedin:'linkedin.com/in/felype',github:'github.com/felype',website:'felype.dev'},published:true,githubConnected:false,settings:{email:true,product:true,publicProfile:true,compact:false,theme:'light'},referrals:[{name:'Mariana Costa',date:'12 ago 2026',status:'Ativa'},{name:'Lucas Alves',date:'03 ago 2026',status:'Ativa'},{name:'Rafael Lima',date:'28 jul 2026',status:'Pendente'}]};
-let state=structuredClone(defaults),stateStorageKey='devifolio-state:anonymous';
-const shouldApplyLightDesign=!localStorage.getItem('devifolio-light-design-v1');
-let currentUser=null,remoteWorkspace=false;
-const activeTheme=state.settings?.theme==='light'?'light':'dark';document.documentElement.dataset.theme=activeTheme;
-const statusLabel={published:'Publicado',progress:'Em breve',draft:'Em desenvolvimento'};
-const homeProjects=[
-  {id:1001,name:'Condoomi',description:'Plataforma de comunicação e chamados para condomínios.',tech:'React, Node.js',github:'mario/condoomi',link:'https://devifolio.com/@mario/condoomi',status:'published'},
-  {id:1002,name:'Rootfe',description:'Landing pages para profissionais e empresas.',tech:'Next.js, TypeScript',github:'mario/rootfe',link:'https://devifolio.com/@mario/rootfe',status:'published'},
-  {id:1003,name:'Oddis',description:'Central de inteligência de jogos e análises esportivas.',tech:'React, Analytics',github:'mario/oddis',link:'',status:'progress'},
-  {id:1004,name:'Bookfe',description:'E-books e atividades educativas para crianças.',tech:'Vue.js, Supabase',github:'mario/bookfe',link:'',status:'draft'},
-  {id:1005,name:'CallCript',description:'Rastreador de DCA e alertas de preço para criptomoedas.',tech:'TypeScript, APIs',github:'mario/callcript',link:'',status:'draft'},
-];
-const homePortfolioUrl='https://devifolio.com/@mario';
-const esc=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
-let syncTimer;
-function save(){
-  localStorage.setItem(stateStorageKey,JSON.stringify(state));
-  if(remoteWorkspace&&currentUser){
-    clearTimeout(syncTimer);
-    syncTimer=setTimeout(()=>syncWorkspace(currentUser.id,state).catch(error=>{console.error('[Devifolio] Falha ao sincronizar dados',error);toast('Não foi possível sincronizar seus dados.','error');}),250);
+const $ = (selector, root = document) => root.querySelector(selector)
+const $$ = (selector, root = document) => [...root.querySelectorAll(selector)]
+const esc = value => String(value ?? '').replace(/[&<>'"]/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[character])
+
+const icons = {
+  home: '<path d="M3 11.5 12 4l9 7.5"/><path d="M5 10.5V21h14V10.5M9 21v-6h6v6"/>',
+  folder: '<path d="M3 6.5A2.5 2.5 0 0 1 5.5 4H10l2 2h6.5A2.5 2.5 0 0 1 21 8.5v9A2.5 2.5 0 0 1 18.5 20h-13A2.5 2.5 0 0 1 3 17.5z"/>',
+  user: '<circle cx="12" cy="7" r="4"/><path d="M4 21v-2a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v2z"/>',
+  profile: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0z"/>',
+  users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+  github: '<path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3.3-.36 6.8-1.62 6.8-7.25A5.7 5.7 0 0 0 19.3 3.3 5.3 5.3 0 0 0 19.15 0S18 0 15 1.5a13.4 13.4 0 0 0-7 0C5 0 3.85 0 3.85 0a5.3 5.3 0 0 0-.15 3.3 5.7 5.7 0 0 0-1.5 3.95c0 5.62 3.5 6.88 6.8 7.25A4.8 4.8 0 0 0 8 18v4"/><path d="M8 19c-3 .9-3-1.5-4.2-2"/>',
+  chart: '<path d="M4 20V10M10 20V4M16 20v-7M22 20V7"/><path d="M2 20h22"/>',
+  settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06a1.7 1.7 0 0 0-1.88-.34A1.7 1.7 0 0 0 14 20.92V21h-4v-.08A1.7 1.7 0 0 0 8.95 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15 1.7 1.7 0 0 0 3 14v-4a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.34-1.88l2.83-2.83A1.7 1.7 0 0 0 9 4.6 1.7 1.7 0 0 0 10 3.08V3h4v.08A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.88-.34l2.83 2.83A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 1.52 1H21v4a1.7 1.7 0 0 0-1.6 1z"/>',
+  logout: '<path d="M10 17l5-5-5-5M15 12H3"/><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>',
+  chevron: '<path d="m9 18 6-6-6-6"/>', menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+  crown: '<path d="m3 7 4 4 5-7 5 7 4-4-2 12H5z"/>',
+  eye: '<path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  link: '<path d="M10 13a5 5 0 0 0 7.07.07l2-2A5 5 0 0 0 12 4l-1.15 1.15"/><path d="M14 11a5 5 0 0 0-7.07-.07l-2 2A5 5 0 0 0 12 20l1.15-1.15"/>',
+  copy: '<rect x="9" y="9" width="12" height="12"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+  arrow: '<path d="M5 12h14m-5-5 5 5-5 5"/>', plus: '<path d="M12 5v14M5 12h14"/>',
+  search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/>',
+  edit: '<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4z"/>',
+  trash: '<path d="M3 6h18M8 6V4h8v2M19 6l-1 15H6L5 6M10 11v6M14 11v6"/>',
+  external: '<path d="M14 3h7v7M10 14 21 3"/><path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/>',
+  check: '<path d="m5 12 4 4L19 6"/>', upload: '<path d="M12 16V4m-5 5 5-5 5 5M4 20h16"/>',
+  refresh: '<path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/>', repo: '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M8 7h6"/>',
+  bell: '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/>',
+  shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+  palette: '<path d="M12 3a9 9 0 0 0 0 18h1.5a2.5 2.5 0 0 0 0-5H12a1 1 0 0 1 0-2h2a7 7 0 0 0-2-11z"/>',
+  lock: '<rect x="4" y="10" width="16" height="11"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',
+  save: '<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/>',
+  x: '<path d="m6 6 12 12M18 6 6 18"/>', trending: '<path d="m3 17 6-6 4 4 8-8"/><path d="M15 7h6v6"/>',
+  mail: '<rect x="3" y="5" width="18" height="14"/><path d="m3 7 9 6 9-6"/>',
+}
+
+function hydrateIcons(root = document) {
+  $$('[data-icon]', root).forEach(element => {
+    const paths = icons[element.dataset.icon]
+    if (paths) element.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`
+  })
+}
+
+const blankProfile = { name: '', username: '', email: '', role: '', bio: '', skills: '', linkedin: '', github: '', website: '', avatar: '' }
+const blankSettings = { email: true, product: true, publicProfile: true, compact: false, theme: 'light' }
+const state = { projects: [], profile: { ...blankProfile }, published: false, githubConnected: false, githubUsername: '', repos: [], analytics: [], referrals: [], settings: { ...blankSettings } }
+const statusLabel = { published: 'Publicado', progress: 'Em breve', draft: 'Em desenvolvimento' }
+let currentUser = null
+let providerToken = ''
+let reposLoading = false
+let reposLoaded = false
+
+const realName = () => state.profile.name.trim() || currentUser?.user_metadata?.full_name || currentUser?.user_metadata?.name || currentUser?.email?.split('@')[0] || 'Você'
+const initials = () => realName().split(/\s+/).filter(Boolean).map(part => part[0]).slice(0, 2).join('').toUpperCase()
+const profileComplete = () => Boolean(state.profile.name.trim() && state.profile.username.trim())
+const publicPortfolioUrl = () => {
+  const username = encodeURIComponent(state.profile.username.trim().toLowerCase())
+  return /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? `${location.origin}/portfolio.html?username=${username}` : `${location.origin}/portfolio/${username}`
+}
+const normalizeExternalUrl = value => {
+  const text = String(value || '').trim()
+  if (!text) return ''
+  return /^https?:\/\//i.test(text) ? text : `https://${text}`
+}
+
+function pageHead(title, description, action = '') {
+  return `<header class="page-head"><div><p class="eyebrow">Painel Devifolio</p><h1>${title}</h1><p>${description}</p></div>${action}</header>`
+}
+
+function emptyState(icon, title, description, action = '') {
+  return `<div class="empty-state-content"><span class="circle-icon" data-icon="${icon}"></span><h3>${title}</h3><p>${description}</p>${action}</div>`
+}
+
+function analyticsSummary() {
+  const views = state.analytics.filter(event => event.event_type === 'portfolio_view')
+  const clicks = state.analytics.filter(event => event.event_type === 'link_click' || event.event_type === 'project_view')
+  const visitors = new Set(views.map(event => event.visitor_id).filter(Boolean)).size
+  return { views: views.length, clicks: clicks.length, visitors, rate: views.length ? Math.round((clicks.length / views.length) * 100) : 0 }
+}
+
+async function renderPortfolioQR() {
+  const canvas = $('#portfolio-qr')
+  if (!canvas || !state.published || !profileComplete()) return
+  try {
+    await QRCode.toCanvas(canvas, publicPortfolioUrl(), { width: 150, margin: 1, color: { dark: '#090b0f', light: '#ffffff' }, errorCorrectionLevel: 'M' })
+  } catch (error) {
+    console.error('[Devifolio] Falha ao gerar QR Code', error)
+    toast('Não foi possível gerar o QR Code.', 'error')
   }
 }
-function pageHead(title,description,action=''){return `<header class="page-head"><div><p class="eyebrow">Painel Devifolio</p><h1>${title}</h1><p>${description}</p></div>${action}</header>`;}
-async function renderPortfolioQR(){const canvas=$('#portfolio-qr');if(!canvas)return;try{await QRCode.toCanvas(canvas,homePortfolioUrl,{width:150,margin:1,color:{dark:'#090b0f',light:'#ffffff'},errorCorrectionLevel:'M'});}catch(error){console.error('[Devifolio] Falha ao gerar QR Code',error);toast('Não foi possível gerar o QR Code.','error');}}
-function projectRows(items=state.projects.slice(0,5)){return items.map((p,i)=>`<div class="project-row"><span class="project-number">${String(i+1).padStart(2,'0')}</span><span>${esc(p.name)}</span><span class="project-desc">${esc(p.description)}</span><span class="status ${p.status}">${statusLabel[p.status]}</span><button class="icon-button" data-view-project="${p.id}" aria-label="Visualizar ${esc(p.name)}"><span data-icon="chevron"></span></button></div>`).join('');}
-function homeView(){return `<section class="page-enter home-page"><div class="home-hero"><p class="eyebrow">Olá, Mário</p><h1>Seu portfólio está pronto para ser<br>compartilhado.</h1><p>Conecte seu GitHub para importar seus projetos e deixar tudo organizado<br>em um só lugar.</p><button class="primary-button" data-route-button="github"><span data-icon="github"></span>Conectar GitHub</button></div><div class="dashboard-grid"><article class="card metric-card"><div class="metric-head"><span data-icon="eye"></span>Visualizações do portfólio</div><strong>347</strong><small>nos últimos 30 dias</small></article><article class="card metric-card"><div class="metric-head"><span data-icon="folder"></span>Projetos publicados</div><strong>8</strong><small>no seu portfólio</small></article><article class="card plan-card"><div class="metric-head"><span data-icon="crown"></span>Planos</div><button class="plan-link" type="button" data-route-button="planos">Ver planos <span data-icon="arrow"></span></button></article><article class="card qr-card"><h3>QRCode do seu<br>portfólio</h3><div class="qr-wrap"><canvas id="portfolio-qr" width="150" height="150" aria-label="QR Code dinâmico para devifolio.com/@mario"></canvas></div></article><article class="card portfolio-card"><div class="portfolio-card-head"><span data-icon="link"></span><div><h3>Seu portfólio</h3><p>Um único link para mostrar todo o seu trabalho.</p></div></div><div class="url-field"><span>devifolio.com/@mario</span><button class="icon-button" data-copy="${homePortfolioUrl}" aria-label="Copiar URL"><span data-icon="copy"></span></button></div></article></div><section class="card projects-card"><div class="section-card-head"><h2>Últimos projetos</h2><button class="link-button" data-route-button="projetos">Ver todos <span data-icon="arrow"></span></button></div>${projectRows(homeProjects)}</section></section>`;}
-function projectsView(){return `<section class="page-enter">${pageHead('Projetos','Organize e publique os trabalhos que contam a sua história.','<button class="primary-button" data-new-project><span data-icon="plus"></span>Novo projeto</button>')}<div class="toolbar"><label class="search-field"><span data-icon="search"></span><input id="project-search" type="search" placeholder="Buscar projetos" aria-label="Buscar projetos"></label><select id="status-filter" aria-label="Filtrar por status"><option value="all">Todos os status</option><option value="published">Publicado</option><option value="progress">Em breve</option><option value="draft">Em desenvolvimento</option></select><select id="project-sort" aria-label="Ordenar projetos"><option value="recent">Mais recentes</option><option value="name">Nome: A–Z</option><option value="status">Status</option></select></div><div class="project-grid" id="project-grid">${projectCards(state.projects)}</div></section>`;}
-function projectCards(items){if(!items.length)return `<div class="card empty-state"><span class="circle-icon" data-icon="folder"></span><h3>Nenhum projeto encontrado</h3><p>Ajuste a busca ou crie um novo projeto.</p><button class="primary-button" data-new-project>Novo projeto</button></div>`;return items.map((p,i)=>`<article class="card project-card" style="--project-hue:${205+i*16}"><div class="project-cover">${p.image?`<img class="project-cover-image" src="${esc(p.image)}" alt="Capa do projeto ${esc(p.name)}">`:`<span>${esc(p.name.slice(0,2).toUpperCase())}</span>`}<span class="status ${p.status}">${statusLabel[p.status]}</span></div><div class="project-card-body"><div class="project-card-title"><h2>${esc(p.name)}</h2><button class="icon-button" aria-label="Mais opções"><span data-icon="more"></span></button></div><p>${esc(p.description)}</p><div class="tag-row">${p.tech.split(',').filter(Boolean).map(t=>`<span>${esc(t.trim())}</span>`).join('')}</div><div class="project-actions"><button class="secondary-button" data-view-project="${p.id}"><span data-icon="eye"></span>Visualizar</button><button class="icon-button" data-edit-project="${p.id}" aria-label="Editar"><span data-icon="edit"></span></button><button class="icon-button danger-ghost" data-delete-project="${p.id}" aria-label="Excluir"><span data-icon="trash"></span></button></div></div></article>`).join('');}
-function portfolioView(){const p=state.profile;return `<section class="page-enter">${pageHead('Meu portfólio','Edite sua página pública e escolha o que será exibido.',`<button class="publish-toggle ${state.published?'on':''}" data-toggle-publish><i></i><span>${state.published?'Publicado':'Despublicado'}</span></button>`)}<div class="editor-layout"><form class="card form-card" id="portfolio-form"><div class="card-title"><span class="circle-icon" data-icon="edit"></span><div><h2>Conteúdo do portfólio</h2><p>Suas alterações aparecem na prévia.</p></div></div><div class="form-grid"><label class="field"><span>Nome</span><input name="name" required value="${esc(p.name)}"></label><label class="field"><span>Título profissional</span><input name="role" required value="${esc(p.role)}"></label><label class="field full"><span>URL da foto</span><input type="url" name="avatar" value="${esc(p.avatar||'')}" placeholder="https://"></label><label class="field full"><span>Sobre você</span><textarea name="bio" required maxlength="240">${esc(p.bio)}</textarea><small>Até 240 caracteres</small></label><label class="field full"><span>Habilidades</span><input name="skills" required value="${esc(p.skills)}"><small>Separe as habilidades por vírgulas</small></label><label class="field"><span>GitHub</span><input name="github" value="${esc(p.github)}"></label><label class="field"><span>LinkedIn</span><input name="linkedin" value="${esc(p.linkedin)}"></label><label class="field full"><span>Site pessoal</span><input name="website" value="${esc(p.website)}"></label><div class="field full featured-projects"><span>Projetos publicados</span>${state.projects.slice(0,5).map(project=>`<label><input type="checkbox" name="featured" value="${project.id}" ${project.status==='published'?'checked':''}>${esc(project.name)}</label>`).join('')}</div></div><div class="form-footer"><button class="primary-button" type="submit"><span data-icon="save"></span>Salvar alterações</button></div></form><aside class="card preview-card"><div class="preview-toolbar"><span>Prévia pública</span><button class="icon-button" type="button" data-open-preview aria-label="Abrir prévia"><span data-icon="external"></span></button></div><div class="public-preview"><div class="preview-avatar">M</div><p class="preview-kicker">OLÁ, EU SOU</p><h2 data-preview="name">${esc(p.name)}</h2><h3 data-preview="role">${esc(p.role)}</h3><p data-preview="bio">${esc(p.bio)}</p><div class="preview-skills" data-preview="skills">${p.skills.split(',').map(s=>`<span>${esc(s.trim())}</span>`).join('')}</div><div class="preview-projects"><i></i><i></i><i></i></div></div><div class="url-field"><span>devifolio.com/@${esc(p.username)}</span><button class="icon-button" data-copy="https://devifolio.com/@${esc(p.username)}"><span data-icon="copy"></span></button></div></aside></div></section>`;}
-const repos=[{name:'finance-dashboard',desc:'Dashboard financeiro responsivo',lang:'TypeScript'},{name:'api-pedidos',desc:'API REST para gestão de pedidos',lang:'JavaScript'},{name:'design-system',desc:'Componentes e tokens reutilizáveis',lang:'CSS'},{name:'mobile-habits',desc:'Aplicativo de acompanhamento de hábitos',lang:'Dart'}];
-function githubView(){if(!state.githubConnected)return `<section class="page-enter">${pageHead('GitHub','Conecte sua conta para importar repositórios como projetos.')}<div class="card connect-card"><span class="connect-icon" data-icon="github"></span><h2>Traga seus projetos do GitHub</h2><p>Importe nome, descrição, tecnologias e links sem preencher tudo manualmente.</p><button class="primary-button" data-connect-github><span data-icon="github"></span>Conectar com GitHub</button><small>Você poderá desconectar a conta quando quiser.</small></div><div class="state-showcase"><article class="card mini-state"><span class="spinner"></span><div><b>Carregando</b><small>Buscando seus repositórios</small></div></article><article class="card mini-state success"><span data-icon="check"></span><div><b>Importação concluída</b><small>Projeto adicionado ao portfólio</small></div></article><article class="card mini-state error"><b>!</b><div><b>Não foi possível importar</b><small>Tente novamente em alguns instantes</small></div></article></div></section>`;const githubName=esc(state.githubUsername||'mario');return `<section class="page-enter">${pageHead('GitHub','Selecione os repositórios que deseja transformar em projetos.','<button class="secondary-button" data-disconnect-github>Desconectar</button>')}<div class="card connected-account"><span class="avatar">GH</span><div><small>Conta conectada</small><h2>@${githubName}</h2><p>Última sincronização: agora</p></div><button class="secondary-button" data-sync-repos><span data-icon="refresh"></span>Sincronizar</button></div><div class="card repo-panel"><div class="section-card-head"><div><h2>Seus repositórios</h2><p>4 repositórios encontrados</p></div><button class="primary-button" data-import-selected><span data-icon="upload"></span>Importar selecionados</button></div><div class="repo-list">${repos.map((r,i)=>`<label class="repo-row"><input type="checkbox" value="${i}"><span class="repo-icon" data-icon="repo"></span><span><b>${r.name}</b><small>${r.desc}</small></span><span class="language-dot"></span><small>${r.lang}</small><span data-icon="external"></span></label>`).join('')}</div></div></section>`;}
-function analyticsView(){return `<section class="page-enter">${pageHead('Análise','Entenda como as pessoas encontram e exploram seu portfólio.','<select id="analytics-period"><option>Últimos 7 dias</option><option selected>Últimos 30 dias</option><option>Últimos 90 dias</option></select>')}<div class="analytics-metrics"><article class="card analytic-stat"><span data-icon="eye"></span><small>Visualizações</small><strong>1.847</strong><em>+18,4%</em></article><article class="card analytic-stat"><span data-icon="link"></span><small>Cliques em links</small><strong>463</strong><em>+12,1%</em></article><article class="card analytic-stat"><span data-icon="users"></span><small>Visitantes únicos</small><strong>1.209</strong><em>+8,7%</em></article><article class="card analytic-stat"><span data-icon="trending"></span><small>Taxa de clique</small><strong>25,1%</strong><em>+3,2%</em></article></div><div class="analytics-layout"><article class="card chart-card"><div class="section-card-head"><div><h2>Visualizações do portfólio</h2><p>Desempenho diário</p></div><span class="chart-total">1.847 total</span></div><div class="line-chart" aria-label="Gráfico de visualizações"><div class="y-labels"><span>120</span><span>90</span><span>60</span><span>30</span><span>0</span></div><svg viewBox="0 0 700 230" preserveAspectRatio="none"><defs><linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#0a83ff" stop-opacity=".35"/><stop offset="1" stop-color="#0a83ff" stop-opacity="0"/></linearGradient></defs><path class="area" d="M0 190 L70 174 140 181 210 135 280 148 350 96 420 116 490 68 560 91 630 44 700 56 V230 H0Z"/><path class="line" d="M0 190 L70 174 140 181 210 135 280 148 350 96 420 116 490 68 560 91 630 44 700 56"/></svg><div class="x-labels"><span>12 ago</span><span>17 ago</span><span>22 ago</span><span>27 ago</span><span>1 set</span><span>6 set</span><span>10 set</span></div></div></article><article class="card ranking-card"><div class="section-card-head"><div><h2>Projetos mais acessados</h2><p>Cliques no período</p></div></div>${state.projects.slice(0,4).map((p,i)=>`<div class="rank-row"><span>${i+1}</span><div><b>${esc(p.name)}</b><small>${[184,147,102,76][i]} acessos</small></div><div class="rank-bar"><i style="width:${[100,80,55,41][i]}%"></i></div></div>`).join('')}</article></div><article class="card click-card"><div class="section-card-head"><div><h2>Origem do tráfego e cliques</h2><p>Onde os visitantes mais interagem</p></div></div><div class="channel-bars"><div><span>GitHub</span><i><b style="width:78%"></b></i><strong>218</strong></div><div><span>LinkedIn</span><i><b style="width:57%"></b></i><strong>159</strong></div><div><span>Projetos</span><i><b style="width:31%"></b></i><strong>86</strong></div></div></article></section>`;}
-function profileView(){const p=state.profile;return `<section class="page-enter">${pageHead('Perfil','Mantenha seus dados pessoais e acesso atualizados.')}<div class="settings-layout"><form class="card form-card" id="profile-form"><div class="card-title"><span class="circle-icon" data-icon="profile"></span><div><h2>Dados do usuário</h2><p>Informações usadas dentro do Devifolio.</p></div></div><div class="avatar-editor"><span class="avatar avatar-large">FJ</span><div><button class="secondary-button" type="button" data-upload-avatar><span data-icon="upload"></span>Alterar foto</button><small>JPG ou PNG, até 3 MB</small></div></div><div class="form-grid"><label class="field"><span>Nome completo</span><input name="name" required value="${esc(p.name)}"></label><label class="field"><span>Username</span><div class="input-prefix"><i>@</i><input name="username" required pattern="[a-zA-Z0-9._-]+" value="${esc(p.username)}"></div></label><label class="field full"><span>E-mail</span><input type="email" name="email" required value="${esc(p.email)}"></label></div><div class="form-footer"><button class="primary-button" type="submit"><span data-icon="save"></span>Salvar perfil</button></div></form><form class="card form-card" id="password-form"><div class="card-title"><span class="circle-icon" data-icon="lock"></span><div><h2>Alterar senha</h2><p>Use pelo menos 8 caracteres.</p></div></div><div class="form-grid one"><label class="field"><span>Senha atual</span><input type="password" id="current-password" required minlength="8"></label><label class="field"><span>Nova senha</span><input type="password" required minlength="8" id="new-password"></label><label class="field"><span>Confirmar nova senha</span><input type="password" required minlength="8" id="confirm-password"></label></div><div class="form-footer"><button class="secondary-button" type="submit">Atualizar senha</button></div></form></div></section>`;}
-function switchRow(icon,title,desc,key,on){return `<div class="setting-row"><span class="circle-icon" data-icon="${icon}"></span><div><b>${title}</b><small>${desc}</small></div><button class="switch ${on?'on':''}" type="button" data-setting="${key}" aria-pressed="${on}"><i></i></button></div>`;}
-function settingsView(){return `<section class="page-enter">${pageHead('Configurações','Personalize a experiência e controle sua conta.')}<div class="settings-stack"><article class="card settings-card"><div class="settings-card-head"><span data-icon="palette"></span><div><h2>Aparência</h2><p>Escolha como o painel deve aparecer.</p></div></div><div class="setting-row"><div><b>Tema do painel</b><small>A estrutura permanece a mesma nos dois modos.</small></div><select data-theme-select><option value="dark">Modo escuro</option><option value="light">Modo claro</option></select></div>${switchRow('menu','Modo compacto','Reduz o espaço entre os elementos.','compact',state.settings.compact)}</article><article class="card settings-card"><div class="settings-card-head"><span data-icon="bell"></span><div><h2>Notificações</h2><p>Escolha quais novidades deseja receber.</p></div></div>${switchRow('mail','Resumo por e-mail','Receba um relatório semanal de desempenho.','email',state.settings.email)}${switchRow('bell','Novidades do produto','Avisos sobre melhorias e novos recursos.','product',state.settings.product)}</article><article class="card settings-card"><div class="settings-card-head"><span data-icon="shield"></span><div><h2>Privacidade e integrações</h2><p>Controle a visibilidade e os serviços conectados.</p></div></div>${switchRow('eye','Perfil público','Permitir que seu portfólio apareça nas buscas.','publicProfile',state.settings.publicProfile)}<div class="setting-row"><span class="circle-icon" data-icon="github"></span><div><b>GitHub</b><small>${state.githubConnected?'Conectado como @felype':'Nenhuma conta conectada'}</small></div><button class="secondary-button" data-route-button="github">Gerenciar</button></div></article><article class="card settings-card danger-zone"><div class="settings-card-head"><span data-icon="trash"></span><div><h2>Conta</h2><p>Exporte seus dados ou encerre sua conta.</p></div></div><div class="setting-row"><div><b>Exportar dados</b><small>Baixe uma cópia das informações da conta.</small></div><button class="secondary-button" data-export>Exportar</button></div><div class="setting-row"><div><b>Excluir conta</b><small>Essa ação não poderá ser desfeita.</small></div><button class="danger-button" data-delete-account>Excluir conta</button></div></article></div></section>`;}
-function referralView(){return `<section class="page-enter">${pageHead('Indicação','Convide outros devs e desbloqueie benefícios no Devifolio.')}<div class="referral-hero card"><div><span class="badge">PROGRAMA DE INDICAÇÃO</span><h2>Compartilhe o Devifolio.<br>Os dois ganham.</h2><p>Quando um amigo publicar o primeiro portfólio, vocês recebem 30 dias de recursos Pro.</p><div class="url-field referral-link"><span>devifolio.com/convite/${esc(state.profile.username)}</span><button class="icon-button" data-copy="https://devifolio.com/convite/${esc(state.profile.username)}"><span data-icon="copy"></span></button></div><button class="primary-button" data-share-referral><span data-icon="users"></span>Compartilhar convite</button></div><div class="benefit-orbit"><span data-icon="users"></span><strong>+30</strong><small>dias de Pro</small></div></div><div class="referral-stats"><article class="card"><small>Convites enviados</small><strong>12</strong></article><article class="card"><small>Amigos ativos</small><strong>3</strong></article><article class="card"><small>Dias conquistados</small><strong>90</strong></article></div><article class="card history-card"><div class="section-card-head"><div><h2>Histórico de indicações</h2><p>Acompanhe o status dos seus convites.</p></div></div>${state.referrals.map(r=>`<div class="history-row"><span class="avatar avatar-small">${r.name.split(' ').map(n=>n[0]).slice(0,2).join('')}</span><div><b>${r.name}</b><small>Entrou em ${r.date}</small></div><span class="status ${r.status==='Ativa'?'published':'progress'}">${r.status}</span></div>`).join('')}</article></section>`;}
-function plansView(){const plans=[{name:'Free',price:'R$ 0',description:'Para começar seu portfólio.',features:['Até 5 projetos','Link público','QR Code dinâmico'],current:true},{name:'Pro',price:'R$ 29/mês',description:'Para apresentar seu melhor trabalho.',features:['Projetos ilimitados','Análises completas','Domínio personalizado','Sincronização automática']},{name:'Studio',price:'R$ 59/mês',description:'Para freelancers e pequenos times.',features:['Tudo do Pro','Até 5 perfis','Suporte prioritário','Exportação avançada']}];return `<section class="page-enter">${pageHead('Planos','Escolha os recursos que acompanham o momento da sua carreira.')}<div class="plans-grid">${plans.map(plan=>`<article class="card pricing-card ${plan.current?'current':''}">${plan.current?'<span class="plan-current">PLANO ATUAL</span>':''}<h2>${plan.name}</h2><strong>${plan.price}</strong><p>${plan.description}</p><ul>${plan.features.map(feature=>`<li><span data-icon="check"></span>${feature}</li>`).join('')}</ul><button class="${plan.current?'secondary-button':'primary-button'}" type="button" data-plan="${plan.name}">${plan.current?'Plano atual':'Escolher '+plan.name}</button></article>`).join('')}</div></section>`;}
-function settingsSessionsCard(){return `<article class="card settings-card"><div class="settings-card-head"><span data-icon="shield"></span><div><h2>Idioma e sessões</h2><p>Defina o idioma e gerencie os dispositivos conectados.</p></div></div><div class="setting-row"><div><b>Idioma da interface</b><small>Idioma usado nos menus e mensagens.</small></div><select data-language-select><option value="pt-BR">Português (Brasil)</option><option value="en">English</option></select></div><div class="setting-row"><span class="circle-icon" data-icon="profile"></span><div><b>Este navegador</b><small>Windows · sessão atual</small></div><span class="session-current">ATUAL</span></div><div class="setting-row"><span class="circle-icon" data-icon="profile"></span><div><b>Outro dispositivo</b><small>Último acesso há 2 dias</small></div><button class="secondary-button" type="button" data-revoke-session>Encerrar</button></div></article>`;}
-const views={inicio:homeView,projetos:projectsView,portfolio:portfolioView,github:githubView,analise:analyticsView,perfil:profileView,planos:plansView,configuracoes:settingsView,indicacao:referralView};
-function render(){const route=views[location.hash.slice(1)]?location.hash.slice(1):'inicio';$('#page-content').innerHTML=views[route]();if(route==='configuracoes')$('#page-content .settings-stack')?.insertAdjacentHTML('beforeend',settingsSessionsCard());document.title=`${{inicio:'Início',projetos:'Projetos',portfolio:'Meu portfólio',github:'GitHub',analise:'Análise',perfil:'Perfil',planos:'Planos',configuracoes:'Configurações',indicacao:'Indicação'}[route]} — Devifolio`;$$('.nav-item').forEach(a=>a.classList.toggle('active',a.dataset.route===route));hydrateIcons($('#page-content'));bindActions();if(route==='inicio')renderPortfolioQR();closeMenu();closeUserMenu();window.scrollTo({top:0,behavior:'instant'});}
-function bindActions(){
-  $$('[data-route-button]').forEach(b=>b.onclick=()=>location.hash=b.dataset.routeButton);$$('[data-copy]').forEach(b=>b.onclick=()=>copyText(b.dataset.copy));
-  $$('[data-view-project]').forEach(b=>b.onclick=()=>showProject(+b.dataset.viewProject));$$('[data-edit-project]').forEach(b=>b.onclick=()=>projectModal(+b.dataset.editProject));$$('[data-delete-project]').forEach(b=>b.onclick=()=>confirmDelete(+b.dataset.deleteProject));$$('[data-new-project]').forEach(b=>b.onclick=()=>projectModal());
-  const search=$('#project-search'),filter=$('#status-filter'),sort=$('#project-sort');if(search&&filter&&sort){const update=()=>{const q=search.value.toLowerCase(),s=filter.value;let items=state.projects.filter(p=>(p.name+' '+p.description+' '+p.tech).toLowerCase().includes(q)&&(s==='all'||p.status===s));if(sort.value==='name')items.sort((a,b)=>a.name.localeCompare(b.name,'pt-BR'));if(sort.value==='status')items.sort((a,b)=>statusLabel[a.status].localeCompare(statusLabel[b.status],'pt-BR'));$('#project-grid').innerHTML=projectCards(items);hydrateIcons($('#project-grid'));bindProjectGrid();};search.oninput=update;filter.onchange=update;sort.onchange=update;}
-  const pf=$('#portfolio-form');if(pf){pf.oninput=previewPortfolio;pf.onsubmit=e=>{e.preventDefault();const d=Object.fromEntries(new FormData(pf));state.profile={...state.profile,...d};save();toast('Portfólio atualizado com sucesso.');render();};}
-  $('[data-toggle-publish]')?.addEventListener('click',()=>{state.published=!state.published;save();toast(state.published?'Portfólio publicado.':'Portfólio despublicado.');render();});
-  $('[data-connect-github]')?.addEventListener('click',connectGithub);$('[data-disconnect-github]')?.addEventListener('click',disconnectGithub);$('[data-sync-repos]')?.addEventListener('click',e=>loadingButton(e.currentTarget,'Sincronizando...',()=>toast('Repositórios sincronizados.')));$('[data-import-selected]')?.addEventListener('click',importSelected);
-  $('#profile-form')?.addEventListener('submit',async e=>{e.preventDefault();const changes=Object.fromEntries(new FormData(e.currentTarget));const authChanges={data:{full_name:changes.name}};if(changes.email!==currentUser.email)authChanges.email=changes.email;const {error}=await supabase.auth.updateUser(authChanges);if(error){toast('Não foi possível atualizar os dados de acesso.','error');return;}state.profile={...state.profile,...changes};save();toast(changes.email!==currentUser.email?'Perfil salvo. Confirme o novo e-mail.':'Perfil atualizado.');render();});$('#password-form')?.addEventListener('submit',async e=>{e.preventDefault();if($('#new-password').value!==$('#confirm-password').value){toast('As novas senhas não coincidem.','error');return;}const {error:reauthError}=await supabase.auth.signInWithPassword({email:currentUser.email,password:$('#current-password').value});if(reauthError){toast('A senha atual está incorreta.','error');return;}const {error}=await supabase.auth.updateUser({password:$('#new-password').value});if(error){toast('Não foi possível alterar a senha.','error');return;}e.currentTarget.reset();toast('Senha alterada com segurança.');});$('[data-upload-avatar]')?.addEventListener('click',()=>toast('Selecione uma foto no seu dispositivo.'));
-  $$('[data-setting]').forEach(b=>b.onclick=()=>{const k=b.dataset.setting;state.settings[k]=!state.settings[k];save();b.classList.toggle('on',state.settings[k]);b.setAttribute('aria-pressed',String(state.settings[k]));toast('Preferência salva.');});const themeSelect=$('[data-theme-select]');if(themeSelect){themeSelect.value=state.settings.theme==='light'?'light':'dark';themeSelect.addEventListener('change',e=>{state.settings.theme=e.target.value;document.documentElement.dataset.theme=e.target.value;save();toast(`Modo ${e.target.value==='light'?'claro':'escuro'} ativado.`);});}$('[data-export]')?.addEventListener('click',()=>downloadData());$('[data-delete-account]')?.addEventListener('click',()=>confirmAccountDelete());$('[data-share-referral]')?.addEventListener('click',shareReferral);$('#analytics-period')?.addEventListener('change',()=>toast('Período de análise atualizado.'));
-  $$('[data-plan]').forEach(button=>button.onclick=()=>toast(`Plano ${button.dataset.plan} selecionado. A confirmação será exibida antes da cobrança.`));
-  const languageSelect=$('[data-language-select]');if(languageSelect){languageSelect.value=state.settings.language||'pt-BR';languageSelect.addEventListener('change',event=>{state.settings.language=event.target.value;save();toast('Idioma salvo.');});}
-  $('[data-revoke-session]')?.addEventListener('click',event=>{event.currentTarget.closest('.setting-row').remove();toast('Sessão encerrada com sucesso.');});
-  $('[data-open-preview]')?.addEventListener('click',()=>modal(`<div class="project-detail"><p class="eyebrow">PRÉVIA PÚBLICA</p><h2>devifolio.com/@${esc(state.profile.username)}</h2><p>${esc(state.profile.bio)}</p><div class="tag-row">${state.profile.skills.split(',').map(skill=>`<span>${esc(skill.trim())}</span>`).join('')}</div><div class="modal-actions"><button class="primary-button" data-close-modal>Fechar prévia</button></div></div>`));
-}
-function bindProjectGrid(){$$('[data-view-project]').forEach(b=>b.onclick=()=>showProject(+b.dataset.viewProject));$$('[data-edit-project]').forEach(b=>b.onclick=()=>projectModal(+b.dataset.editProject));$$('[data-delete-project]').forEach(b=>b.onclick=()=>confirmDelete(+b.dataset.deleteProject));$$('[data-new-project]').forEach(b=>b.onclick=()=>projectModal());}
-function previewPortfolio(e){const t=e.target;if(!t.name)return;const out=$(`[data-preview="${t.name}"]`);if(!out)return;if(t.name==='skills')out.innerHTML=t.value.split(',').filter(Boolean).map(s=>`<span>${esc(s.trim())}</span>`).join('');else out.textContent=t.value;}
-function showProject(id){const editable=state.projects.some(x=>x.id===id),p=state.projects.find(x=>x.id===id)||homeProjects.find(x=>x.id===id);if(!p)return;modal(`<div class="project-detail"><div class="project-cover detail-cover"><span>${esc(p.name.slice(0,2).toUpperCase())}</span></div><span class="status ${p.status}">${statusLabel[p.status]}</span><h2>${esc(p.name)}</h2><p>${esc(p.description)}</p><div class="tag-row">${p.tech.split(',').map(t=>`<span>${esc(t.trim())}</span>`).join('')}</div><dl><div><dt>GitHub</dt><dd>${esc(p.github||'Não informado')}</dd></div><div><dt>Projeto publicado</dt><dd>${esc(p.link||'Não informado')}</dd></div></dl><div class="modal-actions"><button class="secondary-button" data-close-modal>Fechar</button>${editable?`<button class="primary-button" data-edit-project="${p.id}"><span data-icon="edit"></span>Editar projeto</button>`:''}</div></div>`);}
-function projectModal(id){const p=state.projects.find(x=>x.id===id)||{name:'',description:'',tech:'',link:'',github:'',image:'',status:'draft'};modal(`<form id="project-form"><div class="modal-head"><div><p class="eyebrow">PROJETOS</p><h2>${id?'Editar projeto':'Novo projeto'}</h2></div><button class="icon-button" type="button" data-close-modal><span data-icon="x"></span></button></div><div class="form-grid"><label class="field full"><span>Nome do projeto</span><input name="name" required maxlength="60" value="${esc(p.name)}"></label><label class="field full"><span>Descrição</span><textarea name="description" required maxlength="180">${esc(p.description)}</textarea></label><label class="field full"><span>Imagem de capa</span><input type="url" name="image" value="${esc(p.image||'')}" placeholder="https://"></label><label class="field full"><span>Tecnologias</span><input name="tech" required value="${esc(p.tech)}" placeholder="React, Node.js, PostgreSQL"></label><label class="field"><span>Link publicado</span><input type="url" name="link" value="${esc(p.link)}" placeholder="https://"></label><label class="field"><span>Repositório GitHub</span><input name="github" value="${esc(p.github)}" placeholder="usuario/repositorio"></label><label class="field full"><span>Status</span><select name="status"><option value="published" ${p.status==='published'?'selected':''}>Publicado</option><option value="progress" ${p.status==='progress'?'selected':''}>Em breve</option><option value="draft" ${p.status==='draft'?'selected':''}>Em desenvolvimento</option></select></label></div><div class="modal-actions"><button class="secondary-button" type="button" data-close-modal>Cancelar</button><button class="primary-button" type="submit">${id?'Salvar alterações':'Criar projeto'}</button></div></form>`);$('#project-form').onsubmit=e=>{e.preventDefault();const data=Object.fromEntries(new FormData(e.currentTarget));if(id)Object.assign(state.projects.find(x=>x.id===id),data);else state.projects.unshift({id:Date.now(),...data});save();closeModal();toast(id?'Projeto atualizado.':'Projeto criado com sucesso.');render();};}
-function confirmDelete(id){const p=state.projects.find(x=>x.id===id);modal(`<div class="confirm-dialog"><span class="circle-icon danger-icon" data-icon="trash"></span><h2>Excluir ${esc(p.name)}?</h2><p>O projeto será removido do seu painel e do portfólio público.</p><div class="modal-actions"><button class="secondary-button" data-close-modal>Cancelar</button><button class="danger-button" id="confirm-delete">Excluir projeto</button></div></div>`);$('#confirm-delete').onclick=()=>{state.projects=state.projects.filter(x=>x.id!==id);save();closeModal();toast('Projeto excluído.');render();};}
-function modal(content){$('#modal-root').innerHTML=`<div class="modal-backdrop"><div class="modal" role="dialog" aria-modal="true">${content}</div></div>`;hydrateIcons($('#modal-root'));$$('[data-close-modal]').forEach(b=>b.onclick=closeModal);$$('[data-edit-project]',$('#modal-root')).forEach(b=>b.onclick=()=>projectModal(+b.dataset.editProject));$('.modal-backdrop').onclick=e=>{if(e.target===e.currentTarget)closeModal();};document.addEventListener('keydown',escapeModal,{once:true});}
-function escapeModal(e){if(e.key==='Escape')closeModal();}function closeModal(){$('#modal-root').innerHTML='';}
-async function connectGithub(e){const button=e.currentTarget,old=button.innerHTML;button.disabled=true;button.innerHTML='<span class="spinner"></span>Conectando...';const {error}=await supabase.auth.linkIdentity({provider:'github',options:{redirectTo:`${location.origin}${location.pathname}#github`,scopes:'read:user repo'}});if(error){console.error('[Devifolio] Erro no OAuth do GitHub',error);button.disabled=false;button.innerHTML=old;hydrateIcons(button);toast(`Não foi possível conectar o GitHub: ${error.message}`,'error');}}
-async function disconnectGithub(){const {data,error:getUserError}=await supabase.auth.getUser();if(getUserError){toast('Não foi possível verificar a conta do GitHub.','error');return;}const identity=data.user?.identities?.find(item=>item.provider==='github');if(identity){const {error}=await supabase.auth.unlinkIdentity(identity);if(error){console.error('[Devifolio] Erro ao desconectar GitHub',error);toast(`Não foi possível desconectar: ${error.message}`,'error');return;}}state.githubConnected=false;delete state.githubUsername;save();toast('Conta do GitHub desconectada.');render();}
-function loadingButton(btn,label,done,delay=650){const old=btn.innerHTML;btn.disabled=true;btn.innerHTML=`<span class="spinner"></span>${label}`;setTimeout(()=>{btn.disabled=false;btn.innerHTML=old;done();},delay);}
-function importSelected(e){const checked=$$('.repo-row input:checked');if(!checked.length){toast('Selecione ao menos um repositório.','error');return;}loadingButton(e.currentTarget,'Importando...',()=>{checked.forEach(c=>{const r=repos[+c.value];if(!state.projects.some(p=>p.name===r.name))state.projects.unshift({id:Date.now()+Number(c.value),name:r.name,description:r.desc,tech:r.lang,link:'',github:`${state.githubUsername||'github'}/${r.name}`,status:'draft'});});save();toast(`${checked.length} ${checked.length>1?'projetos importados':'projeto importado'} com sucesso.`);render();},900);}
-async function copyText(text){try{await navigator.clipboard.writeText(text);toast('Link copiado para a área de transferência.');}catch{toast('Não foi possível copiar automaticamente.','error');}}
-function shareReferral(){const url=`https://devifolio.com/convite/${state.profile.username}`;if(navigator.share)navigator.share({title:'Conheça o Devifolio',text:'Crie seu portfólio profissional com o Devifolio.',url}).catch(()=>{});else copyText(url);}
-function downloadData(){const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='devifolio-dados.json';a.click();URL.revokeObjectURL(a.href);toast('Seus dados foram exportados.');}
-function confirmAccountDelete(){modal(`<div class="confirm-dialog"><span class="circle-icon danger-icon" data-icon="trash"></span><h2>Excluir sua conta?</h2><p>Projetos, métricas e configurações serão removidos permanentemente.</p><div class="modal-actions"><button class="secondary-button" data-close-modal>Manter conta</button><button class="danger-button" data-close-modal>Entendi, cancelar por enquanto</button></div></div>`);}
-function toast(message,type='success'){const el=document.createElement('div');el.className=`toast ${type}`;el.innerHTML=`<span data-icon="${type==='error'?'x':'check'}"></span>${esc(message)}`;$('#toast-stack').append(el);hydrateIcons(el);setTimeout(()=>el.remove(),3200);}
-function closeUserMenu(){$('#user-menu')?.setAttribute('hidden','');$('#user-menu-toggle')?.setAttribute('aria-expanded','false');}
-function closeMenu(){$('#sidebar').classList.remove('open');$('#sidebar-overlay').classList.remove('show');$('#menu-toggle').setAttribute('aria-expanded','false');}
-$('#menu-toggle').onclick=()=>{const open=$('#sidebar').classList.toggle('open');$('#sidebar-overlay').classList.toggle('show',open);$('#menu-toggle').setAttribute('aria-expanded',String(open));};
-$('#sidebar-overlay').onclick=closeMenu;
-$('#user-menu-toggle').onclick=event=>{event.stopPropagation();const menu=$('#user-menu'),open=menu.hasAttribute('hidden');menu.toggleAttribute('hidden',!open);$('#user-menu-toggle').setAttribute('aria-expanded',String(open));};
-document.addEventListener('click',event=>{if(!event.target.closest('#user-menu')&&!event.target.closest('#user-menu-toggle'))closeUserMenu();});
-window.addEventListener('hashchange',render);
 
-async function bootstrap(){
-  const {data,error}=await supabase.auth.getSession();
-  if(error||!data.session){location.replace('cadastro.html#login');return;}
-  currentUser=data.session.user;
-  stateStorageKey=`devifolio-state:${currentUser.id}`;
-  let hasScopedState=false;
-  try{
-    const cached=JSON.parse(localStorage.getItem(stateStorageKey));
-    if(cached){state={...structuredClone(defaults),...cached,profile:{...defaults.profile,...cached.profile},settings:{...defaults.settings,...cached.settings}};hasScopedState=true;}
-  }catch(error){console.error('[Devifolio] Estado local inválido; usando valores seguros.',error);}
-  const githubIdentity=currentUser.identities?.find(identity=>identity.provider==='github');
-  state.githubConnected=Boolean(githubIdentity);
-  if(githubIdentity)state.githubUsername=githubIdentity.identity_data?.user_name||githubIdentity.identity_data?.preferred_username||githubIdentity.identity_data?.name||'github';
-  state.profile.email=currentUser.email||state.profile.email;
-  state.profile.name=currentUser.user_metadata?.full_name||currentUser.user_metadata?.name||state.profile.name;
-  let workspaceError=null;
-  try{
-    const workspace=await loadWorkspace(currentUser.id);
-    remoteWorkspace=workspace.available;
-    if(workspace.profile){state.profile={...state.profile,...workspace.profile};state.published=workspace.profile.published;state.projects=workspace.projects||[];}
-    if(workspace.settings)state.settings={...state.settings,email:workspace.settings.email_notifications,product:workspace.settings.product_notifications,publicProfile:workspace.settings.public_profile,compact:workspace.settings.compact_mode,theme:workspace.settings.theme};
-    if(workspace.available&&!workspace.profile){
-      if(!hasScopedState){
-        const emailBase=(currentUser.email?.split('@')[0]||'dev').toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,20)||'dev';
-        state.profile={...defaults.profile,name:currentUser.user_metadata?.full_name||currentUser.user_metadata?.name||'Novo usuário',username:`${emailBase}-${currentUser.id.slice(0,6)}`,email:currentUser.email||'',role:'',bio:'',skills:'',linkedin:'',github:'',website:''};
-        state.projects=[];
-        state.published=false;
-      }
-      await syncWorkspace(currentUser.id,state);
+function projectRows(items = state.projects.slice(0, 5)) {
+  if (!items.length) return `<div class="projects-empty">${emptyState('folder', 'Você ainda não possui projetos.', 'Crie seu primeiro projeto para começar.', '<button class="primary-button" data-new-project>Criar primeiro projeto</button>')}</div>`
+  return items.map((project, index) => `<div class="project-row"><span class="project-number">${String(index + 1).padStart(2, '0')}</span><span>${esc(project.name)}</span><span class="project-desc">${esc(project.description)}</span><span class="status ${project.status}">${statusLabel[project.status]}</span><button class="icon-button" data-view-project="${project.id}" aria-label="Visualizar ${esc(project.name)}"><span data-icon="chevron"></span></button></div>`).join('')
+}
+
+function homeView() {
+  const summary = analyticsSummary()
+  const publishedProjects = state.projects.filter(project => project.status === 'published').length
+  const ready = state.published && profileComplete()
+  const heroTitle = ready ? 'Seu portfólio está pronto para ser<br>compartilhado.' : 'Seu portfólio ainda não está completo.'
+  const heroCopy = ready ? 'Acompanhe seus dados reais e mantenha seus projetos atualizados.' : 'Adicione suas informações e seu primeiro projeto para publicar.'
+  return `<section class="page-enter home-page"><div class="home-hero"><p class="eyebrow">Olá, ${esc(realName())}</p><h1>${heroTitle}</h1><p>${heroCopy}</p><button class="primary-button" data-route-button="${profileComplete() ? 'projetos' : 'portfolio'}"><span data-icon="${profileComplete() ? 'plus' : 'edit'}"></span>${profileComplete() ? 'Adicionar projeto' : 'Configurar portfólio'}</button></div><div class="dashboard-grid"><article class="card metric-card"><div class="metric-head"><span data-icon="eye"></span>Visualizações do portfólio</div><strong>${summary.views}</strong><small>dados reais acumulados</small></article><article class="card metric-card"><div class="metric-head"><span data-icon="folder"></span>Projetos publicados</div><strong>${publishedProjects}</strong><small>no seu portfólio</small></article><article class="card plan-card"><div class="metric-head"><span data-icon="crown"></span>Planos</div><button class="plan-link" type="button" data-route-button="planos">Ver planos <span data-icon="arrow"></span></button></article><article class="card qr-card"><h3>QR Code do seu<br>portfólio</h3>${ready ? '<div class="qr-wrap"><canvas id="portfolio-qr" width="150" height="150" aria-label="QR Code do portfólio público"></canvas></div>' : '<div class="qr-empty">O QR Code aparecerá quando o portfólio for publicado.</div>'}</article><article class="card portfolio-card"><div class="portfolio-card-head"><span data-icon="link"></span><div><h3>Seu portfólio</h3><p>${ready ? 'Um único link para mostrar todo o seu trabalho.' : 'Seu link público aparecerá aqui quando estiver pronto.'}</p></div></div>${ready ? `<div class="url-field"><span>${esc(publicPortfolioUrl())}</span><button class="icon-button" data-copy="${esc(publicPortfolioUrl())}" aria-label="Copiar URL"><span data-icon="copy"></span></button><button class="icon-button" data-share-portfolio aria-label="Compartilhar portfólio"><span data-icon="users"></span></button><button class="icon-button" data-open-preview aria-label="Abrir portfólio"><span data-icon="external"></span></button></div>` : ''}</article></div><section class="card projects-card"><div class="section-card-head"><h2>Últimos projetos</h2>${state.projects.length ? '<button class="link-button" data-route-button="projetos">Ver todos <span data-icon="arrow"></span></button>' : ''}</div>${projectRows()}</section></section>`
+}
+
+function projectCards(items) {
+  if (!items.length) return `<div class="card empty-state">${emptyState('folder', 'Você ainda não possui projetos.', 'Crie seu primeiro projeto para começar.', '<button class="primary-button" data-new-project>Novo projeto</button>')}</div>`
+  return items.map(project => `<article class="card project-card"><div class="project-cover">${project.image ? `<img class="project-cover-image" src="${esc(project.image)}" alt="Capa do projeto ${esc(project.name)}">` : `<span>${esc(project.name.slice(0, 2).toUpperCase())}</span>`}<span class="status ${project.status}">${statusLabel[project.status]}</span></div><div class="project-card-body"><div class="project-card-title"><h2>${esc(project.name)}</h2></div>${project.description ? `<p>${esc(project.description)}</p>` : ''}<div class="tag-row">${project.tech.split(',').filter(Boolean).map(item => `<span>${esc(item.trim())}</span>`).join('')}</div><div class="project-actions"><button class="secondary-button" data-view-project="${project.id}"><span data-icon="eye"></span>Visualizar</button><button class="icon-button" data-edit-project="${project.id}" aria-label="Editar"><span data-icon="edit"></span></button><button class="icon-button danger-ghost" data-delete-project="${project.id}" aria-label="Excluir"><span data-icon="trash"></span></button></div></div></article>`).join('')
+}
+
+function projectsView() {
+  return `<section class="page-enter">${pageHead('Projetos', 'Organize e publique os trabalhos que contam a sua história.', '<button class="primary-button" data-new-project><span data-icon="plus"></span>Novo projeto</button>')}<div class="toolbar"><label class="search-field"><span data-icon="search"></span><input id="project-search" type="search" placeholder="Buscar projetos" aria-label="Buscar projetos"></label><select id="status-filter" aria-label="Filtrar por status"><option value="all">Todos os status</option><option value="published">Publicado</option><option value="progress">Em breve</option><option value="draft">Em desenvolvimento</option></select><select id="project-sort" aria-label="Ordenar projetos"><option value="recent">Mais recentes</option><option value="name">Nome: A–Z</option><option value="status">Status</option></select></div><div class="project-grid" id="project-grid">${projectCards(state.projects)}</div></section>`
+}
+
+function previewMarkup() {
+  const profile = state.profile
+  const publishedProjects = state.projects.filter(project => project.status === 'published')
+  return `<div class="public-preview">${profile.avatar ? `<div class="preview-avatar"><img src="${esc(profile.avatar)}" alt="Foto de ${esc(profile.name)}"></div>` : '<div class="preview-avatar preview-avatar-empty"><span data-icon="user"></span></div>'}${profile.name ? `<p class="preview-kicker">PORTFÓLIO</p><h2 data-preview="name">${esc(profile.name)}</h2>` : '<p class="preview-empty-copy">Adicione seu nome para visualizar a prévia.</p>'}${profile.role ? `<h3 data-preview="role">${esc(profile.role)}</h3>` : ''}${profile.bio ? `<p data-preview="bio">${esc(profile.bio)}</p>` : ''}<div class="preview-skills" data-preview="skills">${profile.skills.split(',').filter(Boolean).map(item => `<span>${esc(item.trim())}</span>`).join('')}</div>${publishedProjects.length ? `<div class="preview-project-list">${publishedProjects.slice(0, 3).map(project => `<span>${esc(project.name)}</span>`).join('')}</div>` : '<div class="preview-empty-copy">Nenhum projeto publicado.</div>'}</div>`
+}
+
+function portfolioView() {
+  const profile = state.profile
+  const ready = state.published && profileComplete()
+  return `<section class="page-enter">${pageHead('Meu portfólio', 'Edite sua página pública e escolha o que será exibido.', `<button class="publish-toggle ${state.published ? 'on' : ''}" data-toggle-publish><i></i><span>${state.published ? 'Publicado' : 'Despublicado'}</span></button>`)}<div class="editor-layout"><form class="card form-card" id="portfolio-form"><div class="card-title"><span class="circle-icon" data-icon="edit"></span><div><h2>Conteúdo do portfólio</h2><p>Suas alterações aparecem na prévia.</p></div></div><div class="form-grid"><label class="field"><span>Nome</span><input name="name" required value="${esc(profile.name)}"></label><label class="field"><span>Título profissional</span><input name="role" value="${esc(profile.role)}"></label><label class="field full"><span>Sobre você</span><textarea name="bio" maxlength="240">${esc(profile.bio)}</textarea><small>Até 240 caracteres</small></label><label class="field full"><span>Habilidades</span><input name="skills" value="${esc(profile.skills)}"><small>Separe as habilidades por vírgulas</small></label><label class="field"><span>GitHub</span><input name="github" value="${esc(profile.github)}" placeholder="github.com/usuario"></label><label class="field"><span>LinkedIn</span><input name="linkedin" value="${esc(profile.linkedin)}" placeholder="linkedin.com/in/usuario"></label><label class="field full"><span>Site pessoal</span><input name="website" value="${esc(profile.website)}" placeholder="https://"></label></div><div class="form-footer"><button class="primary-button" type="submit"><span data-icon="save"></span>Salvar alterações</button></div></form><aside class="card preview-card"><div class="preview-toolbar"><span>Prévia pública</span>${ready ? '<button class="icon-button" type="button" data-open-preview aria-label="Abrir prévia"><span data-icon="external"></span></button>' : ''}</div>${previewMarkup()}${ready ? `<div class="url-field"><span>${esc(publicPortfolioUrl())}</span><button class="icon-button" data-copy="${esc(publicPortfolioUrl())}" aria-label="Copiar URL"><span data-icon="copy"></span></button></div>` : '<div class="preview-link-empty">Publique o portfólio para gerar o link público.</div>'}</aside></div></section>`
+}
+
+function githubView() {
+  if (!state.githubConnected) return `<section class="page-enter">${pageHead('GitHub', 'Conecte sua conta para importar repositórios como projetos.')}<div class="card connect-card"><span class="connect-icon" data-icon="github"></span><h2>Traga seus projetos do GitHub</h2><p>Importe nome, descrição, tecnologias e links sem preencher tudo manualmente.</p><button class="primary-button" data-connect-github><span data-icon="github"></span>Conectar com GitHub</button><small>Você poderá desconectar a conta quando quiser.</small></div></section>`
+  const content = reposLoading ? '<div class="repo-loading"><span class="spinner"></span>Buscando seus repositórios...</div>' : state.repos.length ? `<div class="repo-list">${state.repos.map((repository, index) => `<label class="repo-row"><input type="checkbox" value="${index}"><span class="repo-icon" data-icon="repo"></span><span><b>${esc(repository.name)}</b><small>${esc(repository.description || 'Sem descrição')}</small></span><span class="language-dot"></span><small>${esc(repository.language || '—')}</small><a href="${esc(repository.html_url)}" target="_blank" rel="noopener" aria-label="Abrir repositório"><span data-icon="external"></span></a></label>`).join('')}</div>` : `<div class="projects-empty">${emptyState('repo', 'Nenhum repositório encontrado.', providerToken ? 'Sua conta não possui repositórios disponíveis.' : 'Reconecte o GitHub para liberar a importação.')}</div>`
+  return `<section class="page-enter">${pageHead('GitHub', 'Selecione os repositórios que deseja transformar em projetos.', '<button class="secondary-button" data-disconnect-github>Desconectar</button>')}<div class="card connected-account"><span class="avatar">GH</span><div><small>Conta conectada</small><h2>@${esc(state.githubUsername || 'GitHub')}</h2></div><button class="secondary-button" data-sync-repos><span data-icon="refresh"></span>Sincronizar</button></div><div class="card repo-panel"><div class="section-card-head"><div><h2>Seus repositórios</h2><p>${state.repos.length} encontrado${state.repos.length === 1 ? '' : 's'}</p></div>${state.repos.length ? '<button class="primary-button" data-import-selected><span data-icon="upload"></span>Importar selecionados</button>' : ''}</div>${content}</div></section>`
+}
+
+function analyticsView() {
+  const summary = analyticsSummary()
+  const projectCounts = new Map()
+  state.analytics.filter(event => event.project_id && (event.event_type === 'project_view' || event.event_type === 'link_click')).forEach(event => projectCounts.set(Number(event.project_id), (projectCounts.get(Number(event.project_id)) || 0) + 1))
+  const ranking = state.projects.map(project => ({ project, count: projectCounts.get(project.id) || 0 })).filter(item => item.count).sort((a, b) => b.count - a.count)
+  const max = ranking[0]?.count || 1
+  const metrics = `<div class="analytics-metrics"><article class="card analytic-stat"><span data-icon="eye"></span><small>Visualizações</small><strong>${summary.views}</strong></article><article class="card analytic-stat"><span data-icon="link"></span><small>Cliques em links</small><strong>${summary.clicks}</strong></article><article class="card analytic-stat"><span data-icon="users"></span><small>Visitantes únicos</small><strong>${summary.visitors}</strong></article><article class="card analytic-stat"><span data-icon="trending"></span><small>Taxa de clique</small><strong>${summary.rate}%</strong></article></div>`
+  const details = state.analytics.length ? `<div class="analytics-layout"><article class="card chart-card"><div class="section-card-head"><div><h2>Atividade real</h2><p>Eventos registrados no portfólio público.</p></div><span class="chart-total">${state.analytics.length} total</span></div><div class="event-summary"><div><span>Visualizações</span><strong>${summary.views}</strong></div><div><span>Interações</span><strong>${summary.clicks}</strong></div></div></article><article class="card ranking-card"><div class="section-card-head"><div><h2>Projetos mais acessados</h2><p>Cliques registrados</p></div></div>${ranking.length ? ranking.slice(0, 5).map((item, index) => `<div class="rank-row"><span>${index + 1}</span><div><b>${esc(item.project.name)}</b><small>${item.count} acesso${item.count === 1 ? '' : 's'}</small></div><div class="rank-bar"><i style="width:${Math.round((item.count / max) * 100)}%"></i></div></div>`).join('') : `<div class="compact-empty">Nenhum projeto recebeu acessos ainda.</div>`}</article></div>` : `<article class="card analytics-empty">${emptyState('chart', 'Ainda não há dados de análise.', 'As métricas aparecerão quando o portfólio publicado receber visitas.')}</article>`
+  return `<section class="page-enter">${pageHead('Análise', 'Entenda como as pessoas encontram e exploram seu portfólio.')}${metrics}${details}</section>`
+}
+
+function avatarMarkup(className = 'avatar avatar-large') {
+  return state.profile.avatar ? `<span class="${className}"><img src="${esc(state.profile.avatar)}" alt="Foto de ${esc(realName())}"></span>` : `<span class="${className}">${esc(initials())}</span>`
+}
+
+function profileView() {
+  const profile = state.profile
+  return `<section class="page-enter">${pageHead('Perfil', 'Mantenha seus dados pessoais e acesso atualizados.')}<div class="settings-layout"><form class="card form-card" id="profile-form"><div class="card-title"><span class="circle-icon" data-icon="profile"></span><div><h2>Dados do usuário</h2><p>Informações usadas dentro do Devifolio.</p></div></div><div class="avatar-editor">${avatarMarkup()}<div><input id="avatar-file" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="secondary-button" type="button" data-upload-avatar><span data-icon="upload"></span>Alterar foto</button><small>JPG, PNG ou WebP, até 3 MB</small></div></div><div class="form-grid"><label class="field"><span>Nome completo</span><input name="name" required value="${esc(profile.name)}"></label><label class="field"><span>Username</span><div class="input-prefix"><i>@</i><input name="username" required pattern="[a-zA-Z0-9._-]+" value="${esc(profile.username)}"></div></label><label class="field full"><span>E-mail</span><input type="email" name="email" required value="${esc(profile.email)}"></label></div><div class="form-footer"><button class="primary-button" type="submit"><span data-icon="save"></span>Salvar perfil</button></div></form><form class="card form-card" id="password-form"><div class="card-title"><span class="circle-icon" data-icon="lock"></span><div><h2>Alterar senha</h2><p>Use pelo menos 8 caracteres.</p></div></div><div class="form-grid one"><label class="field"><span>Senha atual</span><input type="password" id="current-password" required minlength="8"></label><label class="field"><span>Nova senha</span><input type="password" required minlength="8" id="new-password"></label><label class="field"><span>Confirmar nova senha</span><input type="password" required minlength="8" id="confirm-password"></label></div><div class="form-footer"><button class="secondary-button" type="submit">Atualizar senha</button></div></form></div></section>`
+}
+
+function switchRow(icon, title, description, key, on) {
+  return `<div class="setting-row"><span class="circle-icon" data-icon="${icon}"></span><div><b>${title}</b><small>${description}</small></div><button class="switch ${on ? 'on' : ''}" type="button" data-setting="${key}" aria-pressed="${on}"><i></i></button></div>`
+}
+
+function settingsView() {
+  return `<section class="page-enter">${pageHead('Configurações', 'Personalize a experiência e controle sua conta.')}<div class="settings-stack"><article class="card settings-card"><div class="settings-card-head"><span data-icon="palette"></span><div><h2>Aparência</h2><p>Escolha como o painel deve aparecer.</p></div></div><div class="setting-row"><div><b>Tema do painel</b><small>A estrutura permanece a mesma nos dois modos.</small></div><select data-theme-select><option value="dark" ${state.settings.theme === 'dark' ? 'selected' : ''}>Modo escuro</option><option value="light" ${state.settings.theme === 'light' ? 'selected' : ''}>Modo claro</option></select></div>${switchRow('menu', 'Modo compacto', 'Reduz o espaço entre os elementos.', 'compact', state.settings.compact)}</article><article class="card settings-card"><div class="settings-card-head"><span data-icon="bell"></span><div><h2>Notificações</h2><p>Escolha quais novidades deseja receber.</p></div></div>${switchRow('mail', 'Resumo por e-mail', 'Receba um relatório semanal de desempenho.', 'email', state.settings.email)}${switchRow('bell', 'Novidades do produto', 'Avisos sobre melhorias e novos recursos.', 'product', state.settings.product)}</article><article class="card settings-card"><div class="settings-card-head"><span data-icon="shield"></span><div><h2>Privacidade e integrações</h2><p>Controle a visibilidade e os serviços conectados.</p></div></div>${switchRow('eye', 'Aparecer em buscas públicas', 'Permitir que o portfólio publicado seja indexado.', 'publicProfile', state.settings.publicProfile)}<div class="setting-row"><span class="circle-icon" data-icon="github"></span><div><b>GitHub</b><small>${state.githubConnected ? `Conectado como @${esc(state.githubUsername)}` : 'Nenhuma conta conectada'}</small></div><button class="secondary-button" data-route-button="github">Gerenciar</button></div></article><article class="card settings-card danger-zone"><div class="settings-card-head"><span data-icon="trash"></span><div><h2>Conta</h2><p>Exporte seus dados ou encerre sua conta.</p></div></div><div class="setting-row"><div><b>Exportar dados</b><small>Baixe uma cópia das informações da conta.</small></div><button class="secondary-button" data-export>Exportar</button></div><div class="setting-row"><div><b>Excluir conta</b><small>Essa ação não poderá ser desfeita.</small></div><button class="danger-button" data-delete-account>Excluir conta</button></div></article></div></section>`
+}
+
+function referralView() {
+  const link = `${location.origin}/cadastro.html?ref=${encodeURIComponent(state.profile.username)}#cadastro`
+  const active = state.referrals.filter(item => item.status === 'active').length
+  return `<section class="page-enter">${pageHead('Indicação', 'Convide outros devs e acompanhe indicações reais.')}<div class="referral-hero card"><div><span class="badge">PROGRAMA DE INDICAÇÃO</span><h2>Compartilhe o Devifolio.</h2><p>Seu convite usa um link exclusivo vinculado à sua conta.</p><div class="url-field referral-link"><span>${esc(link)}</span><button class="icon-button" data-copy="${esc(link)}"><span data-icon="copy"></span></button></div><button class="primary-button" data-share-referral data-share-url="${esc(link)}"><span data-icon="users"></span>Compartilhar convite</button></div><div class="benefit-orbit"><span data-icon="users"></span><strong>${active}</strong><small>amigos ativos</small></div></div><div class="referral-stats"><article class="card"><small>Indicações registradas</small><strong>${state.referrals.length}</strong></article><article class="card"><small>Amigos ativos</small><strong>${active}</strong></article><article class="card"><small>Pendentes</small><strong>${state.referrals.length - active}</strong></article></div><article class="card history-card"><div class="section-card-head"><div><h2>Histórico de indicações</h2><p>Acompanhe o status dos seus convites.</p></div></div>${state.referrals.length ? state.referrals.map(item => `<div class="history-row"><span class="avatar avatar-small">${esc(item.referred_email.slice(0, 1).toUpperCase())}</span><div><b>${esc(item.referred_email)}</b><small>${new Date(item.created_at).toLocaleDateString('pt-BR')}</small></div><span class="status ${item.status === 'active' ? 'published' : 'progress'}">${item.status === 'active' ? 'Ativa' : 'Pendente'}</span></div>`).join('') : `<div class="projects-empty">${emptyState('users', 'Nenhuma indicação registrada.', 'Compartilhe seu link para começar.')}</div>`}</article></section>`
+}
+
+function plansView() {
+  return `<section class="page-enter">${pageHead('Planos', 'Seu plano atual e recursos disponíveis.')}<div class="plans-grid"><article class="card pricing-card current"><span class="plan-current">PLANO ATUAL</span><h2>Free</h2><strong>R$ 0</strong><p>Para criar e compartilhar seu portfólio.</p><ul><li><span data-icon="check"></span>Projetos e perfil reais</li><li><span data-icon="check"></span>Link público</li><li><span data-icon="check"></span>QR Code dinâmico</li></ul><button class="secondary-button" type="button" disabled>Plano atual</button></article><article class="card pricing-card"><h2>Pro</h2><strong>Em breve</strong><p>Novos recursos serão informados quando estiverem disponíveis.</p><button class="secondary-button" type="button" disabled>Indisponível</button></article></div></section>`
+}
+
+const views = { inicio: homeView, projetos: projectsView, portfolio: portfolioView, github: githubView, analise: analyticsView, perfil: profileView, planos: plansView, configuracoes: settingsView, indicacao: referralView }
+
+function render() {
+  const route = views[location.hash.slice(1)] ? location.hash.slice(1) : 'inicio'
+  $('#page-content').innerHTML = views[route]()
+  document.title = `${{ inicio: 'Início', projetos: 'Projetos', portfolio: 'Meu portfólio', github: 'GitHub', analise: 'Análise', perfil: 'Perfil', planos: 'Planos', configuracoes: 'Configurações', indicacao: 'Indicação' }[route]} — Devifolio`
+  $$('.nav-item').forEach(item => item.classList.toggle('active', item.dataset.route === route))
+  hydrateIcons($('#page-content'))
+  bindActions()
+  if (route === 'inicio') renderPortfolioQR()
+  if (route === 'github' && state.githubConnected && providerToken && !reposLoaded && !reposLoading) fetchGithubRepos()
+  updateUserChrome()
+  closeMenu()
+  closeUserMenu()
+  window.scrollTo({ top: 0, behavior: 'instant' })
+}
+
+function updateUserChrome() {
+  const user = $('#user-menu-toggle')
+  if (user) user.innerHTML = `${avatarMarkup('avatar')}<span><b>${esc(realName())}</b><small>@${esc(state.profile.username || 'conta')}</small></span><span data-icon="chevron"></span>`
+  const mobile = $('.mobile-topbar [data-route-button="perfil"]')
+  if (mobile) mobile.innerHTML = state.profile.avatar ? `<img src="${esc(state.profile.avatar)}" alt="">` : esc(initials())
+  hydrateIcons(user || document)
+}
+
+function bindActions() {
+  $$('[data-route-button]').forEach(button => button.onclick = () => { location.hash = button.dataset.routeButton })
+  $$('[data-copy]').forEach(button => button.onclick = () => copyText(button.dataset.copy))
+  $$('[data-open-preview]').forEach(button => button.onclick = () => window.open(publicPortfolioUrl(), '_blank', 'noopener'))
+  $$('[data-share-portfolio]').forEach(button => button.onclick = sharePortfolio)
+  $$('[data-new-project]').forEach(button => button.onclick = () => projectModal())
+  bindProjectGrid()
+
+  const search = $('#project-search'), filter = $('#status-filter'), sort = $('#project-sort')
+  if (search && filter && sort) {
+    const update = () => {
+      const query = search.value.toLowerCase(), status = filter.value
+      const items = state.projects.filter(project => `${project.name} ${project.description} ${project.tech}`.toLowerCase().includes(query) && (status === 'all' || project.status === status))
+      if (sort.value === 'name') items.sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'))
+      if (sort.value === 'status') items.sort((a, b) => statusLabel[a.status].localeCompare(statusLabel[b.status], 'pt-BR'))
+      $('#project-grid').innerHTML = projectCards(items)
+      hydrateIcons($('#project-grid'))
+      bindProjectGrid()
     }
-  }catch(error){workspaceError=error;remoteWorkspace=false;console.error('[Devifolio] Falha ao carregar ou inicializar o banco',error);}
-  if(shouldApplyLightDesign){state.settings.theme='light';localStorage.setItem('devifolio-light-design-v1','1');save();}
-  document.documentElement.dataset.theme=state.settings.theme==='light'?'light':'dark';
-  localStorage.setItem(stateStorageKey,JSON.stringify(state));
-  hydrateIcons();render();
-  if(workspaceError)toast('Sua sessão está ativa, mas os dados do perfil não puderam ser sincronizados.','error');
+    search.oninput = update; filter.onchange = update; sort.onchange = update
+  }
+
+  $('#portfolio-form')?.addEventListener('submit', savePortfolioForm)
+  $('[data-toggle-publish]')?.addEventListener('click', togglePublished)
+  $('#profile-form')?.addEventListener('submit', saveProfileForm)
+  $('#password-form')?.addEventListener('submit', changePassword)
+  $('[data-upload-avatar]')?.addEventListener('click', () => $('#avatar-file')?.click())
+  $('#avatar-file')?.addEventListener('change', handleAvatarUpload)
+  $('[data-connect-github]')?.addEventListener('click', connectGithub)
+  $('[data-disconnect-github]')?.addEventListener('click', disconnectGithub)
+  $('[data-sync-repos]')?.addEventListener('click', fetchGithubRepos)
+  $('[data-import-selected]')?.addEventListener('click', importSelected)
+  $$('[data-setting]').forEach(button => button.onclick = () => updateSetting(button.dataset.setting))
+  $('[data-theme-select]')?.addEventListener('change', event => updateTheme(event.currentTarget.value))
+  $('[data-export]')?.addEventListener('click', exportData)
+  $('[data-delete-account]')?.addEventListener('click', confirmAccountDeletion)
+  $('[data-share-referral]')?.addEventListener('click', shareReferral)
 }
 
-supabase.auth.onAuthStateChange((event,session)=>{
-  if(event==='SIGNED_OUT'||(!session&&event!=='INITIAL_SESSION'))location.replace('cadastro.html#login');
-});
+function bindProjectGrid() {
+  $$('[data-view-project]').forEach(button => button.onclick = () => showProject(Number(button.dataset.viewProject)))
+  $$('[data-edit-project]').forEach(button => button.onclick = () => projectModal(Number(button.dataset.editProject)))
+  $$('[data-delete-project]').forEach(button => button.onclick = () => confirmDelete(Number(button.dataset.deleteProject)))
+}
 
-$$('[data-logout]').forEach(link=>link.addEventListener('click',async event=>{
-  event.preventDefault();
-  await supabase.auth.signOut();
-  location.replace('cadastro.html#login');
-}));
+async function savePortfolioForm(event) {
+  event.preventDefault()
+  const button = event.currentTarget.querySelector('[type="submit"]')
+  const changes = Object.fromEntries(new FormData(event.currentTarget))
+  setButtonLoading(button, true, 'Salvando...')
+  try {
+    const next = { ...state.profile, ...changes }
+    await saveProfile(currentUser.id, next, state.published)
+    Object.assign(state.profile, next)
+    toast('Portfólio atualizado com sucesso.')
+    render()
+  } catch (error) { reportError('Não foi possível salvar o portfólio.', error) } finally { setButtonLoading(button, false) }
+}
 
-bootstrap();
+async function togglePublished(event) {
+  if (!state.published && !profileComplete()) return toast('Adicione seu nome e username antes de publicar.', 'error')
+  const button = event.currentTarget
+  setButtonLoading(button, true, 'Salvando...')
+  try {
+    await saveProfile(currentUser.id, state.profile, !state.published)
+    state.published = !state.published
+    toast(state.published ? 'Portfólio publicado.' : 'Portfólio despublicado.')
+    render()
+  } catch (error) { reportError('Não foi possível alterar a publicação.', error) } finally { setButtonLoading(button, false) }
+}
+
+async function saveProfileForm(event) {
+  event.preventDefault()
+  const form = event.currentTarget
+  const button = form.querySelector('[type="submit"]')
+  const changes = Object.fromEntries(new FormData(form))
+  changes.username = changes.username.trim().toLowerCase()
+  setButtonLoading(button, true, 'Salvando...')
+  try {
+    const authChanges = { data: { full_name: changes.name } }
+    if (changes.email !== currentUser.email) authChanges.email = changes.email
+    const { error } = await supabase.auth.updateUser(authChanges)
+    if (error) throw error
+    const next = { ...state.profile, ...changes }
+    await saveProfile(currentUser.id, next, state.published)
+    Object.assign(state.profile, next)
+    currentUser.email = changes.email
+    toast('Perfil atualizado.')
+    render()
+  } catch (error) { reportError(error?.code === '23505' ? 'Este username já está em uso.' : 'Não foi possível atualizar o perfil.', error) } finally { setButtonLoading(button, false) }
+}
+
+async function changePassword(event) {
+  event.preventDefault()
+  const form = event.currentTarget
+  const button = form.querySelector('[type="submit"]')
+  if ($('#new-password').value !== $('#confirm-password').value) return toast('As novas senhas não coincidem.', 'error')
+  setButtonLoading(button, true, 'Atualizando...')
+  try {
+    const { error: reauthError } = await supabase.auth.signInWithPassword({ email: currentUser.email, password: $('#current-password').value })
+    if (reauthError) throw new Error('A senha atual está incorreta.')
+    const { error } = await supabase.auth.updateUser({ password: $('#new-password').value })
+    if (error) throw error
+    form.reset(); toast('Senha alterada com segurança.')
+  } catch (error) { reportError(error.message || 'Não foi possível alterar a senha.', error) } finally { setButtonLoading(button, false) }
+}
+
+async function handleAvatarUpload(event) {
+  const file = event.currentTarget.files?.[0]
+  if (!file) return
+  if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 3 * 1024 * 1024) return toast('Use uma imagem JPG, PNG ou WebP de até 3 MB.', 'error')
+  const button = $('[data-upload-avatar]')
+  setButtonLoading(button, true, 'Enviando...')
+  try {
+    const avatar = await uploadAvatar(currentUser.id, file)
+    const next = { ...state.profile, avatar }
+    await saveProfile(currentUser.id, next, state.published)
+    Object.assign(state.profile, next)
+    toast('Foto atualizada.')
+    render()
+  } catch (error) { reportError('Não foi possível enviar a foto.', error) } finally { setButtonLoading(button, false) }
+}
+
+function showProject(id) {
+  const project = state.projects.find(item => item.id === id)
+  if (!project) return
+  const projectLink = normalizeExternalUrl(project.link)
+  const githubLink = project.github ? normalizeExternalUrl(project.github.includes('/') && !project.github.includes('.') ? `github.com/${project.github}` : project.github) : ''
+  modal(`<div class="project-detail"><div class="project-cover detail-cover">${project.image ? `<img class="project-cover-image" src="${esc(project.image)}" alt="">` : `<span>${esc(project.name.slice(0, 2).toUpperCase())}</span>`}</div><span class="status ${project.status}">${statusLabel[project.status]}</span><h2>${esc(project.name)}</h2>${project.description ? `<p>${esc(project.description)}</p>` : ''}<div class="tag-row">${project.tech.split(',').filter(Boolean).map(item => `<span>${esc(item.trim())}</span>`).join('')}</div><div class="modal-actions"><button class="secondary-button" data-close-modal>Fechar</button>${githubLink ? `<a class="secondary-button" href="${esc(githubLink)}" target="_blank" rel="noopener">GitHub</a>` : ''}${projectLink ? `<a class="primary-button" href="${esc(projectLink)}" target="_blank" rel="noopener">Ver projeto <span data-icon="external"></span></a>` : ''}<button class="primary-button" data-edit-project="${project.id}"><span data-icon="edit"></span>Editar</button></div></div>`)
+  $('[data-edit-project]')?.addEventListener('click', () => projectModal(project.id))
+}
+
+function projectModal(id) {
+  const project = state.projects.find(item => item.id === id) || { name: '', description: '', tech: '', link: '', github: '', image: '', status: 'draft' }
+  modal(`<form id="project-form"><div class="modal-head"><div><p class="eyebrow">PROJETOS</p><h2>${id ? 'Editar projeto' : 'Novo projeto'}</h2></div><button class="icon-button" type="button" data-close-modal><span data-icon="x"></span></button></div><div class="form-grid"><label class="field full"><span>Nome do projeto</span><input name="name" required maxlength="60" value="${esc(project.name)}"></label><label class="field full"><span>Descrição</span><textarea name="description" maxlength="180">${esc(project.description)}</textarea></label><label class="field full"><span>Imagem de capa</span><input type="url" name="image" value="${esc(project.image)}" placeholder="https://"></label><label class="field full"><span>Tecnologias</span><input name="tech" value="${esc(project.tech)}" placeholder="React, Node.js, PostgreSQL"></label><label class="field"><span>Link publicado</span><input type="url" name="link" value="${esc(project.link)}" placeholder="https://"></label><label class="field"><span>Repositório GitHub</span><input name="github" value="${esc(project.github)}" placeholder="usuario/repositorio"></label><label class="field full"><span>Status</span><select name="status"><option value="published" ${project.status === 'published' ? 'selected' : ''}>Publicado</option><option value="progress" ${project.status === 'progress' ? 'selected' : ''}>Em breve</option><option value="draft" ${project.status === 'draft' ? 'selected' : ''}>Em desenvolvimento</option></select></label></div><div class="modal-actions"><button class="secondary-button" type="button" data-close-modal>Cancelar</button><button class="primary-button" type="submit">${id ? 'Salvar alterações' : 'Criar projeto'}</button></div></form>`)
+  $('#project-form').onsubmit = async event => {
+    event.preventDefault()
+    const button = event.currentTarget.querySelector('[type="submit"]')
+    const data = Object.fromEntries(new FormData(event.currentTarget))
+    const next = { id: id || Date.now(), ...data }
+    setButtonLoading(button, true, 'Salvando...')
+    try {
+      const saved = await saveProject(currentUser.id, next, id ? state.projects.findIndex(item => item.id === id) : 0)
+      if (id) state.projects.splice(state.projects.findIndex(item => item.id === id), 1, saved)
+      else state.projects.unshift(saved)
+      closeModal(); toast(id ? 'Projeto atualizado.' : 'Projeto criado com sucesso.'); render()
+    } catch (error) { reportError('Não foi possível salvar o projeto.', error); setButtonLoading(button, false) }
+  }
+}
+
+function confirmDelete(id) {
+  const project = state.projects.find(item => item.id === id)
+  if (!project) return
+  modal(`<div class="confirm-dialog"><span class="circle-icon danger-icon" data-icon="trash"></span><h2>Excluir ${esc(project.name)}?</h2><p>O projeto será removido do painel e do portfólio público.</p><div class="modal-actions"><button class="secondary-button" data-close-modal>Cancelar</button><button class="danger-button" id="confirm-delete">Excluir projeto</button></div></div>`)
+  $('#confirm-delete').onclick = async event => {
+    setButtonLoading(event.currentTarget, true, 'Excluindo...')
+    try {
+      await removeProject(currentUser.id, id)
+      state.projects = state.projects.filter(item => item.id !== id)
+      closeModal(); toast('Projeto excluído.'); render()
+    } catch (error) { reportError('Não foi possível excluir o projeto.', error); setButtonLoading(event.currentTarget, false) }
+  }
+}
+
+async function connectGithub(event) {
+  const button = event.currentTarget
+  setButtonLoading(button, true, 'Conectando...')
+  const { error } = await supabase.auth.linkIdentity({ provider: 'github', options: { redirectTo: `${location.origin}${location.pathname}#github`, scopes: 'read:user repo' } })
+  if (error) { reportError('Não foi possível conectar o GitHub.', error); setButtonLoading(button, false) }
+}
+
+async function disconnectGithub() {
+  try {
+    const { data, error } = await supabase.auth.getUser()
+    if (error) throw error
+    const identity = data.user?.identities?.find(item => item.provider === 'github')
+    if (identity) {
+      const result = await supabase.auth.unlinkIdentity(identity)
+      if (result.error) throw result.error
+    }
+    state.githubConnected = false; state.githubUsername = ''; state.repos = []; providerToken = ''; reposLoaded = false
+    toast('Conta do GitHub desconectada.'); render()
+  } catch (error) { reportError('Não foi possível desconectar o GitHub.', error) }
+}
+
+async function fetchGithubRepos() {
+  if (!providerToken) return toast('Reconecte o GitHub para autorizar a leitura dos repositórios.', 'error')
+  reposLoading = true; render()
+  try {
+    const response = await fetch('https://api.github.com/user/repos?sort=updated&per_page=100', { headers: { Authorization: `Bearer ${providerToken}`, Accept: 'application/vnd.github+json' } })
+    if (!response.ok) throw new Error(`GitHub respondeu com ${response.status}.`)
+    state.repos = await response.json()
+  } catch (error) { reportError('Não foi possível carregar os repositórios.', error) } finally { reposLoading = false; reposLoaded = true; render() }
+}
+
+async function importSelected(event) {
+  const selected = $$('.repo-row input:checked').map(input => state.repos[Number(input.value)]).filter(Boolean)
+  if (!selected.length) return toast('Selecione ao menos um repositório.', 'error')
+  const button = event.currentTarget
+  setButtonLoading(button, true, 'Importando...')
+  try {
+    for (const repository of selected) {
+      if (state.projects.some(project => project.github === repository.full_name)) continue
+      const project = { id: Date.now() + state.projects.length, name: repository.name, description: repository.description || '', tech: repository.language || '', link: repository.homepage || '', github: repository.full_name, image: '', status: 'draft' }
+      const saved = await saveProject(currentUser.id, project, 0)
+      state.projects.unshift(saved)
+    }
+    toast(`${selected.length} repositório${selected.length === 1 ? '' : 's'} importado${selected.length === 1 ? '' : 's'}.`); render()
+  } catch (error) { reportError('Não foi possível importar os projetos.', error); setButtonLoading(button, false) }
+}
+
+async function updateSetting(key) {
+  const next = { ...state.settings, [key]: !state.settings[key] }
+  try { await saveSettings(currentUser.id, next); Object.assign(state.settings, next); render() } catch (error) { reportError('Não foi possível salvar a configuração.', error) }
+}
+
+async function updateTheme(theme) {
+  const next = { ...state.settings, theme }
+  try { await saveSettings(currentUser.id, next); Object.assign(state.settings, next); document.documentElement.dataset.theme = theme; render() } catch (error) { reportError('Não foi possível alterar o tema.', error) }
+}
+
+function exportData() {
+  const payload = JSON.stringify({ profile: state.profile, published: state.published, projects: state.projects, settings: state.settings, analytics: state.analytics, referrals: state.referrals }, null, 2)
+  const url = URL.createObjectURL(new Blob([payload], { type: 'application/json' }))
+  const anchor = document.createElement('a'); anchor.href = url; anchor.download = `devifolio-${state.profile.username || 'dados'}.json`; anchor.click(); URL.revokeObjectURL(url)
+  toast('Dados exportados.')
+}
+
+function confirmAccountDeletion() {
+  modal(`<div class="confirm-dialog"><span class="circle-icon danger-icon" data-icon="trash"></span><h2>Excluir sua conta?</h2><p>Perfil, projetos e dados associados serão removidos permanentemente.</p><div class="modal-actions"><button class="secondary-button" data-close-modal>Cancelar</button><button class="danger-button" id="confirm-account-delete">Excluir definitivamente</button></div></div>`)
+  $('#confirm-account-delete').onclick = async event => {
+    setButtonLoading(event.currentTarget, true, 'Excluindo...')
+    try { await deleteCurrentAccount(); await supabase.auth.signOut(); location.replace('index.html') } catch (error) { reportError('Não foi possível excluir a conta.', error); setButtonLoading(event.currentTarget, false) }
+  }
+}
+
+async function shareReferral(event) {
+  const url = event.currentTarget.dataset.shareUrl
+  try {
+    if (navigator.share) await navigator.share({ title: 'Devifolio', text: 'Crie seu portfólio profissional.', url })
+    else await copyText(url)
+  } catch (error) { if (error.name !== 'AbortError') reportError('Não foi possível compartilhar.', error) }
+}
+
+async function sharePortfolio() {
+  const url = publicPortfolioUrl()
+  try {
+    if (navigator.share) await navigator.share({ title: `Portfólio de ${realName()}`, url })
+    else await copyText(url)
+  } catch (error) { if (error.name !== 'AbortError') reportError('Não foi possível compartilhar.', error) }
+}
+
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); toast('Link copiado.') } catch (error) { reportError('Não foi possível copiar o link.', error) }
+}
+
+function modal(content) {
+  $('#modal-root').innerHTML = `<div class="modal-backdrop"><div class="modal" role="dialog" aria-modal="true">${content}</div></div>`
+  hydrateIcons($('#modal-root'))
+  $$('[data-close-modal]').forEach(button => button.onclick = closeModal)
+  $('.modal-backdrop').onclick = event => { if (event.target === event.currentTarget) closeModal() }
+}
+
+function closeModal() { $('#modal-root').innerHTML = '' }
+function setButtonLoading(button, loading, label = '') { if (!button) return; if (loading) { button.dataset.original = button.innerHTML; button.disabled = true; button.textContent = label } else { button.disabled = false; if (button.dataset.original) button.innerHTML = button.dataset.original; hydrateIcons(button) } }
+function reportError(message, error) { console.error(`[Devifolio] ${message}`, error); toast(error?.message ? `${message} ${error.message}` : message, 'error') }
+function toast(message, type = 'success') { const element = document.createElement('div'); element.className = `toast ${type}`; element.innerHTML = `<span data-icon="${type === 'error' ? 'x' : 'check'}"></span>${esc(message)}`; $('#toast-stack').append(element); hydrateIcons(element); setTimeout(() => element.remove(), 4200) }
+function closeUserMenu() { $('#user-menu')?.setAttribute('hidden', ''); $('#user-menu-toggle')?.setAttribute('aria-expanded', 'false') }
+function closeMenu() { $('#sidebar')?.classList.remove('open'); $('#sidebar-overlay')?.classList.remove('show'); $('#menu-toggle')?.setAttribute('aria-expanded', 'false') }
+
+$('#menu-toggle').onclick = () => { const open = $('#sidebar').classList.toggle('open'); $('#sidebar-overlay').classList.toggle('show', open); $('#menu-toggle').setAttribute('aria-expanded', String(open)) }
+$('#sidebar-overlay').onclick = closeMenu
+$('#user-menu-toggle').onclick = event => { event.stopPropagation(); const menu = $('#user-menu'), open = menu.hasAttribute('hidden'); menu.toggleAttribute('hidden', !open); $('#user-menu-toggle').setAttribute('aria-expanded', String(open)) }
+document.addEventListener('click', event => { if (!event.target.closest('#user-menu') && !event.target.closest('#user-menu-toggle')) closeUserMenu() })
+window.addEventListener('hashchange', render)
+
+async function bootstrap() {
+  const { data, error } = await supabase.auth.getSession()
+  if (error || !data.session) { location.replace('cadastro.html#login'); return }
+  currentUser = data.session.user
+  providerToken = data.session.provider_token || ''
+  const githubIdentity = currentUser.identities?.find(identity => identity.provider === 'github')
+  state.githubConnected = Boolean(githubIdentity)
+  state.githubUsername = githubIdentity?.identity_data?.user_name || githubIdentity?.identity_data?.preferred_username || ''
+  try {
+    const workspace = await loadWorkspace(currentUser.id)
+    if (!workspace.available) throw new Error('A estrutura mais recente do banco ainda não foi aplicada.')
+    const base = (currentUser.email?.split('@')[0] || 'dev').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 20) || 'dev'
+    const accountDefaults = {
+      name: currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || '',
+      username: `${base}-${currentUser.id.slice(0, 6)}`,
+      email: currentUser.email || '',
+    }
+    if (workspace.profile) {
+      Object.assign(state.profile, workspace.profile)
+      state.published = workspace.profile.published
+      const missingAccountFields = !state.profile.name || !state.profile.username || !state.profile.email
+      if (missingAccountFields) {
+        state.profile.name ||= accountDefaults.name
+        state.profile.username ||= accountDefaults.username
+        state.profile.email ||= accountDefaults.email
+        await saveProfile(currentUser.id, state.profile, state.published)
+      }
+    } else {
+      Object.assign(state.profile, { ...blankProfile, ...accountDefaults })
+      await saveProfile(currentUser.id, state.profile, false)
+    }
+    if (!workspace.settings) await saveSettings(currentUser.id, state.settings)
+    state.projects = workspace.projects || []
+    state.analytics = workspace.analytics || []
+    state.referrals = workspace.referrals || []
+    if (workspace.settings) Object.assign(state.settings, { email: workspace.settings.email_notifications, product: workspace.settings.product_notifications, publicProfile: workspace.settings.public_profile, compact: workspace.settings.compact_mode, theme: workspace.settings.theme })
+  } catch (loadError) {
+    console.error('[Devifolio] Falha ao carregar dados reais', loadError)
+    $('#page-content').innerHTML = `<section class="page-enter"><article class="card fatal-state">${emptyState('x', 'Não foi possível carregar seus dados.', 'A estrutura do banco precisa ser atualizada antes de usar o painel.')}</article></section>`
+    hydrateIcons($('#page-content'))
+    toast(loadError.message, 'error')
+    return
+  }
+  document.documentElement.dataset.theme = state.settings.theme === 'dark' ? 'dark' : 'light'
+  hydrateIcons(); render()
+}
+
+supabase.auth.onAuthStateChange((event, session) => { if (event === 'SIGNED_OUT' || (!session && event !== 'INITIAL_SESSION')) location.replace('cadastro.html#login') })
+$$('[data-logout]').forEach(link => link.addEventListener('click', async event => { event.preventDefault(); await supabase.auth.signOut(); location.replace('cadastro.html#login') }))
+
+bootstrap()

@@ -12,6 +12,7 @@ create table if not exists public.profiles (
   linkedin text not null default '',
   github text not null default '',
   website text not null default '',
+  avatar_url text not null default '',
   published boolean not null default false,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -25,6 +26,7 @@ create table if not exists public.projects (
   tech text not null default '',
   link text,
   github text,
+  image_url text,
   status text not null default 'draft' check (status in ('published', 'progress', 'draft')),
   sort_order integer not null default 0,
   created_at timestamptz not null default now(),
@@ -49,6 +51,7 @@ create table if not exists public.analytics_events (
   user_id uuid not null references auth.users(id) on delete cascade,
   project_id bigint,
   event_type text not null check (event_type in ('portfolio_view', 'link_click', 'project_view')),
+  visitor_id text,
   occurred_at timestamptz not null default now(),
   foreign key (project_id, user_id) references public.projects(id, user_id) on delete cascade
 );
@@ -65,6 +68,11 @@ create table if not exists public.referrals (
 
 create index if not exists referrals_user_id_idx on public.referrals(user_id);
 
+alter table public.profiles add column if not exists avatar_url text not null default '';
+alter table public.projects add column if not exists image_url text;
+alter table public.analytics_events add column if not exists visitor_id text;
+create unique index if not exists referrals_user_email_idx on public.referrals(user_id, referred_email);
+
 alter table public.profiles enable row level security;
 alter table public.projects enable row level security;
 alter table public.user_settings enable row level security;
@@ -74,6 +82,9 @@ alter table public.referrals enable row level security;
 revoke all on table public.profiles, public.projects, public.user_settings, public.analytics_events, public.referrals from anon, authenticated;
 grant select, insert, update, delete on table public.profiles, public.projects, public.user_settings, public.analytics_events, public.referrals to authenticated;
 grant usage, select on sequence public.analytics_events_id_seq, public.referrals_id_seq to authenticated;
+grant select on table public.profiles, public.projects to anon;
+grant insert on table public.analytics_events to anon;
+grant usage, select on sequence public.analytics_events_id_seq to anon;
 
 drop policy if exists "profiles_select_own" on public.profiles;
 create policy "profiles_select_own" on public.profiles for select to authenticated using ((select auth.uid()) is not null and (select auth.uid()) = user_id);
@@ -84,6 +95,9 @@ create policy "profiles_update_own" on public.profiles for update to authenticat
 drop policy if exists "profiles_delete_own" on public.profiles;
 create policy "profiles_delete_own" on public.profiles for delete to authenticated using ((select auth.uid()) is not null and (select auth.uid()) = user_id);
 
+drop policy if exists "profiles_select_public" on public.profiles;
+create policy "profiles_select_public" on public.profiles for select to anon, authenticated using (published = true);
+
 drop policy if exists "projects_select_own" on public.projects;
 create policy "projects_select_own" on public.projects for select to authenticated using ((select auth.uid()) is not null and (select auth.uid()) = user_id);
 drop policy if exists "projects_insert_own" on public.projects;
@@ -92,6 +106,15 @@ drop policy if exists "projects_update_own" on public.projects;
 create policy "projects_update_own" on public.projects for update to authenticated using ((select auth.uid()) is not null and (select auth.uid()) = user_id) with check ((select auth.uid()) is not null and (select auth.uid()) = user_id);
 drop policy if exists "projects_delete_own" on public.projects;
 create policy "projects_delete_own" on public.projects for delete to authenticated using ((select auth.uid()) is not null and (select auth.uid()) = user_id);
+
+drop policy if exists "projects_select_public" on public.projects;
+create policy "projects_select_public" on public.projects for select to anon, authenticated using (
+  status = 'published'
+  and exists (
+    select 1 from public.profiles
+    where profiles.user_id = projects.user_id and profiles.published = true
+  )
+);
 
 drop policy if exists "settings_select_own" on public.user_settings;
 create policy "settings_select_own" on public.user_settings for select to authenticated using ((select auth.uid()) is not null and (select auth.uid()) = user_id);
@@ -109,6 +132,23 @@ create policy "analytics_insert_own" on public.analytics_events for insert to au
 drop policy if exists "analytics_delete_own" on public.analytics_events;
 create policy "analytics_delete_own" on public.analytics_events for delete to authenticated using ((select auth.uid()) is not null and (select auth.uid()) = user_id);
 
+drop policy if exists "analytics_insert_public" on public.analytics_events;
+create policy "analytics_insert_public" on public.analytics_events for insert to anon, authenticated with check (
+  exists (
+    select 1 from public.profiles
+    where profiles.user_id = analytics_events.user_id and profiles.published = true
+  )
+  and (
+    project_id is null
+    or exists (
+      select 1 from public.projects
+      where projects.id = analytics_events.project_id
+        and projects.user_id = analytics_events.user_id
+        and projects.status = 'published'
+    )
+  )
+);
+
 drop policy if exists "referrals_select_own" on public.referrals;
 create policy "referrals_select_own" on public.referrals for select to authenticated using ((select auth.uid()) is not null and (select auth.uid()) = user_id);
 drop policy if exists "referrals_insert_own" on public.referrals;
@@ -117,3 +157,62 @@ drop policy if exists "referrals_update_own" on public.referrals;
 create policy "referrals_update_own" on public.referrals for update to authenticated using ((select auth.uid()) is not null and (select auth.uid()) = user_id) with check ((select auth.uid()) is not null and (select auth.uid()) = user_id);
 drop policy if exists "referrals_delete_own" on public.referrals;
 create policy "referrals_delete_own" on public.referrals for delete to authenticated using ((select auth.uid()) is not null and (select auth.uid()) = user_id);
+
+insert into storage.buckets (id, name, public)
+values ('avatars', 'avatars', true)
+on conflict (id) do update set public = true;
+
+drop policy if exists "avatars_public_read" on storage.objects;
+create policy "avatars_public_read" on storage.objects for select to public using (bucket_id = 'avatars');
+drop policy if exists "avatars_insert_own" on storage.objects;
+create policy "avatars_insert_own" on storage.objects for insert to authenticated with check (
+  bucket_id = 'avatars' and (storage.foldername(name))[1] = (select auth.uid())::text
+);
+drop policy if exists "avatars_update_own" on storage.objects;
+create policy "avatars_update_own" on storage.objects for update to authenticated using (
+  bucket_id = 'avatars' and (storage.foldername(name))[1] = (select auth.uid())::text
+) with check (
+  bucket_id = 'avatars' and (storage.foldername(name))[1] = (select auth.uid())::text
+);
+drop policy if exists "avatars_delete_own" on storage.objects;
+create policy "avatars_delete_own" on storage.objects for delete to authenticated using (
+  bucket_id = 'avatars' and (storage.foldername(name))[1] = (select auth.uid())::text
+);
+
+create or replace function public.register_referral(inviter_username text)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  inviter_id uuid;
+  invited_email text;
+begin
+  if auth.uid() is null then raise exception 'authentication required'; end if;
+  select user_id into inviter_id from public.profiles where username = lower(trim(inviter_username));
+  invited_email := coalesce(auth.jwt() ->> 'email', '');
+  if inviter_id is null or inviter_id = auth.uid() or invited_email = '' then return; end if;
+  insert into public.referrals (user_id, referred_email, status)
+  values (inviter_id, invited_email, 'active')
+  on conflict (user_id, referred_email) do update set status = 'active';
+end;
+$$;
+
+revoke all on function public.register_referral(text) from public;
+grant execute on function public.register_referral(text) to authenticated;
+
+create or replace function public.delete_my_account()
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if auth.uid() is null then raise exception 'authentication required'; end if;
+  delete from auth.users where id = auth.uid();
+end;
+$$;
+
+revoke all on function public.delete_my_account() from public;
+grant execute on function public.delete_my_account() to authenticated;
