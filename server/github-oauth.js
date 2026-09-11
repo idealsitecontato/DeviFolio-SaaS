@@ -9,12 +9,25 @@ function required(name) {
   return value
 }
 
-export function githubConfig() {
+function githubCredentials() {
   return {
     clientId: required('GITHUB_CLIENT_ID'),
     clientSecret: required('GITHUB_CLIENT_SECRET'),
     stateSecret: required('GITHUB_OAUTH_STATE_SECRET'),
+  }
+}
+
+export function githubConfig() {
+  return {
+    ...githubCredentials(),
     callbackUrl: required('GITHUB_CALLBACK_URL'),
+  }
+}
+
+export function githubLoginConfig() {
+  return {
+    ...githubCredentials(),
+    callbackUrl: required('GITHUB_LOGIN_CALLBACK_URL'),
   }
 }
 
@@ -49,6 +62,10 @@ export const encryptGithubToken = token => encrypt(token, 'github-token')
 export const decryptGithubToken = token => decrypt(token, 'github-token')
 export const createOauthCookie = payload => encrypt(payload, 'github-oauth-state')
 export const readOauthCookie = payload => decrypt(payload, 'github-oauth-state')
+export const createLoginStateCookie = payload => encrypt(payload, 'github-login-state')
+export const readLoginStateCookie = payload => decrypt(payload, 'github-login-state')
+export const createLoginSessionCookie = payload => encrypt(payload, 'github-login-session')
+export const readLoginSessionCookie = payload => decrypt(payload, 'github-login-session')
 
 export function parseBearer(req) {
   const match = String(req.headers.authorization || '').match(/^Bearer\s+(.+)$/i)
@@ -114,12 +131,12 @@ export const getGithubToken = async accessToken => {
 
 export const deleteGithubConnection = accessToken => supabaseRpc('delete_my_github_connection', accessToken)
 
-export async function exchangeGithubCode(code) {
+export async function exchangeGithubCode(code, redirectUri = githubConfig().callbackUrl) {
   const config = githubConfig()
   const response = await fetch('https://github.com/login/oauth/access_token', {
     method: 'POST',
     headers: { Accept: 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({ client_id: config.clientId, client_secret: config.clientSecret, code, redirect_uri: config.callbackUrl }),
+    body: new URLSearchParams({ client_id: config.clientId, client_secret: config.clientSecret, code, redirect_uri: redirectUri }),
   })
   const data = await response.json().catch(() => ({}))
   if (!response.ok || data.error || !data.access_token) throw new Error(data.error_description || 'O GitHub não forneceu um token de acesso.')
@@ -171,8 +188,16 @@ export function oauthCookieHeader(value, maxAge = 600) {
 }
 
 export function oauthCookieValue(req) {
+  return cookieValue(req, COOKIE_NAME)
+}
+
+export function cookieValue(req, name) {
   const cookies = Object.fromEntries(String(req.headers.cookie || '').split(';').map(item => item.trim().split('=').map(decodeURIComponent)).filter(parts => parts.length === 2))
-  return cookies[COOKIE_NAME] || ''
+  return cookies[name] || ''
+}
+
+export function secureCookieHeader(name, value, path, maxAge = 600, sameSite = 'Lax') {
+  return `${name}=${value}; HttpOnly; Secure; SameSite=${sameSite}; Path=${path}; Max-Age=${maxAge}`
 }
 
 export function json(res, status, payload) {

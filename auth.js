@@ -182,19 +182,12 @@ document.getElementById('form-cadastro').addEventListener('submit', async event 
 })
 
 document.querySelectorAll('#github-login, #github-cadastro').forEach(button => {
-  button.addEventListener('click', async event => {
+  button.addEventListener('click', event => {
     event.preventDefault()
     clearMessage()
-    try {
-      const supabase = await getSupabase()
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'github',
-        options: { redirectTo: `${window.location.origin}/dashboard.html#inicio` },
-      })
-      if (error) reportAuthError('Falha no login com GitHub', error)
-    } catch (error) {
-      reportAuthError('Erro inesperado no login com GitHub', error)
-    }
+    button.setAttribute('aria-disabled', 'true')
+    const query = referralUsername ? `?ref=${encodeURIComponent(referralUsername)}` : ''
+    window.location.assign(`/api/auth/github/start${query}`)
   })
 })
 
@@ -214,15 +207,52 @@ document.querySelector('.auth-forgot')?.addEventListener('click', async event =>
   }
 })
 
-try {
-  const supabase = await getSupabase()
-  const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
-  if (sessionError) reportAuthError('Falha ao recuperar a sessão', sessionError)
-  if (sessionData.session) goToDashboard()
+async function completeGithubLogin() {
+  const params = new URLSearchParams(window.location.search)
+  const status = params.get('github_login')
+  if (!status) return false
+  history.replaceState(null, '', `${window.location.pathname}${window.location.hash || '#login'}`)
+  if (status !== 'complete') {
+    const messages = {
+      access_denied: 'O login com GitHub foi cancelado.',
+      invalid_state: 'A autorização do GitHub expirou. Tente novamente.',
+      failed: 'O GitHub não concluiu o login. Tente novamente.',
+    }
+    showMessage(messages[status] || messages.failed)
+    return false
+  }
 
-  supabase.auth.onAuthStateChange((event, session) => {
-    if (event === 'SIGNED_IN' && session) goToDashboard()
-  })
+  try {
+    showMessage('Concluindo login com GitHub...', 'success')
+    const response = await fetch('/api/auth/github/session', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+    const payload = await response.json().catch(() => ({}))
+    if (!response.ok) throw new Error(payload.error || 'Não foi possível criar a sessão do Devifolio.')
+    const supabase = await getSupabase()
+    const { error } = await supabase.auth.setSession({ access_token: payload.access_token, refresh_token: payload.refresh_token })
+    if (error) throw error
+    if (referralUsername) {
+      const { registerReferral } = await import('./src/lib/user-data.js')
+      await registerReferral(referralUsername)
+    }
+    goToDashboard()
+  } catch (error) {
+    reportAuthError('Falha ao concluir o login com GitHub', error)
+  }
+  return true
+}
+
+try {
+  const completingGithub = await completeGithubLogin()
+  if (!completingGithub) {
+    const supabase = await getSupabase()
+    const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
+    if (sessionError) reportAuthError('Falha ao recuperar a sessão', sessionError)
+    if (sessionData.session) goToDashboard()
+
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) goToDashboard()
+    })
+  }
 } catch (error) {
   reportAuthError('Falha ao inicializar a autenticação', error)
 }
