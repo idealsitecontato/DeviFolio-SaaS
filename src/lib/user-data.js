@@ -124,6 +124,23 @@ export async function uploadAvatar(userId, file) {
   return `${data.publicUrl}?v=${Date.now()}`
 }
 
+export async function uploadProjectImage(userId, projectId, file) {
+  const path = `${userId}/${projectId}/cover`
+  const { error } = await supabase.storage.from('project-images').upload(path, file, {
+    upsert: true,
+    contentType: file.type,
+    cacheControl: '3600',
+  })
+  if (error) throw error
+  const { data } = supabase.storage.from('project-images').getPublicUrl(path)
+  return `${data.publicUrl}?v=${Date.now()}`
+}
+
+export async function removeProjectImage(userId, projectId) {
+  const { error } = await supabase.storage.from('project-images').remove([`${userId}/${projectId}/cover`])
+  if (error) console.warn('[Devifolio] Imagem do projeto não removida', error)
+}
+
 export async function loadPublicPortfolio(username) {
   const normalized = String(username || '').trim().toLowerCase()
   if (!normalized) return null

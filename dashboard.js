@@ -3,16 +3,27 @@ import {
   deleteCurrentAccount,
   loadWorkspace,
   removeProject,
+  removeProjectImage,
   saveProfile,
   saveProject,
   saveSettings,
   uploadAvatar,
+  uploadProjectImage,
 } from './src/lib/user-data.js'
 import QRCode from 'qrcode'
 
 const $ = (selector, root = document) => root.querySelector(selector)
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)]
 const esc = value => String(value ?? '').replace(/[&<>'"]/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[character])
+const PROJECT_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp'])
+const PROJECT_IMAGE_MAX_BYTES = 5 * 1024 * 1024
+
+function validateProjectImage(file) {
+  if (!file) return ''
+  if (!PROJECT_IMAGE_TYPES.has(file.type)) return 'Formato não permitido. Envie somente uma imagem JPG, PNG ou WEBP. Vídeos e outros arquivos não são aceitos.'
+  if (file.size > PROJECT_IMAGE_MAX_BYTES) return 'A imagem ultrapassa o limite de 5 MB. Escolha um arquivo menor.'
+  return ''
+}
 
 const icons = {
   home: '<path d="M3 11.5 12 4l9 7.5"/><path d="M5 10.5V21h14V10.5M9 21v-6h6v6"/>',
@@ -338,17 +349,43 @@ function showProject(id) {
 
 function projectModal(id) {
   const project = state.projects.find(item => item.id === id) || { name: '', description: '', tech: '', link: '', github: '', image: '', status: 'draft' }
-  modal(`<form id="project-form"><div class="modal-head"><div><p class="eyebrow">PROJETOS</p><h2>${id ? 'Editar projeto' : 'Novo projeto'}</h2></div><button class="icon-button" type="button" data-close-modal><span data-icon="x"></span></button></div><div class="form-grid"><label class="field full"><span>Nome do projeto</span><input name="name" required maxlength="60" value="${esc(project.name)}"></label><label class="field full"><span>Descrição</span><textarea name="description" maxlength="180">${esc(project.description)}</textarea></label><label class="field full"><span>Imagem de capa</span><input type="url" name="image" value="${esc(project.image)}" placeholder="https://"></label><label class="field full"><span>Tecnologias</span><input name="tech" value="${esc(project.tech)}" placeholder="React, Node.js, PostgreSQL"></label><label class="field"><span>Link publicado</span><input type="url" name="link" value="${esc(project.link)}" placeholder="https://"></label><label class="field"><span>Repositório GitHub</span><input name="github" value="${esc(project.github)}" placeholder="usuario/repositorio"></label><label class="field full"><span>Status</span><select name="status"><option value="published" ${project.status === 'published' ? 'selected' : ''}>Publicado</option><option value="progress" ${project.status === 'progress' ? 'selected' : ''}>Em breve</option><option value="draft" ${project.status === 'draft' ? 'selected' : ''}>Em desenvolvimento</option></select></label></div><div class="modal-actions"><button class="secondary-button" type="button" data-close-modal>Cancelar</button><button class="primary-button" type="submit">${id ? 'Salvar alterações' : 'Criar projeto'}</button></div></form>`)
+  modal(`<form id="project-form"><div class="modal-head"><div><p class="eyebrow">PROJETOS</p><h2>${id ? 'Editar projeto' : 'Novo projeto'}</h2></div><button class="icon-button" type="button" data-close-modal><span data-icon="x"></span></button></div><div class="form-grid"><label class="field full"><span>Nome do projeto</span><input name="name" required maxlength="60" value="${esc(project.name)}"></label><label class="field full"><span>Descrição</span><textarea name="description" maxlength="180">${esc(project.description)}</textarea></label><div class="field full"><span>Imagem de capa</span><div class="project-image-upload"><div class="project-image-preview" id="project-image-preview">${project.image ? `<img src="${esc(project.image)}" alt="Imagem atual do projeto">` : '<span data-icon="upload"></span>'}</div><div class="project-image-upload-copy"><input id="project-image-file" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="secondary-button" type="button" id="project-image-button"><span data-icon="upload"></span>Carregar do computador</button><strong id="project-image-name">${project.image ? 'Imagem atual do projeto' : 'Nenhum arquivo selecionado'}</strong><small>JPG, PNG ou WEBP, até 5 MB. Vídeos e outros arquivos não são aceitos.</small></div></div></div><label class="field full"><span>Ou use uma URL de imagem</span><input type="url" name="image" value="${esc(project.image)}" placeholder="https://"></label><label class="field full"><span>Tecnologias</span><input name="tech" value="${esc(project.tech)}" placeholder="React, Node.js, PostgreSQL"></label><label class="field"><span>Link publicado</span><input type="url" name="link" value="${esc(project.link)}" placeholder="https://"></label><label class="field"><span>Repositório GitHub</span><input name="github" value="${esc(project.github)}" placeholder="usuario/repositorio"></label><label class="field full"><span>Status</span><select name="status"><option value="published" ${project.status === 'published' ? 'selected' : ''}>Publicado</option><option value="progress" ${project.status === 'progress' ? 'selected' : ''}>Em breve</option><option value="draft" ${project.status === 'draft' ? 'selected' : ''}>Em desenvolvimento</option></select></label></div><div class="modal-actions"><button class="secondary-button" type="button" data-close-modal>Cancelar</button><button class="primary-button" type="submit">${id ? 'Salvar alterações' : 'Criar projeto'}</button></div></form>`)
+  const imageInput = $('#project-image-file')
+  const imageButton = $('#project-image-button')
+  const imageName = $('#project-image-name')
+  const imagePreview = $('#project-image-preview')
+  let previewUrl = ''
+  imageButton.onclick = () => imageInput.click()
+  imageInput.onchange = () => {
+    const file = imageInput.files?.[0]
+    const validationError = validateProjectImage(file)
+    if (validationError) {
+      imageInput.value = ''
+      imageName.textContent = project.image ? 'Imagem atual do projeto' : 'Nenhum arquivo selecionado'
+      toast(validationError, 'error')
+      return
+    }
+    if (!file) return
+    if (previewUrl) URL.revokeObjectURL(previewUrl)
+    previewUrl = URL.createObjectURL(file)
+    imageName.textContent = `${file.name} · ${(file.size / 1024 / 1024).toFixed(1)} MB`
+    imagePreview.innerHTML = `<img src="${esc(previewUrl)}" alt="Prévia da imagem selecionada">`
+  }
   $('#project-form').onsubmit = async event => {
     event.preventDefault()
     const button = event.currentTarget.querySelector('[type="submit"]')
     const data = Object.fromEntries(new FormData(event.currentTarget))
     const next = { id: id || Date.now(), ...data }
+    const imageFile = imageInput.files?.[0]
+    const validationError = validateProjectImage(imageFile)
+    if (validationError) return toast(validationError, 'error')
     setButtonLoading(button, true, 'Salvando...')
     try {
+      if (imageFile) next.image = await uploadProjectImage(currentUser.id, next.id, imageFile)
       const saved = await saveProject(currentUser.id, next, id ? state.projects.findIndex(item => item.id === id) : 0)
       if (id) state.projects.splice(state.projects.findIndex(item => item.id === id), 1, saved)
       else state.projects.unshift(saved)
+      if (previewUrl) URL.revokeObjectURL(previewUrl)
       closeModal(); toast(id ? 'Projeto atualizado.' : 'Projeto criado com sucesso.'); render()
     } catch (error) { reportError('Não foi possível salvar o projeto.', error); setButtonLoading(button, false) }
   }
@@ -362,6 +399,7 @@ function confirmDelete(id) {
     setButtonLoading(event.currentTarget, true, 'Excluindo...')
     try {
       await removeProject(currentUser.id, id)
+      await removeProjectImage(currentUser.id, id)
       state.projects = state.projects.filter(item => item.id !== id)
       closeModal(); toast('Projeto excluído.'); render()
     } catch (error) { reportError('Não foi possível excluir o projeto.', error); setButtonLoading(event.currentTarget, false) }
