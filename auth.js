@@ -53,9 +53,10 @@ function friendlyError(error) {
   const message = error?.message?.toLowerCase() || ''
   if (message.includes('invalid login credentials')) return 'E-mail ou senha incorretos.'
   if (message.includes('already registered') || message.includes('already been registered')) return 'Este e-mail já possui uma conta.'
+  if (message.includes('email not confirmed')) return 'A confirmação de e-mail ainda está ativa no Supabase. Desative essa exigência para entrar imediatamente.'
+  if (message.includes('rate limit')) return 'Muitas tentativas. Aguarde um pouco e tente novamente.'
   if (message.includes('password')) return 'A senha precisa ter pelo menos 8 caracteres.'
   if (message.includes('email')) return 'Digite um endereço de e-mail válido.'
-  if (message.includes('rate limit')) return 'Muitas tentativas. Aguarde um pouco e tente novamente.'
   return 'Não foi possível concluir agora. Tente novamente.'
 }
 
