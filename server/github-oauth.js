@@ -83,6 +83,21 @@ async function supabaseRpc(name, accessToken, body = {}) {
   return data
 }
 
+export async function getGithubConnection(accessToken, userId) {
+  const config = supabaseConfig()
+  const query = new URLSearchParams({
+    select: 'github_user_id,github_username,avatar_url,connected_at,updated_at',
+    user_id: `eq.${userId}`,
+    limit: '1',
+  })
+  const response = await fetch(`${config.url}/rest/v1/github_connections?${query}`, {
+    headers: { apikey: config.key, Authorization: `Bearer ${accessToken}` },
+  })
+  const data = await response.json().catch(() => [])
+  if (!response.ok) throw Object.assign(new Error(data?.message || 'Não foi possível consultar a conexão com o GitHub.'), { statusCode: response.status })
+  return data[0] || null
+}
+
 export const saveGithubConnection = (accessToken, githubUser, token) => supabaseRpc('save_github_connection', accessToken, {
   p_github_user_id: String(githubUser.id),
   p_github_username: githubUser.login,
