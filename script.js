@@ -81,22 +81,37 @@ githubNext?.addEventListener('click', event => {
 
 syncGithubNext();
 
-const featureList = document.querySelector('.feature-list');
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-if (featureList) {
-  if (prefersReducedMotion) {
-    featureList.classList.add('is-inview');
-  } else {
-    const featureObserver = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          featureList.classList.add('is-inview');
-          featureObserver.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.22 });
-    featureObserver.observe(featureList);
-  }
+const revealElements = document.querySelectorAll([
+  '.showcase-card',
+  '.showcase-stat',
+  '.section-head > *',
+  '.repository-flow-step',
+  '.repository-flow-arrow',
+  '.feature-row',
+  '.step',
+  '.audience-card',
+  '.price-note',
+  '.faq-list details',
+  '.final-video-copy',
+  '.video-frame',
+  '.footer-grid > *',
+].join(','));
+
+revealElements.forEach((element, index) => {
+  element.classList.add('scroll-reveal');
+  element.style.setProperty('--reveal-delay', `${(index % 4) * 55}ms`);
+});
+
+if (prefersReducedMotion) {
+  revealElements.forEach(element => element.classList.add('is-inview'));
+} else {
+  const revealObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      entry.target.classList.toggle('is-inview', entry.isIntersecting);
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -7% 0px' });
+  revealElements.forEach(element => revealObserver.observe(element));
 }
 
 document.querySelectorAll('a[href^="#"]').forEach(link => {

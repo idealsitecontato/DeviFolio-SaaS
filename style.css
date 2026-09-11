@@ -2542,3 +2542,123 @@ body{overflow-x:hidden}
   body .site-header:not(.is-scrolled) .nav-shell,
   body .site-header.is-scrolled .nav-shell{width:calc(100% - 20px) !important}
 }
+
+/* =========================================================
+   AJUSTES FINAIS — landing page
+   ========================================================= */
+
+/* Navbar preservada, com logo discretamente maior e reação suave ao scroll. */
+body .site-header:not(.is-scrolled) .nav-brand-logo{
+  width:120px !important;
+  height:32px !important;
+  transition:width .35s ease,height .35s ease,opacity .2s ease !important;
+}
+body .site-header.is-scrolled .nav-brand-logo{
+  width:114px !important;
+  height:30px !important;
+  transition:width .35s ease,height .35s ease,opacity .2s ease !important;
+}
+body .site-header:not(.is-scrolled) .nav-shell{
+  transform:translateY(0) scale(1) !important;
+  transition:transform .38s cubic-bezier(.22,1,.36,1),width .38s ease,padding .38s ease !important;
+}
+body .site-header.is-scrolled .nav-shell{
+  width:min(930px,calc(100% - 48px)) !important;
+  padding-left:25px !important;
+  transform:translateY(-2px) scale(.98) !important;
+  transition:transform .38s cubic-bezier(.22,1,.36,1),width .38s ease,padding .38s ease !important;
+}
+
+/* Cliques respondem sem glow, bounce ou pulsação. */
+body:not(.auth-body) a[href],
+body:not(.auth-body) button,
+body:not(.auth-body) summary{
+  transition:opacity .16s ease,transform .16s cubic-bezier(.22,1,.36,1),background-color .18s ease,border-color .18s ease !important;
+}
+body:not(.auth-body) a[href]:active,
+body:not(.auth-body) button:active,
+body:not(.auth-body) summary:active{
+  opacity:.82 !important;
+  transform:scale(.975) !important;
+}
+
+/* Zero arredondamento em toda a landing, preservando somente a navbar. */
+html body:not(.auth-body) main#top *,
+html body:not(.auth-body) main#top *::before,
+html body:not(.auth-body) main#top *::after,
+html body:not(.auth-body) footer#contato *,
+html body:not(.auth-body) footer#contato *::before,
+html body:not(.auth-body) footer#contato *::after{
+  border-radius:0 !important;
+}
+
+/* Mesma malha da Hero, com contraste um pouco maior. */
+.hero-devifolio::before{
+  opacity:.9 !important;
+  background:radial-gradient(circle at 1px 1px,rgba(15,18,22,.43) .8px,transparent .95px) !important;
+  background-size:20px 20px !important;
+}
+
+/* Fluxo visual: repositório → organização → apresentação. */
+.repository-flow{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 46px minmax(0,1fr) 46px minmax(0,1fr);
+  align-items:stretch;
+  margin:0 0 46px;
+  border-top:1px solid #d8dce2;
+  border-bottom:1px solid #d8dce2;
+  background:#fff;
+}
+.repository-flow-step{min-height:186px;padding:22px 24px;display:flex;flex-direction:column;gap:22px;background:#fff}
+.repository-flow-step + .repository-flow-arrow + .repository-flow-step{border-left:1px solid #e2e5e9}
+.repository-flow-head{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.repository-flow-head span{color:#8b929d;font-size:12px}
+.repository-flow-head strong{color:#252a31;font-size:12px;letter-spacing:.1em}
+.repository-flow-arrow{display:grid;place-items:center;color:#7f8792;font-size:22px;border-left:1px solid #e2e5e9;background:#f7f8fa}
+.repository-files{display:grid;gap:8px;margin-top:auto}
+.repository-files span{display:flex;align-items:center;gap:10px;color:#59616d;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:13px}
+.repository-files i{width:9px;height:9px;border:1px solid #8b929d;background:#fff}
+.repository-files span:first-child i{background:#0878f9;border-color:#0878f9}
+.repository-organized{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:auto}
+.repository-organized span{min-height:36px;display:flex;align-items:center;padding:0 11px;border:1px solid #d7dce3;color:#4f5865;font-size:12px}
+.repository-organized span:last-child{grid-column:1/-1}
+.repository-project{display:grid;grid-template-columns:76px 1fr;align-items:center;gap:14px;margin-top:auto;border:1px solid #d7dce3;padding:10px}
+.repository-project>div{height:54px;background:linear-gradient(135deg,#0878f9 0 48%,#111315 48% 100%)}
+.repository-project span{display:grid;gap:5px}
+.repository-project b{font-size:13px;font-weight:600;color:#252a31}
+.repository-project small{font-size:11px;color:#858d98}
+
+/* Entrada discreta e reversível ao cruzar o viewport. */
+body:not(.auth-body) .scroll-reveal,
+body:not(.auth-body) .feature-list .feature-row.scroll-reveal{
+  opacity:0 !important;
+  transform:translate3d(0,16px,0) !important;
+  transition:opacity .52s ease var(--reveal-delay,0ms),transform .58s cubic-bezier(.22,1,.36,1) var(--reveal-delay,0ms) !important;
+  will-change:opacity,transform;
+}
+body:not(.auth-body) .scroll-reveal.is-inview,
+body:not(.auth-body) .feature-list .feature-row.scroll-reveal.is-inview{
+  opacity:1 !important;
+  transform:translate3d(0,0,0) !important;
+}
+
+@media (max-width:820px){
+  body .site-header:not(.is-scrolled) .nav-brand-logo{width:112px !important;height:30px !important}
+  body .site-header.is-scrolled .nav-brand-logo{width:106px !important;height:28px !important}
+  body .site-header.is-scrolled .nav-shell{width:calc(100% - 38px) !important}
+  .repository-flow{grid-template-columns:1fr;margin-bottom:36px}
+  .repository-flow-step{min-height:150px}
+  .repository-flow-step + .repository-flow-arrow + .repository-flow-step{border-left:0;border-top:1px solid #e2e5e9}
+  .repository-flow-arrow{min-height:38px;border-left:0;border-top:1px solid #e2e5e9}
+  body:not(.auth-body) .repository-flow-arrow.scroll-reveal{transform:translate3d(0,16px,0) rotate(90deg) !important}
+  body:not(.auth-body) .repository-flow-arrow.scroll-reveal.is-inview{transform:translate3d(0,0,0) rotate(90deg) !important}
+}
+@media (max-width:520px){
+  body .site-header.is-scrolled .nav-shell{width:calc(100% - 26px) !important}
+  .repository-flow-step{padding:19px 18px}
+}
+@media (prefers-reduced-motion:reduce){
+  body:not(.auth-body) .scroll-reveal,
+  body:not(.auth-body) .feature-list .feature-row.scroll-reveal{opacity:1 !important;transform:none !important;transition:none !important}
+  body:not(.auth-body) a[href],body:not(.auth-body) button,body:not(.auth-body) summary{transition:none !important}
+}
