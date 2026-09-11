@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.sites-runtime/
+
+# Local environment files may contain project credentials.
+.env
+.env.*
+!.env.example
+

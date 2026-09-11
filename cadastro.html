@@ -97,70 +97,7 @@
       </div>
     </section>
   </main>
-
-  <script>
-    const panels = {
-      login: document.getElementById('panel-login'),
-      cadastro: document.getElementById('panel-cadastro')
-    };
-
-    function showPanel(name, updateHash){
-      if (name !== 'login' && name !== 'cadastro') name = 'login';
-      Object.keys(panels).forEach(key => {
-        panels[key].classList.toggle('is-active', key === name);
-      });
-      if (updateHash) history.replaceState(null, '', '#' + name);
-    }
-
-    document.querySelectorAll('[data-switch]').forEach(btn => {
-      btn.addEventListener('click', () => showPanel(btn.dataset.switch, true));
-    });
-
-    showPanel(window.location.hash.replace('#', '') || 'login', false);
-    window.addEventListener('hashchange', () => {
-      showPanel(window.location.hash.replace('#', ''), false);
-    });
-
-    function enterDashboard(user){
-      localStorage.setItem('devifolio-auth', JSON.stringify({
-        name: user.name || 'Felype José',
-        email: user.email || 'felype@devifolio.com',
-        provider: user.provider || 'email',
-        signedInAt: new Date().toISOString()
-      }));
-      window.location.href = 'dashboard.html#inicio';
-    }
-
-    document.getElementById('form-login').addEventListener('submit', event => {
-      event.preventDefault();
-      const email = document.getElementById('login-email');
-      const password = document.getElementById('login-senha');
-      if (!email.reportValidity() || !password.reportValidity()) return;
-      enterDashboard({ email: email.value.trim() });
-    });
-
-    document.getElementById('form-cadastro').addEventListener('submit', event => {
-      event.preventDefault();
-      const name = document.getElementById('cad-nome');
-      const email = document.getElementById('cad-email');
-      const password = document.getElementById('cad-senha');
-      if (password.value.length < 8) {
-        password.setCustomValidity('Use pelo menos 8 caracteres.');
-        password.reportValidity();
-        password.setCustomValidity('');
-        return;
-      }
-      if (!name.reportValidity() || !email.reportValidity() || !password.reportValidity()) return;
-      enterDashboard({ name: name.value.trim(), email: email.value.trim() });
-    });
-
-    ['github-login', 'github-cadastro'].forEach(id => {
-      document.getElementById(id).addEventListener('click', event => {
-        event.preventDefault();
-        enterDashboard({ provider: 'github' });
-      });
-    });
-  </script>
+  <script type="module" src="auth.js"></script>
 
 </body>
 </html>
