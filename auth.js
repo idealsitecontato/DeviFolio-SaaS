@@ -49,6 +49,11 @@ function friendlyError(error) {
   return 'Não foi possível concluir agora. Tente novamente.'
 }
 
+function reportAuthError(action, error) {
+  console.error(`[Devifolio Auth] ${action}`, error)
+  showMessage(friendlyError(error))
+}
+
 function setLoading(button, active, label) {
   if (!button.dataset.originalLabel) button.dataset.originalLabel = button.textContent
   button.disabled = active
@@ -77,14 +82,19 @@ document.getElementById('form-login').addEventListener('submit', async event => 
   if (!event.currentTarget.reportValidity()) return
 
   setLoading(button, true, 'Entrando...')
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email: email.value.trim(),
-    password: password.value,
-  })
-  setLoading(button, false)
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.value.trim(),
+      password: password.value,
+    })
 
-  if (error) return showMessage(friendlyError(error))
-  if (data.session) goToDashboard()
+    if (error) return reportAuthError('Falha no login', error)
+    if (data.session) goToDashboard()
+  } catch (error) {
+    reportAuthError('Erro inesperado no login', error)
+  } finally {
+    setLoading(button, false)
+  }
 })
 
 document.getElementById('form-cadastro').addEventListener('submit', async event => {
@@ -97,16 +107,24 @@ document.getElementById('form-cadastro').addEventListener('submit', async event 
   if (!event.currentTarget.reportValidity()) return
 
   setLoading(button, true, 'Criando conta...')
-  const { data, error } = await supabase.auth.signUp({
-    email: email.value.trim(),
-    password: password.value,
-    options: { data: { full_name: name.value.trim() } },
-  })
-  setLoading(button, false)
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email: email.value.trim(),
+      password: password.value,
+      options: {
+        data: { full_name: name.value.trim() },
+        emailRedirectTo: `${window.location.origin}/dashboard.html#inicio`,
+      },
+    })
 
-  if (error) return showMessage(friendlyError(error))
-  if (data.session) return goToDashboard()
-  showMessage('Conta criada. Confirme seu e-mail para entrar.', 'success')
+    if (error) return reportAuthError('Falha no cadastro', error)
+    if (data.session) return goToDashboard()
+    showMessage('Conta criada. Confirme seu e-mail para entrar.', 'success')
+  } catch (error) {
+    reportAuthError('Erro inesperado no cadastro', error)
+  } finally {
+    setLoading(button, false)
+  }
 })
 
 document.querySelectorAll('#github-login, #github-cadastro').forEach(button => {
@@ -117,7 +135,7 @@ document.querySelectorAll('#github-login, #github-cadastro').forEach(button => {
       provider: 'github',
       options: { redirectTo: `${window.location.origin}/dashboard.html#inicio` },
     })
-    if (error) showMessage(friendlyError(error))
+    if (error) reportAuthError('Falha no login com GitHub', error)
   })
 })
 
@@ -128,11 +146,12 @@ document.querySelector('.auth-forgot')?.addEventListener('click', async event =>
   const { error } = await supabase.auth.resetPasswordForEmail(email.value.trim(), {
     redirectTo: `${window.location.origin}/cadastro.html#login`,
   })
-  if (error) return showMessage(friendlyError(error))
+  if (error) return reportAuthError('Falha na recuperação de senha', error)
   showMessage('Enviamos as instruções para o seu e-mail.', 'success')
 })
 
-const { data: sessionData } = await supabase.auth.getSession()
+const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
+if (sessionError) reportAuthError('Falha ao recuperar a sessão', sessionError)
 if (sessionData.session) goToDashboard()
 
 supabase.auth.onAuthStateChange((event, session) => {
