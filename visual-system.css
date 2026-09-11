@@ -1,0 +1,63 @@
+/* Ajustes visuais globais da landing: sutis, consistentes e sem mudar o layout. */
+:root{--ui-radius:10px;--ui-control-radius:8px;--ui-small-radius:6px}
+
+body:not(.auth-body) .nav-shell,
+body:not(.auth-body) .mobile-menu,
+body:not(.auth-body) article,
+body:not(.auth-body) .step,
+body:not(.auth-body) .metric-card,
+body:not(.auth-body) .audience-card,
+body:not(.auth-body) .testimonial-card,
+body:not(.auth-body) .review-card,
+body:not(.auth-body) .price-note,
+body:not(.auth-body) .showcase-card,
+body:not(.auth-body) .github-link-panel,
+body:not(.auth-body) .video-frame,
+body:not(.auth-body) .video-placeholder,
+body:not(.auth-body) .final-cta-inner{border-radius:var(--ui-radius)!important}
+
+body:not(.auth-body) .button,
+body:not(.auth-body) button,
+body:not(.auth-body) input,
+body:not(.auth-body) select,
+body:not(.auth-body) textarea,
+body:not(.auth-body) .mobile-menu a,
+body:not(.auth-body) .feature-icon,
+body:not(.auth-body) .floating-chat,
+body:not(.auth-body) .profile-links a,
+body:not(.auth-body) .skills span{border-radius:var(--ui-control-radius)!important}
+
+body:not(.auth-body) .review-avatar,
+body:not(.auth-body) .person-avatar,
+body:not(.auth-body) .avatar,
+body:not(.auth-body) .mini-avatars i,
+body:not(.auth-body) .metric-orb,
+body:not(.auth-body) .metric-plus,
+body:not(.auth-body) .video-play{border-radius:50%!important}
+
+body:not(.auth-body) .button,
+body:not(.auth-body) .metric-card,
+body:not(.auth-body) .audience-card,
+body:not(.auth-body) .testimonial-card,
+body:not(.auth-body) .review-card,
+body:not(.auth-body) .feature-row,
+body:not(.auth-body) .faq-question{transition:transform .16s ease,background-color .16s ease,border-color .16s ease,color .16s ease,box-shadow .16s ease!important}
+body:not(.auth-body) .button:hover,
+body:not(.auth-body) .metric-card:hover,
+body:not(.auth-body) .audience-card:hover,
+body:not(.auth-body) .testimonial-card:hover,
+body:not(.auth-body) .review-card:hover{transform:translateY(-2px)}
+body:not(.auth-body) .button:active{transform:translateY(0)}
+
+/* A barra ocupa a largura da janela; somente sua borda inferior recebe suavizacao. */
+body:not(.auth-body) .site-header .nav-shell{border-radius:0 0 var(--ui-radius) var(--ui-radius)!important}
+
+@media(prefers-reduced-motion:reduce){
+  body:not(.auth-body) .button,
+  body:not(.auth-body) .metric-card,
+  body:not(.auth-body) .audience-card,
+  body:not(.auth-body) .testimonial-card,
+  body:not(.auth-body) .review-card,
+  body:not(.auth-body) .feature-row,
+  body:not(.auth-body) .faq-question{transition:none!important}
+}

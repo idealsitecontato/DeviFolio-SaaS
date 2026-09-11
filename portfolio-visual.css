@@ -1,0 +1,14 @@
+/* Sistema visual do portfolio publico. */
+:root{--ui-radius:10px;--ui-control-radius:8px;--ui-small-radius:6px}
+.public-avatar,.public-avatar img{border-radius:50%!important;aspect-ratio:1}
+.nav-action,.public-button,.profile-links a,.skills span{border-radius:var(--ui-control-radius)!important}
+.public-project,.empty-projects{border-radius:var(--ui-radius)!important;overflow:hidden}
+.project-image{border-radius:var(--ui-radius) var(--ui-radius) 0 0!important}
+.loader{border-radius:50%!important}
+.public-projects{border:0!important;gap:18px}
+.public-project{border:1px solid #dfe4e8!important}
+.nav-action,.public-button,.profile-links a,.public-project{transition:transform .16s ease,border-color .16s ease,background-color .16s ease,color .16s ease,box-shadow .16s ease}
+.nav-action:hover,.public-button:hover,.profile-links a:hover,.public-project:hover{transform:translateY(-2px)}
+.portfolio-shell,.public-state{animation:public-content-in .26s cubic-bezier(.22,1,.36,1) both}
+@keyframes public-content-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.portfolio-shell,.public-state{animation:none}.nav-action,.public-button,.profile-links a,.public-project{transition:none}}
