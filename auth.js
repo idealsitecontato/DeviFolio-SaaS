@@ -103,8 +103,15 @@ document.getElementById('form-cadastro').addEventListener('submit', async event 
   const name = document.getElementById('cad-nome')
   const email = document.getElementById('cad-email')
   const password = document.getElementById('cad-senha')
+  const passwordConfirmation = document.getElementById('cad-confirmar-senha')
   const button = event.currentTarget.querySelector('[type="submit"]')
+  passwordConfirmation.setCustomValidity('')
   if (!event.currentTarget.reportValidity()) return
+  if (password.value !== passwordConfirmation.value) {
+    passwordConfirmation.setCustomValidity('As senhas precisam ser iguais.')
+    passwordConfirmation.reportValidity()
+    return
+  }
 
   setLoading(button, true, 'Criando conta...')
   try {

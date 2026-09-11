@@ -25,8 +25,7 @@
 .auth-form-wrap{width:min(100%,500px);margin:0 auto}
 .auth-tabs{display:none}
 .auth-panel{display:none}
-.auth-panel.is-active{display:block;animation:auth-enter .22s ease both}
-@keyframes auth-enter{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.auth-panel.is-active{display:block}
 
 .auth-panel h1{margin:0 0 8px;text-align:center;color:#101216;font-size:30px;font-weight:700;line-height:1.15;letter-spacing:-.035em}
 .auth-sub{margin:0 0 28px;text-align:center;color:#657087;font-size:15px;line-height:1.5}
@@ -82,4 +81,3 @@
   .auth-panel h1{font-size:28px}
   .auth-row-between{align-items:flex-start}
 }
-@media (prefers-reduced-motion:reduce){.auth-panel.is-active{animation:none}}

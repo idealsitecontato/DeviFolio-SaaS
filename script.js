@@ -83,11 +83,7 @@ syncGithubNext();
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const revealElements = document.querySelectorAll([
-  '.showcase-card',
-  '.showcase-stat',
   '.section-head > *',
-  '.repository-flow-step',
-  '.repository-flow-arrow',
   '.feature-row',
   '.step',
   '.audience-card',
@@ -95,12 +91,11 @@ const revealElements = document.querySelectorAll([
   '.faq-list details',
   '.final-video-copy',
   '.video-frame',
-  '.footer-grid > *',
 ].join(','));
 
 revealElements.forEach((element, index) => {
-  element.classList.add('scroll-reveal');
-  element.style.setProperty('--reveal-delay', `${(index % 4) * 55}ms`);
+  element.classList.add('direction-reveal', index % 2 === 0 ? 'from-left' : 'from-right');
+  element.style.setProperty('--reveal-delay', `${(index % 3) * 35}ms`);
 });
 
 if (prefersReducedMotion) {
