@@ -2230,37 +2230,6 @@ html{scroll-behavior:auto}
   transform:none !important;
 }
 
-/* --- Recursos: entrada pelas laterais ao rolar a tela --- */
-.feature-list .feature-row,
-.feature-list .feature-row:nth-child(1),
-.feature-list .feature-row:nth-child(2),
-.feature-list .feature-row:nth-child(3),
-.feature-list .feature-row:nth-child(4),
-.feature-list .feature-row:nth-child(5){
-  opacity:0 !important;
-  transform:translateX(-64px) !important;
-  transition:opacity .85s cubic-bezier(.16,1,.3,1), transform .85s cubic-bezier(.16,1,.3,1) !important;
-  will-change:transform,opacity;
-}
-.feature-list .feature-row:nth-child(even){transform:translateX(64px) !important}
-.feature-list.is-inview .feature-row,
-.feature-list.is-inview .feature-row:nth-child(1),
-.feature-list.is-inview .feature-row:nth-child(2),
-.feature-list.is-inview .feature-row:nth-child(3),
-.feature-list.is-inview .feature-row:nth-child(4),
-.feature-list.is-inview .feature-row:nth-child(5){
-  opacity:1 !important;
-  transform:translateX(0) !important;
-}
-.feature-list.is-inview .feature-row:nth-child(1){transition-delay:0s !important}
-.feature-list.is-inview .feature-row:nth-child(2){transition-delay:.06s !important}
-.feature-list.is-inview .feature-row:nth-child(3){transition-delay:.26s !important}
-.feature-list.is-inview .feature-row:nth-child(4){transition-delay:.04s !important}
-.feature-list.is-inview .feature-row:nth-child(5){transition-delay:.32s !important}
-@media (prefers-reduced-motion:reduce){
-  .feature-list .feature-row{opacity:1 !important;transform:none !important;transition:none !important}
-}
-
 /* --- Recursos: ícone azul só no GitHub (item 1); os demais, preto --- */
 .feature-list .feature-icon{
   background:#15171a !important;
@@ -2631,11 +2600,15 @@ html body:not(.auth-body) .section-cream *{filter:none !important;backdrop-filte
 html body:not(.auth-body) .features .section-head{margin-bottom:36px !important}
 html body:not(.auth-body) .features .feature-row:hover{background:#f4f5f6 !important}
 
-/* Movimento lateral rápido e reversível, sem fade. */
+/* Movimento lateral rápido e reversível, incluindo a Hero, sem esconder conteúdo. */
 html body:not(.auth-body) main#top .direction-reveal{
   opacity:1 !important;
   transition:transform .34s cubic-bezier(.22,1,.36,1) var(--reveal-delay,0ms) !important;
   will-change:transform;
+}
+html body:not(.auth-body) main#top .hero-copy.direction-reveal,
+html body:not(.auth-body) main#top .hero-visual.direction-reveal{
+  transition-duration:.62s !important;
 }
 html body:not(.auth-body) main#top .direction-reveal.from-left{transform:translate3d(-30px,0,0) !important}
 html body:not(.auth-body) main#top .direction-reveal.from-right{transform:translate3d(30px,0,0) !important}

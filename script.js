@@ -95,6 +95,10 @@ syncGithubNext();
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const revealElements = document.querySelectorAll([
+  '.hero-copy',
+  '.hero-visual',
+  '.showcase-card',
+  '.showcase-stat',
   '.section-head > *',
   '.feature-row',
   '.step',
@@ -103,10 +107,12 @@ const revealElements = document.querySelectorAll([
   '.faq-item',
   '.final-video-copy',
   '.video-frame',
+  '.footer-grid > *',
 ].join(','));
 
 revealElements.forEach((element, index) => {
-  element.classList.add('direction-reveal', index % 2 === 0 ? 'from-left' : 'from-right');
+  const entersFromRight = element.matches('.hero-visual') || (!element.matches('.hero-copy') && index % 2 !== 0);
+  element.classList.add('direction-reveal', entersFromRight ? 'from-right' : 'from-left');
   element.style.setProperty('--reveal-delay', `${(index % 3) * 35}ms`);
 });
 
@@ -118,7 +124,9 @@ if (prefersReducedMotion) {
       entry.target.classList.toggle('is-inview', entry.isIntersecting);
     });
   }, { threshold: 0.12, rootMargin: '0px 0px -7% 0px' });
-  revealElements.forEach(element => revealObserver.observe(element));
+  window.requestAnimationFrame(() => {
+    revealElements.forEach(element => revealObserver.observe(element));
+  });
 }
 
 document.querySelectorAll('a[href^="#"]').forEach(link => {

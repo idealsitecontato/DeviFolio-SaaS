@@ -70,8 +70,11 @@ function goToDashboard() {
   window.location.replace('dashboard.html#inicio')
 }
 
-document.querySelectorAll('[data-switch]').forEach(button => {
-  button.addEventListener('click', () => showPanel(button.dataset.switch, true))
+document.querySelectorAll('[data-switch]').forEach(control => {
+  control.addEventListener('click', event => {
+    event.preventDefault()
+    showPanel(control.dataset.switch, true)
+  })
 })
 
 document.getElementById('cad-confirmar-senha')?.addEventListener('input', event => {

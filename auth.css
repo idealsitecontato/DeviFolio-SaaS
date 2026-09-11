@@ -52,7 +52,7 @@
 .auth-divider::before,.auth-divider::after{content:"";height:1px;flex:1;background:#dfe3e9}
 .auth-switch,.auth-terms{text-align:center}
 .auth-switch{margin:30px 0 0;color:#657087;font-size:13px}
-.auth-switch button{padding:0;border:0;border-radius:0;background:transparent;color:#0878f9;font:inherit;text-decoration:underline;cursor:pointer}
+.auth-switch a{padding:0;border:0;border-radius:0;background:transparent;color:#0878f9;font:inherit;text-decoration:underline;cursor:pointer}
 .auth-terms{margin:17px 0 0;color:#7b8495;font-size:12px;line-height:1.5}
 .auth-terms a{color:#475168;text-decoration:underline}
 
