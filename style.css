@@ -2677,10 +2677,22 @@ html body .site-header.is-scrolled .nav-shell{
 html body .site-header .nav-brand-logo,
 html body .site-header:not(.is-scrolled) .nav-brand-logo,
 html body .site-header.is-scrolled .nav-brand-logo{
-  width:142px !important;
-  height:38px !important;
+  position:absolute !important;
+  left:-45px !important;
+  top:-51px !important;
+  width:246px !important;
+  height:auto !important;
+  max-width:none !important;
+  object-fit:initial !important;
   transform:none !important;
   transition:none !important;
+}
+html body .site-header .brand{
+  position:relative !important;
+  width:154px !important;
+  height:42px !important;
+  flex:none !important;
+  overflow:hidden !important;
 }
 html body .site-header .button-nav,
 html body .site-header.is-scrolled .button-nav{
@@ -2719,7 +2731,8 @@ html body:not(.auth-body) .faq-item.is-open .faq-answer{grid-template-rows:1fr}
   html body .site-header.is-scrolled .nav-shell{min-height:60px !important}
   html body .site-header .nav-brand-logo,
   html body .site-header:not(.is-scrolled) .nav-brand-logo,
-  html body .site-header.is-scrolled .nav-brand-logo{width:126px !important;height:34px !important}
+  html body .site-header.is-scrolled .nav-brand-logo{left:-39px !important;top:-44px !important;width:212px !important;height:auto !important}
+  html body .site-header .brand{width:134px !important;height:36px !important}
   html body:not(.auth-body) .faq{padding:78px 0 !important}
   html body:not(.auth-body) .faq-simple{width:calc(100% - 32px) !important}
   html body:not(.auth-body) .faq-question{min-height:66px;font-size:16px}

@@ -78,8 +78,14 @@ document.getElementById('cad-confirmar-senha')?.addEventListener('input', event 
   event.currentTarget.setCustomValidity('')
 })
 
-showPanel(window.location.hash.replace('#', '') || 'login')
-window.addEventListener('hashchange', () => showPanel(window.location.hash.replace('#', '')))
+function currentAuthView() {
+  const hashView = window.location.hash.replace('#', '')
+  if (hashView === 'login' || hashView === 'cadastro') return hashView
+  return window.location.pathname.toLowerCase().endsWith('/cadastro.html') ? 'cadastro' : 'login'
+}
+
+showPanel(currentAuthView())
+window.addEventListener('hashchange', () => showPanel(currentAuthView()))
 
 document.getElementById('form-login').addEventListener('submit', async event => {
   event.preventDefault()
