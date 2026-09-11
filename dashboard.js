@@ -1,6 +1,7 @@
 import { supabase } from './src/lib/supabase.js'
 import {
   deleteCurrentAccount,
+  loadPublicPortfolio,
   loadWorkspace,
   removeProject,
   removeProjectImage,
@@ -40,6 +41,7 @@ const icons = {
   eye: '<path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
   link: '<path d="M10 13a5 5 0 0 0 7.07.07l2-2A5 5 0 0 0 12 4l-1.15 1.15"/><path d="M14 11a5 5 0 0 0-7.07-.07l-2 2A5 5 0 0 0 12 20l1.15-1.15"/>',
   copy: '<rect x="9" y="9" width="12" height="12"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+  qr: '<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM18 14h3v7h-3M14 19h2v2h-2"/>',
   arrow: '<path d="M5 12h14m-5-5 5 5-5 5"/>', plus: '<path d="M12 5v14M5 12h14"/>',
   search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/>',
   edit: '<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4z"/>',
@@ -71,6 +73,7 @@ let currentUser = null
 let providerToken = ''
 let reposLoading = false
 let reposLoaded = false
+let homeQrGenerated = false
 
 const realName = () => state.profile.name.trim() || currentUser?.user_metadata?.full_name || currentUser?.user_metadata?.name || currentUser?.email?.split('@')[0] || 'Você'
 const initials = () => realName().split(/\s+/).filter(Boolean).map(part => part[0]).slice(0, 2).join('').toUpperCase()
@@ -119,10 +122,17 @@ function projectRows(items = state.projects.slice(0, 5)) {
 function homeView() {
   const summary = analyticsSummary()
   const publishedProjects = state.projects.filter(project => project.status === 'published').length
-  const ready = state.published && profileComplete()
-  const heroTitle = ready ? 'Seu portfólio está pronto para ser<br>compartilhado.' : 'Seu portfólio ainda não está completo.'
-  const heroCopy = ready ? 'Acompanhe seus dados reais e mantenha seus projetos atualizados.' : 'Adicione suas informações e seu primeiro projeto para publicar.'
-  return `<section class="page-enter home-page"><div class="home-hero"><p class="eyebrow">Olá, ${esc(realName())}</p><h1>${heroTitle}</h1><p>${heroCopy}</p><button class="primary-button" data-route-button="${profileComplete() ? 'projetos' : 'portfolio'}"><span data-icon="${profileComplete() ? 'plus' : 'edit'}"></span>${profileComplete() ? 'Adicionar projeto' : 'Configurar portfólio'}</button></div><div class="dashboard-grid"><article class="card metric-card"><div class="metric-head"><span data-icon="eye"></span>Visualizações do portfólio</div><strong>${summary.views}</strong><small>dados reais acumulados</small></article><article class="card metric-card"><div class="metric-head"><span data-icon="folder"></span>Projetos publicados</div><strong>${publishedProjects}</strong><small>no seu portfólio</small></article><article class="card plan-card"><div class="metric-head"><span data-icon="crown"></span>Planos</div><button class="plan-link" type="button" data-route-button="planos">Ver planos <span data-icon="arrow"></span></button></article><article class="card qr-card"><h3>QR Code do seu<br>portfólio</h3>${ready ? '<div class="qr-wrap"><canvas id="portfolio-qr" width="150" height="150" aria-label="QR Code do portfólio público"></canvas></div>' : '<div class="qr-empty">O QR Code aparecerá quando o portfólio for publicado.</div>'}</article><article class="card portfolio-card"><div class="portfolio-card-head"><span data-icon="link"></span><div><h3>Seu portfólio</h3><p>${ready ? 'Um único link para mostrar todo o seu trabalho.' : 'Seu link público aparecerá aqui quando estiver pronto.'}</p></div></div>${ready ? `<div class="url-field"><span>${esc(publicPortfolioUrl())}</span><button class="icon-button" data-copy="${esc(publicPortfolioUrl())}" aria-label="Copiar URL"><span data-icon="copy"></span></button><button class="icon-button" data-share-portfolio aria-label="Compartilhar portfólio"><span data-icon="users"></span></button><button class="icon-button" data-open-preview aria-label="Abrir portfólio"><span data-icon="external"></span></button></div>` : ''}</article></div><section class="card projects-card"><div class="section-card-head"><h2>Últimos projetos</h2>${state.projects.length ? '<button class="link-button" data-route-button="projetos">Ver todos <span data-icon="arrow"></span></button>' : ''}</div>${projectRows()}</section></section>`
+  const linkReady = state.published && profileComplete()
+  const qrReady = linkReady && homeQrGenerated
+  const heroTitle = linkReady ? 'Seu portfólio está pronto para ser<br>compartilhado.' : 'Seu portfólio ainda não está completo.'
+  const heroCopy = linkReady ? 'Acompanhe seus dados reais e mantenha seus projetos atualizados.' : 'Adicione suas informações e seu primeiro projeto para publicar.'
+  const qrContent = qrReady
+    ? '<h3>QR Code do seu<br>portfólio</h3><div class="qr-wrap"><canvas id="portfolio-qr" width="150" height="150" aria-label="QR Code do portfólio público"></canvas></div><p class="generation-message">Seu QR Code já está disponível. Aponte a câmera e veja seus projetos.</p>'
+    : '<button class="primary-button generation-button" type="button" data-generate-portfolio-qr><span data-icon="qr"></span>Gerar QR Code</button>'
+  const linkContent = linkReady
+    ? `<div class="portfolio-card-head"><span data-icon="link"></span><div><h3>Seu portfólio</h3><p>Seu portfólio já está no ar. Copie o link e envie para seus clientes.</p></div></div><div class="url-field"><span>${esc(publicPortfolioUrl())}</span><button class="icon-button" data-copy="${esc(publicPortfolioUrl())}" aria-label="Copiar link do portfólio"><span data-icon="copy"></span></button><button class="icon-button" data-share-portfolio aria-label="Compartilhar portfólio"><span data-icon="users"></span></button><button class="icon-button" data-open-preview aria-label="Abrir portfólio"><span data-icon="external"></span></button></div>`
+    : '<button class="primary-button generation-button" type="button" data-generate-portfolio-link><span data-icon="link"></span>Gerar link do portfólio</button>'
+  return `<section class="page-enter home-page"><div class="home-hero"><p class="eyebrow">Olá, ${esc(realName())}</p><h1>${heroTitle}</h1><p>${heroCopy}</p><button class="primary-button" data-route-button="${profileComplete() ? 'projetos' : 'portfolio'}"><span data-icon="${profileComplete() ? 'plus' : 'edit'}"></span>${profileComplete() ? 'Adicionar projeto' : 'Configurar portfólio'}</button></div><div class="dashboard-grid"><article class="card metric-card"><div class="metric-head"><span data-icon="eye"></span>Visualizações do portfólio</div><strong>${summary.views}</strong><small>dados reais acumulados</small></article><article class="card metric-card"><div class="metric-head"><span data-icon="folder"></span>Projetos publicados</div><strong>${publishedProjects}</strong><small>no seu portfólio</small></article><article class="card plan-card"><div class="metric-head"><span data-icon="crown"></span>Planos</div><button class="plan-link" type="button" data-route-button="planos">Ver planos <span data-icon="arrow"></span></button></article><article class="card qr-card ${qrReady ? '' : 'generator-card'}">${qrContent}</article><article class="card portfolio-card ${linkReady ? '' : 'generator-card'}">${linkContent}</article></div><section class="card projects-card"><div class="section-card-head"><h2>Últimos projetos</h2>${state.projects.length ? '<button class="link-button" data-route-button="projetos">Ver todos <span data-icon="arrow"></span></button>' : ''}</div>${projectRows()}</section></section>`
 }
 
 function projectCards(items) {
@@ -220,6 +230,8 @@ function bindActions() {
   $$('[data-copy]').forEach(button => button.onclick = () => copyText(button.dataset.copy))
   $$('[data-open-preview]').forEach(button => button.onclick = () => window.open(publicPortfolioUrl(), '_blank', 'noopener'))
   $$('[data-share-portfolio]').forEach(button => button.onclick = sharePortfolio)
+  $('[data-generate-portfolio-link]')?.addEventListener('click', generatePortfolioLink)
+  $('[data-generate-portfolio-qr]')?.addEventListener('click', generatePortfolioQr)
   $$('[data-new-project]').forEach(button => button.onclick = () => projectModal())
   bindProjectGrid()
 
@@ -492,6 +504,42 @@ async function sharePortfolio() {
     if (navigator.share) await navigator.share({ title: `Portfólio de ${realName()}`, url })
     else await copyText(url)
   } catch (error) { if (error.name !== 'AbortError') reportError('Não foi possível compartilhar.', error) }
+}
+
+async function ensurePublicPortfolio(button, loadingLabel) {
+  if (!profileComplete()) {
+    toast('Complete seu nome e username antes de gerar o portfólio.', 'error')
+    location.hash = 'perfil'
+    return false
+  }
+  setButtonLoading(button, true, loadingLabel)
+  try {
+    if (!state.published) {
+      await saveProfile(currentUser.id, state.profile, true)
+      state.published = true
+    }
+    const publicData = await loadPublicPortfolio(state.profile.username)
+    if (!publicData || publicData.profile.userId !== currentUser.id) throw new Error('O portfólio público ainda não pôde ser confirmado.')
+    return true
+  } catch (error) {
+    reportError('Não foi possível publicar o portfólio.', error)
+    return false
+  } finally {
+    setButtonLoading(button, false)
+  }
+}
+
+async function generatePortfolioLink(event) {
+  if (!await ensurePublicPortfolio(event.currentTarget, 'Gerando link...')) return
+  toast('Link público gerado com sucesso.')
+  render()
+}
+
+async function generatePortfolioQr(event) {
+  if (!await ensurePublicPortfolio(event.currentTarget, 'Gerando QR Code...')) return
+  homeQrGenerated = true
+  render()
+  toast('QR Code gerado com sucesso.')
 }
 
 async function copyText(text) {
