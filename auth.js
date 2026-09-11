@@ -10,8 +10,12 @@ let redirecting = false
 function showPanel(name, updateHash = false) {
   const selected = name === 'cadastro' ? 'cadastro' : 'login'
   Object.entries(panels).forEach(([key, panel]) => {
-    panel.classList.toggle('is-active', key === selected)
+    const active = key === selected
+    panel.classList.toggle('is-active', active)
+    panel.hidden = !active
   })
+  document.body.dataset.authView = selected
+  document.title = selected === 'cadastro' ? 'Criar conta — Devifolio' : 'Entrar — Devifolio'
   clearMessage()
   if (updateHash) history.replaceState(null, '', `#${selected}`)
 }
