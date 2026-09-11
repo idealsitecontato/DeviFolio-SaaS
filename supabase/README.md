@@ -5,6 +5,12 @@
 3. Em Authentication > URL Configuration, defina a URL publicada do site como Site URL.
 4. Adicione as URLs locais e publicadas de `dashboard.html` e `cadastro.html` à lista de Redirect URLs.
 5. Para login com GitHub, habilite o provedor em Authentication > Providers e configure as credenciais OAuth do GitHub.
-6. Mantenha a confirmação de e-mail habilitada em produção. Nesse modo, novos usuários entram no dashboard após confirmar o endereço.
+6. Em Authentication > Sign In / Providers > Email, desative **Confirm email** para que o cadastro gere uma sessão imediatamente.
+
+## Variáveis no ambiente publicado
+
+O arquivo `.env.local` é propositalmente ignorado pelo Git e não acompanha clones ou deploys. Configure `VITE_SUPABASE_URL` e `VITE_SUPABASE_PUBLISHABLE_KEY` também no painel do serviço que executa o build. Depois de alterar essas variáveis, gere um novo build; reiniciar apenas o navegador não atualiza valores Vite.
+
+Este projeto usa cadastro com acesso imediato. Em Authentication > Sign In / Providers > Email, a opção **Confirm email** deve permanecer desativada (`mailer_autoconfirm: true`).
 
 O cliente web usa somente a publishable key. Nenhuma chave `secret` ou `service_role` deve ser adicionada ao frontend.

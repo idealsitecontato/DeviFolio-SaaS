@@ -51,17 +51,31 @@ function clearMessage() {
 
 function friendlyError(error) {
   const message = error?.message?.toLowerCase() || ''
+  const code = error?.code || ''
+  if (code === 'supabase_configuration_missing') return 'A autenticação não foi configurada neste ambiente. Configure as variáveis públicas do Supabase e reinicie o site.'
+  if (code === 'supabase_configuration_invalid') return 'A configuração do Supabase neste ambiente é inválida. Verifique a URL e a publishable key.'
+  if (message.includes('failed to fetch') || message.includes('networkerror') || message.includes('network request failed')) return 'Não foi possível conectar ao servidor de autenticação. Verifique sua conexão e tente novamente.'
+  if (message.includes('invalid api key') || message.includes('invalid jwt') || message.includes('apikey')) return 'A credencial pública do Supabase é inválida neste ambiente.'
+  if (message.includes('signups not allowed') || message.includes('signup is disabled')) return 'Novos cadastros estão temporariamente desativados.'
   if (message.includes('invalid login credentials')) return 'E-mail ou senha incorretos.'
   if (message.includes('already registered') || message.includes('already been registered')) return 'Este e-mail já possui uma conta.'
   if (message.includes('email not confirmed')) return 'A confirmação de e-mail ainda está ativa no Supabase. Desative essa exigência para entrar imediatamente.'
   if (message.includes('rate limit')) return 'Muitas tentativas. Aguarde um pouco e tente novamente.'
+  if (message.includes('weak password')) return 'A senha informada não atende aos requisitos de segurança.'
   if (message.includes('password')) return 'A senha precisa ter pelo menos 8 caracteres.'
   if (message.includes('email')) return 'Digite um endereço de e-mail válido.'
-  return 'Não foi possível concluir agora. Tente novamente.'
+  if (Number(error?.status) >= 500) return 'O servidor de autenticação está indisponível no momento. Tente novamente em alguns instantes.'
+  return error?.message ? `Falha na autenticação: ${error.message}` : 'Falha inesperada na autenticação. Recarregue a página e tente novamente.'
 }
 
 function reportAuthError(action, error) {
-  console.error(`[Devifolio Auth] ${action}`, error)
+  console.error(`[Devifolio Auth] ${action}`, {
+    name: error?.name,
+    code: error?.code,
+    status: error?.status,
+    message: error?.message,
+    error,
+  })
   showMessage(friendlyError(error))
 }
 
