@@ -42,10 +42,11 @@ export async function loadWorkspace(userId) {
     supabase.from('user_settings').select('*').eq('user_id', userId).maybeSingle(),
     supabase.from('analytics_events').select('event_type,project_id,visitor_id,occurred_at').eq('user_id', userId).order('occurred_at', { ascending: true }),
     supabase.from('referrals').select('id,referred_email,status,created_at').eq('user_id', userId).order('created_at', { ascending: false }),
+    supabase.from('github_connections').select('github_user_id,github_username,avatar_url,connected_at').eq('user_id', userId).maybeSingle(),
   ])
 
   if (!throwFirstUnexpected(results)) return { available: false }
-  const [profileResult, projectsResult, settingsResult, analyticsResult, referralsResult] = results
+  const [profileResult, projectsResult, settingsResult, analyticsResult, referralsResult, githubResult] = results
   return {
     available: true,
     profile: mapProfile(profileResult.data),
@@ -53,6 +54,7 @@ export async function loadWorkspace(userId) {
     settings: settingsResult.data,
     analytics: analyticsResult.data || [],
     referrals: referralsResult.data || [],
+    githubConnection: githubResult.data,
   }
 }
 

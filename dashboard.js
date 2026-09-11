@@ -70,7 +70,6 @@ const blankSettings = { email: true, product: true, publicProfile: true, compact
 const state = { projects: [], profile: { ...blankProfile }, published: false, githubConnected: false, githubUsername: '', repos: [], analytics: [], referrals: [], settings: { ...blankSettings } }
 const statusLabel = { published: 'Publicado', progress: 'Em breve', draft: 'Em desenvolvimento' }
 let currentUser = null
-let providerToken = ''
 let reposLoading = false
 let reposLoaded = false
 let homeQrGenerated = false
@@ -158,7 +157,7 @@ function portfolioView() {
 
 function githubView() {
   if (!state.githubConnected) return `<section class="page-enter">${pageHead('GitHub', 'Conecte sua conta para importar repositórios como projetos.')}<div class="card connect-card"><span class="connect-icon" data-icon="github"></span><h2>Traga seus projetos do GitHub</h2><p>Importe nome, descrição, tecnologias e links sem preencher tudo manualmente.</p><button class="primary-button" data-connect-github><span data-icon="github"></span>Conectar com GitHub</button><small>Você poderá desconectar a conta quando quiser.</small></div></section>`
-  const content = reposLoading ? '<div class="repo-loading"><span class="spinner"></span>Buscando seus repositórios...</div>' : state.repos.length ? `<div class="repo-list">${state.repos.map((repository, index) => `<label class="repo-row"><input type="checkbox" value="${index}"><span class="repo-icon" data-icon="repo"></span><span><b>${esc(repository.name)}</b><small>${esc(repository.description || 'Sem descrição')}</small></span><span class="language-dot"></span><small>${esc(repository.language || '—')}</small><a href="${esc(repository.html_url)}" target="_blank" rel="noopener" aria-label="Abrir repositório"><span data-icon="external"></span></a></label>`).join('')}</div>` : `<div class="projects-empty">${emptyState('repo', 'Nenhum repositório encontrado.', providerToken ? 'Sua conta não possui repositórios disponíveis.' : 'Reconecte o GitHub para liberar a importação.')}</div>`
+  const content = reposLoading ? '<div class="repo-loading"><span class="spinner"></span>Buscando seus repositórios...</div>' : state.repos.length ? `<div class="repo-list">${state.repos.map((repository, index) => `<label class="repo-row"><input type="checkbox" value="${index}"><span class="repo-icon" data-icon="repo"></span><span><b>${esc(repository.name)}</b><small>${esc(repository.description || 'Sem descrição')}</small></span><span class="language-dot"></span><small>${esc(repository.language || '—')}</small><a href="${esc(repository.html_url)}" target="_blank" rel="noopener" aria-label="Abrir repositório"><span data-icon="external"></span></a></label>`).join('')}</div>` : `<div class="projects-empty">${emptyState('repo', 'Nenhum repositório encontrado.', 'Sua conta não possui repositórios disponíveis.')}</div>`
   return `<section class="page-enter">${pageHead('GitHub', 'Selecione os repositórios que deseja transformar em projetos.', '<button class="secondary-button" data-disconnect-github>Desconectar</button>')}<div class="card connected-account"><span class="avatar">GH</span><div><small>Conta conectada</small><h2>@${esc(state.githubUsername || 'GitHub')}</h2></div><button class="secondary-button" data-sync-repos><span data-icon="refresh"></span>Sincronizar</button></div><div class="card repo-panel"><div class="section-card-head"><div><h2>Seus repositórios</h2><p>${state.repos.length} encontrado${state.repos.length === 1 ? '' : 's'}</p></div>${state.repos.length ? '<button class="primary-button" data-import-selected><span data-icon="upload"></span>Importar selecionados</button>' : ''}</div>${content}</div></section>`
 }
 
@@ -210,7 +209,7 @@ function render() {
   hydrateIcons($('#page-content'))
   bindActions()
   if (route === 'inicio') renderPortfolioQR()
-  if (route === 'github' && state.githubConnected && providerToken && !reposLoaded && !reposLoading) fetchGithubRepos()
+  if (route === 'github' && state.githubConnected && !reposLoaded && !reposLoading) fetchGithubRepos()
   updateUserChrome()
   closeMenu()
   closeUserMenu()
@@ -421,32 +420,49 @@ function confirmDelete(id) {
 async function connectGithub(event) {
   const button = event.currentTarget
   setButtonLoading(button, true, 'Conectando...')
-  const { error } = await supabase.auth.linkIdentity({ provider: 'github', options: { redirectTo: `${location.origin}${location.pathname}#github`, scopes: 'read:user repo' } })
-  if (error) { reportError('Não foi possível conectar o GitHub.', error); setButtonLoading(button, false) }
+  try {
+    const data = await authenticatedApi('/api/github/connect', { method: 'POST' })
+    location.assign(data.authorizationUrl)
+  } catch (error) { reportError('Não foi possível conectar o GitHub.', error); setButtonLoading(button, false) }
 }
 
 async function disconnectGithub() {
   try {
-    const { data, error } = await supabase.auth.getUser()
-    if (error) throw error
-    const identity = data.user?.identities?.find(item => item.provider === 'github')
-    if (identity) {
-      const result = await supabase.auth.unlinkIdentity(identity)
-      if (result.error) throw result.error
-    }
-    state.githubConnected = false; state.githubUsername = ''; state.repos = []; providerToken = ''; reposLoaded = false
+    await authenticatedApi('/api/github/connection', { method: 'DELETE' })
+    state.githubConnected = false; state.githubUsername = ''; state.repos = []; reposLoaded = false
     toast('Conta do GitHub desconectada.'); render()
   } catch (error) { reportError('Não foi possível desconectar o GitHub.', error) }
 }
 
 async function fetchGithubRepos() {
-  if (!providerToken) return toast('Reconecte o GitHub para autorizar a leitura dos repositórios.', 'error')
   reposLoading = true; render()
   try {
-    const response = await fetch('https://api.github.com/user/repos?sort=updated&per_page=100', { headers: { Authorization: `Bearer ${providerToken}`, Accept: 'application/vnd.github+json' } })
-    if (!response.ok) throw new Error(`GitHub respondeu com ${response.status}.`)
-    state.repos = await response.json()
+    const data = await authenticatedApi('/api/github/repos')
+    state.repos = data.repositories || []
   } catch (error) { reportError('Não foi possível carregar os repositórios.', error) } finally { reposLoading = false; reposLoaded = true; render() }
+}
+
+async function authenticatedApi(path, options = {}) {
+  const { data, error } = await supabase.auth.getSession()
+  if (error || !data.session) throw new Error('Sua sessão expirou. Entre novamente.')
+  const response = await fetch(path, {
+    ...options,
+    headers: { ...options.headers, Authorization: `Bearer ${data.session.access_token}`, 'Content-Type': 'application/json' },
+  })
+  const payload = await response.json().catch(() => ({}))
+  if (!response.ok) throw new Error(payload.error || `A integração respondeu com ${response.status}.`)
+  return payload
+}
+
+function showGithubCallbackResult() {
+  const params = new URLSearchParams(location.search)
+  const status = params.get('github')
+  if (!status) return
+  if (status === 'connected') toast('Conta do GitHub conectada com sucesso.')
+  else if (status === 'access_denied') toast('A autorização do GitHub foi cancelada.', 'error')
+  else if (status === 'invalid_state') toast('A autorização expirou. Tente conectar novamente.', 'error')
+  else toast('O GitHub não concluiu a autorização. Tente novamente.', 'error')
+  history.replaceState(null, '', `${location.pathname}${location.hash || '#github'}`)
 }
 
 async function importSelected(event) {
@@ -570,10 +586,6 @@ async function bootstrap() {
   const { data, error } = await supabase.auth.getSession()
   if (error || !data.session) { location.replace('cadastro.html#login'); return }
   currentUser = data.session.user
-  providerToken = data.session.provider_token || ''
-  const githubIdentity = currentUser.identities?.find(identity => identity.provider === 'github')
-  state.githubConnected = Boolean(githubIdentity)
-  state.githubUsername = githubIdentity?.identity_data?.user_name || githubIdentity?.identity_data?.preferred_username || ''
   try {
     const workspace = await loadWorkspace(currentUser.id)
     if (!workspace.available) throw new Error('A estrutura mais recente do banco ainda não foi aplicada.')
@@ -601,6 +613,8 @@ async function bootstrap() {
     state.projects = workspace.projects || []
     state.analytics = workspace.analytics || []
     state.referrals = workspace.referrals || []
+    state.githubConnected = Boolean(workspace.githubConnection)
+    state.githubUsername = workspace.githubConnection?.github_username || ''
     if (workspace.settings) Object.assign(state.settings, { email: workspace.settings.email_notifications, product: workspace.settings.product_notifications, publicProfile: workspace.settings.public_profile, compact: workspace.settings.compact_mode, theme: workspace.settings.theme })
   } catch (loadError) {
     console.error('[Devifolio] Falha ao carregar dados reais', loadError)
@@ -610,7 +624,7 @@ async function bootstrap() {
     return
   }
   document.documentElement.dataset.theme = state.settings.theme === 'dark' ? 'dark' : 'light'
-  hydrateIcons(); render()
+  hydrateIcons(); render(); showGithubCallbackResult()
 }
 
 supabase.auth.onAuthStateChange((event, session) => { if (event === 'SIGNED_OUT' || (!session && event !== 'INITIAL_SESSION')) location.replace('cadastro.html#login') })
