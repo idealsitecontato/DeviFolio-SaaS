@@ -33,12 +33,24 @@ mobileLinks.forEach(link => link.addEventListener('click', () => {
   menuToggle?.setAttribute('aria-label','Abrir menu');
 }));
 
-document.querySelectorAll('.faq-list details').forEach(detail => {
-  detail.addEventListener('toggle', () => {
-    if (!detail.open) return;
-    document.querySelectorAll('.faq-list details').forEach(other => {
-      if (other !== detail) other.open = false;
+const faqItems = document.querySelectorAll('.faq-item');
+faqItems.forEach(item => {
+  const button = item.querySelector('.faq-question');
+  const answer = item.querySelector('.faq-answer');
+  const icon = button?.querySelector('i');
+  button?.addEventListener('click', () => {
+    const willOpen = !item.classList.contains('is-open');
+    faqItems.forEach(other => {
+      other.classList.remove('is-open');
+      other.querySelector('.faq-question')?.setAttribute('aria-expanded', 'false');
+      other.querySelector('.faq-answer')?.setAttribute('aria-hidden', 'true');
+      const otherIcon = other.querySelector('.faq-question i');
+      if (otherIcon) otherIcon.textContent = '+';
     });
+    item.classList.toggle('is-open', willOpen);
+    button.setAttribute('aria-expanded', String(willOpen));
+    answer?.setAttribute('aria-hidden', String(!willOpen));
+    if (icon) icon.textContent = willOpen ? '−' : '+';
   });
 });
 
@@ -88,7 +100,7 @@ const revealElements = document.querySelectorAll([
   '.step',
   '.audience-card',
   '.price-note',
-  '.faq-list details',
+  '.faq-item',
   '.final-video-copy',
   '.video-frame',
 ].join(','));

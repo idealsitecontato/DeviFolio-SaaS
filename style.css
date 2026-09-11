@@ -2653,3 +2653,75 @@ html body:not(.auth-body) main#top .direction-reveal.is-inview{transform:transla
   html body:not(.auth-body) main#top .direction-reveal{transform:none !important;transition:none !important}
   body:not(.auth-body) a[href],body:not(.auth-body) button,body:not(.auth-body) summary{transition:none !important}
 }
+
+/* =========================================================
+   AJUSTES DE CADASTRO, NAVBAR E FAQ
+   ========================================================= */
+
+/* Navbar integral e totalmente estática durante o scroll. */
+html body .site-header,
+html body .site-header.is-scrolled{transform:none !important;transition:none !important}
+html body:not(.auth-body) .site-header *,
+html body:not(.auth-body) .site-header a[href],
+html body:not(.auth-body) .site-header button{animation:none !important;transition:none !important}
+html body:not(.auth-body) .site-header a[href]:active,
+html body:not(.auth-body) .site-header button:active{opacity:1 !important;transform:none !important}
+html body .site-header .nav-shell,
+html body .site-header:not(.is-scrolled) .nav-shell,
+html body .site-header.is-scrolled .nav-shell{
+  min-height:72px !important;
+  background:#111315 !important;
+  transform:none !important;
+  transition:none !important;
+}
+html body .site-header .nav-brand-logo,
+html body .site-header:not(.is-scrolled) .nav-brand-logo,
+html body .site-header.is-scrolled .nav-brand-logo{
+  width:142px !important;
+  height:38px !important;
+  transform:none !important;
+  transition:none !important;
+}
+html body .site-header .button-nav,
+html body .site-header.is-scrolled .button-nav{
+  min-height:48px !important;
+  padding-inline:24px !important;
+  font-size:13px !important;
+  transform:none !important;
+  transition:none !important;
+}
+
+/* O destaque dos recursos acompanha o terracota da marca. */
+html body:not(.auth-body) main#top .features .feature-list .feature-row:hover .feature-highlight{color:#E35336 !important}
+
+/* FAQ simples com expansão por altura, sem fade. */
+html body:not(.auth-body) .faq{padding:100px 0 !important}
+html body:not(.auth-body) .faq-simple{width:min(860px,calc(100% - 48px)) !important}
+html body:not(.auth-body) .faq-simple-head{margin-bottom:42px}
+html body:not(.auth-body) .faq-simple-head>span{display:block;margin-bottom:12px;color:#E35336;font-size:12px;font-weight:700;letter-spacing:.12em}
+html body:not(.auth-body) .faq-simple-head h2{margin:0;font-size:clamp(40px,5vw,62px);font-weight:400;line-height:1;letter-spacing:-.05em}
+html body:not(.auth-body) .faq-list{border-top:1px solid #d9dde2}
+html body:not(.auth-body) .faq-item{border-bottom:1px solid #d9dde2}
+html body:not(.auth-body) .faq-question{
+  width:100%;min-height:72px;padding:20px 0;border:0;background:transparent;color:#17191d;
+  display:flex;align-items:center;justify-content:space-between;gap:24px;text-align:left;
+  font:600 17px/1.35 "DM Sans",ui-sans-serif,system-ui,sans-serif;cursor:pointer;
+}
+html body:not(.auth-body) .faq-question i{font-style:normal;font-size:24px;font-weight:300;color:#686f79;line-height:1}
+html body:not(.auth-body) .faq-answer{display:grid;grid-template-rows:0fr;transition:grid-template-rows .28s ease}
+html body:not(.auth-body) .faq-answer>div{min-height:0;overflow:hidden}
+html body:not(.auth-body) .faq-answer p{margin:0;padding:0 48px 22px 0;color:#656b74;font-size:16px;line-height:1.6}
+html body:not(.auth-body) .faq-item.is-open .faq-answer{grid-template-rows:1fr}
+
+@media (max-width:820px){
+  html body .site-header .nav-shell,
+  html body .site-header:not(.is-scrolled) .nav-shell,
+  html body .site-header.is-scrolled .nav-shell{min-height:60px !important}
+  html body .site-header .nav-brand-logo,
+  html body .site-header:not(.is-scrolled) .nav-brand-logo,
+  html body .site-header.is-scrolled .nav-brand-logo{width:126px !important;height:34px !important}
+  html body:not(.auth-body) .faq{padding:78px 0 !important}
+  html body:not(.auth-body) .faq-simple{width:calc(100% - 32px) !important}
+  html body:not(.auth-body) .faq-question{min-height:66px;font-size:16px}
+  html body:not(.auth-body) .faq-answer p{padding-right:24px}
+}

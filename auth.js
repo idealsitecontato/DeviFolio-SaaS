@@ -70,6 +70,10 @@ document.querySelectorAll('[data-switch]').forEach(button => {
   button.addEventListener('click', () => showPanel(button.dataset.switch, true))
 })
 
+document.getElementById('cad-confirmar-senha')?.addEventListener('input', event => {
+  event.currentTarget.setCustomValidity('')
+})
+
 showPanel(window.location.hash.replace('#', '') || 'login')
 window.addEventListener('hashchange', () => showPanel(window.location.hash.replace('#', '')))
 
