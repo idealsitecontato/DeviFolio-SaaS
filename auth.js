@@ -86,10 +86,10 @@ function setLoading(button, active, label) {
   button.textContent = active ? label : button.dataset.originalLabel
 }
 
-function goToDashboard() {
+function goToDashboard(onboarding = false) {
   if (redirecting) return
   redirecting = true
-  window.location.replace('dashboard.html#inicio')
+  window.location.replace(`dashboard.html${onboarding ? '?onboarding=1' : ''}#inicio`)
 }
 
 document.querySelectorAll('[data-switch]').forEach(control => {
@@ -161,7 +161,7 @@ document.getElementById('form-cadastro').addEventListener('submit', async event 
       password: password.value,
       options: {
         data: { full_name: name.value.trim() },
-        emailRedirectTo: `${window.location.origin}/dashboard.html#inicio`,
+        emailRedirectTo: `${window.location.origin}/dashboard.html?onboarding=1#inicio`,
       },
     })
 
@@ -171,7 +171,7 @@ document.getElementById('form-cadastro').addEventListener('submit', async event 
         const { registerReferral } = await import('./src/lib/user-data.js')
         await registerReferral(referralUsername)
       }
-      return goToDashboard()
+      return goToDashboard(true)
     }
     showMessage('Conta criada. Confirme seu e-mail para entrar.', 'success')
   } catch (error) {

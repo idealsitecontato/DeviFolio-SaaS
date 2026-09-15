@@ -72,7 +72,8 @@ const statusLabel = { published: 'Publicado', progress: 'Em breve', draft: 'Em d
 let currentUser = null
 let reposLoading = false
 let reposLoaded = false
-let homeQrGenerated = false
+let homeQrGenerated = true
+const onboardingRequested = new URLSearchParams(location.search).get('onboarding') === '1'
 
 const realName = () => state.profile.name.trim() || currentUser?.user_metadata?.full_name || currentUser?.user_metadata?.name || currentUser?.email?.split('@')[0] || 'Você'
 const initials = () => realName().split(/\s+/).filter(Boolean).map(part => part[0]).slice(0, 2).join('').toUpperCase()
@@ -104,7 +105,7 @@ function analyticsSummary() {
 
 async function renderPortfolioQR() {
   const canvas = $('#portfolio-qr')
-  if (!canvas || !state.published || !profileComplete()) return
+  if (!canvas || !state.profile.username.trim()) return
   try {
     await QRCode.toCanvas(canvas, publicPortfolioUrl(), { width: 150, margin: 1, color: { dark: '#090b0f', light: '#ffffff' }, errorCorrectionLevel: 'M' })
   } catch (error) {
@@ -121,16 +122,12 @@ function projectRows(items = state.projects.slice(0, 5)) {
 function homeView() {
   const summary = analyticsSummary()
   const publishedProjects = state.projects.filter(project => project.status === 'published').length
-  const linkReady = state.published && profileComplete()
+  const linkReady = Boolean(state.profile.username.trim())
   const qrReady = linkReady && homeQrGenerated
-  const heroTitle = linkReady ? 'Seu portfólio está pronto para ser<br>compartilhado.' : 'Seu portfólio ainda não está completo.'
-  const heroCopy = linkReady ? 'Acompanhe seus dados reais e mantenha seus projetos atualizados.' : 'Adicione suas informações e seu primeiro projeto para publicar.'
-  const qrContent = qrReady
-    ? '<h3>QR Code do seu<br>portfólio</h3><div class="qr-wrap"><canvas id="portfolio-qr" width="150" height="150" aria-label="QR Code do portfólio público"></canvas></div><p class="generation-message">Seu QR Code já está disponível. Aponte a câmera e veja seus projetos.</p>'
-    : '<button class="primary-button generation-button" type="button" data-generate-portfolio-qr><span data-icon="qr"></span>Gerar QR Code</button>'
-  const linkContent = linkReady
-    ? `<div class="portfolio-card-head"><span data-icon="link"></span><div><h3>Seu portfólio</h3><p>Seu portfólio já está no ar. Copie o link e envie para seus clientes.</p></div></div><div class="url-field"><span>${esc(publicPortfolioUrl())}</span><button class="icon-button" data-copy="${esc(publicPortfolioUrl())}" aria-label="Copiar link do portfólio"><span data-icon="copy"></span></button><button class="icon-button" data-share-portfolio aria-label="Compartilhar portfólio"><span data-icon="users"></span></button><button class="icon-button" data-open-preview aria-label="Abrir portfólio"><span data-icon="external"></span></button></div>`
-    : '<button class="primary-button generation-button" type="button" data-generate-portfolio-link><span data-icon="link"></span>Gerar link do portfólio</button>'
+  const heroTitle = linkReady ? 'Seu portfólio está pronto para ser<br>compartilhado.' : 'Seu espaço está sendo preparado.'
+  const heroCopy = linkReady ? 'Acompanhe seus dados reais e mantenha seus projetos atualizados.' : 'Conclua seu perfil para compartilhar seu portfólio.'
+  const qrContent = '<h3>QR Code do seu<br>portfólio</h3><div class="qr-wrap"><canvas id="portfolio-qr" width="150" height="150" aria-label="QR Code do portfólio público"></canvas></div><p class="generation-message">Seu QR Code já está disponível. Aponte a câmera e veja seus projetos.</p>'
+  const linkContent = `<div class="portfolio-card-head"><span data-icon="link"></span><div><h3>Seu portfólio</h3><p>Seu link exclusivo já foi criado. Copie e envie para seus clientes.</p></div></div><div class="url-field"><span>${esc(publicPortfolioUrl())}</span><button class="icon-button" data-copy="${esc(publicPortfolioUrl())}" aria-label="Copiar link do portfólio"><span data-icon="copy"></span></button><button class="icon-button" data-share-portfolio aria-label="Compartilhar portfólio"><span data-icon="users"></span></button><button class="icon-button" data-open-preview aria-label="Abrir portfólio"><span data-icon="external"></span></button></div>`
   return `<section class="page-enter home-page"><div class="home-hero"><p class="eyebrow">Olá, ${esc(realName())}</p><h1>${heroTitle}</h1><p>${heroCopy}</p><button class="primary-button" data-route-button="${profileComplete() ? 'projetos' : 'portfolio'}"><span data-icon="${profileComplete() ? 'plus' : 'edit'}"></span>${profileComplete() ? 'Adicionar projeto' : 'Configurar portfólio'}</button></div><div class="dashboard-grid"><article class="card metric-card"><div class="metric-head"><span data-icon="eye"></span>Visualizações do portfólio</div><strong>${summary.views}</strong><small>dados reais acumulados</small></article><article class="card metric-card"><div class="metric-head"><span data-icon="folder"></span>Projetos publicados</div><strong>${publishedProjects}</strong><small>no seu portfólio</small></article><article class="card plan-card"><div class="metric-head"><span data-icon="crown"></span>Planos</div><button class="plan-link" type="button" data-route-button="planos">Ver planos <span data-icon="arrow"></span></button></article><article class="card qr-card ${qrReady ? '' : 'generator-card'}">${qrContent}</article><article class="card portfolio-card ${linkReady ? '' : 'generator-card'}">${linkContent}</article></div><section class="card projects-card"><div class="section-card-head"><h2>Últimos projetos</h2>${state.projects.length ? '<button class="link-button" data-route-button="projetos">Ver todos <span data-icon="arrow"></span></button>' : ''}</div>${projectRows()}</section></section>`
 }
 
@@ -229,8 +226,6 @@ function bindActions() {
   $$('[data-copy]').forEach(button => button.onclick = () => copyText(button.dataset.copy))
   $$('[data-open-preview]').forEach(button => button.onclick = () => window.open(publicPortfolioUrl(), '_blank', 'noopener'))
   $$('[data-share-portfolio]').forEach(button => button.onclick = sharePortfolio)
-  $('[data-generate-portfolio-link]')?.addEventListener('click', generatePortfolioLink)
-  $('[data-generate-portfolio-qr]')?.addEventListener('click', generatePortfolioQr)
   $$('[data-new-project]').forEach(button => button.onclick = () => projectModal())
   bindProjectGrid()
 
@@ -575,12 +570,37 @@ function reportError(message, error) { console.error(`[Devifolio] ${message}`, e
 function toast(message, type = 'success') { const element = document.createElement('div'); element.className = `toast ${type}`; element.innerHTML = `<span data-icon="${type === 'error' ? 'x' : 'check'}"></span>${esc(message)}`; $('#toast-stack').append(element); hydrateIcons(element); setTimeout(() => element.remove(), 4200) }
 function closeUserMenu() { $('#user-menu')?.setAttribute('hidden', ''); $('#user-menu-toggle')?.setAttribute('aria-expanded', 'false') }
 function closeMenu() { $('#sidebar')?.classList.remove('open'); $('#sidebar-overlay')?.classList.remove('show'); $('#menu-toggle')?.setAttribute('aria-expanded', 'false') }
+function setSidebarCollapsed(collapsed) {
+  $('.app-shell')?.classList.toggle('sidebar-collapsed', collapsed)
+  $('#sidebar-toggle')?.setAttribute('aria-expanded', String(!collapsed))
+  $('#sidebar-toggle')?.setAttribute('aria-label', collapsed ? 'Expandir menu' : 'Recolher menu')
+  try { localStorage.setItem('devifolio_sidebar_collapsed', String(collapsed)) } catch { /* armazenamento indisponível */ }
+}
 
 $('#menu-toggle').onclick = () => { const open = $('#sidebar').classList.toggle('open'); $('#sidebar-overlay').classList.toggle('show', open); $('#menu-toggle').setAttribute('aria-expanded', String(open)) }
 $('#sidebar-overlay').onclick = closeMenu
+$('#sidebar-toggle').onclick = () => setSidebarCollapsed(!$('.app-shell')?.classList.contains('sidebar-collapsed'))
 $('#user-menu-toggle').onclick = event => { event.stopPropagation(); const menu = $('#user-menu'), open = menu.hasAttribute('hidden'); menu.toggleAttribute('hidden', !open); $('#user-menu-toggle').setAttribute('aria-expanded', String(open)) }
 document.addEventListener('click', event => { if (!event.target.closest('#user-menu') && !event.target.closest('#user-menu-toggle')) closeUserMenu() })
 window.addEventListener('hashchange', render)
+
+function onboardingView() {
+  return `<section class="onboarding-screen" aria-live="polite"><div class="onboarding-panel"><p class="eyebrow">Devifolio</p><h1>Estamos preparando seu portfólio.</h1><p>Isso leva só alguns instantes.</p><ol>${['Gerando seu link', 'Gerando seu QR Code', 'Organizando o seu perfil', 'Finalizando seu portfólio'].map((label, index) => `<li data-onboarding-step="${index}"><span class="onboarding-status"></span><span>${label}</span></li>`).join('')}</ol></div></section>`
+}
+
+const wait = milliseconds => new Promise(resolve => window.setTimeout(resolve, milliseconds))
+async function runOnboarding() {
+  $('#page-content').innerHTML = onboardingView()
+  for (const step of $$('[data-onboarding-step]')) {
+    step.classList.add('is-active')
+    await wait(7000)
+    step.classList.remove('is-active')
+    step.classList.add('is-complete')
+  }
+  history.replaceState(null, '', `${location.pathname}${location.hash || '#inicio'}`)
+  render()
+  showGithubCallbackResult()
+}
 
 async function bootstrap() {
   const { data, error } = await supabase.auth.getSession()
@@ -624,7 +644,10 @@ async function bootstrap() {
     return
   }
   document.documentElement.dataset.theme = state.settings.theme === 'dark' ? 'dark' : 'light'
-  hydrateIcons(); render(); showGithubCallbackResult()
+  hydrateIcons()
+  setSidebarCollapsed(localStorage.getItem('devifolio_sidebar_collapsed') === 'true')
+  if (onboardingRequested) return runOnboarding()
+  render(); showGithubCallbackResult()
 }
 
 supabase.auth.onAuthStateChange((event, session) => { if (event === 'SIGNED_OUT' || (!session && event !== 'INITIAL_SESSION')) location.replace('cadastro.html#login') })

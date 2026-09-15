@@ -19,21 +19,21 @@ body a:not(.brand):not(.auth-brand):not(.public-brand){color:var(--neutral-white
 
 /* Shared controls */
 button,.button,.primary-button,.secondary-button,.danger-button,.nav-action,.public-button{
-  border:1px solid var(--neutral-700)!important;border-radius:6px!important;background:var(--neutral-900)!important;
+  border:1px solid var(--neutral-700)!important;border-radius:0!important;background:var(--neutral-900)!important;
   color:var(--neutral-white)!important;box-shadow:none!important
 }
 button:hover,.button:hover,.primary-button:hover,.secondary-button:hover,.danger-button:hover,.nav-action:hover,.public-button:hover{
   background:var(--neutral-800)!important;border-color:var(--neutral-600)!important;filter:none!important;transform:none!important
 }
 button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--neutral-white)!important;outline-offset:2px}
-input,select,textarea{background:var(--neutral-900)!important;color:var(--neutral-white)!important;border:1px solid var(--neutral-700)!important;border-radius:6px!important;box-shadow:none!important}
+input,select,textarea{background:var(--neutral-900)!important;color:var(--neutral-white)!important;border:1px solid var(--neutral-700)!important;border-radius:0!important;box-shadow:none!important}
 input::placeholder,textarea::placeholder{color:var(--neutral-400)!important}
 
 /* Landing */
 body:not(.auth-body){background:var(--neutral-950)!important;color:var(--neutral-white)!important}
 body:not(.auth-body) .site-header{background:transparent!important}
-body:not(.auth-body) .nav-shell,body:not(.auth-body) .mobile-menu{background:var(--neutral-900)!important;border:1px solid var(--neutral-700)!important;color:var(--neutral-white)!important;border-radius:8px!important}
-body:not(.auth-body) .site-header .nav-shell{border-radius:8px!important}
+body:not(.auth-body) .nav-shell,body:not(.auth-body) .mobile-menu{background:var(--neutral-900)!important;border:1px solid var(--neutral-700)!important;color:var(--neutral-white)!important;border-radius:0!important}
+body:not(.auth-body) .site-header .nav-shell{border-radius:0!important}
 body:not(.auth-body) .section-white,body:not(.auth-body) .section-yellow,body:not(.auth-body) .section-cream,
 body:not(.auth-body) .hero,body:not(.auth-body) .showcase,body:not(.auth-body) .features,body:not(.auth-body) .workflow,
 body:not(.auth-body) .audience,body:not(.auth-body) .testimonials,body:not(.auth-body) .pricing,body:not(.auth-body) .faq,body:not(.auth-body) .final-cta{background:var(--neutral-950)!important;color:var(--neutral-white)!important}
@@ -46,7 +46,7 @@ body:not(.auth-body) .button-dark,body:not(.auth-body) .button-nav,body:not(.aut
 body:not(.auth-body) .showcase-card,body:not(.auth-body) .metric-card,body:not(.auth-body) .audience-card,
 body:not(.auth-body) .testimonial-card,body:not(.auth-body) .price-note,body:not(.auth-body) .final-cta-inner,
 body:not(.auth-body) .github-link-panel,body:not(.auth-body) .portfolio-window,body:not(.auth-body) .feature-icon{
-  background:var(--neutral-900)!important;color:var(--neutral-white)!important;border:1px solid var(--neutral-700)!important;border-radius:8px!important
+  background:var(--neutral-900)!important;color:var(--neutral-white)!important;border:1px solid var(--neutral-700)!important;border-radius:0!important
 }
 body:not(.auth-body) .metric-light,body:not(.auth-body) .metric-yellow,body:not(.auth-body) .metric-dark,body:not(.auth-body) .audience-main{background:var(--neutral-900)!important;color:var(--neutral-white)!important}
 body:not(.auth-body) .metric-orb,body:not(.auth-body) .metric-waves{display:none!important}
@@ -74,7 +74,7 @@ body:not(.auth-body) .footer-bottom{border-color:var(--neutral-700)!important}
 .app-shell{background:var(--neutral-950)!important}
 .main-content{background-color:var(--neutral-950)!important;background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,.075) 1px,transparent 1.1px)!important;background-size:20px 20px!important}
 .sidebar{width:308px!important;padding:22px!important;background:var(--neutral-900)!important;border-color:var(--neutral-700)!important}
-.main-content{margin-left:308px!important;padding:0 46px 52px!important}
+.main-content{margin-left:308px!important;padding:0 34px 52px!important}
 .brand-crop{margin:0 0 28px 4px!important}.brand-name{font-size:31px!important;letter-spacing:-1.4px!important}
 .side-nav{gap:4px!important}.nav-item{height:48px!important;padding:0 16px!important;gap:16px!important;border-radius:0!important}
 .brand-name{color:var(--neutral-white)!important}
@@ -84,7 +84,7 @@ body:not(.auth-body) .footer-bottom{border-color:var(--neutral-700)!important}
 .referral-mini,.user-mini{border:1px solid var(--neutral-700)!important}
 .referral-mini small,.user-mini small{color:var(--neutral-400)!important}
 .referral-mini,.user-mini{border-radius:0!important}.user-mini{border-left:1px solid var(--neutral-700)!important;border-right:1px solid var(--neutral-700)!important;border-bottom:1px solid var(--neutral-700)!important}
-.page-content{max-width:1180px!important;margin:0!important}.page-head{min-height:118px!important;margin-bottom:28px!important}.page-head h1{font-size:30px!important;letter-spacing:-.8px!important}.page-head>div>p:last-child{font-size:15px!important}
+.page-content{max-width:none!important;width:100%!important;margin:0!important}.page-head{min-height:118px!important;margin-bottom:28px!important}.page-head h1{font-size:30px!important;letter-spacing:-.8px!important}.page-head>div>p:last-child{font-size:15px!important}
 .card,.metric-card,.plan-card,.qr-card,.connect-card,.connected-account,.repo-panel,.settings-card,.form-card,.preview-card{background:var(--neutral-900)!important;color:var(--neutral-white)!important;border-color:var(--neutral-700)!important}
 .card,.modal,.connect-card,.connected-account,.repo-panel,.form-card,.preview-card,.settings-card,.pricing-card{border-radius:0!important}
 .metric-card,.plan-card{color:var(--neutral-white)!important}
@@ -102,6 +102,11 @@ body:not(.auth-body) .footer-bottom{border-color:var(--neutral-700)!important}
 .connect-card{position:relative!important;max-width:720px!important;min-height:570px!important;margin:0 auto!important;padding:58px 32px!important;background:transparent!important;border:0!important}
 .connect-card::before{content:"";position:absolute;left:0;right:0;top:50%;border-top:1px solid var(--neutral-700);z-index:0}.connect-card>*{position:relative;z-index:1}.connect-card h2{margin-top:0!important;font-size:28px!important}.connect-card p{max-width:500px!important}.connect-card .primary-button{width:340px!important;max-width:100%!important;min-height:68px!important;margin-top:10px!important;background:var(--neutral-850)!important}.connect-card>small{margin-top:32px!important;color:var(--neutral-300)!important}.connect-icon{width:92px!important;height:92px!important;margin-bottom:24px!important;background:var(--neutral-white)!important;color:var(--neutral-950)!important;border-radius:50%!important}.connect-icon svg{width:48px!important}
 .plans-grid{gap:16px!important}.pricing-card{min-height:350px!important;padding:28px!important}.plan-current,.session-current{background:var(--neutral-800)!important;color:var(--neutral-300)!important;border:1px solid var(--neutral-700)!important;border-radius:0!important}
+
+/* Menu lateral recolhível e preparação do primeiro acesso. */
+.sidebar-toggle{position:absolute!important;top:15px;right:16px;width:28px!important;height:28px!important;padding:0!important;display:grid!important;place-items:center!important}.sidebar-toggle svg{width:17px!important}
+.onboarding-screen{min-height:100vh;display:grid;place-items:center;padding:40px 0}.onboarding-panel{width:min(520px,100%);padding:36px;border:1px solid var(--neutral-700);background:var(--neutral-900)}.onboarding-panel h1{margin:4px 0 8px;font-size:30px}.onboarding-panel>p:not(.eyebrow){margin:0;color:var(--neutral-400)}.onboarding-panel ol{display:grid;gap:13px;margin:32px 0 0;padding:0;list-style:none}.onboarding-panel li{display:flex;align-items:center;gap:12px;color:var(--neutral-400);transition:color .2s ease}.onboarding-status{width:12px;height:12px;border:1px solid var(--neutral-600);background:var(--neutral-900)}.onboarding-panel li.is-active{color:var(--neutral-white)}.onboarding-panel li.is-active .onboarding-status{background:var(--neutral-white);animation:onboardingPulse 1s ease-in-out infinite}.onboarding-panel li.is-complete{color:var(--neutral-white)}.onboarding-panel li.is-complete .onboarding-status{background:var(--neutral-800);border-color:var(--neutral-white)}@keyframes onboardingPulse{50%{opacity:.35}}
+@media(min-width:821px){.app-shell.sidebar-collapsed .sidebar{width:74px!important;padding:22px 12px!important}.app-shell.sidebar-collapsed .main-content{margin-left:74px!important}.app-shell.sidebar-collapsed .brand-crop{width:42px!important;margin-left:4px!important}.app-shell.sidebar-collapsed .brand-name,.app-shell.sidebar-collapsed .nav-item>span:last-child,.app-shell.sidebar-collapsed .referral-mini>span:not(:first-child),.app-shell.sidebar-collapsed .user-mini>span:not(:first-child){display:none!important}.app-shell.sidebar-collapsed .nav-item{justify-content:center!important;padding:0!important}.app-shell.sidebar-collapsed .referral-mini,.app-shell.sidebar-collapsed .user-mini{display:flex!important;justify-content:center!important;padding:10px!important;min-height:56px!important}.app-shell.sidebar-collapsed .user-menu{left:78px!important}.app-shell.sidebar-collapsed .sidebar-toggle{right:22px!important}}
 
 /* Public portfolio */
 .public-nav,.portfolio-shell,.public-state,.empty-projects,.public-project{background:var(--neutral-950)!important;color:var(--neutral-white)!important;border-color:var(--neutral-700)!important}
