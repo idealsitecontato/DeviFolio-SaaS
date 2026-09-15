@@ -18,17 +18,27 @@ function githubCredentials() {
 }
 
 export function githubConfig() {
+  const callbackUrl = required('GITHUB_CALLBACK_URL')
+  let parsedCallback
+  try {
+    parsedCallback = new URL(callbackUrl)
+  } catch {
+    throw new Error('GITHUB_CALLBACK_URL precisa ser uma URL absoluta.')
+  }
+  if (!['http:', 'https:'].includes(parsedCallback.protocol) || parsedCallback.pathname !== '/api/auth/github/callback' || parsedCallback.search || parsedCallback.hash) {
+    throw new Error('GITHUB_CALLBACK_URL deve apontar para /api/auth/github/callback, sem parâmetros.')
+  }
   return {
     ...githubCredentials(),
-    callbackUrl: required('GITHUB_CALLBACK_URL'),
+    callbackUrl: parsedCallback.toString(),
   }
 }
 
+// Both GitHub entry points use the same OAuth App callback. GitHub OAuth Apps
+// support one registered callback URL, so separate callback environment values
+// make one of the flows fail before it reaches our server.
 export function githubLoginConfig() {
-  return {
-    ...githubCredentials(),
-    callbackUrl: required('GITHUB_LOGIN_CALLBACK_URL'),
-  }
+  return githubConfig()
 }
 
 function supabaseConfig() {
@@ -184,7 +194,7 @@ export async function githubApi(path, token) {
 }
 
 export function oauthCookieHeader(value, maxAge = 600) {
-  return `${COOKIE_NAME}=${value}; HttpOnly; Secure; SameSite=Lax; Path=/api/github; Max-Age=${maxAge}`
+  return cookieHeader(COOKIE_NAME, value, '/api/github', maxAge)
 }
 
 export function oauthCookieValue(req) {
@@ -197,7 +207,15 @@ export function cookieValue(req, name) {
 }
 
 export function secureCookieHeader(name, value, path, maxAge = 600, sameSite = 'Lax') {
-  return `${name}=${value}; HttpOnly; Secure; SameSite=${sameSite}; Path=${path}; Max-Age=${maxAge}`
+  return cookieHeader(name, value, path, maxAge, sameSite)
+}
+
+function cookieHeader(name, value, path, maxAge, sameSite = 'Lax') {
+  // Secure cookies are required in production, but are not sent back on an
+  // http://localhost callback. The callback URL is environment-specific and is
+  // the source of truth for both cases.
+  const secure = new URL(githubConfig().callbackUrl).protocol === 'https:' ? '; Secure' : ''
+  return `${name}=${value}; HttpOnly${secure}; SameSite=${sameSite}; Path=${path}; Max-Age=${maxAge}`
 }
 
 export function json(res, status, payload) {

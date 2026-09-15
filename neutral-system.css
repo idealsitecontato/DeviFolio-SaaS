@@ -1,0 +1,108 @@
+/* Devifolio neutral design system — visual layer only. */
+:root{
+  --neutral-950:#121212;--neutral-900:#181818;--neutral-850:#1d1d1d;--neutral-800:#242424;
+  --neutral-700:#363636;--neutral-600:#545454;--neutral-400:#a3a3a3;--neutral-300:#c7c7c7;
+  --neutral-100:#f5f5f5;--neutral-white:#ffffff;
+  --bg:var(--neutral-950);--sidebar:var(--neutral-900);--surface:var(--neutral-900);
+  --surface-2:var(--neutral-850);--surface-3:var(--neutral-800);--border:var(--neutral-700);
+  --border-soft:#2d2d2d;--text:var(--neutral-white);--muted:var(--neutral-400);
+  --blue:var(--neutral-white);--blue-2:var(--neutral-white);--green:var(--neutral-white);
+  --danger:var(--neutral-white);--warning:var(--neutral-300);--radius:8px;
+}
+
+*{box-shadow:none!important}
+body{background:var(--neutral-950)!important;color:var(--neutral-white)!important;font-family:"DM Sans","Google Sans",Arial,sans-serif!important}
+body::before,body::after{display:none!important}
+a{color:inherit}
+button,input,select,textarea{font:inherit}
+body a:not(.brand):not(.auth-brand):not(.public-brand){color:var(--neutral-white)!important}
+
+/* Shared controls */
+button,.button,.primary-button,.secondary-button,.danger-button,.nav-action,.public-button{
+  border:1px solid var(--neutral-700)!important;border-radius:6px!important;background:var(--neutral-900)!important;
+  color:var(--neutral-white)!important;box-shadow:none!important
+}
+button:hover,.button:hover,.primary-button:hover,.secondary-button:hover,.danger-button:hover,.nav-action:hover,.public-button:hover{
+  background:var(--neutral-800)!important;border-color:var(--neutral-600)!important;filter:none!important;transform:none!important
+}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--neutral-white)!important;outline-offset:2px}
+input,select,textarea{background:var(--neutral-900)!important;color:var(--neutral-white)!important;border:1px solid var(--neutral-700)!important;border-radius:6px!important;box-shadow:none!important}
+input::placeholder,textarea::placeholder{color:var(--neutral-400)!important}
+
+/* Landing */
+body:not(.auth-body){background:var(--neutral-950)!important;color:var(--neutral-white)!important}
+body:not(.auth-body) .site-header{background:transparent!important}
+body:not(.auth-body) .nav-shell,body:not(.auth-body) .mobile-menu{background:var(--neutral-900)!important;border:1px solid var(--neutral-700)!important;color:var(--neutral-white)!important;border-radius:8px!important}
+body:not(.auth-body) .site-header .nav-shell{border-radius:8px!important}
+body:not(.auth-body) .section-white,body:not(.auth-body) .section-yellow,body:not(.auth-body) .section-cream,
+body:not(.auth-body) .hero,body:not(.auth-body) .showcase,body:not(.auth-body) .features,body:not(.auth-body) .workflow,
+body:not(.auth-body) .audience,body:not(.auth-body) .testimonials,body:not(.auth-body) .pricing,body:not(.auth-body) .faq,body:not(.auth-body) .final-cta{background:var(--neutral-950)!important;color:var(--neutral-white)!important}
+body:not(.auth-body) .hero{min-height:560px!important;border-bottom:1px solid var(--neutral-700)!important}
+body:not(.auth-body) .hero-grid{grid-template-columns:1fr!important;min-height:500px!important}
+body:not(.auth-body) .hero-copy{max-width:780px!important;padding-block:110px 76px!important}
+body:not(.auth-body) .hero h1,body:not(.auth-body) h2,body:not(.auth-body) h3,body:not(.auth-body) .eyebrow,body:not(.auth-body) .hero-text{color:var(--neutral-white)!important}
+body:not(.auth-body) .hero-visual,body:not(.auth-body) .floating-chat{display:none!important}
+body:not(.auth-body) .button-dark,body:not(.auth-body) .button-nav,body:not(.auth-body) .button-outline{background:var(--neutral-900)!important;border:1px solid var(--neutral-700)!important;color:var(--neutral-white)!important}
+body:not(.auth-body) .showcase-card,body:not(.auth-body) .metric-card,body:not(.auth-body) .audience-card,
+body:not(.auth-body) .testimonial-card,body:not(.auth-body) .price-note,body:not(.auth-body) .final-cta-inner,
+body:not(.auth-body) .github-link-panel,body:not(.auth-body) .portfolio-window,body:not(.auth-body) .feature-icon{
+  background:var(--neutral-900)!important;color:var(--neutral-white)!important;border:1px solid var(--neutral-700)!important;border-radius:8px!important
+}
+body:not(.auth-body) .metric-light,body:not(.auth-body) .metric-yellow,body:not(.auth-body) .metric-dark,body:not(.auth-body) .audience-main{background:var(--neutral-900)!important;color:var(--neutral-white)!important}
+body:not(.auth-body) .metric-orb,body:not(.auth-body) .metric-waves{display:none!important}
+body:not(.auth-body) .feature-list,body:not(.auth-body) .feature-row,body:not(.auth-body) .workflow-grid,body:not(.auth-body) .step,body:not(.auth-body) details,body:not(.auth-body) .faq-list,body:not(.auth-body) .testimonial-card footer{border-color:var(--neutral-700)!important}
+body:not(.auth-body) p,body:not(.auth-body) small,body:not(.auth-body) .feature-main p,body:not(.auth-body) .section-head>p,body:not(.auth-body) .step p,body:not(.auth-body) details p{color:var(--neutral-400)!important}
+body:not(.auth-body) .footer{background:var(--neutral-900)!important;border-top:1px solid var(--neutral-700)!important}
+body:not(.auth-body) .footer-bottom{border-color:var(--neutral-700)!important}
+
+/* Auth */
+.auth-body,.auth-shell,.auth-left,.auth-right{background:var(--neutral-950)!important;color:var(--neutral-white)!important}
+.auth-left{background:var(--neutral-950)!important;border-right:1px solid var(--neutral-700)!important}
+.auth-left::after{display:none!important}
+.auth-right{background:var(--neutral-900)!important}
+.auth-brand,.auth-panel h1,.auth-field label{color:var(--neutral-white)!important}
+.auth-sub,.auth-switch,.auth-terms{color:var(--neutral-400)!important}
+.auth-body .button-submit,.auth-body .button-github{background:var(--neutral-900)!important;color:var(--neutral-white)!important;border-color:var(--neutral-700)!important}
+.auth-body .button-submit:hover,.auth-body .button-github:hover{background:var(--neutral-800)!important}
+.auth-divider::before,.auth-divider::after{background:var(--neutral-700)!important}
+.auth-message,.auth-message.is-success{background:var(--neutral-900)!important;color:var(--neutral-white)!important;border-color:var(--neutral-600)!important}
+.auth-switch a,.auth-terms a{color:var(--neutral-white)!important}
+.auth-forgot{color:var(--neutral-white)!important}
+
+/* Dashboard */
+[data-theme="light"],[data-theme="dark"]{--bg:var(--neutral-950);--sidebar:var(--neutral-900);--surface:var(--neutral-900);--surface-2:var(--neutral-850);--surface-3:var(--neutral-800);--border:var(--neutral-700);--border-soft:#2d2d2d;--text:var(--neutral-white);--muted:var(--neutral-400);--blue:var(--neutral-white);--blue-2:var(--neutral-white)}
+.app-shell,.main-content{background:var(--neutral-950)!important;background-image:none!important}
+.sidebar{background:var(--neutral-900)!important;border-color:var(--neutral-700)!important}
+.brand-name{color:var(--neutral-white)!important}
+.nav-item,.referral-mini,.user-mini{background:transparent!important;border-color:transparent!important;color:var(--neutral-300)!important}
+.nav-item:hover,.referral-mini:hover,.user-mini:hover{background:var(--neutral-850)!important;color:var(--neutral-white)!important}
+.nav-item.active{background:var(--neutral-800)!important;border-color:var(--neutral-700)!important;color:var(--neutral-white)!important}
+.referral-mini,.user-mini{border:1px solid var(--neutral-700)!important}
+.referral-mini small,.user-mini small{color:var(--neutral-400)!important}
+.card,.metric-card,.plan-card,.qr-card,.connect-card,.connected-account,.repo-panel,.settings-card,.form-card,.preview-card{background:var(--neutral-900)!important;color:var(--neutral-white)!important;border-color:var(--neutral-700)!important}
+.metric-card,.plan-card{color:var(--neutral-white)!important}
+.metric-card small,.metric-head,.plan-link{color:var(--neutral-300)!important}
+.page-head p,.home-hero p:not(.eyebrow),.card p,.section-card-head p,.field small,.empty-state p{color:var(--neutral-400)!important}
+.home-hero .eyebrow,.eyebrow{color:var(--neutral-300)!important}
+.table-row,.repo-row,.project-card,.setting-row,.form-footer,.modal-head,.modal-actions,.connected-account,.section-card-head{border-color:var(--neutral-700)!important}
+.project-card,.repo-row,.table-row{background:var(--neutral-900)!important}
+.project-card:hover,.repo-row:hover,.table-row:hover{background:var(--neutral-850)!important}
+.modal-backdrop,.modal{background:rgba(0,0,0,.66)!important}
+.modal>*,.modal-content{background:var(--neutral-900)!important;color:var(--neutral-white)!important;border-color:var(--neutral-700)!important}
+.toast{background:var(--neutral-800)!important;color:var(--neutral-white)!important;border:1px solid var(--neutral-600)!important}
+.status,.tag,.tag-row span,.skills span,.publish-toggle{background:var(--neutral-800)!important;color:var(--neutral-300)!important;border-color:var(--neutral-700)!important}
+.danger-zone{border-color:var(--neutral-600)!important}
+
+/* Public portfolio */
+.public-nav,.portfolio-shell,.public-state,.empty-projects,.public-project{background:var(--neutral-950)!important;color:var(--neutral-white)!important;border-color:var(--neutral-700)!important}
+.public-nav{border-bottom:1px solid var(--neutral-700)!important}
+.public-brand strong,.public-hero h1,.public-project h2,.public-state p{color:var(--neutral-white)!important}
+.public-hero p,.public-project p,.public-meta,.public-footer{color:var(--neutral-400)!important}
+.public-project{border:1px solid var(--neutral-700)!important}
+.project-image{filter:grayscale(1) brightness(.72)!important}
+.skills span,.profile-links a{background:var(--neutral-900)!important;color:var(--neutral-white)!important;border:1px solid var(--neutral-700)!important}
+
+@media(max-width:720px){
+  body:not(.auth-body) .hero-copy{padding-block:120px 60px!important}
+  .auth-left{border-right:0!important;border-top:1px solid var(--neutral-700)!important}
+}
