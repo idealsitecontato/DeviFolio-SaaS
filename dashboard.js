@@ -74,6 +74,7 @@ let reposLoading = false
 let reposLoaded = false
 let homeQrGenerated = true
 const onboardingRequested = new URLSearchParams(location.search).get('onboarding') === '1'
+const authLoadingRequested = new URLSearchParams(location.search).get('auth_loading') === '1'
 
 const realName = () => state.profile.name.trim() || currentUser?.user_metadata?.full_name || currentUser?.user_metadata?.name || currentUser?.email?.split('@')[0] || 'Você'
 const initials = () => realName().split(/\s+/).filter(Boolean).map(part => part[0]).slice(0, 2).join('').toUpperCase()
@@ -624,6 +625,10 @@ function onboardingView() {
   return `<section class="onboarding-screen" aria-live="polite"><div class="onboarding-panel"><p class="eyebrow">Devifolio</p><h1>Estamos preparando seu portfólio.</h1><p>Isso leva só alguns instantes.</p><ol>${['Gerando seu link', 'Gerando seu QR Code', 'Organizando o seu perfil', 'Finalizando seu portfólio'].map((label, index) => `<li data-onboarding-step="${index}"><span class="onboarding-status"></span><span>${label}</span></li>`).join('')}</ol></div></section>`
 }
 
+function startupLoadingView() {
+  return '<section class="startup-loader" aria-live="polite"><span class="spinner" aria-hidden="true"></span><p>Entrando no seu painel...</p></section>'
+}
+
 const wait = milliseconds => new Promise(resolve => window.setTimeout(resolve, milliseconds))
 async function runOnboarding() {
   $('#page-content').innerHTML = onboardingView()
@@ -639,6 +644,7 @@ async function runOnboarding() {
 }
 
 async function bootstrap() {
+  if (authLoadingRequested) $('#page-content').innerHTML = startupLoadingView()
   const { data, error } = await supabase.auth.getSession()
   if (error || !data.session) { location.replace('cadastro.html#login'); return }
   currentUser = data.session.user
@@ -682,6 +688,7 @@ async function bootstrap() {
   document.documentElement.dataset.theme = state.settings.theme === 'dark' ? 'dark' : 'light'
   hydrateIcons()
   setSidebarCollapsed(localStorage.getItem('devifolio_sidebar_collapsed') === 'true')
+  if (authLoadingRequested) history.replaceState(null, '', `${location.pathname}${onboardingRequested ? '?onboarding=1' : ''}${location.hash || '#inicio'}`)
   if (onboardingRequested) return runOnboarding()
   render(); showGithubCallbackResult()
 }

@@ -102,7 +102,9 @@ function setAuthOverlay(active, label = '') {
 function goToDashboard(onboarding = false) {
   if (redirecting) return
   redirecting = true
-  window.location.replace(`dashboard.html${onboarding ? '?onboarding=1' : ''}#inicio`)
+  const params = new URLSearchParams({ auth_loading: '1' })
+  if (onboarding) params.set('onboarding', '1')
+  window.location.replace(`dashboard.html?${params.toString()}#inicio`)
 }
 
 document.querySelectorAll('[data-switch]').forEach(control => {
