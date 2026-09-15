@@ -66,7 +66,7 @@ function hydrateIcons(root = document) {
 }
 
 const blankProfile = { name: '', username: '', email: '', role: '', bio: '', skills: '', linkedin: '', github: '', website: '', avatar: '' }
-const blankSettings = { email: true, product: true, publicProfile: true, compact: false, theme: 'light' }
+const blankSettings = { email: true, product: true, publicProfile: true, compact: false, theme: 'dark' }
 const state = { projects: [], profile: { ...blankProfile }, published: false, githubConnected: false, githubUsername: '', repos: [], analytics: [], referrals: [], settings: { ...blankSettings } }
 const statusLabel = { published: 'Publicado', progress: 'Em breve', draft: 'Em desenvolvimento' }
 let currentUser = null
