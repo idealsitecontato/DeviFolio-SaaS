@@ -86,6 +86,19 @@ function setLoading(button, active, label) {
   button.textContent = active ? label : button.dataset.originalLabel
 }
 
+function setAuthOverlay(active, label = '') {
+  let overlay = document.getElementById('auth-loading-overlay')
+  if (!overlay) {
+    overlay = document.createElement('div')
+    overlay.id = 'auth-loading-overlay'
+    overlay.className = 'auth-loading-overlay'
+    overlay.innerHTML = '<span class="auth-spinner" aria-hidden="true"></span><p></p>'
+    document.body.append(overlay)
+  }
+  overlay.querySelector('p').textContent = label
+  overlay.toggleAttribute('hidden', !active)
+}
+
 function goToDashboard(onboarding = false) {
   if (redirecting) return
   redirecting = true
@@ -121,6 +134,7 @@ document.getElementById('form-login').addEventListener('submit', async event => 
   if (!event.currentTarget.reportValidity()) return
 
   setLoading(button, true, 'Entrando...')
+  setAuthOverlay(true, 'Entrando...')
   try {
     const supabase = await getSupabase()
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -134,6 +148,7 @@ document.getElementById('form-login').addEventListener('submit', async event => 
     reportAuthError('Erro inesperado no login', error)
   } finally {
     setLoading(button, false)
+    setAuthOverlay(false)
   }
 })
 
@@ -154,6 +169,7 @@ document.getElementById('form-cadastro').addEventListener('submit', async event 
   }
 
   setLoading(button, true, 'Criando conta...')
+  setAuthOverlay(true, 'Criando sua conta...')
   try {
     const supabase = await getSupabase()
     const { data, error } = await supabase.auth.signUp({
@@ -178,6 +194,7 @@ document.getElementById('form-cadastro').addEventListener('submit', async event 
     reportAuthError('Erro inesperado no cadastro', error)
   } finally {
     setLoading(button, false)
+    setAuthOverlay(false)
   }
 })
 
