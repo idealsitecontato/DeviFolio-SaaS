@@ -19,8 +19,14 @@ try {
   throw error
 }
 
-if (!supabasePublishableKey.startsWith('sb_publishable_')) {
-  const error = new Error('A variável VITE_SUPABASE_PUBLISHABLE_KEY não contém uma publishable key válida.')
+// Supabase still supports the legacy anon JWT during the migration to
+// publishable keys. Production already has a public legacy key configured;
+// rejecting it here prevented the auth module from loading at all.
+const isPublishableKey = supabasePublishableKey.startsWith('sb_publishable_')
+const isLegacyAnonKey = /^eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+$/.test(supabasePublishableKey)
+
+if (!isPublishableKey && !isLegacyAnonKey) {
+  const error = new Error('A variável VITE_SUPABASE_PUBLISHABLE_KEY não contém uma chave pública válida do Supabase.')
   error.code = 'supabase_configuration_invalid'
   throw error
 }
