@@ -1,0 +1,15 @@
+---
+description: Commit and push completed project changes automatically
+alwaysApply: true
+---
+
+# Git synchronization
+
+After completing and validating any requested project change:
+
+1. Review the final diff and ensure unrelated user changes are preserved.
+2. Create a clear commit for the completed work.
+3. Push the commit to the configured remote branch.
+4. Report the commit hash and push result to the user.
+
+Do not commit or push incomplete work, secrets, generated local environment files, or unrelated changes.
