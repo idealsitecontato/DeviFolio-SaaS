@@ -48,6 +48,7 @@ const icons = {
   trash: '<path d="M3 6h18M8 6V4h8v2M19 6l-1 15H6L5 6M10 11v6M14 11v6"/>',
   external: '<path d="M14 3h7v7M10 14 21 3"/><path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/>',
   check: '<path d="m5 12 4 4L19 6"/>', upload: '<path d="M12 16V4m-5 5 5-5 5 5M4 20h16"/>',
+  download: '<path d="M12 4v12m-5-5 5 5 5-5"/><path d="M4 20h16"/>',
   refresh: '<path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/>', repo: '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M8 7h6"/>',
   bell: '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/>',
   shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
@@ -117,19 +118,21 @@ async function renderPortfolioQR() {
 
 function projectRows(items = state.projects.slice(0, 5)) {
   if (!items.length) return `<div class="projects-empty">${emptyState('folder', 'Você ainda não possui projetos.', 'Crie seu primeiro projeto para começar.', '<button class="primary-button" data-new-project>Criar primeiro projeto</button>')}</div>`
-  return items.map((project, index) => `<div class="project-row"><span class="project-number">${String(index + 1).padStart(2, '0')}</span><span>${esc(project.name)}</span><span class="project-desc">${esc(project.description)}</span><span class="status ${project.status}">${statusLabel[project.status]}</span><button class="icon-button" data-view-project="${project.id}" aria-label="Visualizar ${esc(project.name)}"><span data-icon="chevron"></span></button></div>`).join('')
+  return items.map(project => `<div class="recent-project"><span class="recent-project-image">${project.image ? `<img src="${esc(project.image)}" alt="">` : '<span data-icon="folder"></span>'}</span><div class="recent-project-copy"><strong>${esc(project.name)}</strong><p>${esc(project.description)}</p></div><button class="icon-button" data-view-project="${project.id}" aria-label="Visualizar ${esc(project.name)}"><span data-icon="chevron"></span></button></div>`).join('')
 }
 
 function homeView() {
   const summary = analyticsSummary()
   const publishedProjects = state.projects.filter(project => project.status === 'published').length
   const linkReady = Boolean(state.profile.username.trim())
-  const qrReady = linkReady && homeQrGenerated
-  const heroTitle = linkReady ? 'Seu portfólio está pronto para ser<br>compartilhado.' : 'Seu espaço está sendo preparado.'
-  const heroCopy = linkReady ? 'Acompanhe seus dados reais e mantenha seus projetos atualizados.' : 'Conclua seu perfil para compartilhar seu portfólio.'
-  const qrContent = '<h3>QR Code do seu<br>portfólio</h3><div class="qr-wrap"><canvas id="portfolio-qr" width="150" height="150" aria-label="QR Code do portfólio público"></canvas></div><p class="generation-message">Seu QR Code já está disponível. Aponte a câmera e veja seus projetos.</p>'
-  const linkContent = `<div class="portfolio-card-head"><span data-icon="link"></span><div><h3>Seu portfólio</h3><p>Seu link exclusivo já foi criado. Copie e envie para seus clientes.</p></div></div><div class="url-field"><span>${esc(publicPortfolioUrl())}</span><button class="icon-button" data-copy="${esc(publicPortfolioUrl())}" aria-label="Copiar link do portfólio"><span data-icon="copy"></span></button><button class="icon-button" data-share-portfolio aria-label="Compartilhar portfólio"><span data-icon="users"></span></button><button class="icon-button" data-open-preview aria-label="Abrir portfólio"><span data-icon="external"></span></button></div>`
-  return `<section class="page-enter home-page"><div class="home-hero"><p class="eyebrow">Olá, ${esc(realName())}</p><h1>${heroTitle}</h1><p>${heroCopy}</p><button class="primary-button" data-route-button="${profileComplete() ? 'projetos' : 'portfolio'}"><span data-icon="${profileComplete() ? 'plus' : 'edit'}"></span>${profileComplete() ? 'Adicionar projeto' : 'Configurar portfólio'}</button></div><div class="dashboard-grid"><article class="card metric-card"><div class="metric-head"><span data-icon="eye"></span>Visualizações do portfólio</div><strong>${summary.views}</strong><small>dados reais acumulados</small></article><article class="card metric-card"><div class="metric-head"><span data-icon="folder"></span>Projetos publicados</div><strong>${publishedProjects}</strong><small>no seu portfólio</small></article><article class="card plan-card"><div class="metric-head"><span data-icon="crown"></span>Planos</div><button class="plan-link" type="button" data-route-button="planos">Ver planos <span data-icon="arrow"></span></button></article><article class="card qr-card ${qrReady ? '' : 'generator-card'}">${qrContent}</article><article class="card portfolio-card ${linkReady ? '' : 'generator-card'}">${linkContent}</article></div><section class="card projects-card"><div class="section-card-head"><h2>Últimos projetos</h2>${state.projects.length ? '<button class="link-button" data-route-button="projetos">Ver todos <span data-icon="arrow"></span></button>' : ''}</div>${projectRows()}</section></section>`
+  const publicationLabel = state.published ? 'Ativo' : 'Inativo'
+  const githubCopy = state.githubConnected
+    ? `<p>Conta conectada como <strong>@${esc(state.githubUsername || 'GitHub')}</strong>.</p><button class="dashboard-action" data-route-button="github"><span data-icon="github"></span>Gerenciar GitHub<span data-icon="arrow"></span></button>`
+    : '<p>Importe seus repositórios e transforme-os em projetos do portfólio.</p><button class="dashboard-action" data-route-button="github"><span data-icon="github"></span>Conectar com GitHub<span data-icon="arrow"></span></button>'
+  const qrMarkup = linkReady
+    ? `<div class="dashboard-url"><span data-icon="link"></span><span>${esc(publicPortfolioUrl())}</span><button class="icon-button" data-copy="${esc(publicPortfolioUrl())}" aria-label="Copiar link"><span data-icon="copy"></span></button></div><div class="dashboard-qr"><div class="qr-wrap"><canvas id="portfolio-qr" width="150" height="150" aria-label="QR Code do portfólio público"></canvas></div><button class="secondary-button" data-download-qr><span data-icon="download"></span>Baixar QR Code</button></div>`
+    : '<div class="dashboard-link-empty"><span data-icon="qr"></span><p>Conclua o perfil para gerar seu link público e QR Code.</p><button class="secondary-button" data-route-button="portfolio-editar">Configurar portfólio</button></div>'
+  return `<section class="page-enter home-page"><div class="dashboard-layout"><div class="dashboard-main-column"><article class="card welcome-card"><div class="welcome-copy"><p>Bem-vindo de volta,</p><h1>${esc(realName())}!</h1><span>Seu portfólio, projetos e estatísticas, tudo em um só lugar.</span></div><span class="welcome-brand" aria-hidden="true"><img src="assets/devifolio-logo.png" alt=""></span><div class="dashboard-metrics"><button data-route-button="projetos"><span data-icon="folder"></span><small>Projetos</small><strong>${state.projects.length}</strong></button><button data-route-button="analise"><span data-icon="eye"></span><small>Visualizações</small><strong>${summary.views}</strong></button><button data-route-button="analise"><span data-icon="trending"></span><small>Interações</small><strong>${summary.clicks}</strong></button><button data-route-button="portfolio"><span data-icon="link"></span><small>Link público</small><strong>${publicationLabel}</strong></button></div></article><section class="card projects-card"><div class="section-card-head"><h2>Seus projetos recentes</h2>${state.projects.length ? '<button class="link-button" data-route-button="projetos">Ver todos <span data-icon="arrow"></span></button>' : ''}</div>${projectRows(state.projects.slice(0, 4))}</section></div><aside class="dashboard-side-column"><article class="card github-summary"><div class="summary-title"><span data-icon="github"></span><h2>${state.githubConnected ? 'GitHub conectado' : 'Conectar GitHub'}</h2></div>${githubCopy}</article><article class="card link-summary"><h2>Seu Link, Seu QR Code</h2><p>Compartilhe seu portfólio com um único link ou através do QR Code.</p>${qrMarkup}</article></aside></div></section>`
 }
 
 function projectCards(items) {
@@ -198,7 +201,7 @@ function switchRow(icon, title, description, key, on) {
 }
 
 function settingsView() {
-  return `<section class="page-enter compact-panel-page"><div class="card settings-card compact-panel"><div class="settings-card-head"><span data-icon="settings"></span><div><h1>Configurações</h1><p>Preferências, privacidade e integrações.</p></div></div><div class="settings-tabs"><span>Preferências</span><span>Privacidade</span><span>Integrações</span><span>Conta</span></div><div class="panel-section"><h2>Preferências</h2><div class="setting-row"><div><b>Tema do painel</b><small>Use uma visualização escura e consistente.</small></div><select data-theme-select><option value="dark" ${state.settings.theme === 'dark' ? 'selected' : ''}>Modo escuro</option><option value="light" ${state.settings.theme === 'light' ? 'selected' : ''}>Modo claro</option></select></div>${switchRow('menu', 'Modo compacto', 'Reduz o espaço entre os elementos.', 'compact', state.settings.compact)}${switchRow('mail', 'Resumo por e-mail', 'Receba um relatório semanal.', 'email', state.settings.email)}</div><div class="panel-section"><h2>Privacidade e integrações</h2>${switchRow('eye', 'Aparecer em buscas públicas', 'Permitir que o portfólio seja indexado.', 'publicProfile', state.settings.publicProfile)}<div class="setting-row"><div><b>GitHub</b><small>${state.githubConnected ? `Conectado como @${esc(state.githubUsername)}` : 'Nenhuma conta conectada'}</small></div><button class="secondary-button" data-route-button="github">Gerenciar</button></div></div><div class="panel-section"><h2>Conta</h2><div class="setting-row"><div><b>Exportar dados</b><small>Baixe uma cópia das informações da conta.</small></div><button class="secondary-button" data-export>Exportar</button></div><div class="setting-row"><div><b>Excluir conta</b><small>Essa ação não poderá ser desfeita.</small></div><button class="danger-button" data-delete-account>Excluir conta</button></div></div></div></section>`
+  return `<section class="page-enter compact-panel-page"><div class="card settings-card compact-panel"><div class="settings-card-head"><span data-icon="settings"></span><div><h1>Configurações</h1><p>Preferências, privacidade e integrações.</p></div></div><div class="settings-tabs"><span>Preferências</span><span>Privacidade</span><span>Integrações</span><span>Conta</span></div><div class="panel-section"><h2>Preferências</h2><div class="setting-row"><div><b>Tema do painel</b><small>Use uma visualização escura e consistente.</small></div><span class="status">Modo escuro</span></div>${switchRow('menu', 'Modo compacto', 'Reduz o espaço entre os elementos.', 'compact', state.settings.compact)}${switchRow('mail', 'Resumo por e-mail', 'Receba um relatório semanal.', 'email', state.settings.email)}</div><div class="panel-section"><h2>Privacidade e integrações</h2>${switchRow('eye', 'Aparecer em buscas públicas', 'Permitir que o portfólio seja indexado.', 'publicProfile', state.settings.publicProfile)}<div class="setting-row"><div><b>GitHub</b><small>${state.githubConnected ? `Conectado como @${esc(state.githubUsername)}` : 'Nenhuma conta conectada'}</small></div><button class="secondary-button" data-route-button="github">Gerenciar</button></div></div><div class="panel-section"><h2>Conta</h2><div class="setting-row"><div><b>Exportar dados</b><small>Baixe uma cópia das informações da conta.</small></div><button class="secondary-button" data-export>Exportar</button></div><div class="setting-row"><div><b>Excluir conta</b><small>Essa ação não poderá ser desfeita.</small></div><button class="danger-button" data-delete-account>Excluir conta</button></div></div></div></section>`
 }
 
 function referralView() {
@@ -217,7 +220,10 @@ const views = { inicio: homeView, projetos: projectsView, portfolio: portfolioMa
 function render() {
   const route = views[location.hash.slice(1)] ? location.hash.slice(1) : 'inicio'
   $('#page-content').innerHTML = views[route]()
-  document.title = `${{ inicio: 'Início', projetos: 'Projetos', portfolio: 'Meus portfólios', 'portfolio-editar': 'Editar portfólio', github: 'GitHub', analise: 'Análise', perfil: 'Perfil', planos: 'Planos', configuracoes: 'Configurações', indicacao: 'Indicação' }[route]} — Devifolio`
+  const routeLabel = { inicio: 'Dashboard', projetos: 'Projetos', portfolio: 'Meu portfólio', 'portfolio-editar': 'Editar portfólio', github: 'GitHub', analise: 'Análise', perfil: 'Perfil', planos: 'Planos', configuracoes: 'Configurações', indicacao: 'Indicação' }[route]
+  document.title = `${routeLabel} — Devifolio`
+  if ($('#breadcrumb-page')) $('#breadcrumb-page').textContent = routeLabel
+  if ($('#breadcrumb-section')) $('#breadcrumb-section').textContent = route === 'inicio' ? 'Início' : 'Painel'
   $$('.nav-item').forEach(item => item.classList.toggle('active', item.dataset.route === route))
   hydrateIcons($('#page-content'))
   bindActions()
@@ -244,6 +250,7 @@ function bindActions() {
   $$('[data-edit-portfolio]').forEach(button => button.onclick = () => { location.hash = 'portfolio-editar' })
   $$('[data-new-portfolio]').forEach(button => button.onclick = () => toast('A conta possui um portfólio principal. A criação de múltiplos portfólios será liberada quando o modelo de dados for expandido.', 'error'))
   $$('[data-share-portfolio]').forEach(button => button.onclick = sharePortfolio)
+  $$('[data-download-qr]').forEach(button => button.onclick = downloadPortfolioQR)
   $$('[data-new-project]').forEach(button => button.onclick = () => projectModal())
   bindProjectGrid()
 
@@ -276,6 +283,15 @@ function bindActions() {
   $('[data-export]')?.addEventListener('click', exportData)
   $('[data-delete-account]')?.addEventListener('click', confirmAccountDeletion)
   $('[data-share-referral]')?.addEventListener('click', shareReferral)
+}
+
+function downloadPortfolioQR() {
+  const canvas = $('#portfolio-qr')
+  if (!canvas) return toast('Gere seu link público antes de baixar o QR Code.', 'error')
+  const anchor = document.createElement('a')
+  anchor.href = canvas.toDataURL('image/png')
+  anchor.download = `devifolio-${state.profile.username || 'portfolio'}-qrcode.png`
+  anchor.click()
 }
 
 function bindProjectGrid() {
@@ -616,8 +632,25 @@ document.addEventListener('click', event => { if (!event.target.closest('#user-m
 let routeLoadingTimer
 function renderWithTransition() {
   clearTimeout(routeLoadingTimer)
-  $('#page-content').innerHTML = '<section class="route-loader" aria-live="polite"><span></span><p>Carregando<i>.</i><i>.</i><i>.</i></p></section>'
-  routeLoadingTimer = window.setTimeout(render, 650)
+  $('.main-content > .route-loader')?.remove()
+  const content = $('#page-content')
+  content.classList.remove('route-transitioning')
+  content.removeAttribute('aria-busy')
+  // Render and start route-specific data requests immediately, before visual loading.
+  render()
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+  content.classList.add('route-transitioning')
+  content.setAttribute('aria-busy', 'true')
+  const loader = document.createElement('section')
+  loader.className = 'route-loader'
+  loader.setAttribute('role', 'status')
+  loader.innerHTML = '<span aria-hidden="true"></span><p>Carregando</p>'
+  $('.main-content').append(loader)
+  routeLoadingTimer = window.setTimeout(() => {
+    loader.remove()
+    content.classList.remove('route-transitioning')
+    content.removeAttribute('aria-busy')
+  }, 380)
 }
 window.addEventListener('hashchange', renderWithTransition)
 
@@ -685,7 +718,7 @@ async function bootstrap() {
     toast(loadError.message, 'error')
     return
   }
-  document.documentElement.dataset.theme = state.settings.theme === 'dark' ? 'dark' : 'light'
+  document.documentElement.dataset.theme = 'dark'
   hydrateIcons()
   setSidebarCollapsed(localStorage.getItem('devifolio_sidebar_collapsed') === 'true')
   if (authLoadingRequested) history.replaceState(null, '', `${location.pathname}${onboardingRequested ? '?onboarding=1' : ''}${location.hash || '#inicio'}`)

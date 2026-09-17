@@ -1,38 +1,32 @@
 <!doctype html>
-<html lang="pt-BR" data-theme="light">
+<html lang="pt-BR" data-theme="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Gerencie seus projetos, portfólio e resultados no Devifolio.">
-  <meta name="theme-color" content="#07121d">
+  <meta name="theme-color" content="#1B1D1F">
   <title>Início — Devifolio</title>
   <link rel="icon" type="image/png" href="assets/devifolio-logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="dashboard.css">
-  <link rel="stylesheet" href="dashboard-v2.css">
-  <link rel="stylesheet" href="neutral-system.css">
+  <link rel="stylesheet" href="dashboard-reference.css">
 </head>
-<body>
+<body class="dashboard-app">
   <div class="app-shell">
     <aside class="sidebar" id="sidebar" aria-label="Menu principal">
       <div class="brand-crop" aria-label="Devifolio"><span class="brand-mark"><img src="assets/devifolio-logo.png" alt=""></span><span class="brand-name">Devifolio</span></div>
-      <button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Recolher menu" aria-expanded="true"><span data-icon="menu"></span></button>
-      <nav class="side-nav" id="side-nav">
+      <button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Recolher menu" aria-expanded="true"><span data-icon="chevron"></span></button>
+      <nav class="side-nav side-nav-primary" id="side-nav">
         <a class="nav-item active" href="#inicio" data-route="inicio"><span data-icon="home"></span><span>Início</span></a>
         <a class="nav-item" href="#projetos" data-route="projetos"><span data-icon="folder"></span><span>Projetos</span></a>
-        <a class="nav-item" href="#portfolio" data-route="portfolio"><span data-icon="user"></span><span>Meus portfólios</span></a>
+        <a class="nav-item" href="#portfolio" data-route="portfolio"><span data-icon="user"></span><span>Meu portfólio</span></a>
         <a class="nav-item" href="#github" data-route="github"><span data-icon="github"></span><span>GitHub</span></a>
         <a class="nav-item" href="#analise" data-route="analise"><span data-icon="chart"></span><span>Análise</span></a>
+        <a class="nav-item" href="#indicacao" data-route="indicacao"><span data-icon="users"></span><span>Indicação</span></a>
         <a class="nav-item" href="#planos" data-route="planos"><span data-icon="crown"></span><span>Planos</span></a>
-        <a class="nav-item" href="#configuracoes" data-route="configuracoes"><span data-icon="settings"></span><span>Configurações</span></a>
-        <a class="nav-item" href="cadastro.html#login" data-logout><span data-icon="logout"></span><span>Sair</span></a>
       </nav>
       <div class="sidebar-spacer"></div>
-      <a class="referral-mini" href="#indicacao" data-route="indicacao">
-        <span class="circle-icon" data-icon="users"></span><span><b>Indicação</b><small>Ganhe benefícios<br>indicando amigos.</small></span><span data-icon="chevron"></span>
-      </a>
       <button class="user-mini" id="user-menu-toggle" type="button" aria-expanded="false" aria-controls="user-menu">
         <span class="avatar"></span><span><b>Sua conta</b><small></small></span><span data-icon="chevron"></span>
       </button>
@@ -41,6 +35,11 @@
         <button type="button" data-route-button="configuracoes"><span data-icon="settings"></span>Configurações</button>
         <a href="cadastro.html#login" data-logout><span data-icon="logout"></span>Sair</a>
       </div>
+      <nav class="side-nav side-nav-utility" aria-label="Conta">
+        <a class="nav-item" href="#perfil" data-route="perfil"><span data-icon="profile"></span><span>Perfil</span></a>
+        <a class="nav-item" href="#configuracoes" data-route="configuracoes"><span data-icon="settings"></span><span>Configurações</span></a>
+        <a class="nav-item" href="cadastro.html#login" data-logout><span data-icon="logout"></span><span>Sair</span></a>
+      </nav>
     </aside>
 
     <div class="mobile-topbar">
@@ -50,6 +49,9 @@
     </div>
 
     <main class="main-content">
+      <header class="desktop-topbar" aria-label="Localização atual">
+        <span id="breadcrumb-section">Início</span><i aria-hidden="true">/</i><strong id="breadcrumb-page">Dashboard</strong>
+      </header>
       <div id="page-content" class="page-content" aria-live="polite"></div>
     </main>
   </div>
