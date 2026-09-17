@@ -2,7 +2,7 @@
    This stylesheet is loaded only by dashboard.html. No public UI imports it. */
 :root {
   color-scheme: dark;
-  --bg-app:#1B1D1F;
+  --bg-app:#878787;
   --bg-sidebar:#151618;
   --bg-card:#202225;
   --bg-card-alt:#222426;
@@ -39,6 +39,11 @@ a {color:inherit;text-decoration:none}
 svg {width:20px;height:20px;stroke-width:1.7;flex:none;color:var(--icon-default);vertical-align:middle}
 [data-icon] {display:inline-flex;align-items:center;justify-content:center;flex:none}
 img {display:block;max-width:100%}
+/* Keep the supplied artwork intact; frame its transparent margins at icon sizes. */
+.github-icon {position:relative;display:block;width:20px;height:20px;flex:none;overflow:hidden}
+.github-icon img {position:absolute;width:150%;height:150%;max-width:none;left:-25%;top:-25%}
+.summary-title .github-icon {width:28px;height:28px}
+.connect-icon .github-icon {width:32px;height:32px}
 h1,h2,h3,p {margin:0}
 h1 {font-size:var(--font-title);line-height:1.2;letter-spacing:-.5px;font-weight:600}
 h2 {font-size:var(--font-section);line-height:1.4;font-weight:600}
@@ -96,9 +101,10 @@ button,input,select,textarea {box-shadow:none}
 .main-content {position:relative;margin-left:var(--sidebar-width);padding-top:var(--header-height);min-height:100dvh;background:var(--bg-app);transition:margin-left var(--motion-base) var(--ease-out)}
 .desktop-topbar {position:fixed;top:0;left:var(--sidebar-width);right:0;height:var(--header-height);z-index:16;display:flex;align-items:center;gap:12px;padding:0 20px;background:var(--bg-app);border-bottom:1px solid var(--border);font-size:12px;transition:left var(--motion-base) var(--ease-out)}
 .desktop-topbar i {font-style:normal;color:var(--text-muted)}
-.desktop-topbar strong {color:var(--text-secondary);font-weight:400}
+.desktop-topbar strong {color:var(--text-primary);font-weight:400}
 .page-content {padding:16px 16px 32px;width:100%;margin:auto;min-width:0}
-.page-enter {min-width:0;animation:page-settle 170ms var(--ease-out) both}
+.page-enter {min-width:0}
+.page-head p {color:var(--text-primary)}
 .card,.modal,.onboarding-panel {background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-card);padding:20px;min-width:0}
 .card-title,.section-card-head,.settings-card-head {display:flex;align-items:center;justify-content:space-between;gap:16px}
 .section-card-head {margin-bottom:16px}
@@ -118,7 +124,8 @@ button,input,select,textarea {box-shadow:none}
 .link-button:hover {color:var(--text-primary)}
 .link-button svg {width:14px;height:14px}
 .dashboard-layout {display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:stretch;min-height:calc(100dvh - var(--header-height) - 48px)}
-.dashboard-main-column,.dashboard-side-column {display:grid;grid-template-rows:auto 1fr;gap:16px;min-width:0}
+.dashboard-main-column {display:grid;grid-template-rows:auto 1fr;gap:16px;min-width:0}
+.dashboard-side-column {display:grid;gap:16px;min-width:0;align-content:start}
 .welcome-card {position:relative;padding:20px;min-height:248px}
 .welcome-copy {padding-right:64px}
 .welcome-copy p {font-size:16px;margin-bottom:4px}
@@ -240,14 +247,18 @@ input[type="checkbox"] {accent-color:var(--text-secondary);width:16px;height:16p
 .language-dot {width:8px;height:8px;background:var(--text-secondary);border-radius:4px}
 .repo-loading {display:flex;align-items:center;justify-content:center;gap:12px;min-height:200px;color:var(--text-secondary)}
 .analytics-metrics,.referral-stats {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-bottom:16px}
-.analytic-stat {display:grid;grid-template-columns:1fr auto;gap:12px;min-height:120px}
+.analytic-stat {display:grid;grid-template-columns:minmax(0,1fr) 24px;grid-template-areas:"label icon" "value value";gap:12px;min-height:128px;align-content:space-between}
+.analytic-stat>[data-icon] {grid-area:icon;align-self:start;justify-self:end}
+.analytic-stat>small {grid-area:label;overflow-wrap:anywhere}
+.analytic-stat>strong {grid-area:value;line-height:1.2}
 .analytic-stat strong {font-size:28px}
 .analytic-stat em {font-style:normal;color:var(--text-secondary)}
-.portfolio-select {display:grid;gap:8px;color:var(--text-secondary)}
+.portfolio-select {display:grid;gap:8px;color:var(--text-primary);max-width:100%}
+.portfolio-select select {width:100%;text-overflow:ellipsis}
 .monthly-chart {margin-bottom:16px}
-.month-bars {height:180px;display:grid;grid-template-columns:repeat(31,minmax(0,1fr));gap:4px;align-items:end;padding-top:16px;border-bottom:1px solid var(--border)}
+.month-bars {height:200px;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:4px;align-items:end;padding-top:16px;border-bottom:1px solid var(--border)}
 .month-bars>span {height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:8px;min-width:0}
-.month-bars i {display:block;width:100%;background:var(--icon-default)}
+.month-bars i {display:block;width:100%;max-height:calc(100% - 24px);min-height:3px;background:var(--icon-default)}
 .month-bars small {font-size:10px}
 .analytics-layout {display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px}
 .event-summary {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
@@ -263,7 +274,7 @@ input[type="checkbox"] {accent-color:var(--text-secondary);width:16px;height:16p
 .profile-summary h1 {font-size:24px;margin:4px 0;overflow-wrap:anywhere}
 .profile-summary p {overflow-wrap:anywhere}
 .settings-card-head h1 {font-size:24px}
-.settings-tabs {display:flex;gap:20px;padding-bottom:16px;border-bottom:1px solid var(--border);color:var(--text-secondary);overflow:auto}
+.settings-tabs {display:flex;flex-wrap:wrap;gap:12px 20px;padding-bottom:16px;border-bottom:1px solid var(--border);color:var(--text-secondary)}
 .settings-tabs span:first-child {color:var(--text-primary)}
 .panel-section {padding:20px 0;border-bottom:1px solid var(--border)}
 .panel-section:last-child {border-bottom:0;padding-bottom:0}
@@ -302,8 +313,9 @@ input[type="checkbox"] {accent-color:var(--text-secondary);width:16px;height:16p
 .empty-state-content h3 {font-size:16px}
 .empty-state-content button {margin-top:4px}
 .fatal-state,.analytics-empty {min-height:280px}
-.modal-backdrop {position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:24px;overflow:auto;opacity:0;transition:opacity 150ms var(--ease-out)}
-.modal-backdrop.is-open {opacity:1}
+.modal-backdrop {position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:24px;overflow:auto;isolation:isolate}
+.modal-backdrop::before {content:"";position:fixed;inset:0;z-index:-1;background:rgba(0,0,0,.5);opacity:0;transition:opacity 120ms var(--ease-out);pointer-events:none}
+.modal-backdrop.is-open::before {opacity:1}
 .modal {width:min(620px,100%);max-height:calc(100dvh - 48px);overflow-y:auto;padding:24px;transform:translateY(10px);transition:transform 220ms var(--ease-out)}
 .modal-backdrop.is-open .modal {transform:translateY(0)}
 .modal-backdrop.is-closing .modal {transform:translateY(10px);transition-duration:170ms}
@@ -331,7 +343,22 @@ input[type="checkbox"] {accent-color:var(--text-secondary);width:16px;height:16p
 .is-active .onboarding-status,.is-active .process-indicator,.is-complete .onboarding-status,.is-complete .process-indicator {background:var(--icon-default)}
 .spinner {display:block;width:24px;height:24px;border:2px solid var(--border-strong);border-top-color:var(--icon-default);border-radius:50%;animation:internal-spin 800ms linear infinite}
 @keyframes internal-spin {to {transform:rotate(1turn)}}
-@keyframes page-settle {from {opacity:0;transform:translateY(10px)}to {opacity:1;transform:translateY(0)}}
+.route-loader {min-height:calc(100dvh - 104px);display:grid;place-content:center;justify-items:center;gap:12px}
+.route-loader p {color:var(--text-primary)}
+.share-card {display:grid;grid-template-columns:minmax(0,1fr) 320px;align-items:center;gap:32px;min-height:440px;padding:32px}
+.share-copy {display:grid;gap:24px;min-width:0}
+.share-copy .secondary-button {justify-self:start}
+.share-card .qr-wrap {width:320px;height:auto;padding:16px;background:#fff;max-width:100%;aspect-ratio:1}
+.share-card .qr-wrap canvas {width:100%!important;height:auto!important;filter:none;mix-blend-mode:normal;max-width:100%}
+.share-card>.empty-state-content {grid-column:1/-1}
+.process-panel li {opacity:.5}
+.process-panel li.is-active,.process-panel li.is-complete {opacity:1}
+.process-panel li.is-active {color:var(--text-primary)}
+@media(max-width:1100px) {
+  .share-card {grid-template-columns:minmax(0,1fr);justify-items:center}
+  .share-copy {width:100%}
+  .analytics-metrics {grid-template-columns:repeat(2,minmax(0,1fr))}
+}
 @media(min-width:821px) {
   .sidebar-collapsed {--sidebar-width:72px}
   .sidebar-collapsed .brand-crop {padding-inline:20px}

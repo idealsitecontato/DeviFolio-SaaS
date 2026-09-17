@@ -13,6 +13,8 @@ import {
 } from './src/lib/user-data.js'
 import QRCode from 'qrcode'
 
+const githubIconUrl = new URL('./assets/github-icon.png', import.meta.url).href
+
 const $ = (selector, root = document) => root.querySelector(selector)
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)]
 const esc = value => String(value ?? '').replace(/[&<>'"]/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[character])
@@ -33,7 +35,7 @@ const icons = {
   profile: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0z"/>',
   users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
   github: '<path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3.3-.36 6.8-1.62 6.8-7.25A5.7 5.7 0 0 0 19.3 3.3 5.3 5.3 0 0 0 19.15 0S18 0 15 1.5a13.4 13.4 0 0 0-7 0C5 0 3.85 0 3.85 0a5.3 5.3 0 0 0-.15 3.3 5.7 5.7 0 0 0-1.5 3.95c0 5.62 3.5 6.88 6.8 7.25A4.8 4.8 0 0 0 8 18v4"/><path d="M8 19c-3 .9-3-1.5-4.2-2"/>',
-  chart: '<path d="M4 20V10M10 20V4M16 20v-7M22 20V7"/><path d="M2 20h22"/>',
+  chart: '<path d="M5 20V10M10 20V4M15 20v-7M20 20V7"/><path d="M2 20h20"/>',
   layout: '<rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/>',
   share: '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.5 6.8-4M8.6 13.5l6.8 4"/>',
   card: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h4"/>',
@@ -65,6 +67,10 @@ const icons = {
 
 function hydrateIcons(root = document) {
   $$('[data-icon]', root).forEach(element => {
+    if (element.dataset.icon === 'github') {
+      element.innerHTML = `<span class="github-icon" aria-hidden="true"><img src="${githubIconUrl}" alt="" decoding="async"></span>`
+      return
+    }
     const paths = icons[element.dataset.icon]
     if (paths) element.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`
   })
@@ -113,7 +119,7 @@ async function renderPortfolioQR() {
   const canvas = $('#portfolio-qr')
   if (!canvas || !state.profile.username.trim()) return
   try {
-    await QRCode.toCanvas(canvas, publicPortfolioUrl(), { width: 150, margin: 1, color: { dark: '#090b0f', light: '#ffffff' }, errorCorrectionLevel: 'M' })
+    await QRCode.toCanvas(canvas, publicPortfolioUrl(), { width: 320, margin: 4, color: { dark: '#090b0f', light: '#ffffff' }, errorCorrectionLevel: 'M' })
   } catch (error) {
     console.error('[Devifolio] Falha ao gerar QR Code', error)
     toast('Não foi possível gerar o QR Code.', 'error')
@@ -128,18 +134,20 @@ function projectRows(items = state.projects.slice(0, 5)) {
 function homeView() {
   const summary = analyticsSummary()
   const publishedProjects = state.projects.filter(project => project.status === 'published').length
-  const linkReady = Boolean(state.profile.username.trim())
   const publicationLabel = state.published ? 'Ativo' : 'Inativo'
   const githubCopy = state.githubConnected
     ? `<p>Conta conectada como <strong>@${esc(state.githubUsername || 'GitHub')}</strong>.</p><button class="dashboard-action" data-route-button="github"><span data-icon="github"></span>Gerenciar GitHub<span data-icon="arrow"></span></button>`
     : '<p>Importe seus repositórios e transforme-os em projetos do portfólio.</p><button class="dashboard-action" data-route-button="github"><span data-icon="github"></span>Conectar com GitHub<span data-icon="arrow"></span></button>'
-  const qrMarkup = linkReady
-    ? `<div class="dashboard-url"><span data-icon="link"></span><span>${esc(publicPortfolioUrl())}</span><button class="icon-button" data-copy="${esc(publicPortfolioUrl())}" aria-label="Copiar link"><span data-icon="copy"></span></button></div><div class="dashboard-qr"><div class="qr-wrap"><canvas id="portfolio-qr" width="150" height="150" aria-label="QR Code do portfólio público"></canvas></div><button class="secondary-button" data-download-qr><span data-icon="download"></span>Baixar QR Code</button></div>`
-    : '<div class="dashboard-link-empty"><span data-icon="qr"></span><p>Conclua o perfil para gerar seu link público e QR Code.</p><button class="secondary-button" data-route-button="portfolio-editar">Configurar portfólio</button></div>'
-  return `<section class="page-enter home-page"><div class="dashboard-layout"><div class="dashboard-main-column"><article class="card welcome-card"><div class="welcome-copy"><p>Bem-vindo de volta,</p><h1>${esc(realName())}!</h1><span>Seu portfólio, projetos e estatísticas, tudo em um só lugar.</span></div><span class="welcome-brand" aria-hidden="true"><img src="assets/devifolio-logo.png" alt=""></span><div class="dashboard-metrics"><button data-route-button="projetos"><span data-icon="folder"></span><small>Projetos</small><strong>${state.projects.length}</strong></button><button data-route-button="analise"><span data-icon="eye"></span><small>Visualizações</small><strong>${summary.views}</strong></button><button data-route-button="analise"><span data-icon="trending"></span><small>Interações</small><strong>${summary.clicks}</strong></button><button data-route-button="portfolio"><span data-icon="link"></span><small>Link público</small><strong>${publicationLabel}</strong></button></div></article><section class="card projects-card"><div class="section-card-head"><h2>Seus projetos recentes</h2>${state.projects.length ? '<button class="link-button" data-route-button="projetos">Ver todos <span data-icon="arrow"></span></button>' : ''}</div>${projectRows(state.projects.slice(0, 4))}</section></div><aside class="dashboard-side-column"><article class="card github-summary"><div class="summary-title"><span data-icon="github"></span><h2>${state.githubConnected ? 'GitHub conectado' : 'Conectar GitHub'}</h2></div>${githubCopy}</article><article class="card link-summary"><h2>Seu Link, Seu QR Code</h2><p>Compartilhe seu portfólio com um único link ou através do QR Code.</p>${qrMarkup}</article></aside></div></section>`
+  return `<section class="page-enter home-page"><div class="dashboard-layout"><div class="dashboard-main-column"><article class="card welcome-card"><div class="welcome-copy"><p>Bem-vindo de volta,</p><h1>${esc(realName())}!</h1><span>Seu portfólio, projetos e estatísticas, tudo em um só lugar.</span></div><span class="welcome-brand" aria-hidden="true"><img src="assets/devifolio-logo.png" alt=""></span><div class="dashboard-metrics"><button data-route-button="projetos"><span data-icon="folder"></span><small>Projetos</small><strong>${state.projects.length}</strong></button><button data-route-button="analise"><span data-icon="eye"></span><small>Visualizações</small><strong>${summary.views}</strong></button><button data-route-button="analise"><span data-icon="trending"></span><small>Interações</small><strong>${summary.clicks}</strong></button><button data-route-button="portfolio"><span data-icon="link"></span><small>Link público</small><strong>${publicationLabel}</strong></button></div></article><section class="card projects-card"><div class="section-card-head"><h2>Seus projetos recentes</h2>${state.projects.length ? '<button class="link-button" data-route-button="projetos">Ver todos <span data-icon="arrow"></span></button>' : ''}</div>${projectRows(state.projects.slice(0, 4))}</section></div><aside class="dashboard-side-column"><article class="card github-summary"><div class="summary-title"><span data-icon="github"></span><h2>${state.githubConnected ? 'GitHub conectado' : 'Conectar GitHub'}</h2></div>${githubCopy}</article></aside></div></section>`
+}
+
+function linkQrView() {
+  const ready = Boolean(state.profile.username.trim())
+  return `<section class="page-enter link-page">${pageHead('Seu link, Seu QRCode', 'Compartilhe seu portfólio com um link ou QR Code.')}<article class="card share-card">${ready ? `<div class="share-copy"><h2>Seu portfólio, pronto para compartilhar</h2><p>Copie o endereço ou baixe o QR Code para usar onde quiser.</p><div class="dashboard-url"><span data-icon="link"></span><span>${esc(publicPortfolioUrl())}</span><button class="icon-button" data-copy="${esc(publicPortfolioUrl())}" aria-label="Copiar link"><span data-icon="copy"></span></button></div><button class="secondary-button" data-download-qr><span data-icon="download"></span>Baixar QR Code</button></div><div class="qr-wrap"><canvas id="portfolio-qr" width="320" height="320" aria-label="QR Code do portfólio público"></canvas></div>` : emptyState('qr', 'Configure seu link público', 'Complete o perfil para gerar seu link e QR Code.', '<button class="primary-button" data-route-button="portfolio-editar">Configurar portfólio</button>')}</article></section>`
 }
 
 function projectCards(items) {
+  if (!items.length && state.projects.length) return `<div class="card empty-state">${emptyState('search', 'Nenhum projeto encontrado.', 'Ajuste a busca ou os filtros para encontrar seus projetos.')}</div>`
   if (!items.length) return `<div class="card empty-state">${emptyState('folder', 'Você ainda não possui projetos.', 'Crie seu primeiro projeto para começar.', '<button class="primary-button" data-new-project>Novo projeto</button>')}</div>`
   return items.map(project => `<article class="card project-card"><div class="project-cover">${project.image ? `<img class="project-cover-image" src="${esc(project.image)}" alt="Capa do projeto ${esc(project.name)}">` : `<span>${esc(project.name.slice(0, 2).toUpperCase())}</span>`}<span class="status ${project.status}">${statusLabel[project.status]}</span></div><div class="project-card-body"><div class="project-card-title"><h2>${esc(project.name)}</h2></div>${project.description ? `<p>${esc(project.description)}</p>` : ''}<div class="tag-row">${project.tech.split(',').filter(Boolean).map(item => `<span>${esc(item.trim())}</span>`).join('')}</div><div class="project-actions"><button class="secondary-button" data-view-project="${project.id}"><span data-icon="eye"></span>Visualizar</button><button class="icon-button" data-edit-project="${project.id}" aria-label="Editar"><span data-icon="edit"></span></button><button class="icon-button danger-ghost" data-delete-project="${project.id}" aria-label="Excluir"><span data-icon="trash"></span></button></div></div></article>`).join('')
 }
@@ -181,7 +189,7 @@ function analyticsView() {
   const dailyViews = Array.from({ length: daysInMonth }, (_, index) => monthEvents.filter(event => new Date(event.created_at).getDate() === index + 1).length)
   const maxDailyViews = Math.max(1, ...dailyViews)
   const monthLabel = new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(now)
-  const monthlyChart = `<article class="card monthly-chart"><div class="section-card-head"><div><h2>Visualizações — ${esc(monthLabel)}</h2><p>${monthEvents.length} visualização${monthEvents.length === 1 ? '' : 'ões'} neste mês</p></div></div><div class="month-bars" aria-label="Visualizações por dia">${dailyViews.map((count, index) => `<span title="Dia ${index + 1}: ${count} visualizações"><i style="height:${Math.max(3, Math.round((count / maxDailyViews) * 100))}%"></i><small>${index + 1}</small></span>`).join('')}</div></article>`
+  const monthlyChart = `<article class="card monthly-chart"><div class="section-card-head"><div><h2>Visualizações — ${esc(monthLabel)}</h2><p>${monthEvents.length} ${monthEvents.length === 1 ? 'visualização' : 'visualizações'} neste mês</p></div></div><div class="month-bars" aria-label="Visualizações por dia">${dailyViews.map((count, index) => `<span title="Dia ${index + 1}: ${count} visualizações"><i style="height:${Math.max(3, Math.round((count / maxDailyViews) * 100))}%"></i><small>${index + 1}</small></span>`).join('')}</div></article>`
   const projectCounts = new Map()
   state.analytics.filter(event => event.project_id && (event.event_type === 'project_view' || event.event_type === 'link_click')).forEach(event => projectCounts.set(Number(event.project_id), (projectCounts.get(Number(event.project_id)) || 0) + 1))
   const ranking = state.projects.map(project => ({ project, count: projectCounts.get(project.id) || 0 })).filter(item => item.count).sort((a, b) => b.count - a.count)
@@ -219,19 +227,20 @@ function plansView() {
   return `<section class="page-enter">${pageHead('Planos', 'Escolha os recursos certos para sua presença profissional.')}<div class="plans-grid">${plan('Essencial', '19,90', 'Para apresentar seu trabalho com clareza.', ['1 portfólio', 'Personalização básica', 'Link público', 'Edição de perfil'])}${plan('Pro', '29,90', 'Para profissionais que precisam de mais alcance.', ['Até 3 portfólios', 'Domínio personalizado', 'Analytics', 'Integração com GitHub', 'Mais personalizações'])}${plan('Premium', '59,90', 'Para uma operação de portfólios completa.', ['Portfólios ilimitados', 'Domínio personalizado', 'Analytics avançado', 'Suporte prioritário', 'Recursos premium'])}</div></section>`
 }
 
-const views = { inicio: homeView, projetos: projectsView, portfolio: portfolioManagerView, 'portfolio-editar': portfolioEditorView, github: githubView, analise: analyticsView, perfil: profileView, planos: plansView, configuracoes: settingsView, indicacao: referralView }
+const views = { 'link-qrcode': linkQrView, inicio: homeView, projetos: projectsView, portfolio: portfolioManagerView, 'portfolio-editar': portfolioEditorView, github: githubView, analise: analyticsView, perfil: profileView, planos: plansView, configuracoes: settingsView, indicacao: referralView }
 
 function render() {
+  if (routeLoadingTimer) return
   const route = views[location.hash.slice(1)] ? location.hash.slice(1) : 'inicio'
   $('#page-content').innerHTML = views[route]()
-  const routeLabel = { inicio: 'Dashboard', projetos: 'Projetos', portfolio: 'Meus portfólios', 'portfolio-editar': 'Editar portfólio', github: 'GitHub', analise: 'Análise', perfil: 'Perfil', planos: 'Planos', configuracoes: 'Configurações', indicacao: 'Indicação' }[route]
+  const routeLabel = { 'link-qrcode': 'Seu link, Seu QRCode', inicio: 'Dashboard', projetos: 'Projetos', portfolio: 'Meus portfólios', 'portfolio-editar': 'Editar portfólio', github: 'GitHub', analise: 'Análise', perfil: 'Perfil', planos: 'Planos', configuracoes: 'Configurações', indicacao: 'Indicação' }[route]
   document.title = `${routeLabel} — Devifolio`
   if ($('#breadcrumb-page')) $('#breadcrumb-page').textContent = routeLabel
   if ($('#breadcrumb-section')) $('#breadcrumb-section').textContent = route === 'inicio' ? 'Início' : 'Painel'
   $$('.nav-item').forEach(item => item.classList.toggle('active', item.dataset.route === route))
   hydrateIcons($('#page-content'))
   bindActions()
-  if (route === 'inicio') renderPortfolioQR()
+  if (route === 'link-qrcode') renderPortfolioQR()
   if (route === 'github' && state.githubConnected && !reposLoaded && !reposLoading) fetchGithubRepos()
   updateUserChrome()
   closeMenu()
@@ -324,7 +333,8 @@ async function togglePublished(event) {
   const publishing = !state.published
   setButtonLoading(button, true, publishing ? 'Fazendo deploy...' : 'Despublicando...')
   try {
-    await runStatusProcess(publishing ? 'Publicando portfólio' : 'Despublicando portfólio', publishing ? ['Preparando projeto...', 'Validando informações...', 'Gerando build...', 'Preparando publicação...', 'Publicando portfólio...'] : ['Preparando despublicação...', 'Removendo versão pública...', 'Atualizando status...', 'Finalizando...'])
+    const proceed = await runStatusProcess(publishing ? 'Publicando portfólio' : 'Despublicando portfólio', publishing ? ['Preparando projeto...', 'Validando informações...', 'Gerando build...', 'Preparando publicação...', 'Publicando portfólio...'] : ['Preparando despublicação...', 'Removendo versão pública...', 'Atualizando status...', 'Finalizando...'])
+    if (!proceed) return
     await saveProfile(currentUser.id, state.profile, publishing)
     state.published = publishing
     toast(publishing ? 'Deploy realizado com sucesso.' : 'Portfólio despublicado.')
@@ -456,6 +466,8 @@ async function connectGithub(event) {
   const button = event.currentTarget
   setButtonLoading(button, true, 'Conectando...')
   try {
+    const proceed = await runStatusProcess('Conectar GitHub', ['Analisando...', 'Preparando conexão com GitHub...', 'Pronto para solicitar autorização.'], { cancellable: true })
+    if (!proceed) { setButtonLoading(button, false); return }
     const data = await authenticatedApi('/api/github/connect', { method: 'POST' })
     location.assign(data.authorizationUrl)
   } catch (error) { reportError('Não foi possível conectar o GitHub.', error); setButtonLoading(button, false) }
@@ -597,21 +609,29 @@ async function copyText(text) {
   try { await navigator.clipboard.writeText(text); toast('Link copiado.') } catch (error) { reportError('Não foi possível copiar o link.', error) }
 }
 
-async function runStatusProcess(title, steps) {
-  modal(`<div class="process-panel"><p class="eyebrow">Devifolio</p><h2>${esc(title)}</h2><p>Estamos atualizando seu portfólio.</p><ol>${steps.map((step, index) => `<li data-process-step="${index}"><span class="process-indicator"></span>${esc(step)}</li>`).join('')}</ol></div>`)
-  for (const step of $$('[data-process-step]')) {
+async function runStatusProcess(title, steps, { cancellable = false } = {}) {
+  modal(`<div class="process-panel"><p class="eyebrow">Devifolio</p><h2>${esc(title)}</h2><p>Preparando sua solicitação.</p><ol>${steps.map((step, index) => `<li data-process-step="${index}"><span class="process-indicator"></span><span>${esc(step)}</span></li>`).join('')}</ol>${cancellable ? '<div class="modal-actions"><button class="secondary-button" data-close-modal>Cancelar</button></div>' : ''}</div>`)
+  const panel = $('.process-panel')
+  const backdrop = panel.closest('.modal-backdrop')
+  backdrop.onclick = null
+  for (const step of $$('[data-process-step]', panel)) {
+    if (!panel.isConnected || backdrop.classList.contains('is-closing')) return false
     step.classList.add('is-active')
-    await wait(1050)
+    await wait(6000 / steps.length)
+    if (!panel.isConnected || backdrop.classList.contains('is-closing')) return false
     step.classList.remove('is-active')
     step.classList.add('is-complete')
   }
   closeModal()
+  return true
 }
 
 function modal(content, { creationPanel = false } = {}) {
   const root = $('#modal-root')
   root.innerHTML = `<div class="modal-backdrop${creationPanel ? ' creation-backdrop' : ''}"><div class="modal${creationPanel ? ' creation-panel' : ''}" role="dialog" aria-modal="true">${content}</div></div>`
-  requestAnimationFrame(() => root.querySelector('.modal-backdrop')?.classList.add('is-open'))
+  const backdrop = root.querySelector('.modal-backdrop')
+  backdrop.getBoundingClientRect()
+  requestAnimationFrame(() => { if (!backdrop.classList.contains('is-closing')) backdrop.classList.add('is-open') })
   hydrateIcons($('#modal-root'))
   $$('[data-close-modal]').forEach(button => button.onclick = closeModal)
   $('.modal-backdrop').onclick = event => { if (event.target === event.currentTarget) closeModal() }
@@ -643,17 +663,21 @@ function setSidebarCollapsed(collapsed) {
 $('#menu-toggle').onclick = () => { const open = $('#sidebar').classList.toggle('open'); $('#sidebar-overlay').classList.toggle('show', open); $('#menu-toggle').setAttribute('aria-expanded', String(open)) }
 $('#sidebar-overlay').onclick = closeMenu
 $('#sidebar-toggle').onclick = () => setSidebarCollapsed(!$('.app-shell')?.classList.contains('sidebar-collapsed'))
-$('#sidebar-public-link').onclick = event => {
-  event.preventDefault()
-  const revealLinkCard = () => $('.link-summary')?.scrollIntoView({ block: 'nearest' })
-  if (location.hash === '#inicio') revealLinkCard()
-  else { location.hash = 'inicio'; window.setTimeout(revealLinkCard, 0) }
-  closeMenu()
-}
 $('#user-menu-toggle').onclick = event => { event.stopPropagation(); const menu = $('#user-menu'), open = menu.hasAttribute('hidden'); menu.toggleAttribute('hidden', !open); $('#user-menu-toggle').setAttribute('aria-expanded', String(open)) }
 document.addEventListener('click', event => { if (!event.target.closest('#user-menu') && !event.target.closest('#user-menu-toggle')) closeUserMenu() })
+let routeLoadingTimer = null
 function renderWithTransition() {
-  render()
+  clearTimeout(routeLoadingTimer)
+  closeModal()
+  closeMenu()
+  closeUserMenu()
+  $('#page-content').setAttribute('aria-busy', 'true')
+  $('#page-content').innerHTML = '<section class="route-loader" role="status"><span class="spinner" aria-hidden="true"></span><p>Carregando...</p></section>'
+  routeLoadingTimer = window.setTimeout(() => {
+    routeLoadingTimer = null
+    $('#page-content').removeAttribute('aria-busy')
+    render()
+  }, 500)
 }
 window.addEventListener('hashchange', renderWithTransition)
 

@@ -1,0 +1,5 @@
+/* Scoped to login and registration; public pages do not import this file. */
+body.auth-body {--auth-background:#878787;background:var(--auth-background)!important}
+.auth-body .auth-shell,.auth-body .auth-left,.auth-body .auth-right {background:var(--auth-background)!important}
+.auth-body .auth-left::after {display:none!important}
+.auth-body .auth-sub,.auth-body .auth-switch,.auth-body .auth-terms,.auth-body .auth-remember,.auth-body .auth-divider {color:#fff!important}
