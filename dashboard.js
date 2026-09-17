@@ -34,6 +34,10 @@ const icons = {
   users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
   github: '<path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3.3-.36 6.8-1.62 6.8-7.25A5.7 5.7 0 0 0 19.3 3.3 5.3 5.3 0 0 0 19.15 0S18 0 15 1.5a13.4 13.4 0 0 0-7 0C5 0 3.85 0 3.85 0a5.3 5.3 0 0 0-.15 3.3 5.7 5.7 0 0 0-1.5 3.95c0 5.62 3.5 6.88 6.8 7.25A4.8 4.8 0 0 0 8 18v4"/><path d="M8 19c-3 .9-3-1.5-4.2-2"/>',
   chart: '<path d="M4 20V10M10 20V4M16 20v-7M22 20V7"/><path d="M2 20h22"/>',
+  layout: '<rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/>',
+  share: '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.5 6.8-4M8.6 13.5l6.8 4"/>',
+  card: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h4"/>',
+  panel: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M14 9l-3 3 3 3"/>',
   settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06a1.7 1.7 0 0 0-1.88-.34A1.7 1.7 0 0 0 14 20.92V21h-4v-.08A1.7 1.7 0 0 0 8.95 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15 1.7 1.7 0 0 0 3 14v-4a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.34-1.88l2.83-2.83A1.7 1.7 0 0 0 9 4.6 1.7 1.7 0 0 0 10 3.08V3h4v.08A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.88-.34l2.83 2.83A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 1.52 1H21v4a1.7 1.7 0 0 0-1.6 1z"/>',
   logout: '<path d="M10 17l5-5-5-5M15 12H3"/><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>',
   chevron: '<path d="m9 18 6-6-6-6"/>', menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
@@ -151,7 +155,7 @@ function previewMarkup() {
 }
 
 function portfolioManagerView() {
-  const title = state.profile.name ? `Portfólio — ${state.profile.name}` : 'Meu portfólio'
+  const title = state.profile.name ? `Portfólio — ${state.profile.name}` : 'Meus portfólios'
   return `<section class="page-enter">${pageHead('Meus portfólios', 'Gerencie a versão pública associada à sua conta.', '<button class="primary-button" data-new-portfolio><span data-icon="plus"></span>Adicionar novo portfólio</button>')}<div class="portfolio-list"><article class="card portfolio-list-item"><div><p class="eyebrow">PORTFÓLIO PRINCIPAL</p><h2>${esc(title)}</h2><p>${state.published ? 'Seu portfólio está disponível para visitantes.' : 'Finalize o conteúdo e faça o deploy quando estiver pronto.'}</p></div><span class="status ${state.published ? 'published' : 'draft'}">${state.published ? 'Publicado' : 'Rascunho'}</span><div class="portfolio-list-actions"><button class="secondary-button" data-open-preview><span data-icon="eye"></span>Ver</button><button class="primary-button" data-edit-portfolio><span data-icon="edit"></span>Editar</button></div></article></div></section>`
 }
 
@@ -220,7 +224,7 @@ const views = { inicio: homeView, projetos: projectsView, portfolio: portfolioMa
 function render() {
   const route = views[location.hash.slice(1)] ? location.hash.slice(1) : 'inicio'
   $('#page-content').innerHTML = views[route]()
-  const routeLabel = { inicio: 'Dashboard', projetos: 'Projetos', portfolio: 'Meu portfólio', 'portfolio-editar': 'Editar portfólio', github: 'GitHub', analise: 'Análise', perfil: 'Perfil', planos: 'Planos', configuracoes: 'Configurações', indicacao: 'Indicação' }[route]
+  const routeLabel = { inicio: 'Dashboard', projetos: 'Projetos', portfolio: 'Meus portfólios', 'portfolio-editar': 'Editar portfólio', github: 'GitHub', analise: 'Análise', perfil: 'Perfil', planos: 'Planos', configuracoes: 'Configurações', indicacao: 'Indicação' }[route]
   document.title = `${routeLabel} — Devifolio`
   if ($('#breadcrumb-page')) $('#breadcrumb-page').textContent = routeLabel
   if ($('#breadcrumb-section')) $('#breadcrumb-section').textContent = route === 'inicio' ? 'Início' : 'Painel'
@@ -391,7 +395,7 @@ function showProject(id) {
 
 function projectModal(id) {
   const project = state.projects.find(item => item.id === id) || { name: '', description: '', tech: '', link: '', github: '', image: '', status: 'draft' }
-  modal(`<form id="project-form"><div class="modal-head"><div><p class="eyebrow">PROJETOS</p><h2>${id ? 'Editar projeto' : 'Novo projeto'}</h2></div><button class="icon-button" type="button" data-close-modal><span data-icon="x"></span></button></div><div class="form-grid"><label class="field full"><span>Nome do projeto</span><input name="name" required maxlength="60" value="${esc(project.name)}"></label><label class="field full"><span>Descrição</span><textarea name="description" maxlength="180">${esc(project.description)}</textarea></label><div class="field full"><span>Imagem de capa</span><div class="project-image-upload"><div class="project-image-preview" id="project-image-preview">${project.image ? `<img src="${esc(project.image)}" alt="Imagem atual do projeto">` : '<span data-icon="upload"></span>'}</div><div class="project-image-upload-copy"><input id="project-image-file" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="secondary-button" type="button" id="project-image-button"><span data-icon="upload"></span>Carregar do computador</button><strong id="project-image-name">${project.image ? 'Imagem atual do projeto' : 'Nenhum arquivo selecionado'}</strong><small>JPG, PNG ou WEBP, até 5 MB. Vídeos e outros arquivos não são aceitos.</small></div></div></div><label class="field full"><span>Tecnologias</span><input name="tech" value="${esc(project.tech)}" placeholder="React, Node.js, PostgreSQL"></label><label class="field"><span>Link publicado</span><input type="url" name="link" value="${esc(project.link)}" placeholder="https://"></label><label class="field"><span>Repositório GitHub</span><input name="github" value="${esc(project.github)}" placeholder="usuario/repositorio"></label><label class="field full"><span>Status</span><select name="status"><option value="published" ${project.status === 'published' ? 'selected' : ''}>Publicado</option><option value="progress" ${project.status === 'progress' ? 'selected' : ''}>Em breve</option><option value="draft" ${project.status === 'draft' ? 'selected' : ''}>Em desenvolvimento</option></select></label></div><div class="modal-actions"><button class="secondary-button" type="button" data-close-modal>Cancelar</button><button class="primary-button" type="submit">${id ? 'Salvar alterações' : 'Criar projeto'}</button></div></form>`)
+  modal(`<form id="project-form"><div class="modal-head"><div><p class="eyebrow">PROJETOS</p><h2>${id ? 'Editar projeto' : 'Novo projeto'}</h2></div><button class="icon-button" type="button" data-close-modal><span data-icon="x"></span></button></div><div class="form-grid"><label class="field full"><span>Nome do projeto</span><input name="name" required maxlength="60" value="${esc(project.name)}"></label><label class="field full"><span>Descrição</span><textarea name="description" maxlength="180">${esc(project.description)}</textarea></label><div class="field full"><span>Imagem de capa</span><div class="project-image-upload"><div class="project-image-preview" id="project-image-preview">${project.image ? `<img src="${esc(project.image)}" alt="Imagem atual do projeto">` : '<span data-icon="upload"></span>'}</div><div class="project-image-upload-copy"><input id="project-image-file" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="secondary-button" type="button" id="project-image-button"><span data-icon="upload"></span>Carregar do computador</button><strong id="project-image-name">${project.image ? 'Imagem atual do projeto' : 'Nenhum arquivo selecionado'}</strong><small>JPG, PNG ou WEBP, até 5 MB. Vídeos e outros arquivos não são aceitos.</small></div></div></div><label class="field full"><span>Tecnologias</span><input name="tech" value="${esc(project.tech)}" placeholder="React, Node.js, PostgreSQL"></label><label class="field"><span>Link publicado</span><input type="url" name="link" value="${esc(project.link)}" placeholder="https://"></label><label class="field"><span>Repositório GitHub</span><input name="github" value="${esc(project.github)}" placeholder="usuario/repositorio"></label><label class="field full"><span>Status</span><select name="status"><option value="published" ${project.status === 'published' ? 'selected' : ''}>Publicado</option><option value="progress" ${project.status === 'progress' ? 'selected' : ''}>Em breve</option><option value="draft" ${project.status === 'draft' ? 'selected' : ''}>Em desenvolvimento</option></select></label></div><div class="modal-actions"><button class="secondary-button" type="button" data-close-modal>Cancelar</button><button class="primary-button" type="submit">${id ? 'Salvar alterações' : 'Criar projeto'}</button></div></form>`, { creationPanel: true })
   const imageInput = $('#project-image-file')
   const imageButton = $('#project-image-button')
   const imageName = $('#project-image-name')
@@ -604,14 +608,24 @@ async function runStatusProcess(title, steps) {
   closeModal()
 }
 
-function modal(content) {
-  $('#modal-root').innerHTML = `<div class="modal-backdrop"><div class="modal" role="dialog" aria-modal="true">${content}</div></div>`
+function modal(content, { creationPanel = false } = {}) {
+  const root = $('#modal-root')
+  root.innerHTML = `<div class="modal-backdrop${creationPanel ? ' creation-backdrop' : ''}"><div class="modal${creationPanel ? ' creation-panel' : ''}" role="dialog" aria-modal="true">${content}</div></div>`
+  requestAnimationFrame(() => root.querySelector('.modal-backdrop')?.classList.add('is-open'))
   hydrateIcons($('#modal-root'))
   $$('[data-close-modal]').forEach(button => button.onclick = closeModal)
   $('.modal-backdrop').onclick = event => { if (event.target === event.currentTarget) closeModal() }
 }
 
-function closeModal() { $('#modal-root').innerHTML = '' }
+function closeModal() {
+  const root = $('#modal-root')
+  const backdrop = root.querySelector('.modal-backdrop')
+  if (!backdrop) return
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { root.innerHTML = ''; return }
+  backdrop.classList.remove('is-open')
+  backdrop.classList.add('is-closing')
+  window.setTimeout(() => { if (root.contains(backdrop)) root.innerHTML = '' }, 180)
+}
 function setButtonLoading(button, loading, label = '') { if (!button) return; if (loading) { button.dataset.original = button.innerHTML; button.disabled = true; button.textContent = label } else { button.disabled = false; if (button.dataset.original) button.innerHTML = button.dataset.original; hydrateIcons(button) } }
 function reportError(message, error) { console.error(`[Devifolio] ${message}`, error); toast(error?.message ? `${message} ${error.message}` : message, 'error') }
 function toast(message, type = 'success') { const element = document.createElement('div'); element.className = `toast ${type}`; element.innerHTML = `<span data-icon="${type === 'error' ? 'x' : 'check'}"></span>${esc(message)}`; $('#toast-stack').append(element); hydrateIcons(element); setTimeout(() => element.remove(), 4200) }
@@ -619,38 +633,27 @@ function closeUserMenu() { $('#user-menu')?.setAttribute('hidden', ''); $('#user
 function closeMenu() { $('#sidebar')?.classList.remove('open'); $('#sidebar-overlay')?.classList.remove('show'); $('#menu-toggle')?.setAttribute('aria-expanded', 'false') }
 function setSidebarCollapsed(collapsed) {
   $('.app-shell')?.classList.toggle('sidebar-collapsed', collapsed)
-  $('#sidebar-toggle')?.setAttribute('aria-expanded', String(!collapsed))
-  $('#sidebar-toggle')?.setAttribute('aria-label', collapsed ? 'Expandir menu' : 'Recolher menu')
+  const toggle = $('#sidebar-toggle')
+  toggle?.setAttribute('aria-expanded', String(!collapsed))
+  toggle?.setAttribute('aria-label', collapsed ? 'Expandir menu' : 'Recolher menu')
+  toggle?.setAttribute('data-tooltip', collapsed ? 'Expandir menu' : 'Recolher menu')
   try { localStorage.setItem('devifolio_sidebar_collapsed', String(collapsed)) } catch { /* armazenamento indisponível */ }
 }
 
 $('#menu-toggle').onclick = () => { const open = $('#sidebar').classList.toggle('open'); $('#sidebar-overlay').classList.toggle('show', open); $('#menu-toggle').setAttribute('aria-expanded', String(open)) }
 $('#sidebar-overlay').onclick = closeMenu
 $('#sidebar-toggle').onclick = () => setSidebarCollapsed(!$('.app-shell')?.classList.contains('sidebar-collapsed'))
+$('#sidebar-public-link').onclick = event => {
+  event.preventDefault()
+  const revealLinkCard = () => $('.link-summary')?.scrollIntoView({ block: 'nearest' })
+  if (location.hash === '#inicio') revealLinkCard()
+  else { location.hash = 'inicio'; window.setTimeout(revealLinkCard, 0) }
+  closeMenu()
+}
 $('#user-menu-toggle').onclick = event => { event.stopPropagation(); const menu = $('#user-menu'), open = menu.hasAttribute('hidden'); menu.toggleAttribute('hidden', !open); $('#user-menu-toggle').setAttribute('aria-expanded', String(open)) }
 document.addEventListener('click', event => { if (!event.target.closest('#user-menu') && !event.target.closest('#user-menu-toggle')) closeUserMenu() })
-let routeLoadingTimer
 function renderWithTransition() {
-  clearTimeout(routeLoadingTimer)
-  $('.main-content > .route-loader')?.remove()
-  const content = $('#page-content')
-  content.classList.remove('route-transitioning')
-  content.removeAttribute('aria-busy')
-  // Render and start route-specific data requests immediately, before visual loading.
   render()
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-  content.classList.add('route-transitioning')
-  content.setAttribute('aria-busy', 'true')
-  const loader = document.createElement('section')
-  loader.className = 'route-loader'
-  loader.setAttribute('role', 'status')
-  loader.innerHTML = '<span aria-hidden="true"></span><p>Carregando</p>'
-  $('.main-content').append(loader)
-  routeLoadingTimer = window.setTimeout(() => {
-    loader.remove()
-    content.classList.remove('route-transitioning')
-    content.removeAttribute('aria-busy')
-  }, 380)
 }
 window.addEventListener('hashchange', renderWithTransition)
 
@@ -677,6 +680,7 @@ async function runOnboarding() {
 }
 
 async function bootstrap() {
+  hydrateIcons()
   if (authLoadingRequested) $('#page-content').innerHTML = startupLoadingView()
   const { data, error } = await supabase.auth.getSession()
   if (error || !data.session) { location.replace('cadastro.html#login'); return }
