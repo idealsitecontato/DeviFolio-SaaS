@@ -119,7 +119,7 @@ async function renderPortfolioQR() {
   const canvas = $('#portfolio-qr')
   if (!canvas || !state.profile.username.trim()) return
   try {
-    await QRCode.toCanvas(canvas, publicPortfolioUrl(), { width: 320, margin: 4, color: { dark: '#090b0f', light: '#ffffff' }, errorCorrectionLevel: 'M' })
+    await QRCode.toCanvas(canvas, publicPortfolioUrl(), { width: 512, margin: 2, color: { dark: '#111111', light: '#ffffff' }, errorCorrectionLevel: 'M' })
   } catch (error) {
     console.error('[Devifolio] Falha ao gerar QR Code', error)
     toast('Não foi possível gerar o QR Code.', 'error')
@@ -302,13 +302,18 @@ function bindActions() {
   $('[data-share-referral]')?.addEventListener('click', shareReferral)
 }
 
-function downloadPortfolioQR() {
-  const canvas = $('#portfolio-qr')
-  if (!canvas) return toast('Gere seu link público antes de baixar o QR Code.', 'error')
-  const anchor = document.createElement('a')
-  anchor.href = canvas.toDataURL('image/png')
-  anchor.download = `devifolio-${state.profile.username || 'portfolio'}-qrcode.png`
-  anchor.click()
+async function downloadPortfolioQR() {
+  if (!state.profile.username.trim()) return toast('Gere seu link público antes de baixar o QR Code.', 'error')
+  try {
+    const dataUrl = await QRCode.toDataURL(publicPortfolioUrl(), { width: 1024, margin: 2, color: { dark: '#111111', light: '#ffffff' }, errorCorrectionLevel: 'M' })
+    const anchor = document.createElement('a')
+    anchor.href = dataUrl
+    anchor.download = `devifolio-${state.profile.username || 'portfolio'}-qrcode.png`
+    anchor.click()
+  } catch (error) {
+    console.error('[Devifolio] Falha ao baixar QR Code', error)
+    toast('Não foi possível baixar o QR Code.', 'error')
+  }
 }
 
 function bindProjectGrid() {
