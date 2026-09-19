@@ -1,0 +1,227 @@
+/* Atualizacao visual global: fundos neutros unificados e avatares circulares. */
+:root {
+  --app-background: #3D3D3D;
+}
+
+html,
+body {
+  background-color: var(--app-background) !important;
+}
+
+/* Landing page: todas as superficies de pagina e cards neutros usam o mesmo fundo. */
+html body.landing-body,
+html body.landing-body main,
+html body.landing-body .hero,
+html body.landing-body .section-white,
+html body.landing-body .section-cream,
+html body.landing-body .section-yellow,
+html body.landing-body .showcase,
+html body.landing-body .workflow,
+html body.landing-body .features,
+html body.landing-body .audience,
+html body.landing-body .testimonials,
+html body.landing-body .pricing,
+html body.landing-body .faq,
+html body.landing-body .metric-card,
+html body.landing-body .showcase-card,
+html body.landing-body .github-link-panel,
+html body.landing-body .feature-row,
+html body.landing-body .feature-icon,
+html body.landing-body .step,
+html body.landing-body .audience-card,
+html body.landing-body .testimonial-card,
+html body.landing-body .review-card,
+html body.landing-body .price-note,
+html body.landing-body .video-frame,
+html body.landing-body .video-placeholder,
+html body.landing-body .final-cta-inner,
+html body.landing-body .chat-top,
+html body.landing-body .chat-dark,
+html body.landing-body .chat-bottom {
+  background-color: var(--app-background) !important;
+  background-image: none !important;
+}
+
+html body.landing-body,
+html body.landing-body h1,
+html body.landing-body h2,
+html body.landing-body h3,
+html body.landing-body p,
+html body.landing-body .hero-text,
+html body.landing-body .eyebrow,
+html body.landing-body .feature-index,
+html body.landing-body .feature-arrow,
+html body.landing-body .audience-tag,
+html body.landing-body .section-head > p,
+html body.landing-body .step > span,
+html body.landing-body .review-person small,
+html body.landing-body .price-note span,
+html body.landing-body .showcase-card,
+html body.landing-body .analytics-top div,
+html body.landing-body .chat-top,
+html body.landing-body .chat-dark,
+html body.landing-body .chat-bottom {
+  color: #FFFFFF !important;
+}
+
+html body.landing-body .hero h1,
+html body.landing-body .hero h1 span {
+  color: #FFFFFF !important;
+}
+
+html body.landing-body .metric-card,
+html body.landing-body .showcase-card,
+html body.landing-body .feature-row,
+html body.landing-body .step,
+html body.landing-body .audience-card,
+html body.landing-body .testimonial-card,
+html body.landing-body .review-card,
+html body.landing-body .price-note,
+html body.landing-body .github-link-panel,
+html body.landing-body .video-frame,
+html body.landing-body .video-placeholder {
+  border-color: #666666 !important;
+}
+
+html body.landing-body .button-outline {
+  border-color: #A0A0A0 !important;
+  color: #FFFFFF !important;
+}
+
+html body.landing-body .button-outline:hover,
+html body.landing-body .feature-row:hover {
+  background: var(--app-background) !important;
+}
+
+/* Login e cadastro. Campos e estados funcionais preservam suas cores existentes. */
+body.auth-body,
+body.auth-body .auth-shell,
+body.auth-body .auth-left,
+body.auth-body .auth-right {
+  --auth-background: var(--app-background);
+  background: var(--app-background) !important;
+}
+
+body.auth-body .auth-brand,
+body.auth-body .auth-panel h1,
+body.auth-body .auth-field label {
+  color: #FFFFFF !important;
+}
+
+/* Dashboard e todas as telas internas renderizadas nele. */
+html:has(body.dashboard-app) {
+  --bg-app: var(--app-background);
+  --bg-sidebar: var(--app-background);
+  --bg-card: var(--app-background);
+  --bg-card-alt: var(--app-background);
+  --bg-hover: var(--app-background);
+  --bg-input: var(--app-background);
+  background: var(--app-background) !important;
+}
+
+body.dashboard-app,
+body.dashboard-app .app-shell,
+body.dashboard-app .sidebar,
+body.dashboard-app .mobile-topbar,
+body.dashboard-app .main-content,
+body.dashboard-app .desktop-topbar,
+body.dashboard-app .card,
+body.dashboard-app .modal,
+body.dashboard-app .onboarding-panel,
+body.dashboard-app .user-menu,
+body.dashboard-app .project-cover,
+body.dashboard-app .public-preview,
+body.dashboard-app .project-image-upload,
+body.dashboard-app .project-image-preview,
+body.dashboard-app .connect-icon,
+body.dashboard-app .circle-icon,
+body.dashboard-app .repo-icon,
+body.dashboard-app .toast,
+body.dashboard-app input,
+body.dashboard-app textarea,
+body.dashboard-app select,
+body.dashboard-app option,
+body.dashboard-app .input-prefix,
+body.dashboard-app .url-field,
+body.dashboard-app .search-field,
+body.dashboard-app .status,
+body.dashboard-app .badge,
+body.dashboard-app .tag-row span,
+body.dashboard-app .preview-skills span {
+  background-color: var(--app-background) !important;
+  background-image: none !important;
+}
+
+/* Portfolio publico e seus estados de carregamento/vazio. */
+body:not(.landing-body):not(.auth-body):not(.dashboard-app),
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .public-nav,
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .portfolio-shell,
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .public-state,
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .public-project,
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .project-image,
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .empty-projects,
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .skills span,
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .profile-links a {
+  background-color: var(--app-background) !important;
+  background-image: none !important;
+}
+
+body:not(.landing-body):not(.auth-body):not(.dashboard-app),
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) h1,
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) h2,
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) h3,
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) p,
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) span,
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) a {
+  color: #FFFFFF !important;
+}
+
+/* Fotos de usuario: recorte circular consistente em qualquer proporcao. */
+.avatar,
+.avatar img,
+.preview-avatar,
+.preview-avatar img,
+.public-avatar,
+.public-avatar img,
+.profile-avatar,
+.profile-avatar img,
+.user-avatar,
+.user-avatar img,
+.review-avatar,
+.review-avatar img,
+.person-avatar,
+.person-avatar img,
+.mini-avatars i,
+img.avatar,
+img.profile-avatar,
+img.user-avatar {
+  border-radius: 50% !important;
+}
+
+.avatar img,
+.preview-avatar img,
+.public-avatar img,
+.profile-avatar img,
+.user-avatar img,
+.review-avatar img,
+.person-avatar img,
+img.avatar,
+img.profile-avatar,
+img.user-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover !important;
+  object-position: center !important;
+}
+
+@media (max-width: 520px) {
+  html body.landing-body .hero-devifolio .hero-actions {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  html body.landing-body .hero-devifolio .hero-actions .button {
+    width: 100% !important;
+    min-width: 0 !important;
+    white-space: normal !important;
+  }
+}
