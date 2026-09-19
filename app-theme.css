@@ -365,3 +365,9 @@ body.dashboard-app .link-page .share-card .qr-wrap {
     white-space: normal !important;
   }
 }
+
+/* Shared typography: Google Sans when available, with Roboto as the compatible web fallback. */
+:root { --devifolio-font: "Google Sans", "Google Sans Text", "Roboto", Arial, sans-serif; }
+html, body, button, input, textarea, select, option, label, a, table, th, td {
+  font-family: var(--devifolio-font) !important;
+}
