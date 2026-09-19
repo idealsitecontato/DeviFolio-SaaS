@@ -1,6 +1,8 @@
 /* Atualizacao visual global: fundos neutros unificados e avatares circulares. */
 :root {
   --app-background: #3D3D3D;
+  --app-card-background: #6E6E6E;
+  --app-button-hover: #3D3D3D;
 }
 
 html,
@@ -212,6 +214,144 @@ img.user-avatar {
   height: 100%;
   object-fit: cover !important;
   object-position: center !important;
+}
+
+/* Cards e containers de destaque: contraste fixo sobre o fundo principal. */
+html body.landing-body .metric-card,
+html body.landing-body .showcase-card,
+html body.landing-body .github-link-panel,
+html body.landing-body .feature-row,
+html body.landing-body .step,
+html body.landing-body .audience-card,
+html body.landing-body .testimonial-card,
+html body.landing-body .review-card,
+html body.landing-body .price-note,
+html body.landing-body .video-frame,
+html body.landing-body .video-placeholder,
+html body.landing-body .final-cta-inner,
+html body.landing-body .feature-row:hover,
+html body.landing-body .review-card:hover,
+body.dashboard-app .card,
+body.dashboard-app .card:hover,
+body.dashboard-app .modal,
+body.dashboard-app .onboarding-panel,
+body.dashboard-app .user-menu,
+body.dashboard-app .public-preview,
+body.dashboard-app .project-image-upload,
+body.dashboard-app .project-image-preview,
+body.dashboard-app .dashboard-metrics button,
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .public-project,
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .public-project:hover,
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .empty-projects {
+  background: var(--app-card-background) !important;
+  background-image: none !important;
+}
+
+/* Hover discreto e uniforme, sem alterar a aparência normal dos botões. */
+button:not(:disabled):hover,
+.button:hover,
+.primary-button:not(:disabled):hover,
+.secondary-button:not(:disabled):hover,
+.danger-button:not(:disabled):hover,
+.dashboard-action:not(:disabled):hover,
+.nav-action:hover,
+.public-button:hover {
+  background-color: #3D3D3D !important;
+  background-image: none !important;
+}
+
+html body.landing-body a.button:hover,
+html body.landing-body button:not(:disabled):hover,
+html body.auth-body a.button:hover,
+html body.auth-body button:not(:disabled):hover,
+html body.dashboard-app .app-shell button:not(:disabled):hover,
+html body.dashboard-app .app-shell .dashboard-action:not(:disabled):hover,
+html body:not(.landing-body):not(.auth-body):not(.dashboard-app) a.nav-action:hover,
+html body:not(.landing-body):not(.auth-body):not(.dashboard-app) a.public-button:hover,
+html body:not(.landing-body):not(.auth-body):not(.dashboard-app) button:not(:disabled):hover {
+  background-color: #3D3D3D !important;
+  background-image: none !important;
+}
+
+/* Início: informações relacionadas próximas, sem aumentar os elementos. */
+body.dashboard-app .home-page .dashboard-layout {
+  min-height: 0;
+}
+
+body.dashboard-app .home-page .dashboard-main-column {
+  grid-template-rows: auto auto;
+  align-content: start;
+}
+
+body.dashboard-app .home-page .dashboard-side-column {
+  gap: 12px;
+}
+
+body.dashboard-app .link-summary > p,
+body.dashboard-app .plans-summary > p {
+  margin: 8px 0 12px;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+body.dashboard-app .link-summary .dashboard-qr {
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 12px;
+  margin-top: 12px;
+}
+
+body.dashboard-app .link-summary .qr-wrap {
+  width: 96px;
+  height: 96px;
+  padding: 12px;
+}
+
+body.dashboard-app .plans-summary .dashboard-action {
+  margin-top: 4px;
+}
+
+/* Página específica: QR Code proporcional ao conteúdo, sem dominar a tela. */
+body.dashboard-app .link-page .share-card {
+  grid-template-columns: minmax(0, 1fr) 220px;
+  gap: 24px;
+  min-height: 320px;
+  padding: 24px;
+}
+
+body.dashboard-app .link-page .share-copy {
+  gap: 16px;
+}
+
+body.dashboard-app .link-page .share-card .qr-wrap {
+  width: 220px;
+  padding: 12px;
+}
+
+@media (max-width: 1100px) {
+  body.dashboard-app .link-page .share-card {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+  }
+
+  body.dashboard-app .link-page .share-copy {
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  body.dashboard-app .link-summary .dashboard-qr {
+    grid-template-columns: 88px minmax(0, 1fr);
+  }
+
+  body.dashboard-app .link-summary .qr-wrap {
+    width: 88px;
+    height: 88px;
+    padding: 8px;
+  }
+
+  body.dashboard-app .link-page .share-card .qr-wrap {
+    width: min(190px, 100%);
+  }
 }
 
 @media (max-width: 520px) {
