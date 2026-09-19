@@ -93,7 +93,7 @@ githubNext?.addEventListener('click', event => {
 
 syncGithubNext();
 
-const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
 const revealElements = document.querySelectorAll([
   '.hero-copy',
   '.hero-visual',
@@ -110,24 +110,41 @@ const revealElements = document.querySelectorAll([
   '.footer-grid > *',
 ].join(','));
 
-revealElements.forEach((element, index) => {
-  const entersFromRight = element.matches('.hero-visual') || (!element.matches('.hero-copy') && index % 2 !== 0);
-  element.classList.add('direction-reveal', entersFromRight ? 'from-right' : 'from-left');
-  element.style.setProperty('--reveal-delay', `${(index % 3) * 35}ms`);
+revealElements.forEach(element => {
+  element.classList.add('direction-reveal');
+  const siblings = [...element.parentElement.children];
+  element.style.setProperty('--reveal-delay', `${Math.min(siblings.indexOf(element), 3) * 35}ms`);
 });
 
-if (prefersReducedMotion) {
+if (motionPreference.matches) {
   revealElements.forEach(element => element.classList.add('is-inview'));
 } else {
+  // Observe unclipped layout parents so a masked child can still enter view.
+  const revealGroups = new Map();
+  revealElements.forEach(element => {
+    const group = element.parentElement;
+    if (!revealGroups.has(group)) revealGroups.set(group, []);
+    revealGroups.get(group).push(element);
+  });
   const revealObserver = new IntersectionObserver(entries => {
     entries.forEach(entry => {
-      entry.target.classList.toggle('is-inview', entry.isIntersecting);
+      if (entry.isIntersecting) {
+        revealGroups.get(entry.target).forEach(element => element.classList.add('is-inview'));
+        revealObserver.unobserve(entry.target);
+      }
     });
   }, { threshold: 0.12, rootMargin: '0px 0px -7% 0px' });
   window.requestAnimationFrame(() => {
-    revealElements.forEach(element => revealObserver.observe(element));
+    revealGroups.forEach((elements, group) => revealObserver.observe(group));
   });
 }
+
+document.addEventListener('focusin', event => {
+  event.target.closest('.direction-reveal')?.classList.add('is-inview');
+});
+motionPreference.addEventListener('change', event => {
+  if (event.matches) revealElements.forEach(element => element.classList.add('is-inview'));
+});
 
 document.querySelectorAll('a[href^="#"]').forEach(link => {
   link.addEventListener('click', event => {
@@ -139,3 +156,66 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
     target.scrollIntoView({behavior:'auto', block:'start'});
   });
 });
+
+/* Progressive enhancement: vertical scrolling remains native on every page. */
+const horizontalScenes = [
+  { section: document.getElementById('funcionalidades'), selector: '.feature-list' },
+  { section: document.getElementById('como-funciona'), selector: '.workflow-grid' },
+].flatMap(({ section, selector }) => {
+  const track = section?.querySelector(selector);
+  if (!track) return [];
+  const viewport = document.createElement('div');
+  viewport.className = 'horizontal-viewport';
+  track.before(viewport);
+  viewport.append(track);
+  return [{ section, track, viewport, container: section.querySelector('.container'), distance: 0, start: 0 }];
+});
+const desktopScroll = window.matchMedia('(min-width: 1000px) and (min-height: 640px)');
+let sceneFrame = 0;
+let measureFrame = 0;
+
+function updateHorizontalScenes() {
+  sceneFrame = 0;
+  const scrollY = window.scrollY;
+  horizontalScenes.forEach(scene => {
+    if (!scene.distance) return;
+    const progress = Math.max(0, Math.min(1, (scrollY - scene.start) / scene.distance));
+    scene.track.style.setProperty('--track-x', `${-progress * scene.distance}px`);
+  });
+}
+
+function measureHorizontalScenes() {
+  measureFrame = 0;
+  const enabled = desktopScroll.matches && !motionPreference.matches;
+  // Complete all layout setup before measuring; scrolling only updates transforms.
+  horizontalScenes.forEach(scene => {
+    scene.section.classList.toggle('horizontal-scene', enabled);
+    if (!enabled) {
+      scene.distance = 0;
+      scene.section.style.removeProperty('--scene-height');
+      scene.track.style.removeProperty('--track-x');
+    }
+  });
+  if (!enabled) return;
+  horizontalScenes.forEach(scene => {
+    scene.distance = Math.max(0, scene.track.scrollWidth - scene.viewport.clientWidth);
+    scene.section.style.setProperty('--scene-height', `${scene.container.offsetHeight + scene.distance}px`);
+  });
+  horizontalScenes.forEach(scene => {
+    scene.start = scene.section.getBoundingClientRect().top + window.scrollY - 72;
+  });
+  updateHorizontalScenes();
+}
+
+function scheduleSceneMeasure() {
+  if (!measureFrame) measureFrame = requestAnimationFrame(measureHorizontalScenes);
+}
+window.addEventListener('scroll', () => {
+  if (!sceneFrame) sceneFrame = requestAnimationFrame(updateHorizontalScenes);
+}, { passive: true });
+window.addEventListener('resize', scheduleSceneMeasure, { passive: true });
+window.addEventListener('load', scheduleSceneMeasure, { once: true });
+desktopScroll.addEventListener('change', scheduleSceneMeasure);
+motionPreference.addEventListener('change', scheduleSceneMeasure);
+document.fonts?.ready.then(scheduleSceneMeasure);
+scheduleSceneMeasure();
