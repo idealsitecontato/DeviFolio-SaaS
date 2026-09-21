@@ -77,7 +77,7 @@ function hydrateIcons(root = document) {
 }
 
 const blankProfile = { name: '', username: '', email: '', role: '', bio: '', skills: '', linkedin: '', github: '', website: '', avatar: '' }
-const blankSettings = { email: true, product: true, publicProfile: true, compact: false, theme: 'dark' }
+const blankSettings = { email: true, product: true, publicProfile: true, compact: false }
 const state = { projects: [], profile: { ...blankProfile }, published: false, githubConnected: false, githubUsername: '', repos: [], analytics: [], referrals: [], settings: { ...blankSettings } }
 const statusLabel = { published: 'Publicado', progress: 'Em breve', draft: 'Em desenvolvimento' }
 let currentUser = null
@@ -217,7 +217,7 @@ function switchRow(icon, title, description, key, on) {
 }
 
 function settingsView() {
-  return `<section class="page-enter compact-panel-page"><div class="card settings-card compact-panel"><div class="settings-card-head"><span data-icon="settings"></span><div><h1>Configurações</h1><p>Preferências, privacidade e integrações.</p></div></div><div class="settings-tabs"><span>Preferências</span><span>Privacidade</span><span>Integrações</span><span>Conta</span></div><div class="panel-section"><h2>Preferências</h2><div class="setting-row"><div><b>Aparência</b><small>Alterne entre o visual claro e escuro do Devifolio.</small></div><button class="inline-theme-toggle" type="button" data-theme-toggle aria-label="Alternar entre modo claro e escuro" aria-pressed="${state.settings.theme === 'dark'}"><span data-theme-toggle-label>${state.settings.theme === 'dark' ? 'Escuro' : 'Claro'}</span><span class="theme-switch" aria-hidden="true"><i></i></span></button></div>${switchRow('menu', 'Modo compacto', 'Reduz o espaço entre os elementos.', 'compact', state.settings.compact)}${switchRow('mail', 'Resumo por e-mail', 'Receba um relatório semanal.', 'email', state.settings.email)}</div><div class="panel-section"><h2>Privacidade e integrações</h2>${switchRow('eye', 'Aparecer em buscas públicas', 'Permitir que o portfólio seja indexado.', 'publicProfile', state.settings.publicProfile)}<div class="setting-row"><div><b>GitHub</b><small>${state.githubConnected ? `Conectado como @${esc(state.githubUsername)}` : 'Nenhuma conta conectada'}</small></div><button class="secondary-button" data-route-button="github">Gerenciar</button></div></div><div class="panel-section"><h2>Conta</h2><div class="setting-row"><div><b>Exportar dados</b><small>Baixe uma cópia das informações da conta.</small></div><button class="secondary-button" data-export>Exportar</button></div><div class="setting-row"><div><b>Excluir conta</b><small>Essa ação não poderá ser desfeita.</small></div><button class="danger-button" data-delete-account>Excluir conta</button></div></div></div></section>`
+  return `<section class="page-enter compact-panel-page"><div class="card settings-card compact-panel"><div class="settings-card-head"><span data-icon="settings"></span><div><h1>Configurações</h1><p>Preferências, privacidade e integrações.</p></div></div><div class="settings-tabs"><span>Preferências</span><span>Privacidade</span><span>Integrações</span><span>Conta</span></div><div class="panel-section"><h2>Preferências</h2><div class="panel-section"><h2>Conta</h2><div class="setting-row"><div><b>Exportar dados</b><small>Baixe uma cópia das informações da conta.</small></div><button class="secondary-button" data-export>Exportar</button></div><div class="setting-row"><div><b>Excluir conta</b><small>Essa ação não poderá ser desfeita.</small></div><button class="danger-button" data-delete-account>Excluir conta</button></div></div></div></section>`
 }
 
 function referralView() {
@@ -296,7 +296,6 @@ function bindActions() {
   $('[data-sync-repos]')?.addEventListener('click', fetchGithubRepos)
   $('[data-import-selected]')?.addEventListener('click', importSelected)
   $$('[data-setting]').forEach(button => button.onclick = () => updateSetting(button.dataset.setting))
-  $$('[data-theme-toggle]').forEach(button => button.onclick = () => updateTheme(state.settings.theme === 'dark' ? 'light' : 'dark'))
   $('[data-export]')?.addEventListener('click', exportData)
   $('[data-delete-account]')?.addEventListener('click', confirmAccountDeletion)
   $('[data-share-referral]')?.addEventListener('click', shareReferral)
@@ -542,29 +541,6 @@ async function updateSetting(key) {
   try { await saveSettings(currentUser.id, next); Object.assign(state.settings, next); render() } catch (error) { reportError('Não foi possível salvar a configuração.', error) }
 }
 
-function syncThemeControls(theme) {
-  const dark = theme === 'dark'
-  document.documentElement.dataset.theme = dark ? 'dark' : 'light'
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#111315' : '#f8fafc')
-  $$('[data-theme-toggle]').forEach(button => { button.setAttribute('aria-pressed', String(dark)); $('[data-theme-toggle-label]', button).textContent = dark ? 'Escuro' : 'Claro' })
-}
-
-function themeNotice(theme) {
-  const notice = document.createElement('div')
-  notice.className = 'theme-transition'
-  notice.textContent = 'Carregando modo ' + (theme === 'dark' ? 'escuro' : 'claro') + '...'
-  document.body.append(notice)
-  window.setTimeout(() => notice.remove(), 800)
-}
-
-async function updateTheme(theme) {
-  if (theme === state.settings.theme) return
-  const previous = state.settings.theme
-  state.settings.theme = theme
-  syncThemeControls(theme)
-  themeNotice(theme)
-  try { await saveSettings(currentUser.id, state.settings); render() } catch (error) { state.settings.theme = previous; syncThemeControls(previous); reportError('Não foi possível alterar o tema.', error) }
-}
 
 function exportData() {
   const payload = JSON.stringify({ profile: state.profile, published: state.published, projects: state.projects, settings: state.settings, analytics: state.analytics, referrals: state.referrals }, null, 2)
@@ -766,7 +742,7 @@ async function bootstrap() {
     state.referrals = workspace.referrals || []
     state.githubConnected = Boolean(workspace.githubConnection)
     state.githubUsername = workspace.githubConnection?.github_username || ''
-    if (workspace.settings) Object.assign(state.settings, { email: workspace.settings.email_notifications, product: workspace.settings.product_notifications, publicProfile: workspace.settings.public_profile, compact: workspace.settings.compact_mode, theme: workspace.settings.theme })
+    if (workspace.settings) Object.assign(state.settings, { email: workspace.settings.email_notifications, product: workspace.settings.product_notifications, publicProfile: workspace.settings.public_profile, compact: workspace.settings.compact_mode })
   } catch (loadError) {
     console.error('[Devifolio] Falha ao carregar dados reais', loadError)
     $('#page-content').innerHTML = `<section class="page-enter"><article class="card fatal-state">${emptyState('x', 'Não foi possível carregar seus dados.', 'A estrutura do banco precisa ser atualizada antes de usar o painel.')}</article></section>`
@@ -774,7 +750,7 @@ async function bootstrap() {
     toast(loadError.message, 'error')
     return
   }
-  syncThemeControls(state.settings.theme === 'light' ? 'light' : 'dark')
+  document.documentElement.dataset.theme = 'light'
   hydrateIcons()
   setSidebarCollapsed(localStorage.getItem('devifolio_sidebar_collapsed') === 'true')
   if (authLoadingRequested) history.replaceState(null, '', `${location.pathname}${onboardingRequested ? '?onboarding=1' : ''}${location.hash || '#inicio'}`)
