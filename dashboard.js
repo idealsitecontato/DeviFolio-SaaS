@@ -77,7 +77,7 @@ function hydrateIcons(root = document) {
 }
 
 const blankProfile = { name: '', username: '', email: '', role: '', bio: '', skills: '', linkedin: '', github: '', website: '', avatar: '' }
-const blankSettings = { email: true, product: true, publicProfile: true, compact: false, theme: 'dark' }
+const blankSettings = { email: true, product: true, publicProfile: true, compact: false, theme: 'light' }
 const state = { projects: [], profile: { ...blankProfile }, published: false, githubConnected: false, githubUsername: '', repos: [], analytics: [], referrals: [], settings: { ...blankSettings } }
 const statusLabel = { published: 'Publicado', progress: 'Em breve', draft: 'Em desenvolvimento' }
 let currentUser = null
@@ -217,7 +217,7 @@ function switchRow(icon, title, description, key, on) {
 }
 
 function settingsView() {
-  return `<section class="page-enter compact-panel-page"><div class="card settings-card compact-panel"><div class="settings-card-head"><span data-icon="settings"></span><div><h1>Configurações</h1><p>Preferências, privacidade e integrações.</p></div></div><div class="settings-tabs"><span>Preferências</span><span>Privacidade</span><span>Integrações</span><span>Conta</span></div><div class="panel-section"><h2>Preferências</h2><div class="setting-row"><div><b>Tema do painel</b><small>Use uma visualização escura e consistente.</small></div><span class="status">Modo escuro</span></div>${switchRow('menu', 'Modo compacto', 'Reduz o espaço entre os elementos.', 'compact', state.settings.compact)}${switchRow('mail', 'Resumo por e-mail', 'Receba um relatório semanal.', 'email', state.settings.email)}</div><div class="panel-section"><h2>Privacidade e integrações</h2>${switchRow('eye', 'Aparecer em buscas públicas', 'Permitir que o portfólio seja indexado.', 'publicProfile', state.settings.publicProfile)}<div class="setting-row"><div><b>GitHub</b><small>${state.githubConnected ? `Conectado como @${esc(state.githubUsername)}` : 'Nenhuma conta conectada'}</small></div><button class="secondary-button" data-route-button="github">Gerenciar</button></div></div><div class="panel-section"><h2>Conta</h2><div class="setting-row"><div><b>Exportar dados</b><small>Baixe uma cópia das informações da conta.</small></div><button class="secondary-button" data-export>Exportar</button></div><div class="setting-row"><div><b>Excluir conta</b><small>Essa ação não poderá ser desfeita.</small></div><button class="danger-button" data-delete-account>Excluir conta</button></div></div></div></section>`
+  return `<section class="page-enter compact-panel-page"><div class="card settings-card compact-panel"><div class="settings-card-head"><span data-icon="settings"></span><div><h1>Configurações</h1><p>Preferências, privacidade e integrações.</p></div></div><div class="settings-tabs"><span>Preferências</span><span>Privacidade</span><span>Integrações</span><span>Conta</span></div><div class="panel-section"><h2>Preferências</h2><div class="setting-row"><div><b>Tema do painel</b><small>Escolha entre o visual claro e escuro do Devifolio.</small></div><label class="theme-select"><span class="sr-only">Tema do painel</span><select data-theme-select aria-label="Tema do painel"><option value="light" ${state.settings.theme === 'light' ? 'selected' : ''}>Claro</option><option value="dark" ${state.settings.theme === 'dark' ? 'selected' : ''}>Escuro</option></select></label></div>${switchRow('menu', 'Modo compacto', 'Reduz o espaço entre os elementos.', 'compact', state.settings.compact)}${switchRow('mail', 'Resumo por e-mail', 'Receba um relatório semanal.', 'email', state.settings.email)}</div><div class="panel-section"><h2>Privacidade e integrações</h2>${switchRow('eye', 'Aparecer em buscas públicas', 'Permitir que o portfólio seja indexado.', 'publicProfile', state.settings.publicProfile)}<div class="setting-row"><div><b>GitHub</b><small>${state.githubConnected ? `Conectado como @${esc(state.githubUsername)}` : 'Nenhuma conta conectada'}</small></div><button class="secondary-button" data-route-button="github">Gerenciar</button></div></div><div class="panel-section"><h2>Conta</h2><div class="setting-row"><div><b>Exportar dados</b><small>Baixe uma cópia das informações da conta.</small></div><button class="secondary-button" data-export>Exportar</button></div><div class="setting-row"><div><b>Excluir conta</b><small>Essa ação não poderá ser desfeita.</small></div><button class="danger-button" data-delete-account>Excluir conta</button></div></div></div></section>`
 }
 
 function referralView() {
@@ -755,7 +755,7 @@ async function bootstrap() {
     toast(loadError.message, 'error')
     return
   }
-  document.documentElement.dataset.theme = 'dark'
+  document.documentElement.dataset.theme = state.settings.theme === 'dark' ? 'dark' : 'light'
   hydrateIcons()
   setSidebarCollapsed(localStorage.getItem('devifolio_sidebar_collapsed') === 'true')
   if (authLoadingRequested) history.replaceState(null, '', `${location.pathname}${onboardingRequested ? '?onboarding=1' : ''}${location.hash || '#inicio'}`)
