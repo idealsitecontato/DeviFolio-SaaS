@@ -95,3 +95,11 @@ body.dashboard-app .home-qr-card .home-qr-download .secondary-button { min-heigh
 }
 @media(max-width:820px) { body.dashboard-app .sidebar { width:256px; } body.dashboard-app .main-content { margin-left:0; } body.dashboard-app .dashboard-side-column { grid-template-columns:1fr 1fr; } }
 @media(max-width:600px) { body.dashboard-app .dashboard-side-column { grid-template-columns:1fr; } body.dashboard-app .dashboard-metrics { grid-template-columns:1fr 1fr; } body.dashboard-app .home-qr-card { min-height:390px; } }
+
+/* Instagram callout shown below the complete Home dashboard grid. */
+body.dashboard-app .instagram-banner{grid-column:1/-1;display:flex;align-items:center;gap:26px;width:100%;min-height:76px;padding:16px 28px;border:1px solid #e2e2e2;border-radius:7px;background:#fff;color:#111;text-decoration:none;box-shadow:0 1px 2px rgba(0,0,0,.08);transition:transform .18s ease,box-shadow .18s ease}
+body.dashboard-app .instagram-banner:hover{color:#111;transform:translateY(-1px);box-shadow:0 5px 16px rgba(0,0,0,.14)}
+body.dashboard-app .instagram-banner>span{display:grid;place-items:center;flex:0 0 auto}
+body.dashboard-app .instagram-banner svg{width:36px;height:36px;stroke-width:2}
+body.dashboard-app .instagram-banner strong{font-size:16px;line-height:1.35;font-weight:700}
+@media(max-width:600px){body.dashboard-app .instagram-banner{gap:16px;min-height:72px;padding:15px 18px}body.dashboard-app .instagram-banner svg{width:32px;height:32px}body.dashboard-app .instagram-banner strong{font-size:14px}}
