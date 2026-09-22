@@ -1,184 +1,44 @@
-/* Atualizacao visual global: fundos neutros unificados e avatares circulares. */
+/*
+ * Devifolio shared visual system
+ * Used by the landing page, authentication and public portfolios.
+ */
 :root {
-  --app-background: #3D3D3D;
-  --app-card-background: #6E6E6E;
-  --app-button-hover: #3D3D3D;
+  color-scheme: dark;
+  --dv-bg: #101316;
+  --dv-bg-soft: #171b1f;
+  --dv-surface: #1d2125;
+  --dv-surface-2: #24292e;
+  --dv-line: #363e46;
+  --dv-line-strong: #4a545e;
+  --dv-text: #f4f6f8;
+  --dv-muted: #b8c1cb;
+  --dv-subtle: #8994a0;
+  --dv-radius: 10px;
+  --dv-control-radius: 8px;
+  --dv-shadow: 0 18px 50px rgba(0, 0, 0, .16);
+  --devifolio-font: "DM Sans", "Google Sans", system-ui, sans-serif;
+}
+
+html,
+body,
+button,
+input,
+textarea,
+select,
+option,
+label,
+a,
+table,
+th,
+td {
+  font-family: var(--devifolio-font) !important;
 }
 
 html,
 body {
-  background-color: var(--app-background) !important;
+  background: var(--dv-bg);
 }
 
-/* Landing page: todas as superficies de pagina e cards neutros usam o mesmo fundo. */
-html body.landing-body,
-html body.landing-body main,
-html body.landing-body .hero,
-html body.landing-body .section-white,
-html body.landing-body .section-cream,
-html body.landing-body .section-yellow,
-html body.landing-body .showcase,
-html body.landing-body .workflow,
-html body.landing-body .features,
-html body.landing-body .audience,
-html body.landing-body .testimonials,
-html body.landing-body .pricing,
-html body.landing-body .faq,
-html body.landing-body .metric-card,
-html body.landing-body .showcase-card,
-html body.landing-body .github-link-panel,
-html body.landing-body .feature-row,
-html body.landing-body .feature-icon,
-html body.landing-body .step,
-html body.landing-body .audience-card,
-html body.landing-body .testimonial-card,
-html body.landing-body .review-card,
-html body.landing-body .price-note,
-html body.landing-body .video-frame,
-html body.landing-body .video-placeholder,
-html body.landing-body .final-cta-inner,
-html body.landing-body .chat-top,
-html body.landing-body .chat-dark,
-html body.landing-body .chat-bottom {
-  background-color: var(--app-background) !important;
-  background-image: none !important;
-}
-
-html body.landing-body,
-html body.landing-body h1,
-html body.landing-body h2,
-html body.landing-body h3,
-html body.landing-body p,
-html body.landing-body .hero-text,
-html body.landing-body .eyebrow,
-html body.landing-body .feature-index,
-html body.landing-body .feature-arrow,
-html body.landing-body .audience-tag,
-html body.landing-body .section-head > p,
-html body.landing-body .step > span,
-html body.landing-body .review-person small,
-html body.landing-body .price-note span,
-html body.landing-body .showcase-card,
-html body.landing-body .analytics-top div,
-html body.landing-body .chat-top,
-html body.landing-body .chat-dark,
-html body.landing-body .chat-bottom {
-  color: #FFFFFF !important;
-}
-
-html body.landing-body .hero h1,
-html body.landing-body .hero h1 span {
-  color: #FFFFFF !important;
-}
-
-html body.landing-body .metric-card,
-html body.landing-body .showcase-card,
-html body.landing-body .feature-row,
-html body.landing-body .step,
-html body.landing-body .audience-card,
-html body.landing-body .testimonial-card,
-html body.landing-body .review-card,
-html body.landing-body .price-note,
-html body.landing-body .github-link-panel,
-html body.landing-body .video-frame,
-html body.landing-body .video-placeholder {
-  border-color: #666666 !important;
-}
-
-html body.landing-body .button-outline {
-  border-color: #A0A0A0 !important;
-  color: #FFFFFF !important;
-}
-
-html body.landing-body .button-outline:hover,
-html body.landing-body .feature-row:hover {
-  background: var(--app-background) !important;
-}
-
-/* Login e cadastro. Campos e estados funcionais preservam suas cores existentes. */
-body.auth-body,
-body.auth-body .auth-shell,
-body.auth-body .auth-left,
-body.auth-body .auth-right {
-  --auth-background: var(--app-background);
-  background: var(--app-background) !important;
-}
-
-body.auth-body .auth-brand,
-body.auth-body .auth-panel h1,
-body.auth-body .auth-field label {
-  color: #FFFFFF !important;
-}
-
-/* Dashboard e todas as telas internas renderizadas nele. */
-html:has(body.dashboard-app) {
-  --bg-app: var(--app-background);
-  --bg-sidebar: var(--app-background);
-  --bg-card: var(--app-background);
-  --bg-card-alt: var(--app-background);
-  --bg-hover: var(--app-background);
-  --bg-input: var(--app-background);
-  background: var(--app-background) !important;
-}
-
-body.dashboard-app,
-body.dashboard-app .app-shell,
-body.dashboard-app .sidebar,
-body.dashboard-app .mobile-topbar,
-body.dashboard-app .main-content,
-body.dashboard-app .desktop-topbar,
-body.dashboard-app .card,
-body.dashboard-app .modal,
-body.dashboard-app .onboarding-panel,
-body.dashboard-app .user-menu,
-body.dashboard-app .project-cover,
-body.dashboard-app .public-preview,
-body.dashboard-app .project-image-upload,
-body.dashboard-app .project-image-preview,
-body.dashboard-app .connect-icon,
-body.dashboard-app .circle-icon,
-body.dashboard-app .repo-icon,
-body.dashboard-app .toast,
-body.dashboard-app input,
-body.dashboard-app textarea,
-body.dashboard-app select,
-body.dashboard-app option,
-body.dashboard-app .input-prefix,
-body.dashboard-app .url-field,
-body.dashboard-app .search-field,
-body.dashboard-app .status,
-body.dashboard-app .badge,
-body.dashboard-app .tag-row span,
-body.dashboard-app .preview-skills span {
-  background-color: var(--app-background) !important;
-  background-image: none !important;
-}
-
-/* Portfolio publico e seus estados de carregamento/vazio. */
-body:not(.landing-body):not(.auth-body):not(.dashboard-app),
-body:not(.landing-body):not(.auth-body):not(.dashboard-app) .public-nav,
-body:not(.landing-body):not(.auth-body):not(.dashboard-app) .portfolio-shell,
-body:not(.landing-body):not(.auth-body):not(.dashboard-app) .public-state,
-body:not(.landing-body):not(.auth-body):not(.dashboard-app) .public-project,
-body:not(.landing-body):not(.auth-body):not(.dashboard-app) .project-image,
-body:not(.landing-body):not(.auth-body):not(.dashboard-app) .empty-projects,
-body:not(.landing-body):not(.auth-body):not(.dashboard-app) .skills span,
-body:not(.landing-body):not(.auth-body):not(.dashboard-app) .profile-links a {
-  background-color: var(--app-background) !important;
-  background-image: none !important;
-}
-
-body:not(.landing-body):not(.auth-body):not(.dashboard-app),
-body:not(.landing-body):not(.auth-body):not(.dashboard-app) h1,
-body:not(.landing-body):not(.auth-body):not(.dashboard-app) h2,
-body:not(.landing-body):not(.auth-body):not(.dashboard-app) h3,
-body:not(.landing-body):not(.auth-body):not(.dashboard-app) p,
-body:not(.landing-body):not(.auth-body):not(.dashboard-app) span,
-body:not(.landing-body):not(.auth-body):not(.dashboard-app) a {
-  color: #FFFFFF !important;
-}
-
-/* Fotos de usuario: recorte circular consistente em qualquer proporcao. */
 .avatar,
 .avatar img,
 .preview-avatar,
@@ -193,7 +53,6 @@ body:not(.landing-body):not(.auth-body):not(.dashboard-app) a {
 .review-avatar img,
 .person-avatar,
 .person-avatar img,
-.mini-avatars i,
 img.avatar,
 img.profile-avatar,
 img.user-avatar {
@@ -216,8 +75,141 @@ img.user-avatar {
   object-position: center !important;
 }
 
-/* Cards e containers de destaque: contraste fixo sobre o fundo principal. */
-html body.landing-body .metric-card,
+/* Landing page */
+html body.landing-body {
+  background: var(--dv-bg) !important;
+  color: var(--dv-text) !important;
+}
+
+html body.landing-body .site-header {
+  background: rgba(3, 4, 5, .82) !important;
+  border-color: rgba(255, 255, 255, .08) !important;
+  backdrop-filter: blur(16px);
+}
+
+html body.landing-body .nav-shell,
+html body.landing-body .site-header.is-scrolled .nav-shell {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+html body.landing-body .desktop-nav a,
+html body.landing-body .login-link,
+html body.landing-body .mobile-menu a {
+  color: #edf1f5 !important;
+}
+
+html body.landing-body .desktop-nav a:hover,
+html body.landing-body .login-link:hover {
+  color: #fff !important;
+}
+
+html body.landing-body .menu-toggle,
+html body.landing-body .mobile-menu {
+  background: #111519 !important;
+  border-color: var(--dv-line) !important;
+  color: var(--dv-text) !important;
+}
+
+html body.landing-body .hero-devifolio {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, rgba(8, 10, 13, .93) 0%, rgba(10, 13, 17, .75) 48%, rgba(10, 13, 17, .42) 100%),
+    url("./assets/herobackground.jpg") center / cover no-repeat !important;
+  color: var(--dv-text) !important;
+}
+
+html body.landing-body .hero-devifolio::before {
+  opacity: .14 !important;
+}
+
+html body.landing-body .hero-devifolio::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 180px;
+  pointer-events: none;
+  background: linear-gradient(transparent, var(--dv-bg));
+}
+
+html body.landing-body .hero-devifolio .hero-grid {
+  position: relative;
+  z-index: 1;
+}
+
+html body.landing-body .hero-devifolio h1,
+html body.landing-body .hero-devifolio h1 span,
+html body.landing-body .hero-devifolio .eyebrow {
+  color: #fff !important;
+}
+
+html body.landing-body .hero-devifolio .hero-text {
+  color: #c5cdd6 !important;
+}
+
+html body.landing-body .button,
+html body.landing-body .button-dark,
+html body.landing-body .button-nav,
+html body.landing-body .button-outline {
+  border: 1px solid var(--dv-line-strong) !important;
+  border-radius: var(--dv-control-radius) !important;
+  background: linear-gradient(180deg, #20262b, #15191d) !important;
+  color: #f7f9fb !important;
+  box-shadow: none !important;
+}
+
+html body.landing-body .button:hover,
+html body.landing-body .button-dark:hover,
+html body.landing-body .button-nav:hover,
+html body.landing-body .button-outline:hover {
+  border-color: #697580 !important;
+  background: linear-gradient(180deg, #2d343a, #20262b) !important;
+  color: #fff !important;
+}
+
+html body.landing-body main > section,
+html body.landing-body .section-white,
+html body.landing-body .section-cream,
+html body.landing-body .section-yellow,
+html body.landing-body .showcase,
+html body.landing-body .workflow,
+html body.landing-body .features,
+html body.landing-body .audience,
+html body.landing-body .testimonials,
+html body.landing-body .pricing,
+html body.landing-body .faq,
+html body.landing-body .final-video {
+  background-color: var(--dv-bg) !important;
+  color: var(--dv-text) !important;
+}
+
+html body.landing-body main > section:nth-of-type(even) {
+  background-color: #13171a !important;
+}
+
+html body.landing-body h1,
+html body.landing-body h2,
+html body.landing-body h3,
+html body.landing-body h4,
+html body.landing-body strong,
+html body.landing-body b {
+  color: var(--dv-text) !important;
+}
+
+html body.landing-body p,
+html body.landing-body .section-head > p,
+html body.landing-body .feature-main p,
+html body.landing-body .audience-card p,
+html body.landing-body .review-person small,
+html body.landing-body .price-note span,
+html body.landing-body .faq-answer p,
+html body.landing-body .footer p,
+html body.landing-body .footer span {
+  color: var(--dv-muted) !important;
+}
+
 html body.landing-body .showcase-card,
 html body.landing-body .github-link-panel,
 html body.landing-body .feature-row,
@@ -228,129 +220,336 @@ html body.landing-body .review-card,
 html body.landing-body .price-note,
 html body.landing-body .video-frame,
 html body.landing-body .video-placeholder,
-html body.landing-body .final-cta-inner,
+html body.landing-body .faq-item,
+html body.landing-body .final-cta-inner {
+  background: linear-gradient(145deg, #1f2428, #181c20) !important;
+  border-color: var(--dv-line) !important;
+  border-radius: var(--dv-radius) !important;
+  color: var(--dv-text) !important;
+  box-shadow: none !important;
+}
+
+html body.landing-body .showcase-card:hover,
 html body.landing-body .feature-row:hover,
 html body.landing-body .review-card:hover,
-body.dashboard-app .card,
-body.dashboard-app .card:hover,
-body.dashboard-app .modal,
-body.dashboard-app .onboarding-panel,
-body.dashboard-app .user-menu,
-body.dashboard-app .public-preview,
-body.dashboard-app .project-image-upload,
-body.dashboard-app .project-image-preview,
-body.dashboard-app .dashboard-metrics button,
-body:not(.landing-body):not(.auth-body):not(.dashboard-app) .public-project,
-body:not(.landing-body):not(.auth-body):not(.dashboard-app) .public-project:hover,
-body:not(.landing-body):not(.auth-body):not(.dashboard-app) .empty-projects {
-  background: var(--app-card-background) !important;
-  background-image: none !important;
+html body.landing-body .audience-card:hover {
+  border-color: var(--dv-line-strong) !important;
+  background: linear-gradient(145deg, #272d32, #1d2226) !important;
 }
 
-/* Hover discreto e uniforme, sem alterar a aparência normal dos botões. */
-button:not(:disabled):hover,
-.button:hover,
-.primary-button:not(:disabled):hover,
-.secondary-button:not(:disabled):hover,
-.danger-button:not(:disabled):hover,
-.dashboard-action:not(:disabled):hover,
-.nav-action:hover,
-.public-button:hover {
-  background-color: #3D3D3D !important;
-  background-image: none !important;
+html body.landing-body .showcase-stat,
+html body.landing-body .analytics-top,
+html body.landing-body .portfolio-window,
+html body.landing-body .portfolio-projects span,
+html body.landing-body .chat-top,
+html body.landing-body .chat-dark,
+html body.landing-body .chat-bottom {
+  background: #15191d !important;
+  border-color: var(--dv-line) !important;
+  color: var(--dv-text) !important;
 }
 
-html body.landing-body a.button:hover,
-html body.landing-body button:not(:disabled):hover,
-html body.auth-body a.button:hover,
-html body.auth-body button:not(:disabled):hover,
-html body.dashboard-app .app-shell button:not(:disabled):hover,
-html body.dashboard-app .app-shell .dashboard-action:not(:disabled):hover,
-html body:not(.landing-body):not(.auth-body):not(.dashboard-app) a.nav-action:hover,
-html body:not(.landing-body):not(.auth-body):not(.dashboard-app) a.public-button:hover,
-html body:not(.landing-body):not(.auth-body):not(.dashboard-app) button:not(:disabled):hover {
-  background-color: #3D3D3D !important;
-  background-image: none !important;
+html body.landing-body .showcase-stat strong,
+html body.landing-body .showcase-stat p,
+html body.landing-body .showcase-analytics p,
+html body.landing-body .analytics-top div {
+  color: var(--dv-text) !important;
 }
 
-/* Início: informações relacionadas próximas, sem aumentar os elementos. */
-body.dashboard-app .home-page .dashboard-layout {
-  min-height: 0;
+html body.landing-body .feature-icon,
+html body.landing-body .feature-index,
+html body.landing-body .feature-arrow,
+html body.landing-body .audience-tag,
+html body.landing-body .topic-kicker,
+html body.landing-body .video-kicker {
+  color: #c7cfd7 !important;
 }
 
-body.dashboard-app .home-page .dashboard-main-column {
-  grid-template-rows: auto auto;
-  align-content: start;
+html body.landing-body .feature-icon {
+  background: #121619 !important;
+  border-color: var(--dv-line) !important;
 }
 
-body.dashboard-app .home-page .dashboard-side-column {
-  gap: 12px;
+html body.landing-body .faq-question {
+  color: var(--dv-text) !important;
 }
 
-body.dashboard-app .link-summary > p,
-body.dashboard-app .plans-summary > p {
-  margin: 8px 0 12px;
-  font-size: 12px;
-  line-height: 1.45;
+html body.landing-body .footer {
+  background: #030405 !important;
+  border-color: #252b31 !important;
+  color: var(--dv-muted) !important;
 }
 
-body.dashboard-app .link-summary .dashboard-qr {
-  grid-template-columns: 96px minmax(0, 1fr);
-  gap: 12px;
-  margin-top: 12px;
+html body.landing-body .footer a,
+html body.landing-body .footer h3 {
+  color: #e8edf2 !important;
 }
 
-body.dashboard-app .link-summary .qr-wrap {
-  width: 96px;
-  height: 96px;
-  padding: 12px;
+/* Authentication */
+body.auth-body,
+body.auth-body .auth-shell {
+  background: #090b0d !important;
+  color: var(--dv-text);
 }
 
-body.dashboard-app .plans-summary .dashboard-action {
-  margin-top: 4px;
+body.auth-body .auth-shell {
+  grid-template-columns: minmax(420px, .9fr) minmax(0, 1.1fr);
 }
 
-/* Página específica: QR Code proporcional ao conteúdo, sem dominar a tela. */
-body.dashboard-app .link-page .share-card {
-  grid-template-columns: minmax(0, 1fr) 220px;
-  gap: 24px;
-  min-height: 320px;
-  padding: 24px;
+body.auth-body .auth-left {
+  grid-column: 1;
+  grid-row: 1;
+  justify-content: center;
+  background: #090b0d !important;
+  padding: 42px clamp(34px, 5vw, 86px);
 }
 
-body.dashboard-app .link-page .share-copy {
-  gap: 16px;
+body.auth-body .auth-left::after {
+  display: none !important;
 }
 
-body.dashboard-app .link-page .share-card .qr-wrap {
-  width: 220px;
-  padding: 12px;
+body.auth-body .auth-right {
+  grid-column: 2;
+  grid-row: 1;
+  align-items: flex-start;
+  padding: 52px;
+  background:
+    linear-gradient(180deg, rgba(6, 8, 10, .32), rgba(6, 8, 10, .7)),
+    url("./assets/herobackground.jpg") center / cover no-repeat !important;
+  color: #fff;
 }
 
-@media (max-width: 1100px) {
-  body.dashboard-app .link-page .share-card {
-    grid-template-columns: minmax(0, 1fr);
-    justify-items: center;
+body.auth-body .auth-right::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 48% 82%, rgba(255, 255, 255, .11), transparent 34%);
+}
+
+body.auth-body .auth-right-heading {
+  position: relative;
+  z-index: 1;
+  max-width: 480px;
+  color: #f7f8fa;
+  font-size: clamp(30px, 3vw, 48px);
+  font-weight: 400;
+  line-height: 1.08;
+}
+
+body.auth-body .auth-brand {
+  color: #f7f8fa !important;
+  font-size: 25px;
+  font-weight: 600;
+}
+
+body.auth-body .auth-form-wrap {
+  width: min(100%, 440px);
+}
+
+body.auth-body .auth-panel h1 {
+  color: #fff !important;
+  font-size: 29px;
+  font-weight: 500;
+}
+
+body.auth-body .auth-sub,
+body.auth-body .auth-switch,
+body.auth-body .auth-terms,
+body.auth-body .auth-remember,
+body.auth-body .auth-divider {
+  color: var(--dv-muted) !important;
+}
+
+body.auth-body .auth-field label {
+  color: #dce2e8 !important;
+  font-weight: 500;
+}
+
+body.auth-body .auth-field input {
+  height: 50px;
+  border: 1px solid var(--dv-line) !important;
+  border-radius: var(--dv-control-radius) !important;
+  background: #14181b !important;
+  color: #f4f6f8 !important;
+  box-shadow: none !important;
+}
+
+body.auth-body .auth-field input:focus {
+  border-color: #707b86 !important;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, .055) !important;
+}
+
+body.auth-body .auth-field input::placeholder {
+  color: #7f8a96;
+}
+
+body.auth-body .button-submit,
+body.auth-body .button-github {
+  min-height: 50px;
+  border: 1px solid var(--dv-line-strong) !important;
+  border-radius: var(--dv-control-radius) !important;
+  background: linear-gradient(180deg, #242a2f, #171b1f) !important;
+  color: #f7f8fa !important;
+  box-shadow: none !important;
+}
+
+body.auth-body .button-submit:hover,
+body.auth-body .button-github:hover {
+  border-color: #697580 !important;
+  background: linear-gradient(180deg, #30373d, #22282d) !important;
+}
+
+body.auth-body .auth-divider::before,
+body.auth-body .auth-divider::after {
+  background: #2d343b;
+}
+
+body.auth-body .auth-forgot,
+body.auth-body .auth-switch a,
+body.auth-body .auth-terms a {
+  color: #e1e6eb !important;
+}
+
+body.auth-body .auth-message {
+  border-color: #6c3d43;
+  border-radius: var(--dv-control-radius);
+  background: #26181b;
+  color: #f0b8bf;
+}
+
+body.auth-body .auth-message.is-success {
+  border-color: #395a4c;
+  background: #15231d;
+  color: #b8dbc9;
+}
+
+/* Public portfolio */
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) {
+  background:
+    radial-gradient(circle at 50% 0, rgba(255, 255, 255, .045), transparent 32%),
+    var(--dv-bg) !important;
+  color: var(--dv-text) !important;
+}
+
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .public-nav {
+  background: rgba(3, 4, 5, .9) !important;
+  border-color: #282f35 !important;
+  backdrop-filter: blur(16px);
+}
+
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .public-brand,
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) h1,
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) h2,
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) h3 {
+  color: var(--dv-text) !important;
+}
+
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) p,
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .section-heading span,
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .public-footer,
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .public-state {
+  color: var(--dv-muted) !important;
+}
+
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .profile-header,
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .public-footer {
+  border-color: var(--dv-line) !important;
+}
+
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .public-avatar,
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .project-image,
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .empty-projects,
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .public-state {
+  background: #171b1f !important;
+  border-color: var(--dv-line) !important;
+  color: #a7b1bb !important;
+}
+
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .public-project {
+  overflow: hidden;
+  border: 1px solid var(--dv-line) !important;
+  border-radius: var(--dv-radius) !important;
+  background: linear-gradient(145deg, #1f2428, #181c20) !important;
+  box-shadow: var(--dv-shadow);
+}
+
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .public-project:hover {
+  border-color: var(--dv-line-strong) !important;
+}
+
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .profile-copy .kicker {
+  color: #d3dae1 !important;
+}
+
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .profile-copy h2,
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .profile-copy .bio,
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .project-content p {
+  color: var(--dv-muted) !important;
+}
+
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .profile-links a,
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .skills span {
+  border: 1px solid var(--dv-line) !important;
+  border-radius: 999px !important;
+  background: #242a2f !important;
+  color: #d9e0e6 !important;
+}
+
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .nav-action,
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .public-button {
+  border: 1px solid var(--dv-line-strong) !important;
+  border-radius: var(--dv-control-radius) !important;
+  background: linear-gradient(180deg, #242a2f, #171b1f) !important;
+  color: #f7f9fb !important;
+}
+
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .nav-action:hover,
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .public-button:hover {
+  border-color: #697580 !important;
+  background: linear-gradient(180deg, #30373d, #22282d) !important;
+}
+
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .public-footer {
+  background: #030405 !important;
+}
+
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .public-footer a {
+  color: #eef2f6 !important;
+}
+
+body:not(.landing-body):not(.auth-body):not(.dashboard-app) .loader {
+  border-color: #3f4851;
+  border-top-color: #edf1f5;
+}
+
+@media (max-width: 900px) {
+  body.auth-body .auth-shell {
+    grid-template-columns: minmax(360px, 1fr) minmax(300px, .86fr);
+  }
+}
+
+@media (max-width: 720px) {
+  body.auth-body .auth-shell {
+    grid-template-columns: 1fr;
+    grid-template-rows: 170px auto;
   }
 
-  body.dashboard-app .link-page .share-copy {
-    width: 100%;
-  }
-}
-
-@media (max-width: 600px) {
-  body.dashboard-app .link-summary .dashboard-qr {
-    grid-template-columns: 88px minmax(0, 1fr);
+  body.auth-body .auth-right {
+    grid-column: 1;
+    grid-row: 1;
+    padding: 28px 24px;
   }
 
-  body.dashboard-app .link-summary .qr-wrap {
-    width: 88px;
-    height: 88px;
-    padding: 8px;
+  body.auth-body .auth-left {
+    grid-column: 1;
+    grid-row: 2;
+    min-height: calc(100dvh - 170px);
+    padding: 42px 24px 54px;
   }
 
-  body.dashboard-app .link-page .share-card .qr-wrap {
-    width: min(190px, 100%);
+  html body.landing-body .mobile-menu {
+    border-radius: 0 0 var(--dv-radius) var(--dv-radius) !important;
   }
 }
 
@@ -366,8 +565,10 @@ body.dashboard-app .link-page .share-card .qr-wrap {
   }
 }
 
-/* Shared typography: Google Sans when available, with Roboto as the compatible web fallback. */
-:root { --devifolio-font: "Google Sans", "Google Sans Text", "Roboto", Arial, sans-serif; }
-html, body, button, input, textarea, select, option, label, a, table, th, td {
-  font-family: var(--devifolio-font) !important;
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
 }
