@@ -1,14 +1,44 @@
-/* Sistema visual do portfolio publico. */
-:root{--ui-radius:10px;--ui-control-radius:8px;--ui-small-radius:6px}
-.public-avatar,.public-avatar img{border-radius:50%!important;aspect-ratio:1}
-.nav-action,.public-button,.profile-links a,.skills span{border-radius:var(--ui-control-radius)!important}
-.public-project,.empty-projects{border-radius:var(--ui-radius)!important;overflow:hidden}
-.project-image{border-radius:var(--ui-radius) var(--ui-radius) 0 0!important}
-.loader{border-radius:50%!important}
-.public-projects{border:0!important;gap:18px}
-.public-project{border:1px solid #dfe4e8!important}
-.nav-action,.public-button,.profile-links a,.public-project{transition:transform .16s ease,border-color .16s ease,background-color .16s ease,color .16s ease,box-shadow .16s ease}
-.nav-action:hover,.public-button:hover,.profile-links a:hover,.public-project:hover{transform:translateY(-2px)}
-.portfolio-shell,.public-state{animation:public-content-in .26s cubic-bezier(.22,1,.36,1) both}
-@keyframes public-content-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-@media(prefers-reduced-motion:reduce){.portfolio-shell,.public-state{animation:none}.nav-action,.public-button,.profile-links a,.public-project{transition:none}}
+/* Public portfolio: the same quiet black-and-white language as the home hero. */
+:root{color-scheme:light;background:#f7f7f6}
+html,body{background:#f7f7f6;color:#17191b}
+.public-nav{height:120px;padding:28px clamp(20px,6vw,96px) 0;border:0;background:#f7f7f6;align-items:center}
+.public-brand{gap:8px;color:#17191b;font-size:24px;font-weight:700;letter-spacing:-.055em}
+.public-brand img{width:29px;height:30px;object-fit:contain}
+.nav-action,.public-button{min-height:44px;padding:0 18px;border:1px solid #111;background:#111;color:#fff;border-radius:0!important;font-family:"DM Sans",Arial,sans-serif;font-size:13px;font-weight:600}
+.nav-action:hover,.public-button:hover{background:#333;border-color:#333;color:#fff;transform:none}
+.portfolio-shell{width:min(1120px,calc(100% - 40px));margin:0 auto;padding:38px 0 105px;animation:none}
+.profile-header{display:flex;flex-direction:column;align-items:center;gap:0;padding:0 0 58px;border-bottom:1px solid #d9dcda;text-align:center}
+.public-avatar,.public-avatar img{width:136px;height:136px;aspect-ratio:1;overflow:hidden;border-radius:50%!important}
+.public-avatar{display:grid;place-items:center;margin-bottom:24px;border:1px solid #d8dad8;background:#e9eae9;color:#50555a;font-size:38px}
+.public-avatar img{display:block;width:100%;height:100%;object-fit:cover}
+.profile-copy .kicker{margin:0 0 10px;color:#777;font-size:11px;font-weight:700;letter-spacing:.12em}
+.profile-copy h1{margin:0;color:#151719;font-size:clamp(36px,5vw,58px);line-height:1.05;letter-spacing:-.055em;font-weight:600}
+.profile-copy h2{margin:11px 0 0;color:#555;font-size:19px;font-weight:400}
+.profile-copy .bio{max-width:660px;margin:17px auto 0;color:#5b6064;font-size:16px;line-height:1.6}
+.profile-copy .skills,.profile-copy .profile-links{justify-content:center;margin-top:20px}
+.profile-links a,.skills span{padding:8px 11px;border:1px solid #d9dcda;border-radius:0!important;background:#fff;color:#262b2e;font-size:12px}
+.profile-links a:hover{border-color:#111;color:#111;transform:none}
+.projects-section{padding-top:47px}
+.section-heading{margin-bottom:22px}
+.section-heading h2{font-size:30px;font-weight:600;color:#151719}
+.section-heading span{color:#767b7f;font-size:13px}
+.public-projects{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;border:0}
+.public-project,.empty-projects{overflow:hidden;border:1px solid #d9dcda!important;border-radius:0!important;background:#fff;animation:none;box-shadow:none}
+.public-project{display:flex;flex-direction:column}
+.project-image{width:100%;height:auto;aspect-ratio:16/9;display:grid;place-items:center;border-bottom:1px solid #e4e6e4;border-radius:0!important;background:#f4f5f4;color:#757a7d}
+.project-image img{display:block;width:100%;height:100%;object-fit:contain}
+.project-content{flex:1;padding:25px}
+.project-content h3{color:#181b1d;font-size:23px}
+.project-content p{min-height:0;margin:11px 0 0;color:#62676b;font-size:14px;line-height:1.55}
+.project-content .skills{margin:18px 0 24px}
+.project-content .skills span{padding:6px 8px;background:#f7f7f6;font-size:11px}
+.project-actions{margin-top:auto}
+.public-button.secondary{background:#fff;border-color:#cdd0cf;color:#181b1d}
+.public-button.secondary:hover{border-color:#17191b;background:#f7f7f6;color:#17191b}
+.public-state{min-height:calc(100vh - 120px);background:#f7f7f6;animation:none}
+.public-state h1{color:#17191b}
+.public-state p{color:#676d71}
+.loader{border-radius:0!important;border-top-color:#111}
+.public-footer{background:#f7f7f6;border-top:1px solid #d9dcda;color:#74797d}
+.public-footer a{color:#17191b}
+@media(max-width:720px){.public-nav{height:92px;padding:20px 18px 0}.public-brand{font-size:21px}.public-brand img{width:26px;height:27px}.nav-action{padding:0 10px;font-size:11px}.portfolio-shell{width:calc(100% - 28px);padding:24px 0 70px}.profile-header{padding-bottom:42px}.public-avatar,.public-avatar img{width:108px;height:108px}.profile-copy h1{font-size:38px}.public-projects{grid-template-columns:1fr;gap:14px}.project-content{padding:20px}.public-state{min-height:calc(100vh - 92px)}}

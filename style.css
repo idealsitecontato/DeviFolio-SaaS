@@ -82,7 +82,7 @@ button{font:inherit}
   --dot-gray:rgba(156,162,171,.38);
 }
 
-/* Hero: charcoal + subtle dot field, with lower contrast around content */
+/* Legacy hero surface; final hero composition is defined in landing-reference.css. */
 /* .audience-dark (seção Perfil) compartilha exatamente o mesmo fundo. */
 .hero-devifolio.section-yellow,
 .audience-dark{
@@ -98,7 +98,7 @@ button{font:inherit}
   inset:0;
   z-index:-2;
   pointer-events:none;
-  background-image:radial-gradient(circle at 1px 1px, var(--dot-gray) 1.15px, transparent 1.35px);
+  background-image:none;
   background-size:22px 22px;
   opacity:.78;
 }
@@ -789,7 +789,7 @@ button{font:inherit}
   background:#1D2024;
 }
 .hero-devifolio::before{
-  background-image:radial-gradient(circle at 1px 1px, rgba(157,163,173,.42) 1.15px, transparent 1.4px);
+  background-image:none;
   background-size:21px 21px;
   opacity:.9;
 }
@@ -2373,7 +2373,7 @@ html{scroll-behavior:auto}
   inset:0 !important;
   display:block !important;
   opacity:.8 !important;
-  background:radial-gradient(circle at 1px 1px,rgba(15,18,22,.33) .8px,transparent .95px) !important;
+  background:none !important;
   background-size:20px 20px !important;
   mask-image:linear-gradient(90deg,#000 0%,rgba(0,0,0,.4) 22%,rgba(0,0,0,.12) 51%,rgba(0,0,0,.4) 78%,#000 100%) !important;
   -webkit-mask-image:linear-gradient(90deg,#000 0%,rgba(0,0,0,.4) 22%,rgba(0,0,0,.12) 51%,rgba(0,0,0,.4) 78%,#000 100%) !important;
@@ -2561,10 +2561,10 @@ html body:not(.auth-body) footer#contato *::after{
   border-radius:0 !important;
 }
 
-/* Mesma malha da Hero, com contraste um pouco maior. */
+/* Legacy hero surface without a texture. */
 .hero-devifolio::before{
   opacity:.9 !important;
-  background:radial-gradient(circle at 1px 1px,rgba(15,18,22,.43) .8px,transparent .95px) !important;
+  background:none !important;
   background-size:20px 20px !important;
 }
 
@@ -2600,30 +2600,12 @@ html body:not(.auth-body) .section-cream *{filter:none !important;backdrop-filte
 html body:not(.auth-body) .features .section-head{margin-bottom:36px !important}
 html body:not(.auth-body) .features .feature-row:hover{background:#f4f5f6 !important}
 
-/* Movimento lateral rápido e reversível, incluindo a Hero, sem esconder conteúdo. */
-html body:not(.auth-body) main#top .direction-reveal{
-  opacity:1 !important;
-  transition:transform .34s cubic-bezier(.22,1,.36,1) var(--reveal-delay,0ms) !important;
-  will-change:transform;
-}
-html body:not(.auth-body) main#top .hero-copy.direction-reveal,
-html body:not(.auth-body) main#top .hero-visual.direction-reveal{
-  transition-duration:.62s !important;
-}
-html body:not(.auth-body) main#top .direction-reveal.from-left{transform:translate3d(-30px,0,0) !important}
-html body:not(.auth-body) main#top .direction-reveal.from-right{transform:translate3d(30px,0,0) !important}
-html body:not(.auth-body) main#top .direction-reveal.is-inview{transform:translate3d(0,0,0) !important}
-
 @media (max-width:820px){
   html body .site-header .nav-shell,
   html body .site-header:not(.is-scrolled) .nav-shell,
   html body .site-header.is-scrolled .nav-shell{width:100% !important;min-height:58px !important;padding:0 18px !important}
-  html body:not(.auth-body) main#top .direction-reveal.from-left{transform:translate3d(-20px,0,0) !important}
-  html body:not(.auth-body) main#top .direction-reveal.from-right{transform:translate3d(20px,0,0) !important}
-  html body:not(.auth-body) main#top .direction-reveal.is-inview{transform:translate3d(0,0,0) !important}
 }
 @media (prefers-reduced-motion:reduce){
-  html body:not(.auth-body) main#top .direction-reveal{transform:none !important;transition:none !important}
   body:not(.auth-body) a[href],body:not(.auth-body) button,body:not(.auth-body) summary{transition:none !important}
 }
 

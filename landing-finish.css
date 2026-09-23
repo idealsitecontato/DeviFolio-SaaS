@@ -1,0 +1,87 @@
+/* Second visual pass: preserve the supplied hero composition and remove its dots. */
+html{scroll-behavior:auto!important}
+body.landing-body,body.landing-body main{background:#f7f7f6!important}
+body.landing-body *{animation:none!important;transition:none!important}
+body.landing-body .site-header .nav-shell,body.landing-body .site-header.is-scrolled .nav-shell{transition:min-height .2s ease!important}
+body.landing-body .hero-devifolio:before{display:none!important}
+body.landing-body .hero-devifolio{background:#fbfbfa!important}
+body.landing-body .lf-wrap{width:min(1180px,calc(100% - 48px));margin-inline:auto}
+body.landing-body .lf-kicker{margin:0;font-size:11px;font-weight:700;line-height:1.4;letter-spacing:.115em;text-transform:uppercase}
+body.landing-body :is(.lf-intro,.lf-problem,.lf-flow,.lf-product,.lf-github,.lf-outcomes,.lf-faq,.lf-final) h2{margin:0;font-size:clamp(35px,4.4vw,66px);line-height:1.04;letter-spacing:-.059em;font-weight:500}
+body.landing-body :is(.lf-intro,.lf-problem,.lf-flow,.lf-product,.lf-github,.lf-outcomes,.lf-faq,.lf-final) h3{margin:0;letter-spacing:-.04em;font-weight:500}
+body.landing-body .lf-intro{background:#080808;color:#fff;padding:110px 0 120px}
+body.landing-body .lf-intro-grid{display:grid;grid-template-columns:220px minmax(0,1fr);gap:48px}
+body.landing-body .lf-intro .lf-kicker{padding-top:13px;color:#b4b4b4}
+body.landing-body .lf-intro h2{font-size:clamp(44px,5.4vw,82px);max-width:920px}
+body.landing-body .lf-intro-grid>div>p{max-width:620px;margin:32px 0 0;color:#c1c1c1;font-size:18px;line-height:1.5}
+body.landing-body .lf-problem{padding:118px 0;background:#f7f7f6;color:#151515}
+body.landing-body .lf-problem-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1fr);gap:10%}
+body.landing-body .lf-problem-lead .lf-kicker{margin-bottom:24px;color:#777}
+body.landing-body .lf-problem h2{font-size:clamp(38px,4vw,61px)}
+body.landing-body .lf-problem-list{border-top:1px solid #d2d2d0}
+body.landing-body .lf-problem-list>div{display:grid;grid-template-columns:58px minmax(0,1fr);gap:18px;padding:25px 0 28px;border-bottom:1px solid #d2d2d0}
+body.landing-body .lf-problem-list span{padding-top:5px;color:#777;font-size:11px;font-weight:600}
+body.landing-body .lf-problem-list h3{font-size:24px}
+body.landing-body .lf-problem-list p{max-width:410px;margin:8px 0 0;color:#656565;font-size:14px;line-height:1.55}
+body.landing-body .lf-flow{padding:116px 0 128px;background:#fff;color:#151515}
+body.landing-body .lf-section-head .lf-kicker{margin-bottom:21px;color:#777}
+body.landing-body .lf-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin-top:69px}
+body.landing-body .lf-steps article{border-top:1px solid #bcbfbe;padding-top:18px}
+body.landing-body .lf-steps article>span{font-size:12px;color:#777}
+body.landing-body .lf-steps h3{margin-top:42px;font-size:28px}
+body.landing-body .lf-steps p{max-width:310px;margin:12px 0 0;color:#666;font-size:15px;line-height:1.52}
+body.landing-body .lf-product{padding:110px 0 100px;background:#eaeae8;color:#141414}
+body.landing-body .lf-product-head{display:flex;justify-content:space-between;align-items:end;gap:38px;margin-bottom:45px}
+body.landing-body .lf-product-head .lf-kicker{margin-bottom:21px;color:#717171}
+body.landing-body .lf-product-head>p{max-width:300px;margin:0 0 5px;color:#555;font-size:15px;line-height:1.5}
+body.landing-body .lf-product-frame{border:1px solid #cfd1d0;background:#fff;padding:17px}
+body.landing-body .lf-product-frame img{display:block;width:100%;height:auto;border:1px solid #e4e5e5}
+body.landing-body .lf-product-caption{display:flex;justify-content:space-between;gap:16px;margin-top:13px;color:#737373;font-size:11px;letter-spacing:.03em}
+body.landing-body .lf-github{padding:128px 0;background:#fff;color:#151515}
+body.landing-body .lf-github-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.85fr);gap:10%;align-items:center}
+body.landing-body .lf-github .lf-kicker{margin-bottom:23px;color:#777}
+body.landing-body .lf-github-grid>div:first-child>p:not(.lf-kicker){max-width:450px;margin:25px 0 24px;color:#626262;font-size:16px;line-height:1.55}
+body.landing-body .lf-text-link{display:inline-flex;gap:24px;padding-bottom:6px;border-bottom:1px solid #171717;color:#171717;font-size:14px;font-weight:700;text-decoration:none}
+body.landing-body .lf-github-entry{padding:39px;border:1px solid #d8dad9;background:#f7f7f6}
+body.landing-body .lf-github-entry>span{color:#777;font-size:11px;letter-spacing:.1em;font-weight:700}
+body.landing-body .lf-github-entry h3{margin-top:45px;font-size:34px;line-height:1.1}
+body.landing-body .lf-github-entry>p{max-width:350px;margin:13px 0 24px;color:#656565;font-size:14px;line-height:1.5}
+body.landing-body .lf-github-form{display:flex;min-height:48px;border:1px solid #c8cbca;background:#fff}
+body.landing-body .lf-github-form input{width:100%;min-width:0;padding:0 12px;border:0!important;outline:0;background:#fff;color:#151515;font:inherit;font-size:13px}
+body.landing-body .lf-github-form button{padding:0 11px;border:0;background:transparent;color:#444;font:inherit;font-size:12px;cursor:pointer}
+body.landing-body .lf-github-form a{display:grid;place-items:center;width:47px;flex:none;background:#111;color:#fff;text-decoration:none;font-size:21px}
+body.landing-body .lf-github-entry small{display:block;margin-top:11px;color:#777;font-size:11px}
+body.landing-body .lf-outcomes{padding:112px 0 122px;background:#f7f7f6;color:#151515}
+body.landing-body .lf-outcome-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;margin-top:66px;border-top:1px solid #d1d3d1}
+body.landing-body .lf-outcome-list article{min-height:190px;padding:20px 28px 0 0;border-right:1px solid #d1d3d1}
+body.landing-body .lf-outcome-list article+article{padding-left:28px}
+body.landing-body .lf-outcome-list article:last-child{border-right:0}
+body.landing-body .lf-outcome-list article>span{font-size:11px;color:#777}
+body.landing-body .lf-outcome-list h3{margin-top:34px;font-size:25px}
+body.landing-body .lf-outcome-list p{max-width:310px;margin:9px 0 0;color:#666;font-size:14px;line-height:1.55}
+body.landing-body .lf-faq{padding:118px 0;background:#fff;color:#151515}
+body.landing-body .lf-faq-grid{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.15fr);gap:10%}
+body.landing-body .lf-faq .lf-kicker{margin-bottom:22px;color:#777}
+body.landing-body .lf-faq h2{font-size:clamp(36px,3.8vw,56px)}
+body.landing-body .lf-faq .faq-list{border-top:1px solid #d4d5d4}
+body.landing-body .lf-faq .faq-item{border-bottom:1px solid #d4d5d4!important}
+body.landing-body .lf-faq .faq-question{display:flex;align-items:center;justify-content:space-between;gap:18px;width:100%;padding:20px 0;border:0;background:transparent;color:#171717;text-align:left;font:inherit;font-size:15px;font-weight:600;cursor:pointer}
+body.landing-body .lf-faq .faq-question i{font-style:normal;font-size:20px;font-weight:400}
+body.landing-body .lf-faq .faq-answer{transition:none!important}
+body.landing-body .lf-faq .faq-answer p{padding:0 28px 21px 0;color:#656565;font-size:14px;line-height:1.55}
+body.landing-body .lf-final{padding:122px 0 130px;background:#111;color:#fff}
+body.landing-body .lf-final-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,.55fr);align-items:end;gap:8%}
+body.landing-body .lf-final .lf-kicker{margin-bottom:25px;color:#aaa}
+body.landing-body .lf-final h2{font-size:clamp(43px,5vw,75px)}
+body.landing-body .lf-final-grid>div:last-child p{margin:0 0 25px;color:#bdbdbd;font-size:15px;line-height:1.55}
+body.landing-body .lf-final-grid>div:last-child a{display:flex;align-items:center;justify-content:space-between;min-height:50px;padding:0 16px;background:#fff;color:#111;text-decoration:none;font-size:13px;font-weight:700}
+body.landing-body .footer{padding:68px 0 24px;background:#f7f7f6!important;color:#151515!important}
+body.landing-body .footer-grid{border:0!important;padding:0!important;gap:36px}
+body.landing-body .footer .brand{display:inline-flex;align-items:center;gap:8px;color:#151515;font-size:23px;font-weight:700;letter-spacing:-.055em;text-decoration:none}
+body.landing-body .footer-brand-mark{width:28px;height:28px;object-fit:contain}
+body.landing-body .footer-brand p{margin-top:15px;color:#686868;font-size:13px}
+body.landing-body .footer-col h3{color:#171717!important;font-size:12px;font-weight:700}
+body.landing-body .footer-col a,body.landing-body .footer-col span{color:#666!important;font-size:12px}
+body.landing-body .footer-bottom{margin-top:65px;padding-top:17px;border-top:1px solid #d7d8d6;color:#777;font-size:11px}
+@media(max-width:900px){body.landing-body .lf-intro-grid{grid-template-columns:1fr;gap:24px}body.landing-body .lf-problem-grid,body.landing-body .lf-github-grid,body.landing-body .lf-faq-grid{grid-template-columns:1fr;gap:48px}body.landing-body .lf-final-grid{grid-template-columns:1fr;gap:40px}}
+@media(max-width:640px){body.landing-body .lf-wrap{width:calc(100% - 36px)}body.landing-body :is(.lf-intro,.lf-problem,.lf-flow,.lf-product,.lf-github,.lf-outcomes,.lf-faq,.lf-final){padding-top:76px;padding-bottom:82px}body.landing-body :is(.lf-intro,.lf-problem,.lf-flow,.lf-product,.lf-github,.lf-outcomes,.lf-faq,.lf-final) h2{font-size:clamp(36px,10vw,50px)}body.landing-body .lf-intro h2{font-size:clamp(42px,11vw,58px)}body.landing-body .lf-intro-grid>div>p{font-size:16px}body.landing-body .lf-steps,body.landing-body .lf-outcome-list{grid-template-columns:1fr;gap:0;margin-top:44px}body.landing-body .lf-steps article{padding:18px 0 29px}body.landing-body .lf-steps h3{margin-top:24px}body.landing-body .lf-outcome-list article,body.landing-body .lf-outcome-list article+article{min-height:0;padding:22px 0 30px;border-right:0;border-bottom:1px solid #d1d3d1}body.landing-body .lf-outcome-list h3{margin-top:20px}body.landing-body .lf-product-head{display:block}body.landing-body .lf-product-head>p{margin-top:20px}body.landing-body .lf-product-frame{padding:6px}body.landing-body .lf-product-caption{flex-direction:column;gap:5px}body.landing-body .lf-github-entry{padding:24px}body.landing-body .lf-github-entry h3{margin-top:28px;font-size:28px}body.landing-body .lf-faq-grid{gap:30px}body.landing-body .footer-bottom{display:block}body.landing-body .footer-bottom span{display:block;margin-top:8px}}

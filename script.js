@@ -102,42 +102,6 @@ githubNext?.addEventListener('click', event => {
 
 syncGithubNext();
 
-const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const revealElements = document.querySelectorAll([
-  '.hero-copy',
-  '.hero-visual',
-  '.showcase-card',
-  '.showcase-stat',
-  '.section-head > *',
-  '.feature-row',
-  '.step',
-  '.audience-card',
-  '.price-note',
-  '.faq-item',
-  '.final-video-copy',
-  '.video-frame',
-  '.footer-grid > *',
-].join(','));
-
-revealElements.forEach((element, index) => {
-  const entersFromRight = element.matches('.hero-visual') || (!element.matches('.hero-copy') && index % 2 !== 0);
-  element.classList.add('direction-reveal', entersFromRight ? 'from-right' : 'from-left');
-  element.style.setProperty('--reveal-delay', `${(index % 3) * 35}ms`);
-});
-
-if (prefersReducedMotion) {
-  revealElements.forEach(element => element.classList.add('is-inview'));
-} else {
-  const revealObserver = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      entry.target.classList.toggle('is-inview', entry.isIntersecting);
-    });
-  }, { threshold: 0.12, rootMargin: '0px 0px -7% 0px' });
-  window.requestAnimationFrame(() => {
-    revealElements.forEach(element => revealObserver.observe(element));
-  });
-}
-
 document.querySelectorAll('a[href^="#"]').forEach(link => {
   link.addEventListener('click', event => {
     const id = link.getAttribute('href');

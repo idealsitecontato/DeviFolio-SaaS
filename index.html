@@ -12,6 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="landing-reference.css">
+  <link rel="stylesheet" href="landing-finish.css">
 </head>
 <body class="landing-body">
   <header class="site-header" id="site-header">
@@ -55,175 +56,62 @@
       </div>
     </section>
 
-    <section class="showcase section-white" aria-label="Recursos e resultados da Devifolio">
-      <div class="container showcase-grid">
-        <article class="showcase-card showcase-github">
-          <div class="showcase-card-title">Integração<br>com GitHub</div>
-          <p>Integração com GitHub para agilizar o seu processo manual e automatizar seu fluxo de trabalho.</p>
-          <div class="github-mark" aria-hidden="true">
-            <svg viewBox="0 0 98 98" role="img"><path fill="currentColor" d="M49 0C21.94 0 0 21.94 0 49c0 21.64 14.03 39.99 33.47 46.47 2.45.45 3.35-1.06 3.35-2.36 0-1.17-.04-4.27-.07-8.37-13.62 2.96-16.5-6.56-16.5-6.56-2.23-5.66-5.45-7.17-5.45-7.17-4.45-3.04.34-2.98.34-2.98 4.92.35 7.51 5.05 7.51 5.05 4.38 7.5 11.48 5.34 14.28 4.09.44-3.18 1.71-5.34 3.11-6.57-10.87-1.24-22.3-5.44-22.3-24.2 0-5.35 1.91-9.71 5.05-13.13-.5-1.24-2.19-6.23.48-12.97 0 0 4.12-1.32 13.49 5.02a46.7 46.7 0 0 1 12.29-1.66c4.17.02 8.37.56 12.29 1.66 9.37-6.34 13.49-5.02 13.49-5.02 2.67 6.74.99 11.73.48 12.97 3.14 3.42 5.05 7.78 5.05 13.13 0 18.82-11.46 22.94-22.37 24.15 1.76 1.52 3.33 4.51 3.33 9.1 0 6.57-.06 11.87-.06 13.49 0 1.31.89 2.84 3.38 2.35C83.99 88.95 98 70.62 98 49 98 21.94 76.06 0 49 0Z"/></svg>
-          </div>
-          <strong>GitHub</strong>
-        </article>
-
-        <article class="showcase-card showcase-portfolio">
-          <div class="showcase-card-title">Link próprio<br>do seu portfólio</div>
-          <p>Tenha um link próprio que ao abrir ilustra o seu portfólio completinho de forma profissional.</p>
-          <div class="portfolio-window" aria-label="Prévia de como conectar seu GitHub">
-            <div class="portfolio-bar"><span class="portfolio-logo-dot"></span><span>Devifolio</span><small>devifolio.com</small></div>
-            <div class="github-link-panel">
-              <span class="portfolio-kicker">COMECE PELO GITHUB</span>
-              <h3>Cole o link do seu GitHub</h3>
-              <p>A Devifolio organiza seus projetos e prepara seu portfólio.</p>
-              <div class="github-link-form">
-                <input id="github-link-input" type="url" inputmode="url" autocomplete="url" placeholder="github.com/seuusuario" aria-label="Link do seu GitHub">
-                <button class="paste-button" type="button" id="paste-github">Colar</button>
-                <a class="paste-arrow" id="github-next" href="cadastro.html#cadastro" aria-label="Continuar para o cadastro">→</a>
-              </div>
-              <small class="github-link-status" id="github-link-status" aria-live="polite">Cole o link e continue.</small>
-            </div>
-            <div class="portfolio-projects" aria-hidden="true">
-              <span></span><span></span><span></span><span></span><span></span>
-            </div>
-          </div>
-        </article>
-
-        <article class="showcase-card showcase-analytics">
-          <div class="analytics-top"><div>7d</div><b>30d</b><div>12m</div></div>
-          <h3>Acompanhe as<br>visualizações</h3>
-          <p>Acompanhe as visualizações de seu portfólio em tempo real quando quiser.</p>
-          <div class="bar-chart" aria-hidden="true"><i style="height:44%"></i><i style="height:26%"></i><i style="height:70%"></i><i style="height:48%"></i><i style="height:100%"></i><i style="height:42%"></i></div>
-          <strong>Visão clara <small>dos seus resultados</small></strong>
-        </article>
-
+    <section class="lf-intro" id="funcionalidades">
+      <div class="lf-wrap lf-intro-grid">
+        <p class="lf-kicker">O SEU TRABALHO, EM PRIMEIRO PLANO</p>
+        <div><h2>Projetos bons merecem ser vistos<br>do jeito certo.</h2><p>Repositórios mostram o código. A DeviFolio mostra o que você construiu, por que importa e onde encontrar cada projeto — tudo em um endereço profissional.</p></div>
       </div>
     </section>
 
-    <section class="features section-white" id="funcionalidades">
-      <div class="container">
-        <div class="section-head">
-          <div><h2>Do repositório à apresentação, sem refazer seu trabalho.</h2></div>
-          <p>A Devifolio lê o que já existe no GitHub e organiza a parte que costuma ficar espalhada: descrição, tecnologias, links, imagem e projeto publicado.</p>
-        </div>
-        <div class="feature-list">
-          <article class="feature-row">
-            <span class="feature-index">01</span>
-            <div class="feature-icon feature-github" aria-hidden="true">
-              <svg viewBox="0 0 98 98"><path fill="currentColor" d="M49 0C21.94 0 0 21.94 0 49c0 21.64 14.03 39.99 33.47 46.47 2.45.45 3.35-1.06 3.35-2.36 0-1.17-.04-4.27-.07-8.37-13.62 2.96-16.5-6.56-16.5-6.56-2.23-5.66-5.45-7.17-5.45-7.17-4.45-3.04.34-2.98.34-2.98 4.92.35 7.51 5.05 7.51 5.05 4.38 7.5 11.48 5.34 14.28 4.09.44-3.18 1.71-5.34 3.11-6.57-10.87-1.24-22.3-5.44-22.3-24.2 0-5.35 1.91-9.71 5.05-13.13-.5-1.24-2.19-6.23.48-12.97 0 0 4.12-1.32 13.49 5.02a46.7 46.7 0 0 1 12.29-1.66c4.17.02 8.37.56 12.29 1.66 9.37-6.34 13.49-5.02 13.49-5.02 2.67 6.74.99 11.73.48 12.97 3.14 3.42 5.05 7.78 5.05 13.13 0 18.82-11.46 22.94-22.37 24.15 1.76 1.52 3.33 4.51 3.33 9.1 0 6.57-.06 11.87-.06 13.49 0 1.31.89 2.84 3.38 2.35C83.99 88.95 98 70.62 98 49 98 21.94 76.06 0 49 0Z"/></svg>
-            </div>
-            <div class="feature-main"><h3>Conecte seu <span class="feature-highlight">GitHub</span></h3><p>Autorize seus repositórios e deixe a plataforma reunir as informações que você já mantém.</p></div>
-            <span class="feature-arrow">↗</span>
-          </article>
-          <article class="feature-row">
-            <span class="feature-index">02</span>
-            <div class="feature-icon feature-js" aria-hidden="true"><span>JS</span></div>
-            <div class="feature-main"><h3>Entenda cada <span class="feature-highlight">projeto</span></h3><p>README, tecnologias e contexto viram uma apresentação inicial que você pode revisar.</p></div>
-            <span class="feature-arrow">↗</span>
-          </article>
-          <article class="feature-row">
-            <span class="feature-index">03</span>
-            <div class="feature-icon feature-google" aria-hidden="true"><span>G</span></div>
-            <div class="feature-main"><h3>Encontre o site <span class="feature-highlight">publicado</span></h3><p>Quando houver uma URL no projeto, a Devifolio tenta localizar homepage, deploy ou link de demonstração.</p></div>
-            <span class="feature-arrow">↗</span>
-          </article>
-          <article class="feature-row">
-            <span class="feature-index">04</span>
-            <div class="feature-icon feature-camera" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7.5h3l1.2-2h7.6l1.2 2H20a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9.5a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="13.5" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></div>
-            <div class="feature-main"><h3>Mostre o projeto de <span class="feature-highlight">verdade</span></h3><p>Quando possível, uma captura da aplicação publicada vira a imagem de apresentação do projeto.</p></div>
-            <span class="feature-arrow">↗</span>
-          </article>
-          <article class="feature-row">
-            <span class="feature-index">05</span>
-            <div class="feature-icon feature-windows" aria-hidden="true"><svg viewBox="0 0 28 24"><path d="M3 12h18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="m15 5 7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-            <div class="feature-main"><h3>Revise antes de <span class="feature-highlight">publicar</span></h3><p>Você decide o título, descrição, tecnologias, imagem, links e quais projetos aparecem no perfil.</p></div>
-            <span class="feature-arrow">↗</span>
-          </article>
+    <section class="lf-problem" aria-labelledby="lf-problem-title">
+      <div class="lf-wrap lf-problem-grid">
+        <div class="lf-problem-lead"><p class="lf-kicker">O QUE MUDA</p><h2 id="lf-problem-title">Menos tempo montando.<br>Mais clareza para apresentar.</h2></div>
+        <div class="lf-problem-list">
+          <div><span>01 /</span><div><h3>Seu trabalho já existe.</h3><p>Comece pelos repositórios que você mantém no GitHub, sem cadastrar tudo do zero.</p></div></div>
+          <div><span>02 /</span><div><h3>Você controla a narrativa.</h3><p>Revise descrição, imagem, tecnologias e links antes de publicar cada projeto.</p></div></div>
+          <div><span>03 /</span><div><h3>Um endereço para compartilhar.</h3><p>Reúna perfil e projetos em uma página pronta para currículo, LinkedIn e conversas profissionais.</p></div></div>
         </div>
       </div>
     </section>
 
-    <section class="workflow section-cream" id="como-funciona">
-      <div class="container">
-        <div class="section-head"><div><h2>Você conecta. A Devifolio organiza. Você publica.</h2></div><p>O objetivo é tirar do caminho a parte operacional do portfólio e deixar você com a decisão final.</p></div>
-        <div class="workflow-grid">
-          <article class="step"><span>01</span><h3>Conecte o GitHub</h3><p>Os repositórios autorizados entram na Devifolio com as informações básicas do projeto.</p></article>
-          <article class="step"><span>02</span><h3>Revise a apresentação</h3><p>A IA organiza o contexto do projeto, e você ajusta o que quiser antes de publicar.</p></article>
-          <article class="step"><span>03</span><h3>Compartilhe um único link</h3><p>Seu perfil reúne seus projetos e pode ser usado no LinkedIn, currículo, GitHub, redes e QR Code.</p></article>
+    <section class="lf-flow" id="como-funciona">
+      <div class="lf-wrap">
+        <div class="lf-section-head"><p class="lf-kicker">COMO FUNCIONA</p><h2>Do GitHub ao seu portfólio<br>em três movimentos.</h2></div>
+        <div class="lf-steps">
+          <article><span>01</span><h3>Conecte o GitHub.</h3><p>Autorize sua conta e escolha os repositórios que representam seu trabalho.</p></article>
+          <article><span>02</span><h3>Ajuste cada projeto.</h3><p>Confira o conteúdo reunido e personalize os detalhes antes de publicar.</p></article>
+          <article><span>03</span><h3>Compartilhe.</h3><p>Apresente tudo em um link público ou no QR Code gerado para seu perfil.</p></article>
         </div>
       </div>
     </section>
 
-    <section class="audience audience-dark" id="perfil">
-      <div class="container">
-        <div class="section-head"><div><h2>Uma página para mostrar quem você é e o que você construiu.</h2></div></div>
-        <div class="audience-grid">
-          <article class="audience-card audience-main"><span class="audience-tag">PERFIL PÚBLICO</span><h3>devifolio.com/@seuusuario</h3><p>Foto, bio, especialidades, GitHub, LinkedIn, outros links profissionais e seus projetos publicados em um só lugar.</p></article>
-          <article class="audience-card"><span class="audience-tag">PROJETOS</span><h3>Projeto com contexto.</h3><p>Imagem, descrição, tecnologias, tipo, link para acessar e link para o código no GitHub.</p></article>
-          <article class="audience-card"><span class="audience-tag">COMPARTILHAMENTO</span><h3>Um link e um QR Code.</h3><p>Coloque o mesmo perfil no currículo, LinkedIn, GitHub, Instagram, propostas ou materiais impressos.</p></article>
-        </div>
-      </div>
+    <section class="lf-product" aria-labelledby="lf-product-title">
+      <div class="lf-wrap"><div class="lf-product-head"><div><p class="lf-kicker">DENTRO DA DEVIFOLIO</p><h2 id="lf-product-title">Tudo o que você precisa ver.<br>Em um só painel.</h2></div><p>Projetos, portfólio, integração com GitHub, link público e resultados reunidos em uma interface direta.</p></div><div class="lf-product-frame"><img src="./assets/hero-dashboard.png" loading="lazy" alt="Painel da DeviFolio com projetos, integração GitHub e link com QR Code"></div><div class="lf-product-caption"><span>PAINEL / VISÃO GERAL</span><span>Seu trabalho organizado para seguir em frente.</span></div></div>
     </section>
 
-    <section class="editorial-proof" id="avaliacoes">
-      <div class="container editorial-proof-grid">
-        <span class="editorial-index">DEPOIS DE PUBLICAR</span>
-        <h2>Um portfólio que acompanha o seu trabalho.</h2>
-        <p>Um endereço para apresentar projetos, contexto e links. Quando seu trabalho evolui, a apresentação evolui com ele.</p>
-        <a href="cadastro.html#cadastro">Começar meu portfólio <span aria-hidden="true">↗</span></a>
-      </div>
+    <section class="lf-github" aria-labelledby="lf-github-title">
+      <div class="lf-wrap lf-github-grid"><div><p class="lf-kicker">COMECE PELO QUE VOCÊ JÁ FEZ</p><h2 id="lf-github-title">O GitHub entra.<br>Seu portfólio ganha forma.</h2><p>Importe seus repositórios, decida o que merece destaque e mantenha a apresentação sob seu controle.</p><a class="lf-text-link" href="cadastro.html#cadastro">Criar minha conta <span aria-hidden="true">↗</span></a></div><div class="lf-github-entry"><span>GITHUB / PRIMEIRO PASSO</span><h3>Cole o link do seu GitHub.</h3><p>Você pode começar com o endereço do seu perfil e continuar no cadastro.</p><div class="lf-github-form"><input id="github-link-input" type="url" inputmode="url" autocomplete="url" placeholder="github.com/seuusuario" aria-label="Link do seu GitHub"><button type="button" id="paste-github">Colar</button><a id="github-next" href="cadastro.html#cadastro" aria-label="Continuar para o cadastro">→</a></div><small id="github-link-status" aria-live="polite">Cole o link e continue.</small></div></div>
     </section>
 
-    <section class="pricing section-cream" id="precos">
-      <div class="container pricing-wrap">
-        <div><h2>Seu portfólio não precisa virar mais um projeto para manter.</h2><p>A proposta da Devifolio é simples: pegar o trabalho que já existe no GitHub e transformar em uma apresentação que continue fácil de atualizar.</p></div>
-        <div class="price-note"><strong>Você desenvolve. A Devifolio apresenta.</strong><span>Conecte o GitHub, revise o que foi organizado e compartilhe um único link profissional.</span><a class="button button-dark" href="cadastro.html#cadastro">Quero meu portfólio <span>→</span></a></div>
-      </div>
+    <section class="lf-outcomes" id="perfil">
+      <div class="lf-wrap"><div class="lf-section-head"><p class="lf-kicker">PRONTO PARA SER ENCONTRADO</p><h2>Um perfil que trabalha<br>junto com você.</h2></div><div class="lf-outcome-list"><article><span>01</span><h3>Portfólio público</h3><p>Foto, apresentação, projetos publicados e links profissionais em um só lugar.</p></article><article><span>02</span><h3>Link e QR Code</h3><p>O mesmo endereço para compartilhar online ou mostrar em materiais impressos.</p></article><article><span>03</span><h3>Análise de visitas</h3><p>Acompanhe as visualizações do seu portfólio e as interações com seus links.</p></article></div></div>
     </section>
 
-    <section class="faq section-white" id="faq">
-      <div class="container faq-simple">
-        <div class="faq-simple-head"><span>FAQ</span><h2>Dúvidas frequentes</h2></div>
-        <div class="faq-list">
-          <article class="faq-item is-open">
-            <button class="faq-question" type="button" aria-expanded="true" aria-controls="faq-answer-1"><span>Preciso cadastrar cada projeto manualmente?</span><i aria-hidden="true">−</i></button>
-            <div class="faq-answer" id="faq-answer-1" aria-hidden="false"><div><p>Não. Você conecta o GitHub e autoriza os repositórios que quer usar. A plataforma reúne as informações disponíveis.</p></div></div>
-          </article>
-          <article class="faq-item">
-            <button class="faq-question" type="button" aria-expanded="false" aria-controls="faq-answer-2"><span>A IA publica meu projeto sozinha?</span><i aria-hidden="true">+</i></button>
-            <div class="faq-answer" id="faq-answer-2" aria-hidden="true"><div><p>Não. Ela pode organizar uma apresentação inicial, mas você revisa e decide o que será publicado.</p></div></div>
-          </article>
-          <article class="faq-item">
-            <button class="faq-question" type="button" aria-expanded="false" aria-controls="faq-answer-3"><span>A Devifolio consegue encontrar o site do projeto?</span><i aria-hidden="true">+</i></button>
-            <div class="faq-answer" id="faq-answer-3" aria-hidden="true"><div><p>Quando houver informações disponíveis, ela pode procurar homepage, links de deploy ou URLs presentes no README.</p></div></div>
-          </article>
-          <article class="faq-item">
-            <button class="faq-question" type="button" aria-expanded="false" aria-controls="faq-answer-4"><span>Posso colocar o perfil no meu currículo e LinkedIn?</span><i aria-hidden="true">+</i></button>
-            <div class="faq-answer" id="faq-answer-4" aria-hidden="true"><div><p>Sim. O perfil público foi pensado para funcionar como um único endereço profissional para seus projetos.</p></div></div>
-          </article>
-        </div>
-      </div>
+    <section class="lf-faq" id="faq">
+      <div class="lf-wrap lf-faq-grid"><div><p class="lf-kicker">DÚVIDAS FREQUENTES</p><h2>O que você precisa saber antes de começar.</h2></div><div class="faq-list">
+        <article class="faq-item is-open"><button class="faq-question" type="button" aria-expanded="true" aria-controls="faq-answer-1"><span>Preciso cadastrar cada projeto manualmente?</span><i aria-hidden="true">−</i></button><div class="faq-answer" id="faq-answer-1" aria-hidden="false"><div><p>Não. Você conecta o GitHub e escolhe os repositórios que quer importar. Depois, revisa as informações reunidas.</p></div></div></article>
+        <article class="faq-item"><button class="faq-question" type="button" aria-expanded="false" aria-controls="faq-answer-2"><span>A IA publica meu projeto sozinha?</span><i aria-hidden="true">+</i></button><div class="faq-answer" id="faq-answer-2" aria-hidden="true"><div><p>Não. Ela pode organizar uma apresentação inicial, mas você revisa e decide o que será publicado.</p></div></div></article>
+        <article class="faq-item"><button class="faq-question" type="button" aria-expanded="false" aria-controls="faq-answer-3"><span>Posso personalizar meu portfólio?</span><i aria-hidden="true">+</i></button><div class="faq-answer" id="faq-answer-3" aria-hidden="true"><div><p>Sim. Você pode editar seu perfil, escolher os projetos publicados e ajustar textos, imagens e links.</p></div></div></article>
+        <article class="faq-item"><button class="faq-question" type="button" aria-expanded="false" aria-controls="faq-answer-4"><span>Onde posso compartilhar meu perfil?</span><i aria-hidden="true">+</i></button><div class="faq-answer" id="faq-answer-4" aria-hidden="true"><div><p>Use seu link no currículo, LinkedIn, GitHub e propostas, ou compartilhe o QR Code.</p></div></div></article>
+      </div></div>
     </section>
 
-    <section class="final-video section-white" id="cta-final">
-      <div class="container final-video-grid">
-        <div class="final-video-copy">
-          <span class="video-kicker">CONHEÇA A DEVIFOLIO</span>
-          <h2>Do seu código para uma apresentação que faz sentido.</h2>
-          <p>Um único lugar para mostrar o que você construiu, com contexto, imagens e links organizados para quem visita o seu trabalho.</p>
-          <a class="button button-dark large" href="cadastro.html#cadastro">Criar meu portfólio <span>→</span></a>
-        </div>
-        <div class="product-detail" aria-label="Prévia do painel DeviFolio">
-          <div class="product-detail-top"><span>DEVI / PAINEL</span><span>01 — 03</span></div>
-          <img src="./assets/hero-dashboard.png" alt="Projetos, conexão GitHub e QR Code no painel DeviFolio">
-          <span class="product-detail-caption">Tudo pronto para apresentar o que você construiu.</span>
-        </div>
-      </div>
-    </section>
+    <section class="lf-final" id="cta-final"><div class="lf-wrap lf-final-grid"><div><p class="lf-kicker">É HORA DE MOSTRAR O QUE VOCÊ FAZ</p><h2>Seu próximo projeto merece<br>uma boa apresentação.</h2></div><div><p>Crie sua conta, escolha seus projetos e dê a eles um lugar à altura do trabalho que você colocou em cada um.</p><a href="cadastro.html#cadastro">Criar conta grátis <span aria-hidden="true">↗</span></a></div></div></section>
   </main>
 
   <footer class="footer" id="contato">
     <div class="container footer-grid">
-      <div class="footer-brand"><a class="brand" href="#top"><img src="./assets/devifolio-logo.png" alt="Devifolio" class="brand-logo footer-brand-logo"></a><p>Seu código. Seu trabalho. Sua apresentação.</p></div>
+      <div class="footer-brand"><a class="brand" href="#top"><img src="./assets/devifolio-mark.png" alt="" class="footer-brand-mark"><span>Devifolio</span></a><p>Seu código. Seu trabalho. Sua apresentação.</p></div>
       <div class="footer-col"><h3>Produto</h3><a href="#funcionalidades">Recursos</a><a href="#como-funciona">Como funciona</a><a href="#perfil">Portfólio</a></div>
       <div class="footer-col"><h3>Empresa</h3><a href="#perfil">Portfólio</a><a href="#contato">Ajuda</a><a href="#faq">FAQ</a></div>
       <div class="footer-col"><h3>Contato</h3><a href="mailto:oi@devifolio.com">oi@devifolio.com</a><span>Brasil</span></div>
