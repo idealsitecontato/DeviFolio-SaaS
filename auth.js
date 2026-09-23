@@ -210,6 +210,10 @@ document.querySelectorAll('#github-login, #github-cadastro').forEach(button => {
   })
 })
 
+document.querySelectorAll('[data-google-soon]').forEach(button => {
+  button.addEventListener('click', () => showMessage('Login com Google estará disponível em breve.', 'success'))
+})
+
 document.querySelector('.auth-forgot')?.addEventListener('click', async event => {
   event.preventDefault()
   const email = document.getElementById('login-email')

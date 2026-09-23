@@ -1,0 +1,66 @@
+*{box-sizing:border-box}
+:root{font-family:"DM Sans",Arial,sans-serif;color:#151515;background:#fbfbfa}
+[hidden]{display:none!important}
+body.auth-body{margin:0;min-height:100dvh;color:#151515;background:#fbfbfa;font-family:"DM Sans",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+button,input{font:inherit}
+button{cursor:pointer}
+a{color:inherit}
+.auth-shell{display:grid;grid-template-columns:1fr 1fr;min-height:100dvh}
+.auth-left{grid-column:1;grid-row:1;display:flex;flex-direction:column;justify-content:center;align-items:center;min-width:0;padding:44px 36px;background-color:#fbfbfa;background-image:radial-gradient(#d5d5d5 .65px,transparent .8px);background-size:17px 17px}
+.auth-right{grid-column:2;grid-row:1;position:relative;overflow:hidden;min-width:0;background:#050505;color:#fff}
+.auth-right:before{content:"";position:absolute;inset:-25%;background:repeating-linear-gradient(58deg,#070707 0,#111 18px,#2c2c2c 34px,#6b6b6b 52px,#262626 65px,#050505 88px);transform:rotate(-7deg) skewY(-7deg) scale(1.25);filter:blur(2px)}
+.auth-right:after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 18% 40%,#000 0,rgba(0,0,0,.91) 23%,rgba(0,0,0,.12) 75%),linear-gradient(180deg,rgba(0,0,0,.45),transparent 35%,rgba(0,0,0,.28))}
+.auth-right-heading{position:relative;z-index:1;margin:clamp(75px,15vh,145px) 0 0 clamp(40px,5vw,75px);font-size:clamp(34px,3.1vw,51px);line-height:1.13;font-weight:400;letter-spacing:-.045em}
+.auth-brand{display:flex;align-items:center;gap:10px;width:420px;max-width:100%;margin:0 0 24px;padding-left:calc((420px - 420px)/2);font-size:29px;line-height:1;font-weight:700;letter-spacing:-.055em;text-decoration:none}
+.auth-brand-mark{display:block;width:31px;height:32px;flex:none;background:url("./assets/devifolio-mark.png") center/contain no-repeat}
+.auth-form-wrap{width:min(100%,420px)}
+.auth-panel{display:none}
+.auth-panel.is-active{display:block}
+.auth-panel h1{margin:0 0 5px;font-size:29px;line-height:1.18;letter-spacing:-.045em;font-weight:700}
+.auth-sub{margin:0 0 25px;color:#6c7179;font-size:14px;line-height:1.5}
+.auth-field{margin:0 0 15px}
+.auth-field label{display:block;margin-bottom:6px;font-size:13px;color:#454b52}
+.auth-field input{display:block;width:100%;height:45px;padding:0 14px;border:1px solid #cdd1d5;border-radius:0;background:#fff;color:#161616;font-size:14px;outline:none}
+.auth-field input::placeholder{color:#9ca1a7}
+.auth-field input:focus{border-color:#202020;box-shadow:0 0 0 1px #202020}
+.auth-row-between{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:1px 0 18px;font-size:13px;color:#6b7078}
+.auth-remember{display:flex;align-items:center;gap:7px}
+.auth-remember input{width:14px;height:14px;margin:0;accent-color:#111}
+.auth-forgot{color:#3a3e43;text-decoration:underline;text-underline-offset:2px}
+.auth-body .button{border-radius:0;box-shadow:none;text-decoration:none}
+.button-submit,.button-github,.button-google{display:flex;align-items:center;justify-content:center;gap:11px;width:100%;min-height:45px;padding:8px 16px;font-size:13px;font-weight:600;transition:background-color .16s,border-color .16s}
+.button-submit{border:1px solid #080808;background:#080808;color:#fff}
+.button-submit:hover{background:#262626}
+.button-github,.button-google{border:1px solid #cdd1d5;background:#fff;color:#141414}
+.button-github:hover,.button-google:hover{border-color:#333;background:#f8f8f8}
+.button-github svg{width:21px;height:21px;fill:#111}
+.button-google{margin-top:10px}
+.google-g{font-size:23px;line-height:1;font-weight:700;letter-spacing:-.1em;background:conic-gradient(#4285f4 0 25%,#34a853 25% 48%,#fbbc05 48% 67%,#ea4335 67% 83%,#4285f4 83%);background-clip:text;color:transparent}
+.auth-divider{display:flex;align-items:center;gap:13px;margin:20px 0 14px;color:#737983;font-size:13px;white-space:nowrap}
+.auth-divider:before,.auth-divider:after{content:"";height:1px;flex:1;background:#d8dce0}
+.auth-switch{margin:25px 0 0;text-align:center;color:#737983;font-size:13px}
+.auth-switch a{color:#282c30;text-decoration:underline;text-underline-offset:2px;font-weight:600}
+.auth-message{margin:0 0 14px;padding:10px 12px;border:1px solid #c9a7a7;background:#fff7f7;color:#823333;font-size:13px;line-height:1.4}
+.auth-message.is-success{border-color:#cdd1d5;background:#f5f6f7;color:#30363c}
+button:disabled{opacity:.58;cursor:wait}
+.auth-loading-overlay:not([hidden]){position:fixed;z-index:10;inset:0;display:grid;place-content:center;justify-items:center;gap:14px;background:rgba(255,255,255,.88);color:#151515}
+.auth-spinner{width:28px;height:28px;border:2px solid #ddd;border-top-color:#111;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(1turn)}}
+@media(max-width:760px){.auth-shell{grid-template-columns:1fr}.auth-right{display:none}.auth-left{grid-column:1;min-height:100dvh;padding:38px 24px}.auth-brand{width:min(100%,420px)}}
+@media(max-height:720px) and (min-width:761px){.auth-left{justify-content:flex-start;padding-top:36px;padding-bottom:36px}.auth-brand{margin-bottom:16px}.auth-sub{margin-bottom:17px}.auth-field{margin-bottom:10px}.auth-divider{margin:14px 0 10px}.auth-switch{margin-top:15px}}
+@media(prefers-reduced-motion:reduce){.auth-spinner{animation:none}}
+
+
+.auth-right{background:#030303}
+.auth-right:before{inset:0;background:url("./assets/auth-waves.jpg") right center/68% 100% no-repeat;transform:none;filter:none}
+.auth-right:after{background:linear-gradient(90deg,#030303 0%,rgba(0,0,0,.78) 23%,rgba(0,0,0,.16) 58%,transparent 100%)}
+#panel-cadastro .auth-field:has(#cad-confirmar-senha){display:none}
+#form-cadastro:has(#cad-senha:not(:placeholder-shown)) .auth-field:has(#cad-confirmar-senha){display:block}
+body.auth-body .auth-brand,body.auth-body .auth-form-wrap{transform:translate(34px,22px)}
+body.auth-body[data-auth-view="cadastro"] .auth-brand,body.auth-body[data-auth-view="cadastro"] .auth-form-wrap{transform:translate(34px,13px)}
+@media(max-width:760px){body.auth-body .auth-brand,body.auth-body .auth-form-wrap,body.auth-body[data-auth-view="cadastro"] .auth-brand,body.auth-body[data-auth-view="cadastro"] .auth-form-wrap{transform:none}}
+
+
+.auth-right:before{background-size:100% 100%}
+
+.auth-brand{width:max-content;max-width:100%;margin:0 auto 24px;padding-left:0}

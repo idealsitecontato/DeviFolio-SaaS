@@ -1,3 +1,12 @@
+const landingPath = window.location.pathname
+if (landingPath.startsWith('/portfolio/')) {
+  let username = landingPath.slice('/portfolio/'.length)
+  try { username = decodeURIComponent(username) } catch {}
+  window.location.replace('/portfolio.html?username=' + encodeURIComponent(username))
+} else if (landingPath !== '/' && landingPath !== '/index.html') {
+  window.location.replace('/404.html')
+}
+
 const header = document.getElementById('site-header');
 const menuToggle = document.querySelector('.menu-toggle');
 const mobileMenu = document.getElementById('mobile-menu');
