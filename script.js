@@ -1,3 +1,27 @@
+import { renderPlanCards } from './plans.js'
+
+const plansGrid = document.getElementById('landing-plans-grid')
+if (plansGrid) plansGrid.innerHTML = renderPlanCards()
+
+const reviewTrack = document.getElementById('review-track')
+if (reviewTrack) {
+  ;[...reviewTrack.children].forEach(card => {
+    const copy = card.cloneNode(true)
+    copy.setAttribute('aria-hidden', 'true')
+    reviewTrack.append(copy)
+  })
+}
+
+const finalVideo = document.querySelector('.lf-final-video')
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+function syncFinalVideo() {
+  if (!finalVideo) return
+  if (reducedMotion.matches) finalVideo.pause()
+  else finalVideo.play().catch(() => { /* autoplay may be unavailable */ })
+}
+reducedMotion.addEventListener?.('change', syncFinalVideo)
+syncFinalVideo()
+
 const landingPath = window.location.pathname
 if (landingPath.startsWith('/portfolio/')) {
   let username = landingPath.slice('/portfolio/'.length)

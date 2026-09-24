@@ -28,7 +28,7 @@ const mapProject = row => ({
   status: row.status || 'draft',
 })
 
-function throwFirstUnexpected(results) {
+function coreWorkspaceAvailable(results) {
   const errors = results.map(result => result.error).filter(Boolean)
   if (errors.some(isMissingSchema)) return false
   if (errors.length) throw errors[0]
@@ -45,16 +45,17 @@ export async function loadWorkspace(userId) {
     supabase.from('github_connections').select('github_user_id,github_username,avatar_url,connected_at').eq('user_id', userId).maybeSingle(),
   ])
 
-  if (!throwFirstUnexpected(results)) return { available: false }
   const [profileResult, projectsResult, settingsResult, analyticsResult, referralsResult, githubResult] = results
+  if (!coreWorkspaceAvailable([profileResult, projectsResult])) return { available: false }
   return {
     available: true,
     profile: mapProfile(profileResult.data),
     projects: (projectsResult.data || []).map(mapProject),
-    settings: settingsResult.data,
-    analytics: analyticsResult.data || [],
-    referrals: referralsResult.data || [],
-    githubConnection: githubResult.data,
+    settings: settingsResult.error ? null : settingsResult.data,
+    settingsAvailable: !settingsResult.error,
+    analytics: analyticsResult.error ? [] : (analyticsResult.data || []).map(event => ({ ...event, created_at: event.occurred_at })),
+    referrals: referralsResult.error ? [] : referralsResult.data || [],
+    githubConnection: githubResult.error ? null : githubResult.data,
   }
 }
 

@@ -13,6 +13,7 @@ import {
 } from './src/lib/user-data.js'
 import QRCode from 'qrcode'
 import { createBlurTransition } from './blur-transition.js'
+import { renderPlanCards } from './plans.js'
 
 const githubIconUrl = new URL('./assets/github-icon.png', import.meta.url).href
 const bannerUrl = new URL('./assets/devi-plus-banner-original.png', import.meta.url).href
@@ -174,7 +175,7 @@ function previewMarkup() {
 
 function portfolioManagerView() {
   const title = state.profile.name ? `Portfólio — ${state.profile.name}` : 'Meus portfólios'
-  return `<section class="page-enter">${pageHead('Meus portfólios', 'Gerencie a versão pública associada à sua conta.', '<button class="primary-button" data-new-portfolio><span data-icon="plus"></span>Adicionar novo portfólio</button>')}<div class="portfolio-list"><article class="card portfolio-list-item"><div><p class="eyebrow">PORTFÓLIO PRINCIPAL</p><h2>${esc(title)}</h2><p>${state.published ? 'Seu portfólio está disponível para visitantes.' : 'Finalize o conteúdo e faça o deploy quando estiver pronto.'}</p></div><span class="status ${state.published ? 'published' : 'draft'}">${state.published ? 'Publicado' : 'Rascunho'}</span><div class="portfolio-list-actions"><button class="secondary-button" data-open-preview><span data-icon="eye"></span>Ver</button><button class="primary-button" data-edit-portfolio><span data-icon="edit"></span>Editar</button></div></article></div></section>`
+  return `<section class="page-enter">${pageHead('Meus portfólios', 'Gerencie a versão pública associada à sua conta.', '<button class="primary-button" data-new-portfolio><span data-icon="plus"></span>Adicionar novo portfólio</button>')}<div class="portfolio-list"><article class="card portfolio-list-item"><div><p class="eyebrow">PORTFÓLIO PRINCIPAL</p><h2>${esc(title)}</h2><p>${state.published ? 'Seu portfólio está disponível para visitantes.' : 'Finalize o conteúdo e faça o deploy quando estiver pronto.'}</p></div><span class="status ${state.published ? 'published' : 'draft'}">${state.published ? 'Publicado' : 'Rascunho'}</span><div class="portfolio-list-actions"><button class="secondary-button" data-open-preview><span data-icon="eye"></span>Ver</button><button class="icon-button edit-action" data-edit-portfolio aria-label="Editar portfólio" title="Editar portfólio"><span data-icon="edit"></span></button></div></article></div></section>`
 }
 
 function portfolioEditorView() {
@@ -215,7 +216,7 @@ function avatarMarkup(className = 'avatar avatar-large') {
 
 function profileView() {
   const profile = state.profile
-  return `<section class="page-enter compact-panel-page"><form class="card form-card compact-panel" id="profile-form"><div class="profile-summary">${avatarMarkup()}<div><p class="eyebrow">Perfil</p><h1>${esc(realName())}</h1><p>${esc(profile.email)}</p></div><div><input id="avatar-file" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="secondary-button" type="button" data-upload-avatar>Alterar foto</button></div></div><div class="panel-section"><h2>Informações pessoais</h2><div class="form-grid"><label class="field"><span>Nome</span><input name="name" required value="${esc(profile.name)}"></label><label class="field"><span>Usuário</span><div class="input-prefix"><i>@</i><input name="username" required pattern="[a-zA-Z0-9._-]+" value="${esc(profile.username)}"></div></label><label class="field full"><span>E-mail</span><input type="email" name="email" required value="${esc(profile.email)}"></label></div></div><div class="form-footer"><button class="primary-button" type="submit"><span data-icon="save"></span>Salvar perfil</button></div></form></section>`
+  return `<section class="page-enter compact-panel-page"><form class="card form-card compact-panel" id="profile-form"><div class="profile-summary"><div class="profile-avatar-edit">${avatarMarkup()}<input id="avatar-file" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="icon-button avatar-edit-button" type="button" data-upload-avatar aria-label="Alterar foto de perfil" title="Alterar foto"><span data-icon="edit"></span></button></div><div><p class="eyebrow">Perfil</p><h1>${esc(realName())}</h1><p>${esc(profile.email)}</p></div></div><div class="panel-section"><h2>Informações pessoais</h2><div class="form-grid"><label class="field"><span>Nome</span><input name="name" required value="${esc(profile.name)}"></label><label class="field"><span>Usuário</span><div class="input-prefix"><i>@</i><input name="username" required pattern="[a-zA-Z0-9._-]+" value="${esc(profile.username)}"></div></label><label class="field full"><span>E-mail</span><input type="email" name="email" required value="${esc(profile.email)}"></label></div></div><div class="form-footer"><button class="primary-button" type="submit"><span data-icon="save"></span>Salvar perfil</button></div></form></section>`
 }
 
 function switchRow(icon, title, description, key, on) {
@@ -233,8 +234,7 @@ function referralView() {
 }
 
 function plansView() {
-  const plan = (name, price, description, benefits) => `<article class="card pricing-card"><h2>${name}</h2><strong>R$ ${price}<small>/mês</small></strong><p>${description}</p><ul>${benefits.map(item => `<li><span data-icon="check"></span>${item}</li>`).join('')}</ul><button class="secondary-button" type="button" disabled>Em breve</button></article>`
-  return `<section class="page-enter">${pageHead('Planos', 'Escolha os recursos certos para sua presença profissional.')}<div class="plans-grid">${plan('Essencial', '19,90', 'Para apresentar seu trabalho com clareza.', ['1 portfólio', 'Personalização básica', 'Link público', 'Edição de perfil'])}${plan('Pro', '29,90', 'Para profissionais que precisam de mais alcance.', ['Até 3 portfólios', 'Domínio personalizado', 'Analytics', 'Integração com GitHub', 'Mais personalizações'])}${plan('Premium', '59,90', 'Para uma operação de portfólios completa.', ['Portfólios ilimitados', 'Domínio personalizado', 'Analytics avançado', 'Suporte prioritário', 'Recursos premium'])}</div></section>`
+  return `<section class="page-enter">${pageHead('Planos', 'Escolha os recursos certos para sua presença profissional.')}<div class="plans-showcase"><div class="devi-plan-grid">${renderPlanCards({ internal: true })}</div></div></section>`
 }
 
 const views = { 'link-qrcode': linkQrView, inicio: homeView, projetos: projectsView, portfolio: portfolioManagerView, 'portfolio-editar': portfolioEditorView, github: githubView, analise: analyticsView, perfil: profileView, planos: plansView, configuracoes: settingsView, indicacao: referralView }
@@ -413,7 +413,7 @@ function showProject(id) {
   if (!project) return
   const projectLink = normalizeExternalUrl(project.link)
   const githubLink = project.github ? normalizeExternalUrl(project.github.includes('/') && !project.github.includes('.') ? `github.com/${project.github}` : project.github) : ''
-  modal(`<div class="project-detail"><div class="project-cover detail-cover">${project.image ? `<img class="project-cover-image" src="${esc(project.image)}" alt="">` : `<span>${esc(project.name.slice(0, 2).toUpperCase())}</span>`}</div><span class="status ${project.status}">${statusLabel[project.status]}</span><h2>${esc(project.name)}</h2>${project.description ? `<p>${esc(project.description)}</p>` : ''}<div class="tag-row">${project.tech.split(',').filter(Boolean).map(item => `<span>${esc(item.trim())}</span>`).join('')}</div><div class="modal-actions"><button class="secondary-button" data-close-modal>Fechar</button>${githubLink ? `<a class="secondary-button" href="${esc(githubLink)}" target="_blank" rel="noopener">GitHub</a>` : ''}${projectLink ? `<a class="primary-button" href="${esc(projectLink)}" target="_blank" rel="noopener">Ver projeto <span data-icon="external"></span></a>` : ''}<button class="primary-button" data-edit-project="${project.id}"><span data-icon="edit"></span>Editar</button></div></div>`)
+  modal(`<div class="project-detail"><div class="project-cover detail-cover">${project.image ? `<img class="project-cover-image" src="${esc(project.image)}" alt="">` : `<span>${esc(project.name.slice(0, 2).toUpperCase())}</span>`}</div><span class="status ${project.status}">${statusLabel[project.status]}</span><h2>${esc(project.name)}</h2>${project.description ? `<p>${esc(project.description)}</p>` : ''}<div class="tag-row">${project.tech.split(',').filter(Boolean).map(item => `<span>${esc(item.trim())}</span>`).join('')}</div><div class="modal-actions"><button class="secondary-button" data-close-modal>Fechar</button>${githubLink ? `<a class="secondary-button" href="${esc(githubLink)}" target="_blank" rel="noopener">GitHub</a>` : ''}${projectLink ? `<a class="primary-button" href="${esc(projectLink)}" target="_blank" rel="noopener">Ver projeto <span data-icon="external"></span></a>` : ''}<button class="icon-button edit-action" data-edit-project="${project.id}" aria-label="Editar projeto" title="Editar projeto"><span data-icon="edit"></span></button></div></div>`)
   $('[data-edit-project]')?.addEventListener('click', () => projectModal(project.id))
 }
 
@@ -676,7 +676,60 @@ function setSidebarCollapsed(collapsed) {
   toggle?.setAttribute('aria-label', collapsed ? 'Expandir menu' : 'Recolher menu')
   toggle?.setAttribute('data-tooltip', collapsed ? 'Expandir menu' : 'Recolher menu')
   try { localStorage.setItem('devifolio_sidebar_collapsed', String(collapsed)) } catch { /* armazenamento indisponível */ }
+  syncSidebarResizeHandle()
 }
+
+const sidebarResizeHandle = $('#sidebar-resize-handle')
+const sidebarWidthKey = 'devifolio_sidebar_width'
+let sidebarResizeStart = null
+function sidebarWidthLimits() { return { min: 200, max: Math.max(200, Math.min(320, Math.floor(window.innerWidth * .32))) } }
+function setExpandedSidebarWidth(width, persist = false) {
+  const { min, max } = sidebarWidthLimits()
+  const next = Math.min(max, Math.max(min, Math.round(width)))
+  document.documentElement.style.setProperty('--sidebar-expanded-width', `${next}px`)
+  sidebarResizeHandle?.setAttribute('aria-valuemax', String(max))
+  sidebarResizeHandle?.setAttribute('aria-valuenow', String(next))
+  if (persist) { try { localStorage.setItem(sidebarWidthKey, String(next)) } catch { /* armazenamento indisponível */ } }
+}
+function syncSidebarResizeHandle() {
+  if (!sidebarResizeHandle) return
+  const { max } = sidebarWidthLimits()
+  sidebarResizeHandle.setAttribute('aria-valuemax', String(max))
+  sidebarResizeHandle.setAttribute('aria-valuenow', String(Math.round($('#sidebar').getBoundingClientRect().width)))
+}
+try {
+  const savedWidth = Number(localStorage.getItem(sidebarWidthKey))
+  if (Number.isFinite(savedWidth) && savedWidth >= 200) setExpandedSidebarWidth(savedWidth)
+} catch { /* armazenamento indisponível */ }
+sidebarResizeHandle?.addEventListener('pointerdown', event => {
+  if (event.button !== 0 || $('.app-shell').classList.contains('sidebar-collapsed') || window.innerWidth <= 820) return
+  event.preventDefault()
+  sidebarResizeStart = { x: event.clientX, width: $('#sidebar').getBoundingClientRect().width }
+  $('.app-shell').classList.add('is-resizing')
+  sidebarResizeHandle.setPointerCapture(event.pointerId)
+})
+sidebarResizeHandle?.addEventListener('pointermove', event => {
+  if (!sidebarResizeStart) return
+  setExpandedSidebarWidth(sidebarResizeStart.width + event.clientX - sidebarResizeStart.x)
+})
+function finishSidebarResize() {
+  if (!sidebarResizeStart) return
+  sidebarResizeStart = null
+  $('.app-shell').classList.remove('is-resizing')
+  setExpandedSidebarWidth($('#sidebar').getBoundingClientRect().width, true)
+}
+sidebarResizeHandle?.addEventListener('pointerup', finishSidebarResize)
+sidebarResizeHandle?.addEventListener('pointercancel', finishSidebarResize)
+sidebarResizeHandle?.addEventListener('keydown', event => {
+  const { min, max } = sidebarWidthLimits()
+  const width = $('#sidebar').getBoundingClientRect().width
+  const next = event.key === 'ArrowLeft' ? width - 10 : event.key === 'ArrowRight' ? width + 10 : event.key === 'Home' ? min : event.key === 'End' ? max : null
+  if (next === null) return
+  event.preventDefault()
+  setExpandedSidebarWidth(next, true)
+})
+window.addEventListener('resize', syncSidebarResizeHandle)
+syncSidebarResizeHandle()
 
 $('#menu-toggle').onclick = () => { if (drawerCloseTimer) { clearTimeout(drawerCloseTimer); drawerCloseTimer = null }; $('#sidebar-overlay').classList.remove('is-closing'); const open = $('#sidebar').classList.toggle('open'); $('#sidebar-overlay').classList.toggle('show', open); $('#menu-toggle').setAttribute('aria-expanded', String(open)) }
 $('#sidebar-overlay').onclick = closeMenu
@@ -720,13 +773,15 @@ async function bootstrap() {
         state.profile.name ||= accountDefaults.name
         state.profile.username ||= accountDefaults.username
         state.profile.email ||= accountDefaults.email
-        await saveProfile(currentUser.id, state.profile, state.published)
+        try { await saveProfile(currentUser.id, state.profile, state.published) } catch (initialProfileError) { console.error('[Devifolio] Perfil inicial não salvo', initialProfileError); toast('Não foi possível salvar o perfil inicial.', 'error') }
       }
     } else {
       Object.assign(state.profile, { ...blankProfile, ...accountDefaults })
-      await saveProfile(currentUser.id, state.profile, false)
+      try { await saveProfile(currentUser.id, state.profile, false) } catch (initialProfileError) { console.error('[Devifolio] Perfil inicial não salvo', initialProfileError); toast('Não foi possível salvar o perfil inicial.', 'error') }
     }
-    if (!workspace.settings) await saveSettings(currentUser.id, state.settings)
+    if (workspace.settingsAvailable && !workspace.settings) {
+      try { await saveSettings(currentUser.id, state.settings) } catch (initialSettingsError) { console.error('[Devifolio] Configurações iniciais não salvas', initialSettingsError) }
+    }
     state.projects = workspace.projects || []
     state.analytics = workspace.analytics || []
     state.referrals = workspace.referrals || []

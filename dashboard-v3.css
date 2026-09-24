@@ -1,0 +1,23 @@
+/* Focused panel adjustments for the updated DeviFolio brief. */
+@media (min-width:821px){
+  body.dashboard-app .app-shell:not(.sidebar-collapsed){--sidebar-width:clamp(200px,var(--sidebar-expanded-width,244px),min(320px,32vw))}
+  body.dashboard-app .sidebar-resize-handle{position:absolute;top:50%;right:0;z-index:45;width:12px;height:70px;transform:translateY(-50%);cursor:col-resize;touch-action:none}
+  body.dashboard-app .sidebar-resize-handle::before{content:"";position:absolute;top:8px;bottom:8px;left:4px;width:4px;border-radius:999px;background:#8b9096;transition:background .18s ease,box-shadow .18s ease}
+  body.dashboard-app .sidebar-resize-handle:hover::before,body.dashboard-app .sidebar-resize-handle:focus-visible::before{background:#c1c5cb;box-shadow:0 0 0 3px rgba(193,197,203,.12)}
+  body.dashboard-app .sidebar-resize-handle:focus-visible{outline:2px solid #a6afb9;outline-offset:2px;border-radius:8px}
+  body.dashboard-app .sidebar-collapsed .sidebar-resize-handle{display:none}
+  body.dashboard-app .app-shell.is-resizing :is(.sidebar,.main-content,.desktop-topbar){transition:none!important}
+  body.dashboard-app .app-shell.is-resizing{user-select:none;cursor:col-resize}
+}
+@media (max-width:820px){body.dashboard-app .sidebar-resize-handle{display:none}}
+body.dashboard-app .profile-summary{grid-template-columns:auto minmax(0,1fr)!important}
+body.dashboard-app .profile-avatar-edit{position:relative;width:max-content}
+body.dashboard-app .profile-avatar-edit .avatar{display:grid}
+body.dashboard-app .avatar-edit-button{position:absolute;right:-7px;bottom:-6px;display:grid;place-items:center;width:32px;height:32px;padding:0!important;border:1px solid #d6dce5!important;border-radius:50%!important;background:#fff!important;color:#171819!important;box-shadow:0 2px 8px rgba(0,0,0,.12)!important}
+body.dashboard-app .avatar-edit-button:hover{background:#eef4ff!important}
+body.dashboard-app .edit-action{display:inline-grid;place-items:center;min-width:38px;min-height:38px;padding:8px!important;color:#1b2736}
+body.dashboard-app .github-page .repo-row{background:#1763d1!important;border:1px solid #2774e4!important;color:#fff!important;transition:background-color .18s ease,border-color .18s ease}
+body.dashboard-app .github-page .repo-row:hover{background:#104fae!important;border-color:#104fae!important;color:#fff!important}
+body.dashboard-app .github-page .repo-row :is(b,small,a,.repo-icon){color:#fff!important}
+body.dashboard-app .github-page .repo-row .repo-icon{background:rgba(255,255,255,.16)!important}
+body.dashboard-app .github-page .repo-row input{accent-color:#fff}
