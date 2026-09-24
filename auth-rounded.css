@@ -1,0 +1,30 @@
+/* Login and registration use the same restrained radius hierarchy. */
+:root{
+  --radius-sm:8px;
+  --radius-md:12px;
+  --radius-lg:18px;
+  --radius-xl:22px;
+}
+body.auth-body{background:#f7f8fa}
+.auth-left{background:#f7f8fa;padding-inline:clamp(24px,4vw,56px)}
+.auth-right{border-radius:var(--radius-xl) 0 0 var(--radius-xl)}
+.auth-brand,.auth-form-wrap,
+body.auth-body[data-auth-view="cadastro"] .auth-brand,
+body.auth-body[data-auth-view="cadastro"] .auth-form-wrap{transform:none}
+.auth-brand{margin-bottom:28px}
+.auth-sub{margin-bottom:28px}
+.auth-field{margin-bottom:17px}
+.auth-field input{height:48px;border-color:#d8dce2;border-radius:var(--radius-md);transition:border-color .16s,box-shadow .16s}
+.auth-field input:hover{border-color:#b9c0c9}
+.auth-field input:focus{border-color:#848e9a;box-shadow:0 0 0 3px rgba(65,76,90,.1)}
+.auth-remember input{accent-color:#171819}
+.auth-body .button{border-radius:var(--radius-md)}
+.button-submit,.button-github,.button-google{min-height:48px}
+.button-submit:active,.button-github:active,.button-google:active{transform:scale(.99)}
+.auth-message{border-radius:var(--radius-sm);border-color:#e6c5c5;background:#fff8f8}
+.auth-message.is-success{border-color:#dbe3dc;background:#f5faf6}
+.auth-body :is(button,a,input):focus-visible{outline:2px solid #7b8490;outline-offset:3px}
+@media(max-width:760px){
+  .auth-left{padding:36px 24px}
+  .auth-brand{margin-bottom:26px}
+}

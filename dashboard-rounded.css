@@ -1,0 +1,141 @@
+/* Visual refinement based on the supplied reference. Existing layout and behavior stay intact. */
+:root{
+  --radius-sm:8px;
+  --radius-md:12px;
+  --radius-lg:18px;
+  --radius-xl:22px;
+  --radius-pill:999px;
+  --radius-card:var(--radius-lg);
+  --radius-control:var(--radius-md);
+  --sidebar-width:244px;
+}
+html,body.dashboard-app,body.dashboard-app .app-shell,body.dashboard-app .main-content{background:#f6f7f9!important}
+body.dashboard-app .sidebar{width:var(--sidebar-width);padding:0 16px 18px;background:#171819!important;border:0!important;border-radius:0 var(--radius-xl) var(--radius-xl) 0;box-shadow:none}
+body.dashboard-app .brand-crop{height:72px;min-height:72px;margin:0 -16px;padding:0 25px;border:0!important;background:transparent!important}
+body.dashboard-app .brand-name{color:#f8f9fa;font-size:19px;letter-spacing:-.045em}
+body.dashboard-app .sidebar-toggle{top:23px;right:17px;border-radius:var(--radius-sm);color:#e8e9eb}
+body.dashboard-app .sidebar-toggle svg,body.dashboard-app .nav-item svg{color:currentColor}
+body.dashboard-app .sidebar-toggle:hover{background:#2c2e30!important}
+body.dashboard-app .side-nav-primary{margin-top:15px}
+body.dashboard-app .side-nav{gap:5px}
+body.dashboard-app .nav-item{min-height:44px;padding:9px 13px;gap:12px;border-radius:var(--radius-md);color:#d1d4d7;font-size:13px;line-height:1.2}
+body.dashboard-app .nav-item:hover,body.dashboard-app .nav-item.active{background:#2e3033!important;color:#fff}
+body.dashboard-app .side-nav-utility{margin:0;padding:13px 0 0;border-color:#383a3c!important}
+body.dashboard-app .side-nav-utility .nav-item{min-height:43px}
+body.dashboard-app .main-content{margin-left:var(--sidebar-width);padding-top:15px}
+body.dashboard-app .desktop-topbar{height:46px;padding:0 32px;color:#838993}
+body.dashboard-app .page-content{padding:0 32px 40px}
+body.dashboard-app :is(.card,.modal,.onboarding-panel,.connected-account,.repo-panel,.pricing-card,.settings-card,.form-card,.preview-card,.portfolio-list-item,.empty-state){border:1px solid #e9ebef!important;border-radius:var(--radius-lg)!important;box-shadow:none!important}
+body.dashboard-app :is(.dashboard-metrics button,.project-image-upload,.public-preview,.event-summary>div,.benefit-orbit,.dashboard-link-empty){border-radius:var(--radius-lg)!important}
+body.dashboard-app :is(.project-cover,.recent-project-image,.project-image-preview,.detail-cover,.preview-project-list span){border-radius:var(--radius-md)!important;overflow:hidden}
+body.dashboard-app .project-card{overflow:hidden}
+body.dashboard-app .project-card .project-cover{border-radius:var(--radius-lg) var(--radius-lg) 0 0!important}
+body.dashboard-app :is(.primary-button,.secondary-button,.danger-button,.icon-button,.search-field,.input-prefix,.url-field,.dashboard-url,.toolbar select,.field input,.field textarea,.field select,.switch){border-radius:var(--radius-md)!important}
+body.dashboard-app :is(.primary-button,.secondary-button,.danger-button){min-height:42px;padding:9px 16px}
+body.dashboard-app :is(.primary-button,.dashboard-action){background:#171819!important;border-color:#171819!important}
+body.dashboard-app :is(.primary-button,.dashboard-action):hover{background:#303236!important;border-color:#303236!important}
+body.dashboard-app :is(.secondary-button,.danger-button):hover{background:#f4f5f7!important;border-color:#cbd0d6!important}
+body.dashboard-app :is(.dashboard-action,.home-qr-download .secondary-button){border-radius:var(--radius-pill)!important}
+body.dashboard-app :is(.badge,.status,.tag-row span,.preview-skills span,.plan-current,.session-current){border-radius:var(--radius-sm)!important}
+body.dashboard-app :is(.connect-icon,.circle-icon,.repo-icon){border-radius:var(--radius-md)}
+body.dashboard-app :is(.user-menu,.user-menu button,.user-menu a,.toast){border-radius:var(--radius-md)}
+body.dashboard-app .creation-panel{border-radius:var(--radius-xl) 0 0 var(--radius-xl)!important}
+body.dashboard-app :is(input,textarea,select):focus,body.dashboard-app :is(.search-field,.input-prefix):focus-within{border-color:#8f969f!important;box-shadow:0 0 0 3px rgba(63,72,84,.09)!important;outline:none}
+body.dashboard-app :is(button,a):focus-visible{outline:2px solid #747c87;outline-offset:3px}
+body.dashboard-app .dashboard-layout{gap:20px}
+body.dashboard-app .dashboard-main-column{gap:20px}
+body.dashboard-app .dashboard-side-column{gap:20px;padding-top:44px}
+body.dashboard-app .welcome-copy p{font-size:14px}
+body.dashboard-app .welcome-copy h1{font-size:30px;line-height:1.12}
+body.dashboard-app .welcome-copy>span{font-size:12px;line-height:1.5}
+body.dashboard-app .dashboard-metrics{gap:12px;margin-top:24px}
+body.dashboard-app .dashboard-metrics button{min-height:112px;padding:16px 17px;background:#fff!important;border:1px solid #e9ebef!important}
+body.dashboard-app .dashboard-metrics button:hover{background:#f7f8fa!important;border-color:#d9dde3!important}
+body.dashboard-app .dashboard-metrics small{font-size:11px}
+body.dashboard-app .dashboard-metrics strong{font-size:20px}
+body.dashboard-app .projects-card{min-height:340px;padding:20px}
+body.dashboard-app .projects-card .section-card-head{margin-bottom:14px;padding:0}
+body.dashboard-app .projects-card h2{font-size:14px}
+body.dashboard-app .recent-project{grid-template-columns:96px minmax(0,1fr) auto 24px;gap:13px;min-height:76px;margin-bottom:9px;padding:9px 12px;background:#f7f8fa!important;border:0!important;border-radius:var(--radius-md)}
+body.dashboard-app .recent-project:first-of-type{border:0!important}
+body.dashboard-app .recent-project:last-child{margin-bottom:0;border:0!important}
+body.dashboard-app .recent-project:hover{background:#f0f2f5!important}
+body.dashboard-app .recent-project-image{aspect-ratio:16/9;border:1px solid #e4e7ec}
+body.dashboard-app .recent-project-status{border-radius:var(--radius-pill);padding:7px 10px;font-size:10px}
+body.dashboard-app .github-summary,body.dashboard-app .link-summary{padding:20px}
+body.dashboard-app .github-summary>p,body.dashboard-app .link-summary>p{font-size:11px;line-height:1.5}
+body.dashboard-app .dashboard-action{min-height:42px;padding:9px 15px;font-size:11px}
+body.dashboard-app .dashboard-url,body.dashboard-app .url-field{min-height:40px;padding:0 12px;background:#f3f5f8!important;border-color:#e8ebf0!important}
+body.dashboard-app .home-qr-card{min-height:400px}
+body.dashboard-app .home-qr-card .dashboard-qr{margin:14px 0 12px}
+body.dashboard-app .home-qr-area .qr-wrap{width:156px;height:156px;padding:11px;border:1px solid #e2e5eb!important;border-radius:var(--radius-lg);background:#fff!important}
+body.dashboard-app .home-qr-area .qr-wrap canvas{display:block;width:132px!important;height:132px!important;aspect-ratio:1;image-rendering:pixelated}
+body.dashboard-app .home-qr-download{gap:8px!important}
+body.dashboard-app .home-qr-download .secondary-button{min-height:38px;font-size:11px}
+body.dashboard-app .share-card .qr-wrap{aspect-ratio:1;height:auto;border-radius:var(--radius-lg);overflow:hidden}
+body.dashboard-app .share-card .qr-wrap canvas{display:block;aspect-ratio:1;object-fit:contain}
+body.dashboard-app .project-grid,body.dashboard-app .plans-grid,body.dashboard-app .analytics-metrics{gap:18px}
+body.dashboard-app .page-head{margin-bottom:22px}
+body.dashboard-app .page-head h1{font-size:27px;letter-spacing:-.035em}
+body.dashboard-app .form-grid{gap:18px}
+body.dashboard-app .field input,body.dashboard-app .field select{min-height:44px}
+body.dashboard-app .settings-tabs .active{display:inline-flex;align-items:center;padding:6px 11px;border-radius:var(--radius-sm);background:#f1f3f6;color:#202326}
+body.dashboard-app .switch{border-radius:var(--radius-pill)!important}
+body.dashboard-app .switch i{border-radius:50%}
+body.dashboard-app .repo-row{padding:13px 10px;border-radius:var(--radius-md)}
+body.dashboard-app .modal{border-radius:var(--radius-xl)!important}
+@media(min-width:1160px){
+  body.dashboard-app .main-content{padding-top:15px}
+  body.dashboard-app .desktop-topbar{padding-left:42px}
+  body.dashboard-app .page-content{padding-left:42px;padding-right:36px}
+}
+@media(min-width:821px){
+  body.dashboard-app .sidebar-collapsed{--sidebar-width:72px}
+  body.dashboard-app .sidebar-collapsed .sidebar{width:72px;padding-inline:9px}
+  body.dashboard-app .sidebar-collapsed .brand-crop{margin-inline:-9px;padding-left:20px}
+  body.dashboard-app .sidebar-collapsed .side-nav-primary{margin-top:42px}
+  body.dashboard-app .sidebar-collapsed .sidebar-toggle{top:69px;right:19px}
+}
+@media(max-width:1150px){
+  :root{--sidebar-width:214px}
+  body.dashboard-app .page-content{padding-inline:22px}
+  body.dashboard-app .desktop-topbar{padding-inline:22px}
+  body.dashboard-app .dashboard-layout{grid-template-columns:minmax(0,1fr) minmax(290px,.74fr)}
+  body.dashboard-app .recent-project{grid-template-columns:78px minmax(0,1fr) auto 20px}
+}
+@media(max-width:900px){
+  body.dashboard-app .dashboard-layout{grid-template-columns:minmax(0,1fr)}
+  body.dashboard-app .dashboard-side-column{padding-top:0}
+}
+@media(max-width:820px){
+  body.dashboard-app .sidebar{width:min(280px,calc(100vw - 36px));padding-inline:16px}
+  body.dashboard-app .main-content{margin-left:0;padding-top:0}
+  body.dashboard-app .mobile-topbar{background:#fff!important;border-bottom:1px solid #e9ebef!important}
+  body.dashboard-app .page-content{padding:24px 18px 32px}
+  body.dashboard-app .dashboard-side-column{grid-template-columns:repeat(2,minmax(0,1fr))}
+  body.dashboard-app .home-qr-card{min-height:0}
+}
+@media(max-width:620px){
+  body.dashboard-app .page-content{padding:20px 14px 28px}
+  body.dashboard-app .dashboard-side-column{grid-template-columns:minmax(0,1fr)}
+  body.dashboard-app .dashboard-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+  body.dashboard-app .dashboard-metrics button{min-height:104px}
+  body.dashboard-app .projects-card{min-height:0;padding:18px}
+  body.dashboard-app .recent-project{grid-template-columns:76px minmax(0,1fr) 24px;gap:10px;padding:9px}
+  body.dashboard-app .recent-project-status{display:none}
+  body.dashboard-app .recent-project-copy strong{font-size:12px}
+  body.dashboard-app .page-head{gap:14px}
+  body.dashboard-app .page-head h1{font-size:25px}
+  body.dashboard-app .share-card{padding:20px}
+  body.dashboard-app .share-card .qr-wrap{width:min(100%,280px)}
+  body.dashboard-app .creation-panel{border-radius:0!important}
+}
+
+body.dashboard-app .mobile-topbar .brand-name{color:#171819}
+
+body.dashboard-app .welcome-card{background:transparent!important;border:0!important;box-shadow:none!important}
+
+body.dashboard-app :is(input,textarea,select){border-radius:var(--radius-md)!important}
+body.dashboard-app :is(.search-field,.input-prefix) input,
+body.dashboard-app :is(.search-field,.input-prefix) input:focus{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+body.dashboard-app input[type=checkbox]{border-radius:var(--radius-sm)!important}
