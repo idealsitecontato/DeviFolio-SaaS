@@ -1,0 +1,12 @@
+/* Display the untouched 1672 × 941 PNG through its transparent margins. */
+.devifolio-logo,.devifolio-mark{--brand-visible-height:34px;display:block;position:relative;flex:none;height:var(--brand-visible-height);overflow:hidden}
+.devifolio-logo{width:calc(var(--brand-visible-height) * 3.89)}
+.devifolio-mark{--brand-visible-height:32px;width:calc(var(--brand-visible-height) * .90)}
+.devifolio-logo img,.devifolio-mark img,body.dashboard-app .brand-mark.devifolio-mark img{position:absolute!important;display:block!important;left:calc(var(--brand-visible-height) * -1.8739)!important;top:calc(var(--brand-visible-height) * -1.6126)!important;width:auto!important;height:calc(var(--brand-visible-height) * 4.2387)!important;max-width:none!important;object-fit:contain!important;filter:none!important;transform:none!important}
+body.dashboard-app .brand-mark.devifolio-mark{width:calc(var(--brand-visible-height) * .90)!important;height:var(--brand-visible-height)!important;overflow:hidden!important}
+body.dashboard-app .brand-mobile .devifolio-mark{--brand-visible-height:30px}
+body.landing-body .site-header .devifolio-logo{--brand-visible-height:32px}
+body.landing-body .footer .devifolio-logo{--brand-visible-height:29px}
+body.auth-body .auth-brand .devifolio-logo{--brand-visible-height:37px}
+.public-brand .devifolio-logo{--brand-visible-height:31px}
+body.dashboard-app .welcome-brand{filter:none!important}

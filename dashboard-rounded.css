@@ -153,3 +153,8 @@ body.dashboard-app .portfolio-select select{border-radius:var(--radius-md)!impor
 body.dashboard-app .portfolio-select select:hover{border-color:#b9c0c9!important;background:#f7f8fa!important}
 body.dashboard-app .portfolio-select select:active,
 body.dashboard-app .portfolio-select select:focus-visible{border-color:#8f969f!important;box-shadow:0 0 0 3px rgba(63,72,84,.09)!important}
+
+body.dashboard-app .home-page .dashboard-promo-banner{width:100%;aspect-ratio:3350/469;overflow:hidden;border:0;border-radius:var(--radius-lg);box-shadow:none;margin:32px 0 0}
+body.dashboard-app .home-page .dashboard-promo-banner img{display:block;width:100%;height:auto}
+
+body.dashboard-app .sidebar .nav-item[data-route='github'] .github-icon img{filter:brightness(0) invert(1)!important}

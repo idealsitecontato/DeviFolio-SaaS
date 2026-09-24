@@ -12,11 +12,16 @@ import {
   uploadProjectImage,
 } from './src/lib/user-data.js'
 import QRCode from 'qrcode'
+import { createBlurTransition } from './blur-transition.js'
 
 const githubIconUrl = new URL('./assets/github-icon.png', import.meta.url).href
+const bannerUrl = new URL('./assets/devi-plus-banner-original.png', import.meta.url).href
 
 const $ = (selector, root = document) => root.querySelector(selector)
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)]
+const blurTransition = createBlurTransition({ page: document.querySelector('#page-content'), shell: document.querySelector('.app-shell') })
+let renderedRoute = null
+let bootstrapping = true
 const esc = value => String(value ?? '').replace(/[&<>'"]/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[character])
 const PROJECT_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp'])
 const PROJECT_IMAGE_MAX_BYTES = 5 * 1024 * 1024
@@ -143,7 +148,7 @@ function homeView() {
   const qrMarkup = linkReady
     ? `<div class="dashboard-url home-public-url"><span data-icon="link"></span><span>${esc(publicPortfolioUrl())}</span></div><div class="dashboard-qr"><div class="home-qr-area"><div class="qr-wrap"><canvas id="portfolio-qr" width="150" height="150" aria-label="QR Code do portfólio público"></canvas></div></div></div><div class="home-qr-download"><button class="secondary-button" data-copy="${esc(publicPortfolioUrl())}"><span data-icon="copy"></span>Copiar link</button><button class="secondary-button" data-download-qr><span data-icon="download"></span>Baixar QR Code</button></div>`
     : '<div class="dashboard-link-empty"><span data-icon="qr"></span><p>Conclua o perfil para gerar seu link público e QR Code.</p><button class="secondary-button" data-route-button="portfolio-editar">Configurar portfólio</button></div>'
-  return `<section class="page-enter home-page"><div class="dashboard-layout"><div class="dashboard-main-column"><article class="card welcome-card"><div class="welcome-copy"><p>Bem-vindo de volta,</p><h1>${esc(realName())}!</h1><span>Seu portfólio, projetos e estatísticas, tudo em um só lugar.</span></div><span class="welcome-brand" aria-hidden="true"><img src="assets/devifolio-logo.png" alt=""></span><div class="dashboard-metrics"><button data-route-button="portfolio"><span data-icon="folder"></span><small>Portfólios</small><strong>${state.published ? '1' : '0'}</strong></button><button data-route-button="analise"><span data-icon="eye"></span><small>Visualizações</small><strong>${summary.views || '0'}</strong></button><button data-route-button="analise"><span data-icon="users"></span><small>Seguidores</small><strong>${summary.visitors || '0'}</strong></button><button data-route-button="link-qrcode"><span data-icon="link"></span><small>Links ativos</small><strong>${state.published ? '1' : '0'}</strong></button></div></article><section class="card projects-card"><div class="section-card-head"><h2>Seus projetos recentes</h2>${state.projects.length ? '<button class="link-button" data-route-button="projetos">Ver todos <span data-icon="arrow"></span></button>' : ''}</div>${projectRows(state.projects.slice(0, 5))}</section></div><aside class="dashboard-side-column"><article class="card github-summary"><div class="summary-title"><span data-icon="github"></span><h2>${state.githubConnected ? 'GitHub conectado' : 'Conectar GitHub'}</h2></div>${githubCopy}</article><article class="card link-summary home-qr-card"><h2>Seu Link, Seu QR Code</h2><p>Compartilhe seu portfólio por link ou QR Code.</p>${qrMarkup}</article></aside></div></section>`
+  return `<section class="page-enter home-page"><div class="dashboard-layout"><div class="dashboard-main-column"><article class="card welcome-card"><div class="welcome-copy"><p>Bem-vindo de volta,</p><h1>${esc(realName())}!</h1><span>Seu portfólio, projetos e estatísticas, tudo em um só lugar.</span></div><span class="welcome-brand" aria-hidden="true"><img src="assets/devifolio-brand-original.png" alt=""></span><div class="dashboard-metrics"><button data-route-button="portfolio"><span data-icon="folder"></span><small>Portfólios</small><strong>${state.published ? '1' : '0'}</strong></button><button data-route-button="analise"><span data-icon="eye"></span><small>Visualizações</small><strong>${summary.views || '0'}</strong></button><button data-route-button="analise"><span data-icon="users"></span><small>Seguidores</small><strong>${summary.visitors || '0'}</strong></button><button data-route-button="link-qrcode"><span data-icon="link"></span><small>Links ativos</small><strong>${state.published ? '1' : '0'}</strong></button></div></article><section class="card projects-card"><div class="section-card-head"><h2>Seus projetos recentes</h2>${state.projects.length ? '<button class="link-button" data-route-button="projetos">Ver todos <span data-icon="arrow"></span></button>' : ''}</div>${projectRows(state.projects.slice(0, 5))}</section></div><aside class="dashboard-side-column"><article class="card github-summary"><div class="summary-title"><span data-icon="github"></span><h2>${state.githubConnected ? 'GitHub conectado' : 'Conectar GitHub'}</h2></div>${githubCopy}</article><article class="card link-summary home-qr-card"><h2>Seu Link, Seu QR Code</h2><p>Compartilhe seu portfólio por link ou QR Code.</p>${qrMarkup}</article></aside></div><figure class="dashboard-promo-banner"><img src="${bannerUrl}" width="3350" height="469" alt="Devi Plus: mais portfólios, projetos e possibilidades" loading="eager"></figure></section>`
 }
 
 function linkQrView() {
@@ -235,8 +240,8 @@ function plansView() {
 const views = { 'link-qrcode': linkQrView, inicio: homeView, projetos: projectsView, portfolio: portfolioManagerView, 'portfolio-editar': portfolioEditorView, github: githubView, analise: analyticsView, perfil: profileView, planos: plansView, configuracoes: settingsView, indicacao: referralView }
 
 function render() {
-  if (routeLoadingTimer) return
   const route = views[location.hash.slice(1)] ? location.hash.slice(1) : 'inicio'
+  renderedRoute = route
   $('#page-content').innerHTML = views[route]()
   const routeLabel = { 'link-qrcode': 'Seu Link, Seu QR Code', inicio: 'Dashboard', projetos: 'Projetos', portfolio: 'Meus portfólios', 'portfolio-editar': 'Editar portfólio', github: 'GitHub', analise: 'Análise', perfil: 'Perfil', planos: 'Planos', configuracoes: 'Configurações', indicacao: 'Indicação' }[route]
   document.title = `${routeLabel} — Devifolio`
@@ -615,7 +620,7 @@ async function copyText(text) {
 }
 
 async function runStatusProcess(title, steps, { cancellable = false } = {}) {
-  modal(`<div class="process-panel"><p class="eyebrow">Devifolio</p><h2>${esc(title)}</h2><p>Preparando sua solicitação.</p><ol>${steps.map((step, index) => `<li data-process-step="${index}"><span class="process-indicator"></span><span>${esc(step)}</span></li>`).join('')}</ol>${cancellable ? '<div class="modal-actions"><button class="secondary-button" data-close-modal>Cancelar</button></div>' : ''}</div>`)
+  modal(`<div class="process-panel"><p class="eyebrow">Devifolio</p><h2>${esc(title)}</h2><p>Preparando sua solicitação.</p><ol>${steps.map((step, index) => `<li data-process-step="${index}"><span class="process-indicator"></span><span>${esc(step)}</span></li>`).join('')}</ol>${cancellable ? '<div class="modal-actions"><button class="secondary-button" data-close-modal>Cancelar</button></div>' : ''}</div>`, { dismissible: cancellable })
   const panel = $('.process-panel')
   const backdrop = panel.closest('.modal-backdrop')
   backdrop.onclick = null
@@ -631,31 +636,39 @@ async function runStatusProcess(title, steps, { cancellable = false } = {}) {
   return true
 }
 
-function modal(content, { creationPanel = false } = {}) {
+function modal(content, { creationPanel = false, dismissible = true } = {}) {
   const root = $('#modal-root')
+  const opener = blurTransition.modalOpener() || document.activeElement
+  blurTransition.closeModal({ immediate: true, restoreFocus: false })
   root.innerHTML = `<div class="modal-backdrop${creationPanel ? ' creation-backdrop' : ''}"><div class="modal${creationPanel ? ' creation-panel' : ''}" role="dialog" aria-modal="true">${content}</div></div>`
   const backdrop = root.querySelector('.modal-backdrop')
-  backdrop.getBoundingClientRect()
-  requestAnimationFrame(() => { if (!backdrop.classList.contains('is-closing')) backdrop.classList.add('is-open') })
-  hydrateIcons($('#modal-root'))
+  hydrateIcons(root)
   $$('[data-close-modal]').forEach(button => button.onclick = closeModal)
-  $('.modal-backdrop').onclick = event => { if (event.target === event.currentTarget) closeModal() }
+  backdrop.onclick = event => { if (event.target === event.currentTarget) closeModal() }
+  blurTransition.openModal(backdrop, { opener, onDismiss: closeModal, dismissible })
 }
 
-function closeModal() {
-  const root = $('#modal-root')
-  const backdrop = root.querySelector('.modal-backdrop')
-  if (!backdrop) return
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { root.innerHTML = ''; return }
-  backdrop.classList.remove('is-open')
-  backdrop.classList.add('is-closing')
-  window.setTimeout(() => { if (root.contains(backdrop)) root.innerHTML = '' }, 180)
+function closeModal(options = {}) {
+  blurTransition.closeModal(options)
 }
+
 function setButtonLoading(button, loading, label = '') { if (!button) return; if (loading) { button.dataset.original = button.innerHTML; button.disabled = true; button.textContent = label } else { button.disabled = false; if (button.dataset.original) button.innerHTML = button.dataset.original; hydrateIcons(button) } }
 function reportError(message, error) { console.error(`[Devifolio] ${message}`, error); toast(error?.message ? `${message} ${error.message}` : message, 'error') }
 function toast(message, type = 'success') { const element = document.createElement('div'); element.className = `toast ${type}`; element.innerHTML = `<span data-icon="${type === 'error' ? 'x' : 'check'}"></span>${esc(message)}`; $('#toast-stack').append(element); hydrateIcons(element); setTimeout(() => element.remove(), 4200) }
 function closeUserMenu() { $('#user-menu')?.setAttribute('hidden', ''); $('#user-menu-toggle')?.setAttribute('aria-expanded', 'false') }
-function closeMenu() { $('#sidebar')?.classList.remove('open'); $('#sidebar-overlay')?.classList.remove('show'); $('#menu-toggle')?.setAttribute('aria-expanded', 'false') }
+let drawerCloseTimer = null
+function closeMenu() {
+  $('#sidebar')?.classList.remove('open')
+  const overlay = $('#sidebar-overlay')
+  if (overlay?.classList.contains('show') && !overlay.classList.contains('is-closing')) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) overlay.classList.remove('show')
+    else {
+      overlay.classList.add('is-closing')
+      drawerCloseTimer = window.setTimeout(() => { overlay.classList.remove('show', 'is-closing'); drawerCloseTimer = null }, 380)
+    }
+  }
+  $('#menu-toggle')?.setAttribute('aria-expanded', 'false')
+}
 function setSidebarCollapsed(collapsed) {
   $('.app-shell')?.classList.toggle('sidebar-collapsed', collapsed)
   const toggle = $('#sidebar-toggle')
@@ -665,55 +678,31 @@ function setSidebarCollapsed(collapsed) {
   try { localStorage.setItem('devifolio_sidebar_collapsed', String(collapsed)) } catch { /* armazenamento indisponível */ }
 }
 
-$('#menu-toggle').onclick = () => { const open = $('#sidebar').classList.toggle('open'); $('#sidebar-overlay').classList.toggle('show', open); $('#menu-toggle').setAttribute('aria-expanded', String(open)) }
+$('#menu-toggle').onclick = () => { if (drawerCloseTimer) { clearTimeout(drawerCloseTimer); drawerCloseTimer = null }; $('#sidebar-overlay').classList.remove('is-closing'); const open = $('#sidebar').classList.toggle('open'); $('#sidebar-overlay').classList.toggle('show', open); $('#menu-toggle').setAttribute('aria-expanded', String(open)) }
 $('#sidebar-overlay').onclick = closeMenu
 $('#sidebar-toggle').onclick = () => setSidebarCollapsed(!$('.app-shell')?.classList.contains('sidebar-collapsed'))
 $('#user-menu-toggle').onclick = event => { event.stopPropagation(); const menu = $('#user-menu'), open = menu.hasAttribute('hidden'); menu.toggleAttribute('hidden', !open); $('#user-menu-toggle').setAttribute('aria-expanded', String(open)) }
 document.addEventListener('click', event => { if (!event.target.closest('#user-menu') && !event.target.closest('#user-menu-toggle')) closeUserMenu() })
-let routeLoadingTimer = null
 function renderWithTransition() {
-  clearTimeout(routeLoadingTimer)
-  closeModal()
+  closeModal({ immediate: true })
   closeMenu()
   closeUserMenu()
-  $('#page-content').setAttribute('aria-busy', 'true')
-  $('#page-content').innerHTML = '<section class="route-loader" role="status"><span class="spinner" aria-hidden="true"></span><p>Carregando...</p></section>'
-  routeLoadingTimer = window.setTimeout(() => {
-    routeLoadingTimer = null
-    $('#page-content').removeAttribute('aria-busy')
-    render()
-  }, 500)
+  if (bootstrapping) { render(); return }
+  const route = views[location.hash.slice(1)] ? location.hash.slice(1) : 'inicio'
+  if (route === renderedRoute) { blurTransition.resetPage(); return }
+  blurTransition.navigate(render)
 }
 window.addEventListener('hashchange', renderWithTransition)
 
-function onboardingView() {
-  return `<section class="onboarding-screen" aria-live="polite"><div class="onboarding-panel"><p class="eyebrow">Devifolio</p><h1>Estamos preparando seu portfólio.</h1><p>Isso leva só alguns instantes.</p><ol>${['Gerando seu link', 'Gerando seu QR Code', 'Organizando o seu perfil', 'Finalizando seu portfólio'].map((label, index) => `<li data-onboarding-step="${index}"><span class="onboarding-status"></span><span>${label}</span></li>`).join('')}</ol></div></section>`
-}
-
-function startupLoadingView() {
-  return '<section class="startup-loader" aria-live="polite"><span class="spinner" aria-hidden="true"></span><p>Entrando no seu painel...</p></section>'
-}
-
 const wait = milliseconds => new Promise(resolve => window.setTimeout(resolve, milliseconds))
-async function runOnboarding() {
-  $('#page-content').innerHTML = onboardingView()
-  for (const step of $$('[data-onboarding-step]')) {
-    step.classList.add('is-active')
-    await wait(7000)
-    step.classList.remove('is-active')
-    step.classList.add('is-complete')
-  }
-  history.replaceState(null, '', `${location.pathname}${location.hash || '#inicio'}`)
-  render()
-  showGithubCallbackResult()
-}
 
 async function bootstrap() {
   hydrateIcons()
-  if (authLoadingRequested) $('#page-content').innerHTML = startupLoadingView()
+  const entrance = blurTransition.enterDashboard(render)
   const { data, error } = await supabase.auth.getSession()
-  if (error || !data.session) { location.replace('cadastro.html#login'); return }
+  if (error || !data.session) { entrance.abort(); location.replace('cadastro.html#login'); return }
   currentUser = data.session.user
+  render()
   try {
     const workspace = await loadWorkspace(currentUser.id)
     if (!workspace.available) throw new Error('A estrutura mais recente do banco ainda não foi aplicada.')
@@ -749,17 +738,21 @@ async function bootstrap() {
     $('#page-content').innerHTML = `<section class="page-enter"><article class="card fatal-state">${emptyState('x', 'Não foi possível carregar seus dados.', 'A estrutura do banco precisa ser atualizada antes de usar o painel.')}</article></section>`
     hydrateIcons($('#page-content'))
     toast(loadError.message, 'error')
+    bootstrapping = false
+    entrance.ready()
     return
   }
   document.documentElement.dataset.theme = 'light'
   hydrateIcons()
   setSidebarCollapsed(localStorage.getItem('devifolio_sidebar_collapsed') === 'true')
-  if (authLoadingRequested) history.replaceState(null, '', `${location.pathname}${onboardingRequested ? '?onboarding=1' : ''}${location.hash || '#inicio'}`)
-  if (onboardingRequested) return runOnboarding()
-  render(); showGithubCallbackResult()
+  if (authLoadingRequested || onboardingRequested) history.replaceState(null, '', `${location.pathname}${location.hash || '#inicio'}`)
+  render()
+  bootstrapping = false
+  entrance.ready()
+  showGithubCallbackResult()
 }
 
-supabase.auth.onAuthStateChange((event, session) => { if (event === 'SIGNED_OUT' || (!session && event !== 'INITIAL_SESSION')) location.replace('cadastro.html#login') })
+supabase.auth.onAuthStateChange((event, session) => { if (event === 'SIGNED_OUT' || (!session && event !== 'INITIAL_SESSION')) { blurTransition.resetPage(); blurTransition.resetEntry(); closeModal({ immediate: true }); location.replace('cadastro.html#login') } })
 $$('[data-logout]').forEach(link => link.addEventListener('click', async event => { event.preventDefault(); await supabase.auth.signOut(); location.replace('cadastro.html#login') }))
 
 bootstrap()

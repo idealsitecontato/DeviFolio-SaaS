@@ -21,7 +21,6 @@
 .auth-right-heading{margin:0;max-width:420px;font-family:"DM Sans",ui-sans-serif,system-ui,sans-serif;font-size:clamp(28px,2.25vw,42px);font-weight:300;line-height:1.14;letter-spacing:-.035em}
 
 .auth-brand{width:max-content;display:flex;align-items:center;justify-content:center;gap:10px;margin:0 auto 42px;color:#101216;font-size:30px;font-weight:700;letter-spacing:-.045em}
-.auth-brand-mark{width:38px;height:38px;flex:none;background-image:url("./assets/devifolio-logo.png");background-repeat:no-repeat;background-size:304px 144px;background-position:-49px -56px}
 .auth-form-wrap{width:min(100%,500px);margin:0 auto}
 .auth-tabs{display:none}
 .auth-panel{display:none}

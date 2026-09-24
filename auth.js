@@ -1,9 +1,12 @@
+import { createBlurTransition } from './blur-transition.js'
+
 const panels = {
   login: document.getElementById('panel-login'),
   cadastro: document.getElementById('panel-cadastro'),
 }
 
 let redirecting = false
+const blurTransition = createBlurTransition({ shell: document.querySelector('.auth-shell') })
 let supabasePromise
 const referralUsername = new URLSearchParams(window.location.search).get('ref')?.trim().toLowerCase() || ''
 
@@ -86,25 +89,12 @@ function setLoading(button, active, label) {
   button.textContent = active ? label : button.dataset.originalLabel
 }
 
-function setAuthOverlay(active, label = '') {
-  let overlay = document.getElementById('auth-loading-overlay')
-  if (!overlay) {
-    overlay = document.createElement('div')
-    overlay.id = 'auth-loading-overlay'
-    overlay.className = 'auth-loading-overlay'
-    overlay.innerHTML = '<span class="auth-spinner" aria-hidden="true"></span><p></p>'
-    document.body.append(overlay)
-  }
-  overlay.querySelector('p').textContent = label
-  overlay.toggleAttribute('hidden', !active)
-}
-
 function goToDashboard(onboarding = false) {
   if (redirecting) return
   redirecting = true
   const params = new URLSearchParams({ auth_loading: '1' })
   if (onboarding) params.set('onboarding', '1')
-  window.location.replace(`dashboard.html?${params.toString()}#inicio`)
+  blurTransition.exitAuth(() => window.location.replace(`dashboard.html?${params.toString()}#inicio`))
 }
 
 document.querySelectorAll('[data-switch]').forEach(control => {
@@ -136,7 +126,6 @@ document.getElementById('form-login').addEventListener('submit', async event => 
   if (!event.currentTarget.reportValidity()) return
 
   setLoading(button, true, 'Entrando...')
-  setAuthOverlay(true, 'Entrando...')
   try {
     const supabase = await getSupabase()
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -150,7 +139,6 @@ document.getElementById('form-login').addEventListener('submit', async event => 
     reportAuthError('Erro inesperado no login', error)
   } finally {
     setLoading(button, false)
-    setAuthOverlay(false)
   }
 })
 
@@ -171,7 +159,6 @@ document.getElementById('form-cadastro').addEventListener('submit', async event 
   }
 
   setLoading(button, true, 'Criando conta...')
-  setAuthOverlay(true, 'Criando sua conta...')
   try {
     const supabase = await getSupabase()
     const { data, error } = await supabase.auth.signUp({
@@ -196,7 +183,6 @@ document.getElementById('form-cadastro').addEventListener('submit', async event 
     reportAuthError('Erro inesperado no cadastro', error)
   } finally {
     setLoading(button, false)
-    setAuthOverlay(false)
   }
 })
 
