@@ -10,7 +10,7 @@
   --sidebar-width:244px;
 }
 html,body.dashboard-app,body.dashboard-app .app-shell,body.dashboard-app .main-content{background:#f6f7f9!important}
-body.dashboard-app .sidebar{width:var(--sidebar-width);padding:0 16px 18px;background:#171819!important;border:0!important;border-radius:0 var(--radius-xl) var(--radius-xl) 0;box-shadow:none}
+body.dashboard-app .sidebar{width:var(--sidebar-width);padding:0 16px 18px;background:#171819!important;border:0!important;border-radius:0;box-shadow:none}
 body.dashboard-app .brand-crop{height:72px;min-height:72px;margin:0 -16px;padding:0 25px;border:0!important;background:transparent!important}
 body.dashboard-app .brand-name{color:#f8f9fa;font-size:19px;letter-spacing:-.045em}
 body.dashboard-app .sidebar-toggle{top:23px;right:17px;border-radius:var(--radius-sm);color:#e8e9eb}
@@ -139,3 +139,17 @@ body.dashboard-app :is(input,textarea,select){border-radius:var(--radius-md)!imp
 body.dashboard-app :is(.search-field,.input-prefix) input,
 body.dashboard-app :is(.search-field,.input-prefix) input:focus{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important}
 body.dashboard-app input[type=checkbox]{border-radius:var(--radius-sm)!important}
+/* Align the two second-row Home cards using the existing column wrappers. */
+@media(min-width:901px){
+  body.dashboard-app .home-page .dashboard-layout{grid-template-rows:auto auto;align-items:stretch}
+  body.dashboard-app .home-page .dashboard-main-column,
+  body.dashboard-app .home-page .dashboard-side-column{grid-row:span 2;grid-template-rows:subgrid;align-content:stretch;gap:20px}
+  body.dashboard-app .home-page .dashboard-side-column{padding-top:0}
+  body.dashboard-app .home-page .github-summary{align-self:end}
+  body.dashboard-app .home-page :is(.projects-card,.home-qr-card){min-height:400px;align-self:stretch}
+}
+body.dashboard-app #profile-form.compact-panel{margin-inline:auto}
+body.dashboard-app .portfolio-select select{border-radius:var(--radius-md)!important;transition:border-color .16s ease,background-color .16s ease,box-shadow .16s ease}
+body.dashboard-app .portfolio-select select:hover{border-color:#b9c0c9!important;background:#f7f8fa!important}
+body.dashboard-app .portfolio-select select:active,
+body.dashboard-app .portfolio-select select:focus-visible{border-color:#8f969f!important;box-shadow:0 0 0 3px rgba(63,72,84,.09)!important}

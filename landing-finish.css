@@ -85,3 +85,90 @@ body.landing-body .footer-col a,body.landing-body .footer-col span{color:#666!im
 body.landing-body .footer-bottom{margin-top:65px;padding-top:17px;border-top:1px solid #d7d8d6;color:#777;font-size:11px}
 @media(max-width:900px){body.landing-body .lf-intro-grid{grid-template-columns:1fr;gap:24px}body.landing-body .lf-problem-grid,body.landing-body .lf-github-grid,body.landing-body .lf-faq-grid{grid-template-columns:1fr;gap:48px}body.landing-body .lf-final-grid{grid-template-columns:1fr;gap:40px}}
 @media(max-width:640px){body.landing-body .lf-wrap{width:calc(100% - 36px)}body.landing-body :is(.lf-intro,.lf-problem,.lf-flow,.lf-product,.lf-github,.lf-outcomes,.lf-faq,.lf-final){padding-top:76px;padding-bottom:82px}body.landing-body :is(.lf-intro,.lf-problem,.lf-flow,.lf-product,.lf-github,.lf-outcomes,.lf-faq,.lf-final) h2{font-size:clamp(36px,10vw,50px)}body.landing-body .lf-intro h2{font-size:clamp(42px,11vw,58px)}body.landing-body .lf-intro-grid>div>p{font-size:16px}body.landing-body .lf-steps,body.landing-body .lf-outcome-list{grid-template-columns:1fr;gap:0;margin-top:44px}body.landing-body .lf-steps article{padding:18px 0 29px}body.landing-body .lf-steps h3{margin-top:24px}body.landing-body .lf-outcome-list article,body.landing-body .lf-outcome-list article+article{min-height:0;padding:22px 0 30px;border-right:0;border-bottom:1px solid #d1d3d1}body.landing-body .lf-outcome-list h3{margin-top:20px}body.landing-body .lf-product-head{display:block}body.landing-body .lf-product-head>p{margin-top:20px}body.landing-body .lf-product-frame{padding:6px}body.landing-body .lf-product-caption{flex-direction:column;gap:5px}body.landing-body .lf-github-entry{padding:24px}body.landing-body .lf-github-entry h3{margin-top:28px;font-size:28px}body.landing-body .lf-faq-grid{gap:30px}body.landing-body .footer-bottom{display:block}body.landing-body .footer-bottom span{display:block;margin-top:8px}}
+/* Final requested visual corrections; existing markup and scroll handler are preserved. */
+body.landing-body .site-header,
+body.landing-body .site-header.is-scrolled{
+  background:transparent!important;
+  padding:10px 0 8px!important;
+  transition:padding .18s ease!important;
+}
+body.landing-body .site-header.is-scrolled{padding:5px 0 6px!important}
+body.landing-body .site-header .nav-shell,
+body.landing-body .site-header:not(.is-scrolled) .nav-shell{
+  width:min(1080px,calc(100% - 48px))!important;
+  min-height:72px!important;
+  padding:0 20px!important;
+  background:rgba(255,255,255,.98)!important;
+  border:1px solid #e6e8eb!important;
+  border-radius:18px!important;
+  box-shadow:0 3px 12px rgba(20,24,28,.04)!important;
+  transition:min-height .18s ease,padding .18s ease,box-shadow .18s ease!important;
+}
+body.landing-body .site-header.is-scrolled .nav-shell{
+  min-height:60px!important;
+  padding:0 16px!important;
+  background:rgba(255,255,255,.98)!important;
+  border:1px solid #e6e8eb!important;
+  border-radius:18px!important;
+  box-shadow:0 4px 16px rgba(20,24,28,.07)!important;
+}
+body.landing-body .nav-actions .login-link,
+body.landing-body .nav-actions .button-nav,
+html body.landing-body main#top .hero-devifolio .button-dark,
+html body.landing-body main#top .button,
+html body.landing-body main#top .lf-final-grid>div:last-child a{
+  border-radius:12px!important;
+}
+html body.landing-body main#top .lf-product-frame{border-radius:20px!important;overflow:hidden}
+html body.landing-body main#top .lf-product-frame img{border-radius:14px!important}
+html body.landing-body main#top .hero-devifolio .hero-visual img{
+  border-radius:26px!important;
+}
+html body.landing-body main#top .lf-github-entry{border-radius:18px!important}
+html body.landing-body main#top .lf-github-form{border-radius:12px!important;overflow:hidden}
+html body.landing-body main#top .lf-steps article{
+  padding:20px;
+  border:1px solid #e5e6e6;
+  border-radius:16px!important;
+  background:#fafafa;
+}
+html body.landing-body main#top .lf-problem-list>div,
+html body.landing-body main#top .lf-outcome-list article,
+html body.landing-body main#top .lf-faq .faq-question{
+  border-radius:12px!important;
+}
+body.landing-body .lf-problem-list>div:hover,
+body.landing-body .lf-outcome-list article:hover,
+body.landing-body .lf-faq .faq-question:hover{
+  background:rgba(125,130,135,.045);
+}
+@media(max-width:820px){
+  body.landing-body .site-header .nav-shell,
+  body.landing-body .site-header:not(.is-scrolled) .nav-shell{
+    width:calc(100% - 36px)!important;
+    min-height:62px!important;
+    padding:0 15px!important;
+  }
+  body.landing-body .site-header.is-scrolled .nav-shell{
+    width:calc(100% - 36px)!important;
+    min-height:54px!important;
+    padding:0 12px!important;
+  }
+  body.landing-body .site-header .menu-toggle{border-radius:11px!important}
+  body.landing-body .site-header .mobile-menu{
+    border:1px solid #e6e8eb!important;
+    border-radius:16px!important;
+    background:#fff!important;
+    box-shadow:0 5px 18px rgba(20,24,28,.06)!important;
+  }
+  body.landing-body .site-header .mobile-menu a{border-radius:10px!important}
+}
+@media(max-width:640px){
+  html body.landing-body main#top .lf-steps article{padding:18px;margin-bottom:12px}
+}
+@media(prefers-reduced-motion:reduce){
+  body.landing-body .site-header,
+  body.landing-body .site-header.is-scrolled,
+  body.landing-body .site-header .nav-shell,
+  body.landing-body .site-header.is-scrolled .nav-shell{transition:none!important}
+}

@@ -7,7 +7,7 @@
 }
 body.auth-body{background:#f7f8fa}
 .auth-left{background:#f7f8fa;padding-inline:clamp(24px,4vw,56px)}
-.auth-right{border-radius:var(--radius-xl) 0 0 var(--radius-xl)}
+.auth-right{border-radius:0}
 .auth-brand,.auth-form-wrap,
 body.auth-body[data-auth-view="cadastro"] .auth-brand,
 body.auth-body[data-auth-view="cadastro"] .auth-form-wrap{transform:none}
