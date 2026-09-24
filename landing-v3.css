@@ -4,22 +4,13 @@ body.landing-body .site-header,body.landing-body .site-header.is-scrolled{positi
 body.landing-body .site-header :is(.nav-shell,.mobile-menu){pointer-events:auto}
 body.landing-body .hero-devifolio.section-yellow{background:#fff!important;touch-action:pan-y}
 body.landing-body .hero-devifolio .hero-visual img{user-select:none;-webkit-user-drag:none}
-body.landing-body .hero-copy .hero-eyebrow{animation:hero-enter .55s .08s both!important}
-body.landing-body .hero-copy h1{animation:hero-enter .65s .17s both!important}
-body.landing-body .hero-copy .hero-text{animation:hero-enter .68s .27s both!important}
-body.landing-body .hero-copy .hero-actions{animation:hero-enter .7s .38s both!important}
-body.landing-body .hero-devifolio .hero-visual img{animation:hero-visual-arrive .85s .32s both,hero-float 8s 1.2s ease-in-out infinite!important}
-@keyframes hero-enter{from{opacity:0;translate:0 15px}to{opacity:1;translate:0 0}}
-@keyframes hero-visual-arrive{from{opacity:0}to{opacity:1}}
-@keyframes hero-float{0%,100%{translate:0 0}50%{translate:0 -9px}}
 body.landing-body .lf-intro{background:#080808!important;color:#fff!important}
 body.landing-body .lf-intro-points{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:25px;margin-top:86px;border-top:1px solid #444}
 body.landing-body .lf-intro-points article{padding-top:20px}
 body.landing-body .lf-intro-points article>span{font-size:11px;color:#aeb1b6}
 body.landing-body .lf-intro-points h3{margin:24px 0 9px;font-size:21px}
 body.landing-body .lf-intro-points p{max-width:330px;margin:0;color:#b9bcc2;font-size:14px;line-height:1.6}
-body.landing-body .lf-flow{position:relative;isolation:isolate;overflow:hidden;background:#071019 url("./assets/como-funciona-background.png") center/cover no-repeat!important;color:#f6f8fc!important}
-body.landing-body .lf-flow::before{content:"";position:absolute;z-index:0;bottom:-320px;left:50%;width:640px;height:640px;transform:translateX(-50%);background:url("./assets/github-icon.png") center/contain no-repeat;filter:brightness(0);opacity:.5;pointer-events:none}
+body.landing-body .lf-flow{position:relative;isolation:isolate;overflow:hidden;background:#202020 url("./assets/como-funciona-grid-original.png") center/cover no-repeat!important;color:#f6f8fc!important}
 body.landing-body .lf-flow>.lf-wrap{position:relative;z-index:1}
 body.landing-body .lf-flow-start{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.8fr);gap:9%;align-items:center;margin-top:92px;padding-top:70px;border-top:1px solid rgba(255,255,255,.38)}
 body.landing-body .lf-flow-start>div:first-child .lf-kicker{margin-bottom:20px;color:#777}
@@ -78,13 +69,12 @@ body.landing-body .lf-final-scrim{position:absolute;z-index:-1;inset:0;backgroun
 body.landing-body .lf-final .lf-wrap{position:relative;z-index:1}
 body.landing-body .lf-final .lf-kicker,body.landing-body .lf-final-grid>div:last-child p{color:#e0e4e9}
 @media(max-width:900px){body.landing-body .lf-flow-start,body.landing-body .lf-product-story{grid-template-columns:1fr;gap:35px}body.landing-body .lf-product-story-lead{gap:45px}}
-@media(max-width:720px){body.landing-body main#top{padding-top:76px}body.landing-body .lf-intro-points{grid-template-columns:1fr;margin-top:54px;gap:15px}body.landing-body .lf-intro-points article{padding-bottom:14px;border-bottom:1px solid #3d4044}body.landing-body .lf-flow-start{margin-top:58px;padding-top:50px}body.landing-body .lf-flow::before{left:50%;right:auto;bottom:-240px;top:auto;width:480px;height:480px}body.landing-body .lf-product-story{padding:22px}body.landing-body .lf-product-story-lead strong{font-size:38px}body.landing-body .lf-plans,body.landing-body .lf-reviews{padding-block:80px}body.landing-body .lf-final{min-height:520px}body.landing-body .lf-review-viewport::before,body.landing-body .lf-review-viewport::after{width:36px}}
 @media(prefers-reduced-motion:reduce){body.landing-body .hero-copy :is(.hero-eyebrow,h1,.hero-text,.hero-actions),body.landing-body .hero-devifolio .hero-visual img,body.landing-body .lf-review-track{animation:none!important;translate:none!important;transform:none!important}body.landing-body .lf-faq .faq-answer,body.landing-body .lf-faq .faq-question i{transition:none!important}body.landing-body .lf-final-video{display:none}}
 
 html body.landing-body main#top .lf-product-story{border-radius:22px!important}
 html body.landing-body main#top .lf-review-card{border-radius:18px!important}
 
-/* Keep the attached dark gradient limited to Como funciona. */
+/* Keep the supplied grid background limited to Como funciona. */
 body.landing-body .lf-intro-grid>div{grid-column:1/-1}
 body.landing-body .lf-flow .lf-section-head h2,body.landing-body .lf-flow .lf-flow-start>div:first-child h3{color:#f7f9fd!important}
 body.landing-body .lf-flow .lf-steps article{border-color:rgba(255,255,255,.44)!important}
@@ -95,17 +85,15 @@ body.landing-body .lf-flow .lf-text-link{color:#fff!important;border-color:#fff!
 body.landing-body .lf-flow .lf-github-entry h3{margin-top:0;color:#151515!important}
 body.landing-body .lf-product-story-lead{justify-content:center}
 body.landing-body .lf-plans{scroll-margin-top:100px}
-/* Restrained scroll and hover motion; the underlying colors and layout stay intact. */
-body.landing-body .lf-scroll-in{opacity:0!important;transform:translateY(13px)!important;transition:opacity .6s cubic-bezier(.22,1,.36,1),transform .6s cubic-bezier(.22,1,.36,1)!important}
-body.landing-body .lf-scroll-in.is-visible{opacity:1!important;transform:none!important}
-body.landing-body .lf-steps article,body.landing-body .lf-plans .devi-plan-card,body.landing-body .lf-review-card{transition:transform .28s cubic-bezier(.22,1,.36,1),border-color .28s ease!important}
-body.landing-body .lf-steps article:hover,body.landing-body .lf-plans .devi-plan-card:hover{transform:translateY(-3px)!important}
+/* Reviews keep only their requested interaction. */
+body.landing-body .lf-review-card{transition:border-color .28s ease!important}
 body.landing-body .lf-review-card:hover{border-color:#cbd3dc!important}
 body.landing-body .lf-final-video,body.landing-body .lf-final:hover .lf-final-video{opacity:1!important;animation:none!important;transition:none!important}
-@media(prefers-reduced-motion:reduce){body.landing-body .lf-scroll-in,body.landing-body .lf-scroll-in.is-visible{opacity:1!important;transform:none!important;transition:none!important}body.landing-body .lf-steps article:hover,body.landing-body .lf-plans .devi-plan-card:hover{transform:none!important}}
 
 /* The existing white step cards keep their dark typography over the new dark section. */
 html body.landing-body main#top .lf-flow .lf-steps article h3{color:#1c2229!important}
 html body.landing-body main#top .lf-flow .lf-steps article p{color:#586572!important}
 html body.landing-body main#top .lf-flow .lf-steps article>span{color:#6f7d8b!important}
 html body.landing-body main#top .lf-review-person img{border-radius:50%!important}
+@media(max-width:720px){body.landing-body main#top{padding-top:76px}body.landing-body .lf-intro-points{grid-template-columns:1fr;margin-top:54px;gap:15px}body.landing-body .lf-intro-points article{padding-bottom:14px;border-bottom:1px solid #3d4044}body.landing-body .lf-flow-start{margin-top:58px;padding-top:50px}body.landing-body .lf-product-story{padding:22px}body.landing-body .lf-product-story-lead strong{font-size:38px}body.landing-body .lf-plans,body.landing-body .lf-reviews{padding-block:80px}body.landing-body .lf-final{min-height:520px}body.landing-body .lf-review-viewport::before,body.landing-body .lf-review-viewport::after{width:36px}}
+@media(prefers-reduced-motion:reduce){body.landing-body .lf-review-track{animation:none!important}body.landing-body .lf-final-video{display:none}}

@@ -1,0 +1,19 @@
+body.is-screen-loading{overflow:hidden}
+.screen-loading[hidden]{display:none!important}
+.screen-loading{
+  position:fixed;inset:0;z-index:1000;width:100vw;height:100vh;height:100dvh;
+  display:grid;place-content:center;justify-items:center;gap:15px;
+  overflow:hidden;background:#000!important;color:#fff!important;
+  pointer-events:auto;text-align:center;
+}
+body.dashboard-app .screen-loading p,body.auth-body .screen-loading p{margin:0;color:#fff!important;font:600 15px/1.35 "DM Sans",Arial,sans-serif}
+.screen-loading .spinner{
+  display:block;width:24px;height:24px;border:2px solid #737373;
+  border-top-color:#fff;border-radius:50%;
+  animation:internal-spin 800ms linear infinite!important;
+}
+@keyframes internal-spin{to{transform:rotate(1turn)}}
+body.dashboard-app .modal-backdrop{background:rgba(0,0,0,.5)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+body.dashboard-app .modal-backdrop::before{display:none!important}
+body.dashboard-app .modal-backdrop .modal,body.dashboard-app .modal-backdrop .creation-panel{transform:none!important;opacity:1!important;transition:none!important}
+body.dashboard-app .sidebar-overlay.show{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}

@@ -13,7 +13,8 @@
   <link rel="stylesheet" href="auth-reference.css">
   <link rel="stylesheet" href="auth-rounded.css">
   <link rel="stylesheet" href="brand-logo.css">
-  <link rel="stylesheet" href="blur-transition.css">
+  <link rel="stylesheet" href="visual-adjustments.css">
+  <link rel="stylesheet" href="screen-loading.css">
 </head>
 <body class="auth-body">
 
@@ -85,7 +86,7 @@
               <label for="cad-confirmar-senha">Confirmar senha</label>
               <input type="password" id="cad-confirmar-senha" placeholder="Digite a senha novamente" autocomplete="new-password" minlength="8" required>
             </div>
-            <button class="button button-submit" type="submit">Criar conta</button>
+            <button class="button button-submit" type="submit">Cadastrar</button>
           </form>
 
           <div class="auth-divider">ou continue com</div>
@@ -102,6 +103,7 @@
       </div>
     </section>
   </main>
+  <div class="screen-loading" id="auth-loading" role="status" aria-live="polite" aria-hidden="true" hidden><span class="spinner" aria-hidden="true"></span><p>Carregando...</p></div>
   <script type="module" src="auth.js"></script>
 
 </body>

@@ -1,0 +1,71 @@
+/* Motion remains only where the requested interaction needs it. */
+body.landing-body *,body.landing-body *::before,body.landing-body *::after,
+body.dashboard-app *,body.dashboard-app *::before,body.dashboard-app *::after,
+body.auth-body *,body.auth-body *::before,body.auth-body *::after{
+  animation:none!important;transition:none!important;
+}
+html{scroll-behavior:auto!important}
+body.landing-body .site-header .nav-shell,
+body.landing-body .site-header.is-scrolled .nav-shell{
+  transition:min-height 200ms ease,padding 200ms ease!important;
+}
+body.landing-body .site-header :is(a,button),
+body.landing-body .mobile-menu{
+  transition:background-color 160ms ease,color 160ms ease,opacity 160ms ease!important;
+}
+body.landing-body .lf-review-track{animation:reviews-left 22s linear infinite!important}
+body.landing-body .lf-review-card{transition:border-color 180ms ease!important}
+body.landing-body .lf-faq .faq-answer{transition:grid-template-rows 280ms ease!important}
+body.landing-body .lf-faq .faq-question i{transition:transform 280ms ease!important}
+body.landing-body .lf-steps article:hover,
+body.landing-body .lf-plans .devi-plan-card:hover,
+body.landing-body .feature-row:hover,
+body.landing-body .hero-visual:hover{transform:none!important}
+body.landing-body .lf-final-video{animation:none!important}
+body.landing-body .lf-steps article,body.landing-body .lf-plans .devi-plan-card{transition:none!important}
+body.dashboard-app .sidebar{transition:width 320ms ease,transform 320ms ease!important}
+body.dashboard-app .main-content{transition:margin-left 320ms ease!important}
+body.dashboard-app .desktop-topbar{transition:left 320ms ease!important}
+body.dashboard-app .sidebar :is(.nav-item,.sidebar-toggle),
+body.dashboard-app .sidebar .sidebar-resize-handle::before{
+  transition:background-color 160ms ease,color 160ms ease,transform 200ms ease!important;
+}
+body.dashboard-app .sidebar-collapsed [data-tooltip]::after{
+  transition:opacity 100ms ease,transform 100ms ease!important;
+}
+body.dashboard-app .app-shell.is-resizing :is(.sidebar,.main-content,.desktop-topbar){transition:none!important}
+body.dashboard-app :is(button,a,input,textarea,select):focus-visible,
+body.auth-body :is(button,a,input):focus-visible{outline-offset:3px}
+@media(prefers-reduced-motion:reduce){
+  body.landing-body .lf-review-track{animation:none!important}
+  body.landing-body .lf-faq .faq-answer,
+  body.landing-body .lf-faq .faq-question i,
+  body.landing-body .site-header .nav-shell,
+  body.dashboard-app :is(.sidebar,.main-content,.desktop-topbar){transition:none!important}
+}
+/* A smaller radius scale keeps the current layout, colors and type intact. */
+body.dashboard-app{
+  --radius-sm:6px;--radius-md:8px;--radius-lg:12px;
+  --radius-xl:14px;--radius-pill:10px;
+  --radius-card:12px;--radius-control:8px;
+}
+body.dashboard-app :is(.card,.modal,.onboarding-panel,.connected-account,.repo-panel,.pricing-card,.settings-card,.form-card,.preview-card,.portfolio-list-item,.empty-state,.user-mini,.user-menu,.project-card),
+body.dashboard-app :is(.dashboard-metrics button,.project-image-upload,.public-preview,.dashboard-link-empty,.qr-wrap){
+  border-radius:12px!important;
+}
+body.dashboard-app :is(.primary-button,.secondary-button,.danger-button,.icon-button,.dashboard-action,.search-field,.input-prefix,.url-field,.dashboard-url,.toolbar select,.field input,.field textarea,.field select,.switch,.home-qr-download .secondary-button),
+body.dashboard-app :is(.badge,.status,.tag-row span,.preview-skills span,.plan-current,.session-current,.recent-project){
+  border-radius:8px!important;
+}
+body.dashboard-app .home-page .dashboard-promo-banner{border-radius:14px!important}
+body.dashboard-app .creation-panel{border-radius:12px 0 0 12px!important}
+body.dashboard-app .project-card .project-cover{border-radius:12px 12px 0 0!important}
+body.landing-body :is(.button,.button-nav,.lf-github-form,.lf-github-entry a,.devi-plan-card>a,.devi-plan-card>button),
+body.auth-body :is(.button,.auth-field input,.auth-message){border-radius:8px!important}
+body.landing-body :is(.lf-github-entry,.lf-product-story,.lf-review-card,.lf-product-frame,.devi-plan-card,.hero-visual img,.mobile-menu){
+  border-radius:12px!important;
+}
+html body.landing-body main#top .lf-plans .devi-plan-card,
+html body.landing-body main#top .lf-product-story,
+html body.landing-body main#top .lf-review-card{border-radius:12px!important}
+body.landing-body .lf-review-person img{border-radius:50%!important}

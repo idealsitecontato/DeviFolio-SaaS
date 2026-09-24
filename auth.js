@@ -1,4 +1,4 @@
-import { createBlurTransition } from './blur-transition.js'
+import { createScreenLoading } from './screen-loading.js'
 
 const panels = {
   login: document.getElementById('panel-login'),
@@ -6,7 +6,7 @@ const panels = {
 }
 
 let redirecting = false
-const blurTransition = createBlurTransition({ shell: document.querySelector('.auth-shell') })
+const screenLoading = createScreenLoading({ shell: document.querySelector('.auth-shell'), loading: document.getElementById('auth-loading') })
 let supabasePromise
 const referralUsername = new URLSearchParams(window.location.search).get('ref')?.trim().toLowerCase() || ''
 
@@ -92,9 +92,8 @@ function setLoading(button, active, label) {
 function goToDashboard(onboarding = false) {
   if (redirecting) return
   redirecting = true
-  const params = new URLSearchParams({ auth_loading: '1' })
-  if (onboarding) params.set('onboarding', '1')
-  blurTransition.exitAuth(() => window.location.replace(`dashboard.html?${params.toString()}#inicio`))
+  const destination = 'dashboard.html' + (onboarding ? '?onboarding=1' : '') + '#inicio'
+  screenLoading.exitAuth(() => window.location.replace(destination), { duration: onboarding ? 3000 : 1000 })
 }
 
 document.querySelectorAll('[data-switch]').forEach(control => {
@@ -191,6 +190,7 @@ document.querySelectorAll('#github-login, #github-cadastro').forEach(button => {
     event.preventDefault()
     clearMessage()
     button.setAttribute('aria-disabled', 'true')
+    sessionStorage.setItem('devifolio_auth_intent', currentAuthView())
     const query = referralUsername ? `?ref=${encodeURIComponent(referralUsername)}` : ''
     window.location.assign(`/api/auth/github/start${query}`)
   })
@@ -222,6 +222,7 @@ async function completeGithubLogin() {
   if (!status) return false
   history.replaceState(null, '', `${window.location.pathname}${window.location.hash || '#login'}`)
   if (status !== 'complete') {
+    sessionStorage.removeItem('devifolio_auth_intent')
     const messages = {
       access_denied: 'O login com GitHub foi cancelado.',
       invalid_state: 'A autorização do GitHub expirou. Tente novamente.',
@@ -243,25 +244,18 @@ async function completeGithubLogin() {
       const { registerReferral } = await import('./src/lib/user-data.js')
       await registerReferral(referralUsername)
     }
-    goToDashboard()
+    const fromSignup = sessionStorage.getItem('devifolio_auth_intent') === 'cadastro'
+    sessionStorage.removeItem('devifolio_auth_intent')
+    goToDashboard(fromSignup)
   } catch (error) {
+    sessionStorage.removeItem('devifolio_auth_intent')
     reportAuthError('Falha ao concluir o login com GitHub', error)
   }
   return true
 }
 
 try {
-  const completingGithub = await completeGithubLogin()
-  if (!completingGithub) {
-    const supabase = await getSupabase()
-    const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
-    if (sessionError) reportAuthError('Falha ao recuperar a sessão', sessionError)
-    if (sessionData.session) goToDashboard()
-
-    supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session) goToDashboard()
-    })
-  }
+  await completeGithubLogin()
 } catch (error) {
   reportAuthError('Falha ao inicializar a autenticação', error)
 }

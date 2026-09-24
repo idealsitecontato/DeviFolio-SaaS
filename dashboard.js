@@ -12,15 +12,14 @@ import {
   uploadProjectImage,
 } from './src/lib/user-data.js'
 import QRCode from 'qrcode'
-import { createBlurTransition } from './blur-transition.js'
-import { renderPlanCards } from './plans.js'
+import { createScreenLoading } from './screen-loading.js'
 
 const githubIconUrl = new URL('./assets/github-icon.png', import.meta.url).href
 const bannerUrl = new URL('./assets/devi-plus-banner-original.png', import.meta.url).href
 
 const $ = (selector, root = document) => root.querySelector(selector)
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)]
-const blurTransition = createBlurTransition({ page: document.querySelector('#page-content'), shell: document.querySelector('.app-shell'), pageLoading: document.querySelector('#app-loading'), entryLoading: document.querySelector('#app-loading') })
+const screenLoading = createScreenLoading({ shell: document.querySelector('.app-shell'), loading: document.querySelector('#app-loading') })
 let renderedRoute = null
 let bootstrapping = true
 const esc = value => String(value ?? '').replace(/[&<>'"]/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[character])
@@ -92,7 +91,6 @@ let reposLoaded = false
 let reposPromise = null
 let homeQrGenerated = true
 const onboardingRequested = new URLSearchParams(location.search).get('onboarding') === '1'
-const authLoadingRequested = new URLSearchParams(location.search).get('auth_loading') === '1'
 
 const realName = () => state.profile.name.trim() || currentUser?.user_metadata?.full_name || currentUser?.user_metadata?.name || currentUser?.email?.split('@')[0] || 'Você'
 const initials = () => realName().split(/\s+/).filter(Boolean).map(part => part[0]).slice(0, 2).join('').toUpperCase()
@@ -235,17 +233,14 @@ function referralView() {
   return `<section class="page-enter">${pageHead('Indicação', 'Convide outros devs e acompanhe indicações reais.')}<div class="referral-hero card"><div><span class="badge">PROGRAMA DE INDICAÇÃO</span><h2>Compartilhe o Devifolio.</h2><p>Seu convite usa um link exclusivo vinculado à sua conta.</p><div class="url-field referral-link"><span>${esc(link)}</span><button class="icon-button" data-copy="${esc(link)}"><span data-icon="copy"></span></button></div><button class="primary-button" data-share-referral data-share-url="${esc(link)}"><span data-icon="users"></span>Compartilhar convite</button></div><div class="benefit-orbit"><span data-icon="users"></span><strong>${active}</strong><small>amigos ativos</small></div></div><div class="referral-stats"><article class="card"><small>Indicações registradas</small><strong>${state.referrals.length}</strong></article><article class="card"><small>Amigos ativos</small><strong>${active}</strong></article><article class="card"><small>Pendentes</small><strong>${state.referrals.length - active}</strong></article></div><article class="card history-card"><div class="section-card-head"><div><h2>Histórico de indicações</h2><p>Acompanhe o status dos seus convites.</p></div></div>${state.referrals.length ? state.referrals.map(item => `<div class="history-row"><span class="avatar avatar-small">${esc(item.referred_email.slice(0, 1).toUpperCase())}</span><div><b>${esc(item.referred_email)}</b><small>${new Date(item.created_at).toLocaleDateString('pt-BR')}</small></div><span class="status ${item.status === 'active' ? 'published' : 'progress'}">${item.status === 'active' ? 'Ativa' : 'Pendente'}</span></div>`).join('') : `<div class="projects-empty">${emptyState('users', 'Nenhuma indicação registrada.', 'Compartilhe seu link para começar.')}</div>`}</article></section>`
 }
 
-function plansView() {
-  return `<section class="page-enter">${pageHead('Planos', 'Escolha os recursos certos para sua presença profissional.')}<div class="plans-showcase"><div class="devi-plan-grid">${renderPlanCards({ internal: true })}</div></div></section>`
-}
 
-const views = { 'link-qrcode': linkQrView, inicio: homeView, projetos: projectsView, portfolio: portfolioManagerView, 'portfolio-editar': portfolioEditorView, github: githubView, analise: analyticsView, perfil: profileView, planos: plansView, configuracoes: settingsView, indicacao: referralView }
+const views = { 'link-qrcode': linkQrView, inicio: homeView, projetos: projectsView, portfolio: portfolioManagerView, 'portfolio-editar': portfolioEditorView, github: githubView, analise: analyticsView, perfil: profileView, configuracoes: settingsView, indicacao: referralView }
 
 function render({ preserveScroll = false } = {}) {
   const route = views[location.hash.slice(1)] ? location.hash.slice(1) : 'inicio'
   renderedRoute = route
   $('#page-content').innerHTML = views[route]()
-  const routeLabel = { 'link-qrcode': 'Seu Link, Seu QR Code', inicio: 'Dashboard', projetos: 'Projetos', portfolio: 'Meus portfólios', 'portfolio-editar': 'Editar portfólio', github: 'GitHub', analise: 'Análise', perfil: 'Perfil', planos: 'Planos', configuracoes: 'Configurações', indicacao: 'Indicação' }[route]
+  const routeLabel = { 'link-qrcode': 'Seu Link, Seu QR Code', inicio: 'Dashboard', projetos: 'Projetos', portfolio: 'Meus portfólios', 'portfolio-editar': 'Editar portfólio', github: 'GitHub', analise: 'Análise', perfil: 'Perfil', configuracoes: 'Configurações', indicacao: 'Indicação' }[route]
   document.title = `${routeLabel} — Devifolio`
   if ($('#breadcrumb-page')) $('#breadcrumb-page').textContent = routeLabel
   if ($('#breadcrumb-section')) $('#breadcrumb-section').textContent = route === 'inicio' ? 'Início' : 'Painel'
@@ -270,7 +265,7 @@ function updateUserChrome() {
 
 function bindActions() {
   $$('[data-route-button]').forEach(button => button.onclick = () => { location.hash = button.dataset.routeButton })
-  $('[data-promo-plans]')?.addEventListener('click', event => { event.preventDefault(); blurTransition.leaveDashboard(() => location.assign('index.html#planos')) })
+  $('[data-promo-plans]')?.addEventListener('click', event => { event.preventDefault(); screenLoading.leaveDashboard(() => location.assign('index.html#planos')) })
   $$('[data-copy]').forEach(button => button.onclick = () => copyText(button.dataset.copy))
   $$('[data-open-preview]').forEach(button => button.onclick = () => window.open(publicPortfolioUrl(), '_blank', 'noopener'))
   $$('[data-edit-portfolio]').forEach(button => button.onclick = () => { location.hash = 'portfolio-editar' })
@@ -349,14 +344,19 @@ async function togglePublished(event) {
   const button = event.currentTarget
   const publishing = !state.published
   setButtonLoading(button, true, publishing ? 'Fazendo deploy...' : 'Despublicando...')
+  screenLoading.show()
   try {
-    const proceed = await runStatusProcess(publishing ? 'Publicando portfólio' : 'Despublicando portfólio', publishing ? ['Preparando projeto...', 'Validando informações...', 'Gerando build...', 'Preparando publicação...', 'Publicando portfólio...'] : ['Preparando despublicação...', 'Removendo versão pública...', 'Atualizando status...', 'Finalizando...'])
-    if (!proceed) return
     await saveProfile(currentUser.id, state.profile, publishing)
     state.published = publishing
-    toast(publishing ? 'Deploy realizado com sucesso.' : 'Portfólio despublicado.')
     render()
-  } catch (error) { reportError('Não foi possível alterar a publicação.', error) } finally { setButtonLoading(button, false) }
+    screenLoading.hide()
+    toast(publishing ? 'Deploy realizado com sucesso.' : 'Portfólio despublicado.')
+  } catch (error) {
+    screenLoading.hide()
+    reportError('Não foi possível alterar a publicação.', error)
+  } finally {
+    setButtonLoading(button, false)
+  }
 }
 
 async function saveProfileForm(event) {
@@ -480,30 +480,26 @@ function confirmDelete(id) {
 }
 
 function githubStatus(text, { cancellable = false } = {}) {
-  modal(`<div class="github-connection-status"><span class="spinner" aria-hidden="true"></span><p id="github-connection-text" role="status" aria-live="polite">${esc(text)}</p>${cancellable ? '<div class="modal-actions"><button class="secondary-button" type="button" data-close-modal>Cancelar</button></div>' : ''}</div>`, { dismissible: cancellable })
+  modal(`<div class="github-connection-status"><span data-icon="github" aria-hidden="true"></span><p id="github-connection-text" role="status" aria-live="polite">${esc(text)}</p>${cancellable ? '<div class="modal-actions"><button class="secondary-button" type="button" data-close-modal>Cancelar</button></div>' : ''}</div>`, { dismissible: cancellable })
 }
 
 function updateGithubStatus(text, complete = false) {
   const label = $('#github-connection-text')
   if (label) label.textContent = text
-  $('.github-connection-status .spinner')?.classList.toggle('is-complete', complete)
 }
 
 async function connectGithub(event) {
   const button = event.currentTarget
-  const started = performance.now()
   setButtonLoading(button, true, 'Conectando...')
   githubStatus('Preparando conexão...', { cancellable: true })
   try {
     const data = await authenticatedApi('/api/github/connect', { method: 'POST' })
-    await wait(Math.max(0, 800 - (performance.now() - started)))
     const panel = $('.github-connection-status')
     if (!panel || panel.closest('.modal-backdrop')?.classList.contains('is-closing')) { setButtonLoading(button, false); return }
     location.assign(data.authorizationUrl)
   } catch (error) {
     updateGithubStatus('Não foi possível conectar.', true)
     reportError('Não foi possível conectar o GitHub.', error)
-    await wait(1100)
     closeModal()
     setButtonLoading(button, false)
   }
@@ -544,33 +540,17 @@ async function showGithubCallbackResult() {
   const params = new URLSearchParams(location.search)
   const status = params.get('github')
   if (!status) return
-  history.replaceState(null, '', `${location.pathname}${location.hash || '#github'}`)
+  history.replaceState(null, '', location.pathname + (location.hash || '#github'))
   if (status === 'connected' && state.githubConnected) {
-    const started = performance.now()
     githubStatus('Procurando projetos...')
     let repositoriesReady = reposLoaded
     if (reposPromise) repositoriesReady = await reposPromise
     else if (!reposLoaded) { reposPromise = fetchGithubRepos(); repositoriesReady = await reposPromise }
-    await wait(Math.max(0, 2000 - (performance.now() - started)))
-    if (!repositoriesReady) {
-      updateGithubStatus('Não foi possível conectar.', true)
-      await wait(1200)
-      closeModal()
-      return
-    }
-    updateGithubStatus('GitHub conectado', true)
-    await wait(1900)
     closeModal()
-    toast('Conta do GitHub conectada com sucesso.')
+    if (repositoriesReady) toast('Conta do GitHub conectada com sucesso.')
+    else toast('GitHub conectado, mas os repositórios não foram carregados. Tente sincronizar.', 'error')
     return
   }
-  githubStatus('Preparando conexão...')
-  await wait(450)
-  updateGithubStatus('Procurando projetos...')
-  await wait(450)
-  updateGithubStatus('Não foi possível conectar.', true)
-  await wait(1200)
-  closeModal()
   if (status === 'access_denied') toast('A autorização do GitHub foi cancelada.', 'error')
   else if (status === 'invalid_state') toast('A autorização expirou. Tente conectar novamente.', 'error')
   else toast('O GitHub não concluiu a autorização. Tente novamente.', 'error')
@@ -669,37 +649,21 @@ async function copyText(text) {
   try { await navigator.clipboard.writeText(text); toast('Link copiado.') } catch (error) { reportError('Não foi possível copiar o link.', error) }
 }
 
-async function runStatusProcess(title, steps, { cancellable = false } = {}) {
-  modal(`<div class="process-panel"><p class="eyebrow">Devifolio</p><h2>${esc(title)}</h2><p>Preparando sua solicitação.</p><ol>${steps.map((step, index) => `<li data-process-step="${index}"><span class="process-indicator"></span><span>${esc(step)}</span></li>`).join('')}</ol>${cancellable ? '<div class="modal-actions"><button class="secondary-button" data-close-modal>Cancelar</button></div>' : ''}</div>`, { dismissible: cancellable })
-  const panel = $('.process-panel')
-  const backdrop = panel.closest('.modal-backdrop')
-  backdrop.onclick = null
-  for (const step of $$('[data-process-step]', panel)) {
-    if (!panel.isConnected || backdrop.classList.contains('is-closing')) return false
-    step.classList.add('is-active')
-    await wait(6000 / steps.length)
-    if (!panel.isConnected || backdrop.classList.contains('is-closing')) return false
-    step.classList.remove('is-active')
-    step.classList.add('is-complete')
-  }
-  closeModal()
-  return true
-}
 
 function modal(content, { creationPanel = false, dismissible = true } = {}) {
   const root = $('#modal-root')
-  const opener = blurTransition.modalOpener() || document.activeElement
-  blurTransition.closeModal({ immediate: true, restoreFocus: false })
+  const opener = screenLoading.modalOpener() || document.activeElement
+  screenLoading.closeModal({ immediate: true, restoreFocus: false })
   root.innerHTML = `<div class="modal-backdrop${creationPanel ? ' creation-backdrop' : ''}"><div class="modal${creationPanel ? ' creation-panel' : ''}" role="dialog" aria-modal="true">${content}</div></div>`
   const backdrop = root.querySelector('.modal-backdrop')
   hydrateIcons(root)
   $$('[data-close-modal]').forEach(button => button.onclick = closeModal)
   backdrop.onclick = event => { if (dismissible && event.target === event.currentTarget) closeModal() }
-  blurTransition.openModal(backdrop, { opener, onDismiss: closeModal, dismissible })
+  screenLoading.openModal(backdrop, { opener, onDismiss: closeModal, dismissible })
 }
 
 function closeModal(options = {}) {
-  blurTransition.closeModal(options)
+  screenLoading.closeModal(options)
 }
 
 function setButtonLoading(button, loading, label = '') { if (!button) return; if (loading) { button.dataset.original = button.innerHTML; button.disabled = true; button.textContent = label } else { button.disabled = false; if (button.dataset.original) button.innerHTML = button.dataset.original; hydrateIcons(button) } }
@@ -792,16 +756,15 @@ function renderWithTransition() {
   closeUserMenu()
   if (bootstrapping) { render(); return }
   const route = views[location.hash.slice(1)] ? location.hash.slice(1) : 'inicio'
-  if (route === renderedRoute) { blurTransition.resetPage(); return }
-  blurTransition.navigate(render)
+  if (route === renderedRoute) { screenLoading.resetPage(); return }
+  screenLoading.navigate(render)
 }
 window.addEventListener('hashchange', renderWithTransition)
 
-const wait = milliseconds => new Promise(resolve => window.setTimeout(resolve, milliseconds))
 
 async function bootstrap() {
   hydrateIcons()
-  const entrance = blurTransition.enterDashboard(render, { enabled: authLoadingRequested || onboardingRequested })
+  const entrance = screenLoading.enterDashboard(render)
   const { data, error } = await supabase.auth.getSession()
   if (error || !data.session) { entrance.abort(); location.replace('cadastro.html#login'); return }
   currentUser = data.session.user
@@ -850,14 +813,14 @@ async function bootstrap() {
   document.documentElement.dataset.theme = 'light'
   hydrateIcons()
   setSidebarCollapsed(localStorage.getItem('devifolio_sidebar_collapsed') === 'true')
-  if (authLoadingRequested || onboardingRequested) history.replaceState(null, '', `${location.pathname}${location.hash || '#inicio'}`)
+  if (onboardingRequested) history.replaceState(null, '', `${location.pathname}${location.hash || '#inicio'}`)
   render()
   bootstrapping = false
   entrance.ready()
   void showGithubCallbackResult()
 }
 
-supabase.auth.onAuthStateChange((event, session) => { if (event === 'SIGNED_OUT' || (!session && event !== 'INITIAL_SESSION')) { blurTransition.resetPage(); blurTransition.resetEntry(); closeModal({ immediate: true }); location.replace('cadastro.html#login') } })
+supabase.auth.onAuthStateChange((event, session) => { if (event === 'SIGNED_OUT' || (!session && event !== 'INITIAL_SESSION')) { screenLoading.show(); closeModal({ immediate: true }); location.replace('cadastro.html#login') } })
 $$('[data-logout]').forEach(link => link.addEventListener('click', async event => { event.preventDefault(); await supabase.auth.signOut(); location.replace('cadastro.html#login') }))
 
 bootstrap()
