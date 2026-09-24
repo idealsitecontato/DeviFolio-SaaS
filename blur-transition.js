@@ -1,13 +1,12 @@
-const OUT_MS = 220
-const IN_MS = 380
-const ENTRY_MIN_MS = 250
-const ENTRY_MAX_MS = 1200
-const SAFETY_EXTRA_MS = 1500
+const OUT_MS = 180
+const IN_MS = 320
+const ROUTE_TOTAL_MS = OUT_MS + IN_MS
+const ENTRY_MIN_MS = 2000
 const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])'
 
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-export function createBlurTransition({ page = null, shell = null } = {}) {
+export function createBlurTransition({ page = null, shell = null, pageLoading = null, entryLoading = null } = {}) {
   let pageSequence = 0
   let pageTimers = []
   let entrySequence = 0
@@ -25,38 +24,63 @@ export function createBlurTransition({ page = null, shell = null } = {}) {
     timers.length = 0
   }
 
+  function showLoading(element, label) {
+    if (!element) return
+    const text = element.querySelector('[data-loading-label]')
+    if (text) text.textContent = label
+    element.classList.toggle('is-entry', label === 'Carregando seu perfil...')
+    element.hidden = false
+    element.setAttribute('aria-hidden', 'false')
+    void element.offsetWidth
+    element.classList.add('is-visible')
+  }
+
+  function hideLoading(element) {
+    if (!element) return
+    element.classList.remove('is-visible')
+    element.setAttribute('aria-hidden', 'true')
+    window.setTimeout(() => { if (!element.classList.contains('is-visible')) element.hidden = true }, IN_MS)
+  }
+
   function resetPage() {
     pageSequence += 1
     clearTimers(pageTimers)
     phase(page, 'idle')
     if (page) page.inert = false
     page?.removeAttribute('aria-busy')
+    hideLoading(pageLoading)
   }
 
   function navigate(render) {
     resetPage()
-    if (!page || reducedMotion()) { render(); return }
+    if (!page) { render(); return }
     const sequence = pageSequence
     page.setAttribute('aria-busy', 'true')
     page.inert = true
+    showLoading(pageLoading, 'Carregando')
     phase(page, 'blurring-out')
     pageTimers.push(window.setTimeout(() => {
       if (sequence !== pageSequence) return
       phase(page, 'swapping')
       render()
-      // Paint the new tree at peak blur before easing back to a clear page.
       void page.offsetWidth
       window.requestAnimationFrame(() => {
-        if (sequence !== pageSequence) return
-        phase(page, 'blurring-in')
-        pageTimers.push(window.setTimeout(() => {
-          if (sequence === pageSequence) resetPage()
-        }, IN_MS))
+        if (sequence === pageSequence) phase(page, 'blurring-in')
       })
     }, OUT_MS))
     pageTimers.push(window.setTimeout(() => {
       if (sequence === pageSequence) resetPage()
-    }, OUT_MS + IN_MS + SAFETY_EXTRA_MS))
+    }, ROUTE_TOTAL_MS))
+  }
+
+  function leaveDashboard(navigateAway) {
+    resetPage()
+    if (!page) { navigateAway(); return }
+    page.inert = true
+    page.setAttribute('aria-busy', 'true')
+    showLoading(pageLoading, 'Carregando')
+    phase(page, 'blurring-out')
+    pageTimers.push(window.setTimeout(navigateAway, ROUTE_TOTAL_MS))
   }
 
   function resetEntry() {
@@ -64,11 +88,12 @@ export function createBlurTransition({ page = null, shell = null } = {}) {
     clearTimers(entryTimers)
     phase(shell, 'idle')
     if (shell) shell.inert = false
+    hideLoading(entryLoading)
   }
 
-  function enterDashboard(render) {
+  function enterDashboard(render, { enabled = true } = {}) {
     resetEntry()
-    if (!shell || reducedMotion()) {
+    if (!shell || !enabled) {
       render()
       return { ready() {}, abort: resetEntry }
     }
@@ -78,19 +103,16 @@ export function createBlurTransition({ page = null, shell = null } = {}) {
     shell.inert = true
     phase(shell, 'swapping')
     render()
+    showLoading(entryLoading, 'Carregando seu perfil...')
     function release() {
       if (released || sequence !== entrySequence) return
       released = true
       phase(shell, 'blurring-in')
-      shell.inert = false
+      hideLoading(entryLoading)
       entryTimers.push(window.setTimeout(() => {
         if (sequence === entrySequence) resetEntry()
       }, IN_MS))
     }
-    entryTimers.push(window.setTimeout(release, ENTRY_MAX_MS))
-    entryTimers.push(window.setTimeout(() => {
-      if (sequence === entrySequence && !released) release()
-    }, ENTRY_MAX_MS + SAFETY_EXTRA_MS))
     return {
       ready() {
         const remaining = Math.max(0, ENTRY_MIN_MS - (performance.now() - started))
@@ -144,9 +166,9 @@ export function createBlurTransition({ page = null, shell = null } = {}) {
     }
     document.addEventListener('keydown', record.keydown, true)
     void backdrop.offsetWidth
+    backdrop.classList.add('is-open')
     window.requestAnimationFrame(() => {
       if (modalRecord !== record) return
-      backdrop.classList.add('is-open')
       dialog.setAttribute('tabindex', '-1')
       ;(dialog.querySelector(FOCUSABLE) || dialog).focus()
     })
@@ -178,5 +200,5 @@ export function createBlurTransition({ page = null, shell = null } = {}) {
     else record.timer = window.setTimeout(finish, IN_MS)
   }
 
-  return { navigate, resetPage, enterDashboard, exitAuth, modalOpener, openModal, closeModal, resetEntry }
+  return { navigate, leaveDashboard, resetPage, enterDashboard, exitAuth, modalOpener, openModal, closeModal, resetEntry }
 }

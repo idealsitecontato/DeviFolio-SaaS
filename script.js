@@ -136,3 +136,23 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
     target.scrollIntoView({behavior:'auto', block:'start'});
   });
 });
+
+const plansAnchor = document.getElementById('planos')
+if (location.hash === '#planos' && plansAnchor) {
+  const showPlans = () => window.scrollTo({ top: plansAnchor.getBoundingClientRect().top + window.scrollY - 100, behavior: 'instant' })
+  requestAnimationFrame(() => requestAnimationFrame(showPlans))
+  window.addEventListener('load', showPlans, { once: true })
+}
+
+const landingMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+if (!landingMotion.matches && 'IntersectionObserver' in window) {
+  const elements = document.querySelectorAll('.lf-intro-grid h2,.lf-section-head h2,.lf-steps article,.lf-product-head h2,.lf-product-story,.lf-plans .devi-plan-card,.lf-reviews h2,.lf-faq h2,.lf-final h2')
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return
+      entry.target.classList.add('is-visible')
+      observer.unobserve(entry.target)
+    })
+  }, { threshold: .08, rootMargin: '0px 0px -25px 0px' })
+  elements.forEach(element => { element.classList.add('lf-scroll-in'); observer.observe(element) })
+}
