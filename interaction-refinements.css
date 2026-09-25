@@ -1,0 +1,39 @@
+/* Scroll and mouse drag share one reversible progress value. */
+html body.landing-body .hero-devifolio .hero-copy{
+  transform:translate3d(0,var(--hero-copy-shift,0px),0)!important;
+}
+html body.landing-body .hero-devifolio .hero-visual img{
+  transform:translate3d(var(--hero-visual-shift-x,0px),var(--hero-visual-shift-y,0px),0) scale(var(--hero-visual-scale,1))!important;
+  transform-origin:center bottom!important;
+}
+body.landing-body .hero-devifolio .hero-visual{cursor:grab}
+body.landing-body .hero-devifolio:has(.hero-visual:active) .hero-visual{cursor:grabbing}
+@media(max-width:560px){
+  html body.landing-body .hero-devifolio .hero-visual{
+    width:calc(100vw - 32px)!important;
+    max-width:100%!important;
+    margin-top:38px!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  html body.landing-body .hero-devifolio .hero-copy,
+  html body.landing-body .hero-devifolio .hero-visual img{transform:none!important}
+}
+/* The compact publication feedback is anchored to its action, never a modal. */
+body.dashboard-app .deploy-status-panel{
+  position:fixed;z-index:120;box-sizing:border-box;
+  max-width:min(260px,calc(100vw - 24px));
+  padding:13px 16px;border:1px solid #393939;border-radius:9px;
+  background:#111;color:#fff!important;box-shadow:0 12px 26px rgba(0,0,0,.2);
+  font:600 13px/1.35 "DM Sans",Arial,sans-serif;
+  pointer-events:none;overflow-wrap:anywhere;opacity:0!important;
+  transform:translate3d(12px,-6px,0)!important;
+  transition:transform 180ms cubic-bezier(.22,1,.36,1),opacity 180ms ease!important;
+}
+body.dashboard-app .deploy-status-panel.is-visible{
+  opacity:1!important;transform:translate3d(0,0,0)!important;
+}
+body.dashboard-app .deploy-status-panel.is-error{border-color:#bb5b5b}
+@media(prefers-reduced-motion:reduce){
+  body.dashboard-app .deploy-status-panel{opacity:1!important;transform:none!important;transition:none!important}
+}

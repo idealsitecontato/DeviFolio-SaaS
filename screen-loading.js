@@ -1,4 +1,4 @@
-const ROUTE_MS = 500
+const ROUTE_MS = 250
 const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])'
 
 export function createScreenLoading({ shell = null, loading = null } = {}) {
@@ -11,8 +11,10 @@ export function createScreenLoading({ shell = null, loading = null } = {}) {
     timer = null
   }
 
-  function show() {
+  function show(label = 'Carregando...') {
     if (!loading) return
+    const text = loading.querySelector('p')
+    if (text) text.textContent = label
     loading.hidden = false
     loading.setAttribute('aria-hidden', 'false')
     document.body.classList.add('is-screen-loading')

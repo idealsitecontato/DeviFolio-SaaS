@@ -10,7 +10,7 @@ body.landing-body .lf-intro-points article{padding-top:20px}
 body.landing-body .lf-intro-points article>span{font-size:11px;color:#aeb1b6}
 body.landing-body .lf-intro-points h3{margin:24px 0 9px;font-size:21px}
 body.landing-body .lf-intro-points p{max-width:330px;margin:0;color:#b9bcc2;font-size:14px;line-height:1.6}
-body.landing-body .lf-flow{position:relative;isolation:isolate;overflow:hidden;background:#202020 url("./assets/como-funciona-grid-original.png") center/cover no-repeat!important;color:#f6f8fc!important}
+body.landing-body .lf-flow{position:relative;isolation:isolate;overflow:hidden;background:radial-gradient(ellipse 66% 85% at 14% 25%,rgba(20,95,188,.84) 0%,rgba(10,67,143,.58) 55%,transparent 100%),radial-gradient(ellipse 58% 72% at 82% 18%,rgba(2,8,20,.88) 0%,rgba(3,15,37,.5) 64%,transparent 100%),radial-gradient(ellipse 72% 66% at 72% 85%,rgba(1,5,15,.84) 0%,transparent 70%),linear-gradient(128deg,#0b55aa 0%,#083a84 42%,#071b40 74%,#02060f 100%)!important;color:#f6f8fc!important}
 body.landing-body .lf-flow>.lf-wrap{position:relative;z-index:1}
 body.landing-body .lf-flow-start{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.8fr);gap:9%;align-items:center;margin-top:92px;padding-top:70px;border-top:1px solid rgba(255,255,255,.38)}
 body.landing-body .lf-flow-start>div:first-child .lf-kicker{margin-bottom:20px;color:#777}

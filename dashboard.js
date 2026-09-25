@@ -248,7 +248,7 @@ function render({ preserveScroll = false } = {}) {
   hydrateIcons($('#page-content'))
   bindActions()
   if (route === 'link-qrcode' || route === 'inicio') renderPortfolioQR()
-  if (route === 'github' && state.githubConnected && !reposLoaded && !reposLoading) reposPromise = fetchGithubRepos()
+  if (route === 'github' && state.githubConnected && !reposLoaded && !reposLoading) reposPromise = fetchGithubRepos({ reportFailure: !new URLSearchParams(location.search).has('github') })
   updateUserChrome()
   closeMenu()
   closeUserMenu()
@@ -339,22 +339,75 @@ async function savePortfolioForm(event) {
   } catch (error) { reportError('Não foi possível salvar o portfólio.', error) } finally { setButtonLoading(button, false) }
 }
 
+const waitForVisual = (started, targetMs) => new Promise(resolve => {
+  window.setTimeout(resolve, Math.max(0, targetMs - (performance.now() - started)))
+})
+
+function createDeployPanel(button, text) {
+  const panel = document.createElement('div')
+  panel.className = 'deploy-status-panel'
+  panel.setAttribute('role', 'status')
+  panel.setAttribute('aria-live', 'polite')
+  panel.textContent = text
+  document.body.append(panel)
+
+  function position() {
+    const anchor = button.getBoundingClientRect()
+    const width = panel.offsetWidth
+    const height = panel.offsetHeight
+    const left = Math.min(Math.max(12, anchor.left), Math.max(12, innerWidth - width - 12))
+    const below = anchor.bottom + 9
+    const top = below + height <= innerHeight - 12 ? below : Math.max(12, anchor.top - height - 9)
+    panel.style.left = left + 'px'
+    panel.style.top = top + 'px'
+  }
+
+  window.addEventListener('scroll', position, { passive: true })
+  window.addEventListener('resize', position, { passive: true })
+  position()
+  window.requestAnimationFrame(() => panel.classList.add('is-visible'))
+  return {
+    set(text, error = false) {
+      panel.textContent = text
+      panel.classList.toggle('is-error', error)
+      position()
+    },
+    close() {
+      window.removeEventListener('scroll', position)
+      window.removeEventListener('resize', position)
+      panel.remove()
+    },
+  }
+}
+
 async function togglePublished(event) {
   if (!state.published && !profileComplete()) return toast('Adicione seu nome e username antes de publicar.', 'error')
   const button = event.currentTarget
   const publishing = !state.published
+  const started = performance.now()
+  const panel = createDeployPanel(button, publishing ? 'Executando deploy...' : 'Executando undeploy...')
   setButtonLoading(button, true, publishing ? 'Fazendo deploy...' : 'Despublicando...')
-  screenLoading.show()
+  const nextStage = publishing
+    ? window.setTimeout(() => panel.set('Preparando portfólio...'), 1000)
+    : null
   try {
     await saveProfile(currentUser.id, state.profile, publishing)
+    await waitForVisual(started, publishing ? 2000 : 700)
     state.published = publishing
+    panel.set(publishing ? 'Deploy executado.' : 'Undeploy executado.')
+    await waitForVisual(started, publishing ? Math.max(3000, performance.now() - started + 500) : Math.max(1000, performance.now() - started + 300))
+    panel.close()
     render()
-    screenLoading.hide()
     toast(publishing ? 'Deploy realizado com sucesso.' : 'Portfólio despublicado.')
   } catch (error) {
-    screenLoading.hide()
+    if (nextStage !== null) window.clearTimeout(nextStage)
+    await waitForVisual(started, 180)
+    panel.set((publishing ? 'Falha no deploy. ' : 'Falha no undeploy. ') + (error?.message || 'Tente novamente.'), true)
+    await new Promise(resolve => window.setTimeout(resolve, 1100))
+    panel.close()
     reportError('Não foi possível alterar a publicação.', error)
   } finally {
+    if (nextStage !== null) window.clearTimeout(nextStage)
     setButtonLoading(button, false)
   }
 }
@@ -479,48 +532,58 @@ function confirmDelete(id) {
   }
 }
 
-function githubStatus(text, { cancellable = false } = {}) {
-  modal(`<div class="github-connection-status"><span data-icon="github" aria-hidden="true"></span><p id="github-connection-text" role="status" aria-live="polite">${esc(text)}</p>${cancellable ? '<div class="modal-actions"><button class="secondary-button" type="button" data-close-modal>Cancelar</button></div>' : ''}</div>`, { dismissible: cancellable })
-}
-
-function updateGithubStatus(text, complete = false) {
-  const label = $('#github-connection-text')
-  if (label) label.textContent = text
-}
-
 async function connectGithub(event) {
   const button = event.currentTarget
+  const started = performance.now()
   setButtonLoading(button, true, 'Conectando...')
-  githubStatus('Preparando conexão...', { cancellable: true })
+  screenLoading.show('Conectando GitHub...')
   try {
     const data = await authenticatedApi('/api/github/connect', { method: 'POST' })
-    const panel = $('.github-connection-status')
-    if (!panel || panel.closest('.modal-backdrop')?.classList.contains('is-closing')) { setButtonLoading(button, false); return }
+    if (!data.authorizationUrl) throw new Error('A autorização do GitHub não retornou um endereço válido.')
     location.assign(data.authorizationUrl)
   } catch (error) {
-    updateGithubStatus('Não foi possível conectar.', true)
+    await waitForVisual(started, 180)
+    screenLoading.show('Não foi possível conectar.')
+    await waitForVisual(started, 900)
+    screenLoading.hide()
     reportError('Não foi possível conectar o GitHub.', error)
-    closeModal()
     setButtonLoading(button, false)
   }
 }
 
 async function disconnectGithub() {
+  const started = performance.now()
+  screenLoading.show('Desconectando GitHub...')
   try {
     await authenticatedApi('/api/github/connection', { method: 'DELETE' })
-    state.githubConnected = false; state.githubUsername = ''; state.repos = []; reposLoaded = false
-    toast('Conta do GitHub desconectada.'); render()
-  } catch (error) { reportError('Não foi possível desconectar o GitHub.', error) }
+    await waitForVisual(started, 700)
+    state.githubConnected = false
+    state.githubUsername = ''
+    state.repos = []
+    reposLoaded = false
+    reposPromise = null
+    screenLoading.show('GitHub desconectado.')
+    await waitForVisual(started, Math.max(1000, performance.now() - started + 300))
+    render()
+    screenLoading.hide()
+    toast('Conta do GitHub desconectada.')
+  } catch (error) {
+    await waitForVisual(started, 180)
+    screenLoading.show('Não foi possível desconectar.')
+    await new Promise(resolve => window.setTimeout(resolve, 900))
+    screenLoading.hide()
+    reportError('Não foi possível desconectar o GitHub.', error)
+  }
 }
 
-async function fetchGithubRepos() {
+async function fetchGithubRepos({ reportFailure = true } = {}) {
   reposLoading = true; render()
   let loaded = false
   try {
     const data = await authenticatedApi('/api/github/repos')
     state.repos = data.repositories || []
     loaded = true
-  } catch (error) { reportError('Não foi possível carregar os repositórios.', error) } finally { reposLoading = false; reposLoaded = true; render() }
+  } catch (error) { if (reportFailure) reportError('Não foi possível carregar os repositórios.', error); else console.error('[Devifolio] Não foi possível carregar os repositórios.', error) } finally { reposLoading = false; reposLoaded = true; render() }
   return loaded
 }
 
@@ -540,17 +603,36 @@ async function showGithubCallbackResult() {
   const params = new URLSearchParams(location.search)
   const status = params.get('github')
   if (!status) return
+  const started = performance.now()
+  screenLoading.show('Conectando GitHub...')
   history.replaceState(null, '', location.pathname + (location.hash || '#github'))
+
   if (status === 'connected' && state.githubConnected) {
-    githubStatus('Procurando projetos...')
-    let repositoriesReady = reposLoaded
-    if (reposPromise) repositoriesReady = await reposPromise
-    else if (!reposLoaded) { reposPromise = fetchGithubRepos(); repositoriesReady = await reposPromise }
-    closeModal()
-    if (repositoriesReady) toast('Conta do GitHub conectada com sucesso.')
-    else toast('GitHub conectado, mas os repositórios não foram carregados. Tente sincronizar.', 'error')
+    const repositories = reposPromise || (reposLoaded ? Promise.resolve(true) : fetchGithubRepos({ reportFailure: false }))
+    await waitForVisual(started, 800)
+    screenLoading.show('Procurando projetos...')
+    await waitForVisual(started, 1600)
+    screenLoading.show('Extraindo projetos...')
+    const repositoriesReady = await repositories
+    await waitForVisual(started, 2100)
+    if (!repositoriesReady) {
+      screenLoading.show('Não foi possível extrair projetos.')
+      await new Promise(resolve => window.setTimeout(resolve, 900))
+      screenLoading.hide()
+      toast('GitHub conectado, mas não foi possível carregar os projetos.', 'error')
+      return
+    }
+    await waitForVisual(started, 2500)
+    screenLoading.show('GitHub conectado.')
+    await waitForVisual(started, Math.max(3000, performance.now() - started + 500))
+    screenLoading.hide()
+    toast('Conta do GitHub conectada com sucesso.')
     return
   }
+
+  screenLoading.show('Não foi possível conectar.')
+  await waitForVisual(started, 900)
+  screenLoading.hide()
   if (status === 'access_denied') toast('A autorização do GitHub foi cancelada.', 'error')
   else if (status === 'invalid_state') toast('A autorização expirou. Tente conectar novamente.', 'error')
   else toast('O GitHub não concluiu a autorização. Tente novamente.', 'error')
@@ -813,11 +895,11 @@ async function bootstrap() {
   document.documentElement.dataset.theme = 'light'
   hydrateIcons()
   setSidebarCollapsed(localStorage.getItem('devifolio_sidebar_collapsed') === 'true')
-  if (onboardingRequested) history.replaceState(null, '', `${location.pathname}${location.hash || '#inicio'}`)
+  if (onboardingRequested && !new URLSearchParams(location.search).has('github')) history.replaceState(null, '', `${location.pathname}${location.hash || '#inicio'}`)
   render()
   bootstrapping = false
-  entrance.ready()
-  void showGithubCallbackResult()
+  if (new URLSearchParams(location.search).has('github')) void showGithubCallbackResult()
+  else entrance.ready()
 }
 
 supabase.auth.onAuthStateChange((event, session) => { if (event === 'SIGNED_OUT' || (!session && event !== 'INITIAL_SESSION')) { screenLoading.show(); closeModal({ immediate: true }); location.replace('cadastro.html#login') } })

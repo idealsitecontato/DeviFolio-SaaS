@@ -134,3 +134,57 @@ if (location.hash === '#planos' && plansAnchor) {
   requestAnimationFrame(() => requestAnimationFrame(showPlans))
   window.addEventListener('load', showPlans, { once: true })
 }
+
+
+const hero = document.querySelector('.hero-devifolio')
+if (hero) {
+  const reducedHeroMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+  let heroFrame = 0
+  let mouseDrag = null
+
+  function updateHeroProgress() {
+    heroFrame = 0
+    const rect = hero.getBoundingClientRect()
+    const range = Math.max(280, rect.height * .68)
+    const progress = reducedHeroMotion.matches ? 0 : Math.min(1, Math.max(0, -rect.top / range))
+    hero.style.setProperty('--hero-drag-progress', progress.toFixed(4))
+    hero.style.setProperty('--hero-copy-shift', (-16 * progress).toFixed(2) + 'px')
+    hero.style.setProperty('--hero-visual-shift-x', (-11 * progress).toFixed(2) + 'px')
+    hero.style.setProperty('--hero-visual-shift-y', (-34 * progress).toFixed(2) + 'px')
+    hero.style.setProperty('--hero-visual-scale', (1 - .025 * progress).toFixed(4))
+  }
+
+  function scheduleHeroProgress() {
+    if (!heroFrame) heroFrame = window.requestAnimationFrame(updateHeroProgress)
+  }
+
+  window.addEventListener('scroll', scheduleHeroProgress, { passive: true })
+  window.addEventListener('resize', scheduleHeroProgress, { passive: true })
+  reducedHeroMotion.addEventListener?.('change', scheduleHeroProgress)
+
+  hero.addEventListener('pointerdown', event => {
+    if (event.pointerType !== 'mouse' || event.button !== 0 || event.target.closest('a, button, input, textarea, select')) return
+    mouseDrag = { id: event.pointerId, lastY: event.clientY }
+    hero.setPointerCapture(event.pointerId)
+    event.preventDefault()
+  })
+
+  hero.addEventListener('pointermove', event => {
+    if (!mouseDrag || event.pointerId !== mouseDrag.id) return
+    const delta = mouseDrag.lastY - event.clientY
+    mouseDrag.lastY = event.clientY
+    if (Math.abs(delta) < 1) return
+    event.preventDefault()
+    window.scrollBy(0, delta)
+    scheduleHeroProgress()
+  })
+
+  function endHeroDrag(event) {
+    if (!mouseDrag || event.pointerId !== mouseDrag.id) return
+    if (hero.hasPointerCapture(event.pointerId)) hero.releasePointerCapture(event.pointerId)
+    mouseDrag = null
+  }
+  hero.addEventListener('pointerup', endHeroDrag)
+  hero.addEventListener('pointercancel', endHeroDrag)
+  updateHeroProgress()
+}
