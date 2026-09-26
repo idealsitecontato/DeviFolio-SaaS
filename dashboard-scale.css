@@ -1,0 +1,144 @@
+/* Desktop scale for the existing authenticated interface. Layout and colors stay intact. */
+@media (min-width: 821px) {
+  html body.dashboard-app .app-shell:not(.sidebar-collapsed) {
+    --sidebar-width: clamp(180px, var(--sidebar-expanded-width, 225px), min(320px, 32vw));
+  }
+  html body.dashboard-app .app-shell { --header-height: 76px; }
+  html body.dashboard-app .sidebar { padding: 0 16px 18px; overflow-y: auto; }
+  html body.dashboard-app .brand-crop {
+    height: 78px; min-height: 78px; margin-inline: -16px; padding-left: 21px; gap: 10px;
+  }
+  html body.dashboard-app .sidebar .devifolio-mark { --brand-visible-height: 39px; }
+  html body.dashboard-app .brand-name { font-size: 21px; }
+  html body.dashboard-app .sidebar-toggle { top: 21px; right: 13px; width: 39px; height: 39px; }
+  html body.dashboard-app .sidebar-toggle svg { width: 21px; height: 21px; }
+  html body.dashboard-app .side-nav { gap: 5px; }
+  html body.dashboard-app .side-nav-primary { margin-top: 17px; }
+  html body.dashboard-app .nav-item {
+    min-height: 48px; gap: 15px; padding: 10px 13px; font-size: 15px;
+  }
+  html body.dashboard-app .nav-item > span:first-child { width: 24px; }
+  html body.dashboard-app .nav-item svg { width: 22px; height: 22px; }
+  html body.dashboard-app .sidebar-spacer { min-height: 28px; }
+  html body.dashboard-app .sidebar-referral { gap: 9px; padding: 15px; margin-block: 10px; }
+  html body.dashboard-app .sidebar-referral-icon { font-size: 24px; }
+  html body.dashboard-app .sidebar-referral strong { font-size: 15px; }
+  html body.dashboard-app .sidebar-referral-cta { padding: 8px 12px; font-size: 14px; }
+  html body.dashboard-app .user-mini { min-height: 60px; padding: 10px; gap: 10px; }
+  html body.dashboard-app .user-mini .avatar { width: 35px; height: 35px; }
+  html body.dashboard-app .user-mini b,
+  html body.dashboard-app .user-mini small { font-size: 14px; }
+  html body.dashboard-app .side-nav-utility { padding-top: 10px; margin-top: 10px; }
+
+  html body.dashboard-app .desktop-topbar { height: 54px; padding: 12px 28px 0; font-size: 15px; }
+  html body.dashboard-app .page-content {
+    max-width: none !important; padding: 0 clamp(26px, 2.8vw, 54px) 48px;
+  }
+  html body.dashboard-app .page-head { min-height: 90px; margin-bottom: 25px; }
+  html body.dashboard-app .page-head h1 { font-size: 31px; margin-bottom: 10px; }
+  html body.dashboard-app .page-head p { font-size: 16px; line-height: 1.5; }
+  html body.dashboard-app :is(.primary-button,.secondary-button,.danger-button,.dashboard-action) {
+    min-height: 52px; padding-inline: 24px; font-size: 15px;
+  }
+  html body.dashboard-app :is(.primary-button,.secondary-button,.danger-button,.dashboard-action) svg { width: 20px; height: 20px; }
+  html body.dashboard-app :is(.field input,.field textarea,.field select,.search-field,.toolbar select,.input-prefix,.url-field,.dashboard-url) {
+    min-height: 53px; font-size: 15px;
+  }
+  html body.dashboard-app .field > span { font-size: 16px; }
+  html body.dashboard-app .field small { font-size: 14px; }
+  html body.dashboard-app .form-grid { gap: 20px; }
+  html body.dashboard-app :is(.tag-row span,.preview-skills span,.badge,.status) { font-size: 14px; padding: 6px 10px; }
+  html body.dashboard-app :is(.section-card-head h2,.card-title h2,.summary-title h2,.link-summary h2) { font-size: 20px; }
+  html body.dashboard-app :is(.section-card-head p,.card-title p,.settings-card-head p) { font-size: 15px; }
+
+  html body.dashboard-app .home-page .dashboard-layout {
+    grid-template-columns: minmax(0, 1.68fr) minmax(390px, 1fr);
+    gap: 18px 26px;
+    grid-template-rows: minmax(239px, auto) minmax(482px, 1fr);
+    min-height: clamp(739px, calc(100dvh - 175px), 1000px);
+  }
+  html body.dashboard-app .home-page :is(.dashboard-main-column,.dashboard-side-column) { gap: 18px !important; }
+  html body.dashboard-app .home-page .welcome-copy p { font-size: 18px; }
+  html body.dashboard-app .home-page .welcome-copy h1 { font-size: 34px; }
+  html body.dashboard-app .home-page .welcome-copy > span { font-size: 16px; }
+  html body.dashboard-app .home-page .dashboard-metrics { margin-top: 24px !important; gap: 15px; }
+  html body.dashboard-app .home-page .dashboard-metrics button { min-height: 115px; padding: 17px; gap: 6px; }
+  html body.dashboard-app .dashboard-metrics button > [data-icon] svg { width: 25px; height: 25px; }
+  html body.dashboard-app .dashboard-metrics small { font-size: 14px; }
+  html body.dashboard-app .home-page .dashboard-metrics strong { font-size: 29px; }
+  html body.dashboard-app .home-page .projects-card { min-height: 345px !important; padding: 20px !important; }
+  html body.dashboard-app .home-page .projects-card h2 { font-size: 20px; }
+  html body.dashboard-app .home-page .recent-project { min-height: 86px; gap: 15px; padding: 10px 12px; }
+  html body.dashboard-app .home-page .recent-project-image { width: 108px; height: 76px; }
+  html body.dashboard-app .recent-project-copy strong { font-size: 16px; }
+  html body.dashboard-app .home-page .recent-project-copy p { font-size: 13px; }
+  html body.dashboard-app .recent-project .icon-button { min-height: 39px; padding: 7px 16px; font-size: 14px; }
+  html body.dashboard-app .home-page .github-summary { min-height: 236px; padding: 23px; }
+  html body.dashboard-app .home-page .github-summary > p,
+  html body.dashboard-app .home-page .link-summary > p { font-size: 14px; }
+  html body.dashboard-app .home-page .github-summary .dashboard-action { min-height: 68px; }
+  html body.dashboard-app .home-page .link-summary { min-height: 482px !important; padding: 20px !important; }
+  html body.dashboard-app .home-page .home-qr-card .dashboard-qr { min-height: 215px; margin-block: 15px; gap: 14px; }
+  html body.dashboard-app .home-page .home-qr-area .qr-wrap { width: 195px; height: 195px; }
+  html body.dashboard-app .home-page .home-qr-area .qr-wrap canvas { width: 165px !important; height: 165px !important; }
+  html body.dashboard-app .home-page .home-qr-download .secondary-button { min-height: 45px !important; }
+
+  html body.dashboard-app .project-grid,
+  html body.dashboard-app .models-grid { gap: 24px; }
+  html body.dashboard-app .project-card-body { padding: 27px; }
+  html body.dashboard-app .project-card-body h2 { font-size: 20px; }
+  html body.dashboard-app .project-card-body > p { font-size: 16px; }
+  html body.dashboard-app .project-cover { min-height: 215px; }
+  html body.dashboard-app .portfolio-list-item { min-height: 300px; padding: 30px; }
+  html body.dashboard-app .editor-layout { gap: 26px; }
+  html body.dashboard-app :is(.form-card,.settings-card,.share-card,.monthly-chart,.history-card,.repo-panel) { padding: 30px; }
+  html body.dashboard-app .compact-panel-page .compact-panel { width: min(1300px, 100%); padding: 34px; }
+  html body.dashboard-app .compact-panel .panel-section { padding-block: 30px; }
+  html body.dashboard-app .settings-card .setting-row { min-height: 95px; }
+  html body.dashboard-app .analytic-stat { min-height: 185px; padding: 25px; }
+  html body.dashboard-app .analytic-stat strong { font-size: 35px; }
+  html body.dashboard-app .month-bars { height: 330px; }
+  html body.dashboard-app .github-page .repo-row { min-height: 92px; padding: 15px; }
+  html body.dashboard-app .github-page .repo-copy b { font-size: 16px; }
+  html body.dashboard-app .github-page .repo-copy small { font-size: 14px; }
+  html body.dashboard-app .referral-layout { gap: 21px; margin-bottom: 21px; }
+  html body.dashboard-app .referral-primary,
+  html body.dashboard-app .referral-benefit,
+  html body.dashboard-app .referral-totals { padding: 28px; }
+  html body.dashboard-app .referral-qr canvas { width: 160px; height: 160px; }
+  html body.dashboard-app .model-card-content { padding: 25px 27px; }
+  html body.dashboard-app .model-card-heading h2 { font-size: 24px; }
+  html body.dashboard-app .model-card-heading p { font-size: 16px; }
+  html body.dashboard-app .model-card-foot .primary-button { min-height: 48px; font-size: 15px; }
+  html body.dashboard-app .modal { width: min(775px, 100%); padding: 30px; }
+  html body.dashboard-app .modal-head h2 { font-size: 29px; }
+  html body.dashboard-app .modal-actions { gap: 13px; margin-top: 27px; }
+}
+
+/* Intermediate widths keep the larger feel without squeezing the existing grids. */
+@media (min-width: 821px) and (max-width: 1359px) {
+  html body.dashboard-app .app-shell { --header-height: 69px; }
+  html body.dashboard-app .app-shell:not(.sidebar-collapsed) {
+    --sidebar-width: clamp(180px, var(--sidebar-expanded-width, 215px), min(320px, 32vw));
+  }
+  html body.dashboard-app .page-content { padding-inline: 28px; }
+  html body.dashboard-app .home-page .dashboard-layout {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto;
+    min-height: 0;
+  }
+  html body.dashboard-app .home-page :is(.dashboard-main-column,.dashboard-side-column) {
+    grid-template-rows: auto;
+  }
+  html body.dashboard-app .home-page .dashboard-side-column { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  html body.dashboard-app .home-page .github-summary { align-self: start; }
+  html body.dashboard-app .home-page :is(.projects-card,.home-qr-card) { min-height: 0; }
+  html body.dashboard-app .home-page .dashboard-metrics button { min-height: 108px; }
+  html body.dashboard-app .home-page .home-qr-area .qr-wrap { width: 175px; height: 175px; }
+  html body.dashboard-app .home-page .home-qr-area .qr-wrap canvas { width: 148px !important; height: 148px !important; }
+  html body.dashboard-app .models-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 821px) and (max-width: 900px) {
+  html body.dashboard-app .home-page .dashboard-side-column { grid-template-columns: minmax(0, 1fr) !important; }
+}
