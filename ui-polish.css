@@ -1,0 +1,144 @@
+/* Final UI scale and radius pass. Functional state and page structure stay intact. */
+:root { --devi-radius: 10px; }
+
+html body.landing-body .hero-devifolio.section-yellow {
+  min-height: 0 !important;
+  height: auto !important;
+  overflow: hidden !important;
+}
+html body.landing-body .hero-devifolio::after {
+  display: block !important;
+  z-index: 1 !important;
+  height: clamp(210px, 34vw, 360px) !important;
+  background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,.22) 32%, #050505 100%) !important;
+}
+html body.landing-body .hero-devifolio > .container.hero-grid { padding-bottom: 0 !important; }
+html body.landing-body .hero-devifolio .hero-visual {
+  width: min(880px, 84vw) !important;
+  margin-top: 46px !important;
+  margin-bottom: 0 !important;
+  border-radius: 10px 10px 0 0 !important;
+  overflow: hidden !important;
+}
+html body.landing-body main#top .hero-devifolio .hero-visual img {
+  border-radius: 10px 10px 0 0 !important;
+}
+html body.landing-body main#top :is(.button,.button-nav,.lf-github-form,.lf-github-entry a,.devi-plan-card>a,.devi-plan-card>button),
+html body.landing-body .nav-actions :is(.login-link,.button-nav),
+html body.landing-body .hero-devifolio .button-dark { border-radius: 7px !important; }
+html body.landing-body main#top :is(.lf-product-story,.lf-github-entry,.lf-product-frame,.devi-plan-card,.lf-steps article,.lf-problem-list>div) { border-radius: 10px !important; }
+html body.landing-body main#top :is(.faq-item,.lf-github-form,.lf-final-video,.video-frame,.video-placeholder,.product-detail,.showcase-card,.showcase-message,.showcase-analytics,.devi-plan-badge) { border-radius: 10px !important; }
+html body.landing-body main#top .lf-product-frame img { border-radius: 8px !important; }
+html body.landing-body main#top .lf-review-card { border-radius: 18px !important; }
+html body.landing-body .lf-review-viewport::before,
+html body.landing-body .lf-review-viewport::after { display: none !important; }
+html body.landing-body .lf-review-track { animation: reviews-left 32s linear infinite !important; }
+html body.landing-body :is(.lf-intro,.lf-flow,.lf-plans,.lf-reviews) { padding-top: 88px; padding-bottom: 88px; }
+
+html body.auth-body :is(.button,.auth-field input,.auth-message) { border-radius: 7px !important; }
+html body.auth-body .auth-field input { height: 43px; }
+html body.auth-body .auth-form-wrap { width: min(100%, 405px); }
+
+html body.dashboard-app { --devi-radius: 10px; --radius-card: 10px; --radius-control: 7px; }
+html body.dashboard-app :is(.card,.modal,.onboarding-panel,.connected-account,.repo-panel,.pricing-card,.settings-card,.form-card,.preview-card,.portfolio-list-item,.empty-state,.user-mini,.user-menu,.project-card,.dashboard-metrics button,.project-image-upload,.public-preview,.dashboard-link-empty,.qr-wrap) {
+  border-radius: 10px !important;
+}
+html body.dashboard-app :is(.primary-button,.secondary-button,.danger-button,.icon-button,.dashboard-action,.search-field,.input-prefix,.url-field,.dashboard-url,.toolbar select,.field input,.field textarea,.field select,.switch,.badge,.status,.tag-row span,.preview-skills span,.plan-current,.session-current,.recent-project,.nav-item,.repo-icon,.repo-open) {
+  border-radius: 7px !important;
+}
+html body.dashboard-app .project-card .project-cover { border-radius: 10px 10px 0 0 !important; }
+html body.dashboard-app :is(.recent-project-image,.project-image-preview,.detail-cover,.preview-project-list span) { border-radius: 7px !important; }
+html body.dashboard-app .home-page .dashboard-promo-banner { border-radius: 10px !important; }
+html body.dashboard-app .creation-panel { border-radius: 10px 0 0 10px !important; }
+html body.dashboard-app :is(.avatar,.preview-avatar,.profile-avatar,.user-avatar,.avatar-small) { border-radius: 50% !important; }
+html body.dashboard-app .page-content { max-width: 1380px; }
+html body.dashboard-app .page-head { margin-bottom: 14px; }
+html body.dashboard-app .page-head h1 { font-size: 25px; }
+html body.dashboard-app .home-page .dashboard-layout { min-height: 0; align-items: start; }
+html body.dashboard-app .home-page .dashboard-main-column,
+html body.dashboard-app .home-page .dashboard-side-column { gap: 14px; }
+html body.dashboard-app .home-page .dashboard-side-column { padding-top: 0; }
+html body.dashboard-app .home-page .welcome-card { min-height: 0; }
+html body.dashboard-app .home-page .dashboard-metrics { margin-top: 20px; }
+html body.dashboard-app .home-page .dashboard-metrics button { min-height: 88px; padding: 11px; }
+html body.dashboard-app .home-page :is(.projects-card,.home-qr-card) { min-height: 0; align-self: start; }
+html body.dashboard-app .home-page .projects-card { padding: 14px; }
+html body.dashboard-app .home-page .link-summary { padding: 14px; }
+html body.dashboard-app .home-page .home-qr-card .dashboard-qr { min-height: 0; margin-top: 10px; gap: 10px; }
+html body.dashboard-app .home-page .home-qr-area { padding: 0; }
+html body.dashboard-app .home-page .home-qr-download { min-height: 0; }
+html body.dashboard-app .home-page .home-qr-download .secondary-button { min-height: 34px; }
+html body.dashboard-app .home-page .recent-project { min-height: 64px; }
+html body.dashboard-app :is(.sidebar-referral,.sidebar-referral-cta,.circle-icon,.connect-icon,.benefit-orbit,.toast,.settings-tabs .active,.avatar-edit-button,.repo-loading) { border-radius: 7px !important; }
+html body.dashboard-app .recent-project { grid-template-columns: 86px minmax(0,1fr) auto auto; }
+html body.dashboard-app .recent-project .project-type { display: inline-flex; }
+
+html body.dashboard-app .project-type {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 26px;
+  padding: 4px 9px;
+  border: 1px solid transparent;
+  border-radius: 6px !important;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+html body.dashboard-app .project-type.landing { background: #3cae63 !important; border-color: #3cae63 !important; }
+html body.dashboard-app .project-type.site { background: #3b82f6 !important; border-color: #3b82f6 !important; }
+html body.dashboard-app .project-cover .project-type { position: absolute; top: 12px; right: 12px; }
+html body.dashboard-app .project-detail > .project-type { margin-top: 14px; }
+
+html body.dashboard-app .github-page .repo-panel { padding: 18px; }
+html body.dashboard-app .github-page .repo-list { display: grid; gap: 8px; margin-top: 14px; }
+html body.dashboard-app .github-page .repo-row {
+  display: grid;
+  grid-template-columns: 18px 38px minmax(0,1fr) minmax(70px,auto) 34px;
+  align-items: center;
+  gap: 12px;
+  min-height: 72px;
+  padding: 11px 12px;
+  border: 1px solid #dfe2e6 !important;
+  border-radius: 9px !important;
+  background: #fff !important;
+  color: #151719 !important;
+}
+html body.dashboard-app .github-page .repo-row:hover { background: #f8f9fb !important; border-color: #c9ced5 !important; color: #151719 !important; }
+html body.dashboard-app .github-page .repo-row input[type=checkbox] { width: 17px; height: 17px; margin: 0; accent-color: #151719; }
+html body.dashboard-app .github-page .repo-icon { display: grid; place-items: center; width: 38px; height: 38px; background: #f1f3f5 !important; border: 1px solid #e0e3e6; color: #29313a !important; }
+html body.dashboard-app .github-page .repo-icon svg { width: 19px; height: 19px; }
+html body.dashboard-app .github-page .repo-copy { min-width: 0; }
+html body.dashboard-app .github-page .repo-copy b { color: #111 !important; font-size: 13px; line-height: 1.3; }
+html body.dashboard-app .github-page .repo-copy small { margin-top: 3px; color: #68717d !important; font-size: 11px; line-height: 1.35; }
+html body.dashboard-app .github-page .repo-language { justify-self: end; margin: 0; color: #52606d !important; font-size: 11px; }
+html body.dashboard-app .github-page .repo-open { display: grid; place-items: center; width: 32px; height: 32px; border: 1px solid #dfe2e6; color: #202832 !important; text-decoration: none; }
+html body.dashboard-app .github-page .repo-open:hover { background: #edf0f3; }
+
+@media (min-width: 901px) {
+  html body.dashboard-app .home-page .dashboard-layout { grid-template-rows: auto auto; align-items: start; }
+  html body.dashboard-app .home-page :is(.dashboard-main-column,.dashboard-side-column) { grid-template-rows: auto auto; align-content: start; }
+}
+@media (max-width: 900px) {
+  html body.dashboard-app .home-page .dashboard-side-column { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 620px) {
+  html body.landing-body .hero-devifolio .hero-visual { width: min(560px, 140vw) !important; margin-top: 38px !important; }
+  html body.landing-body :is(.lf-intro,.lf-flow,.lf-plans,.lf-reviews) { padding-top: 68px; padding-bottom: 68px; }
+  html body.dashboard-app .home-page .dashboard-side-column { grid-template-columns: 1fr; }
+  html body.dashboard-app .recent-project { grid-template-columns: 52px minmax(0,1fr) auto; }
+  html body.dashboard-app .recent-project .project-type { display: none; }
+  html body.dashboard-app .github-page .repo-row { grid-template-columns: 18px 34px minmax(0,1fr) 32px; gap: 8px; padding: 10px; }
+  html body.dashboard-app .github-page .repo-language { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html body.landing-body .lf-review-track { animation: none !important; }
+}
+
+html body :is(.nav-action,.public-button,.profile-links a,.skills span) { border-radius: 7px !important; }
+html body :is(.public-project,.empty-projects) { border-radius: 10px !important; }
+html body .public-project .project-image { border-radius: 10px 10px 0 0 !important; }
+html body .loader { border-radius: 50% !important; }
+html body:has(> .not-found) .retry-button { border-radius: 7px !important; }

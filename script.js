@@ -5,11 +5,27 @@ if (plansGrid) plansGrid.innerHTML = renderPlanCards()
 
 const reviewTrack = document.getElementById('review-track')
 if (reviewTrack) {
-  ;[...reviewTrack.children].forEach(card => {
-    const copy = card.cloneNode(true)
-    copy.setAttribute('aria-hidden', 'true')
-    reviewTrack.append(copy)
-  })
+  const originals = [...reviewTrack.children].map(card => card.cloneNode(true))
+  const viewport = reviewTrack.parentElement
+  const gap = Number.parseFloat(getComputedStyle(reviewTrack).gap) || 0
+  const firstWidth = originals[0]?.getBoundingClientRect().width || 325
+  const groupWidth = originals.length * (firstWidth + gap)
+  let repetitions = 0
+  const fillTrack = () => {
+    const next = Math.max(1, Math.ceil((viewport.clientWidth + firstWidth) / groupWidth))
+    if (next === repetitions) return
+    repetitions = next
+    reviewTrack.replaceChildren()
+    for (let group = 0; group < repetitions * 2; group += 1) {
+      originals.forEach(card => {
+        const copy = card.cloneNode(true)
+        if (group > 0) copy.setAttribute('aria-hidden', 'true')
+        reviewTrack.append(copy)
+      })
+    }
+  }
+  fillTrack()
+  window.addEventListener('resize', fillTrack, { passive: true })
 }
 
 
