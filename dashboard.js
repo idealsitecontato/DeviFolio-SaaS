@@ -19,6 +19,13 @@ import { portfolioModels, getPortfolioModel } from './src/lib/portfolio-models.j
 const githubIconUrl = new URL('./assets/github-icon.png', import.meta.url).href
 const bannerUrl = new URL('./assets/devi-plus-banner-original.png', import.meta.url).href
 const placeholderUrl = new URL('./assets/user-placeholder.png', import.meta.url).href
+const referenceRepositories = [
+  { name: 'dev-landing', description: 'Landing page moderna e responsiva - HTML, CSS e JavaScript' },
+  { name: 'ecommerce-api', description: 'API de e-commerce com Node.js e Express' },
+  { name: 'portfolio-pro', description: 'Meu portfólio pessoal com Next.js e Tailwind' },
+  { name: 'task-manager', description: 'Aplicação de gerenciamento de tarefas com React' },
+  { name: 'landing-saas', description: 'Landing page para SaaS com foco em conversão' },
+]
 
 const $ = (selector, root = document) => root.querySelector(selector)
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)]
@@ -97,6 +104,8 @@ let currentUser = null
 let reposLoading = false
 let reposLoaded = false
 let reposPromise = null
+let githubConnectionChecked = false
+let repoLoadFailed = false
 let homeQrGenerated = true
 const onboardingRequested = new URLSearchParams(location.search).get('onboarding') === '1'
 
@@ -245,9 +254,15 @@ function portfolioEditorView() {
 }
 
 function githubView() {
-  if (!state.githubConnected) return `<section class="page-enter github-page">${pageHead('GitHub', 'Conecte sua conta para importar repositórios como projetos.')}<div class="card connect-card"><span class="connect-icon" data-icon="github"></span><h2>Traga seus projetos do GitHub</h2><p>Importe nome, descrição, tecnologias e links sem preencher tudo manualmente.</p><button class="primary-button" data-connect-github><span data-icon="github"></span>Conectar com GitHub</button><small>Você poderá desconectar a conta quando quiser.</small></div></section>`
-  const content = reposLoading ? '<div class="repo-loading"><span class="spinner"></span>Buscando seus repositórios...</div>' : state.repos.length ? `<div class="repo-list">${state.repos.map((repository, index) => `<div class="repo-row"><label class="repo-select"><input type="checkbox" value="${index}" aria-label="Selecionar ${esc(repository.name)}"><span class="repo-icon" data-icon="github"></span><span class="repo-copy"><b>${esc(repository.name)}</b><small>${esc(repository.description || 'Sem descrição')}</small></span><small class="repo-language">${esc(repository.language || '—')}</small></label><a class="repo-open" href="${esc(repository.html_url)}" target="_blank" rel="noopener" aria-label="Abrir ${esc(repository.name)} no GitHub"><span data-icon="external"></span></a></div>`).join('')}</div>` : `<div class="projects-empty">${emptyState('repo', 'Nenhum repositório encontrado.', 'Sua conta não possui repositórios disponíveis.')}</div>`
-  return `<section class="page-enter github-page">${pageHead('GitHub', 'Selecione os repositórios que deseja transformar em projetos.', '<button class="secondary-button" data-disconnect-github>Desconectar</button>')}<div class="card connected-account"><span class="avatar">GH</span><div><small>Conta conectada</small><h2>@${esc(state.githubUsername || 'GitHub')}</h2></div><button class="secondary-button" data-sync-repos><span data-icon="refresh"></span>Sincronizar</button></div><div class="card repo-panel"><div class="section-card-head"><div><h2>Seus repositórios</h2><p>${state.repos.length} encontrado${state.repos.length === 1 ? '' : 's'}</p></div>${state.repos.length ? '<button class="primary-button" data-import-selected><span data-icon="upload"></span>Importar selecionados</button>' : ''}</div>${content}</div></section>`
+  const hasRealRepos = state.repos.length > 0
+  const repositories = hasRealRepos ? state.repos : referenceRepositories
+  const content = `<div class="repo-list">${repositories.map((repository, index) => `<div class="repo-row${hasRealRepos ? '' : ' repo-example'}"><label class="repo-select"><input type="checkbox" value="${index}" aria-label="${hasRealRepos ? 'Selecionar' : 'Exemplo'} ${esc(repository.name)}" ${hasRealRepos ? '' : 'disabled'}><span class="repo-icon" data-icon="github"></span><span class="repo-copy"><b>${esc(repository.name)}</b><small>${esc(repository.description || 'Sem descrição')}</small></span></label>${hasRealRepos ? `<a class="repo-open" href="${esc(repository.html_url)}" target="_blank" rel="noopener" aria-label="Abrir ${esc(repository.name)} no GitHub"><span data-icon="external"></span></a>` : '<span class="repo-open" aria-hidden="true"><span data-icon="external"></span></span>'}</div>`).join('')}</div>`
+  const account = state.githubConnected
+    ? `<div class="card connected-account"><span class="avatar">GH</span><div><small>Conta conectada</small><h2>@${esc(state.githubUsername || 'GitHub')}</h2></div><button class="secondary-button" data-sync-repos><span data-icon="refresh"></span>Sincronizar</button></div>`
+    : `<div class="card connect-card"><span class="connect-icon" data-icon="github"></span><h2>Conecte seu GitHub</h2><p>Conecte a conta para sincronizar e importar seus repositórios reais.</p><button class="primary-button" data-connect-github><span data-icon="github"></span>Conectar com GitHub</button></div>`
+  const status = hasRealRepos ? `${state.repos.length} encontrado${state.repos.length === 1 ? '' : 's'}` : '5 exemplos de referência'
+  const message = !hasRealRepos ? `<p class="repo-reference-note">${reposLoading ? 'Sincronizando seus repositórios. Os exemplos exibidos são apenas uma prévia.' : repoLoadFailed ? 'Não foi possível carregar seus repositórios. Sincronize novamente; estes exemplos não podem ser importados.' : 'Exemplos de visualização. Conecte ou sincronize sua conta para importar repositórios reais.'}</p>` : ''
+  return `<section class="page-enter github-page">${pageHead('GitHub', 'Selecione os repositórios que deseja transformar em projetos.', state.githubConnected ? '<button class="secondary-button" data-disconnect-github>Desconectar</button>' : '')}${account}<div class="card repo-panel"><div class="section-card-head"><div><h2>Seus repositórios</h2><p>${status}</p></div><button class="primary-button" data-import-selected ${hasRealRepos ? '' : 'disabled'}><span data-icon="upload"></span>Importar selecionados</button></div>${content}${message}</div></section>`
 }
 
 function analyticsView() {
@@ -307,7 +322,7 @@ function render({ preserveScroll = false } = {}) {
   hydrateIcons($('#page-content'))
   bindActions()
   if (route === 'link-qrcode' || route === 'inicio') renderPortfolioQR()
-  if (route === 'github' && state.githubConnected && !reposLoaded && !reposLoading) reposPromise = fetchGithubRepos({ reportFailure: !new URLSearchParams(location.search).has('github') })
+  if (route === 'github' && !bootstrapping && (state.githubConnected || !githubConnectionChecked) && !reposLoaded && !reposLoading) reposPromise = fetchGithubRepos({ reportFailure: !new URLSearchParams(location.search).has('github') })
   updateUserChrome()
   closeMenu()
   closeUserMenu()
@@ -637,13 +652,16 @@ async function disconnectGithub() {
 }
 
 async function fetchGithubRepos({ reportFailure = true } = {}) {
+  githubConnectionChecked = true
   reposLoading = true; render()
   let loaded = false
   try {
     const data = await authenticatedApi('/api/github/repos')
-    state.repos = data.repositories || []
+    state.repos = Array.isArray(data.repositories) ? data.repositories : []
+    state.githubConnected = true
+    repoLoadFailed = false
     loaded = true
-  } catch (error) { if (reportFailure) reportError('Não foi possível carregar os repositórios.', error); else console.error('[Devifolio] Não foi possível carregar os repositórios.', error) } finally { reposLoading = false; reposLoaded = true; render() }
+  } catch (error) { repoLoadFailed = true; if (reportFailure && state.githubConnected) reportError('Não foi possível carregar os repositórios.', error); else console.error('[Devifolio] Não foi possível carregar os repositórios.', error) } finally { reposLoading = false; reposLoaded = true; render() }
   return loaded
 }
 
@@ -667,8 +685,8 @@ async function showGithubCallbackResult() {
   screenLoading.show('Conectando GitHub...')
   history.replaceState(null, '', location.pathname + (location.hash || '#github'))
 
-  if (status === 'connected' && state.githubConnected) {
-    const repositories = reposPromise || (reposLoaded ? Promise.resolve(true) : fetchGithubRepos({ reportFailure: false }))
+  if (status === 'connected') {
+    const repositories = reposPromise || (reposLoaded && state.githubConnected && !repoLoadFailed ? Promise.resolve(true) : fetchGithubRepos({ reportFailure: false }))
     await waitForVisual(started, 800)
     screenLoading.show('Procurando projetos...')
     await waitForVisual(started, 1600)
@@ -956,8 +974,8 @@ async function bootstrap() {
   hydrateIcons()
   setSidebarCollapsed(localStorage.getItem('devifolio_sidebar_collapsed') === 'true')
   if (onboardingRequested && !new URLSearchParams(location.search).has('github')) history.replaceState(null, '', `${location.pathname}${location.hash || '#inicio'}`)
-  render()
   bootstrapping = false
+  render()
   if (new URLSearchParams(location.search).has('github')) void showGithubCallbackResult()
   else entrance.ready()
 }

@@ -99,6 +99,7 @@ html body.dashboard-app .github-page .repo-panel {
 html body.dashboard-app .github-page .repo-panel .section-card-head { margin-bottom: 14px; }
 html body.dashboard-app .github-page .repo-panel .section-card-head h2 { margin-bottom: 5px; color: #10151c; font-size: 19px; }
 html body.dashboard-app .github-page .repo-panel .section-card-head p { color: #708093; font-size: 14px; }
+html body.dashboard-app .github-page .repo-reference-note { margin: 12px 0 0; color: #748092; font-size: 12px; }
 html body.dashboard-app .github-page .repo-panel [data-import-selected] {
   min-height: 47px;
   padding: 0 22px;
@@ -108,6 +109,7 @@ html body.dashboard-app .github-page .repo-panel [data-import-selected] {
   color: #fff !important;
   font-size: 14px;
 }
+html body.dashboard-app .github-page .repo-panel [data-import-selected]:disabled { opacity: 1; cursor: not-allowed; }
 html body.dashboard-app .github-page .repo-list { gap: 12px; margin-top: 0; }
 html body.dashboard-app .github-page .repo-row {
   display: flex;
@@ -131,7 +133,9 @@ html body.dashboard-app .github-page .repo-select {
   flex: 1;
   cursor: pointer;
 }
+html body.dashboard-app .github-page .repo-example .repo-select { cursor: default; }
 html body.dashboard-app .github-page .repo-row input[type=checkbox] { width: 17px; height: 17px; accent-color: #e8edf4; }
+html body.dashboard-app .github-page .repo-row input[type=checkbox]:disabled { opacity: 1; }
 html body.dashboard-app .github-page .repo-row .repo-icon {
   width: 38px;
   height: 38px;
@@ -180,7 +184,7 @@ html body.dashboard-app .portfolio-manager-page .portfolio-list-item {
   min-height: 235px !important;
   box-sizing: border-box;
   padding: 27px 26px 24px;
-  border-radius: 2px !important;
+  border-radius: 12px !important;
 }
 html body.dashboard-app .portfolio-manager-page .portfolio-folder { display: grid; place-items: center; width: 65px; height: 58px; color: #ffbd27; }
 html body.dashboard-app .portfolio-manager-page .portfolio-folder svg { width: 63px; height: 57px; fill: #ffc335; stroke: #ffb915; stroke-width: 1.2; }
@@ -198,7 +202,7 @@ html body.dashboard-app .portfolio-manager-page .portfolio-list-actions .primary
   min-width: 108px;
   min-height: 42px;
   padding: 0 20px;
-  border-radius: 4px !important;
+  border-radius: 7px !important;
   background: #050607 !important;
   border-color: #050607 !important;
   color: #fff !important;
@@ -210,7 +214,7 @@ html body.dashboard-app .portfolio-manager-page .portfolio-list-actions .icon-bu
   width: 45px;
   height: 42px;
   border: 1px solid #d3dae3 !important;
-  border-radius: 5px !important;
+  border-radius: 7px !important;
   background: #fff !important;
   color: #141a22 !important;
 }
