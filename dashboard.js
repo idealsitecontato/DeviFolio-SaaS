@@ -18,6 +18,7 @@ import { portfolioModels, getPortfolioModel } from './src/lib/portfolio-models.j
 
 const githubIconUrl = new URL('./assets/github-icon.png', import.meta.url).href
 const bannerUrl = new URL('./assets/devi-plus-banner-original.png', import.meta.url).href
+const placeholderUrl = new URL('./assets/user-placeholder.png', import.meta.url).href
 
 const $ = (selector, root = document) => root.querySelector(selector)
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)]
@@ -142,7 +143,7 @@ function projectRows(items = state.projects.slice(0, 5)) {
   if (!items.length) return `<div class="projects-empty">${emptyState('folder', 'Você ainda não possui projetos.', 'Crie seu primeiro projeto para começar.', '<button class="primary-button" data-new-project>Criar primeiro projeto</button>')}</div>`
   return items.map(project => {
     const tags = project.tech.split(',').map(item => item.trim()).filter(Boolean).slice(0, 3)
-    return `<div class="recent-project"><span class="recent-project-image">${project.image ? `<img src="${esc(project.image)}" alt="Imagem do projeto ${esc(project.name)}">` : '<span data-icon="folder"></span>'}</span><div class="recent-project-copy"><strong>${esc(project.name)}</strong><p>${esc(project.description)}</p></div>${tags.length ? `<div class="recent-project-tags">${tags.map(tag => `<span>${esc(tag)}</span>`).join('')}</div>` : '<div class="recent-project-tags" aria-hidden="true"></div>'}${projectTypeChip(project)}<button class="icon-button" data-view-project="${project.id}" aria-label="Visualizar ${esc(project.name)}">Acessar <span data-icon="arrow"></span></button></div>`
+    return `<div class="recent-project"><span class="recent-project-image">${project.image ? `<img src="${esc(project.image)}" alt="Imagem do projeto ${esc(project.name)}">` : '<span data-icon="folder"></span>'}</span><div class="recent-project-copy"><strong>${esc(project.name)}</strong><p>${esc(project.description)}</p></div>${tags.length ? `<div class="recent-project-tags">${tags.map(tag => `<span>${esc(tag)}</span>`).join('')}</div>` : '<div class="recent-project-tags" aria-hidden="true"></div>'}${projectTypeChip(project)}<button class="icon-button" data-view-project="${project.id}" aria-label="Visualizar ${esc(project.name)}">Acessar</button></div>`
   }).join('')
 }
 
@@ -192,8 +193,7 @@ function modelPreview(model, compact = false) {
 }
 
 function modelCard(model) {
-  const current = getPortfolioModel(state.profile.selectedModel).id === model.id
-  return `<article class="card model-card ${current ? 'is-current' : ''}">${modelPreview(model)}<div class="model-card-content"><div class="model-card-heading"><div><h2>${esc(model.name)}</h2><p>${esc(model.description)}</p></div>${!model.available ? '<span class="model-lock" data-icon="lock" aria-label="Bloqueado"></span>' : ''}</div><div class="model-card-foot"><span class="model-status ${current ? 'current' : model.available ? 'available' : 'locked'}">${current ? 'Modelo atual' : model.available ? 'Disponível' : 'Bloqueado'}</span><button class="primary-button" type="button" data-apply-model="${model.id}" aria-label="Aplicar ${esc(model.name)}">Aplicar</button></div></div></article>`
+  return `<article class="card model-card" aria-label="${esc(model.name)}"><div class="model-simple-banner" style="--model-image:url('${model.image}')">${!model.available ? '<span class="model-card-lock" data-icon="lock" aria-label="Modelo exclusivo"></span>' : ''}</div><div class="model-simple-body"><span class="model-placeholder-avatar" aria-hidden="true"><img src="${placeholderUrl}" alt=""></span><strong>Nome</strong><p>Sua descrição...</p><button class="primary-button" type="button" data-apply-model="${model.id}" aria-label="Aplicar ${esc(model.name)}">Aplicar</button></div></article>`
 }
 
 function modelsView() {
@@ -206,45 +206,35 @@ function showUpgradeModel(model) {
   modal(`<div class="model-dialog">${modelDialogHead('Faça upgrade', `Faça upgrade para desbloquear ${model.name} e outros modelos exclusivos da DeviFolio.`)}${modelPreview(model, true)}<div class="modal-actions"><button class="secondary-button" data-close-modal>Voltar</button><a class="primary-button" href="index.html#planos">Ver planos</a></div></div>`)
 }
 
-function showModelLoading(model) {
-  const labels = ['Preparando modelo...', 'Aplicando modelo...', 'Organizando seu portfólio...']
-  modal(`<div class="model-loading" role="status" aria-live="polite"><span class="model-loading-mark" data-icon="palette"></span><h2>${labels[0]}</h2><p>${esc(model.name)}</p><span class="model-loading-track"><i></i></span></div>`, { dismissible: false })
-  let step = 0
-  const advance = () => {
-    if (!$('#modal-root .model-loading')) return
-    step += 1
-    if (step === labels.length) { showPortfolioSelector(model); return }
-    $('#modal-root .model-loading h2').textContent = labels[step]
-    $('#modal-root .model-loading-track i').style.width = `${((step + 1) / labels.length) * 100}%`
-    window.setTimeout(advance, 420)
-  }
-  window.setTimeout(advance, 420)
-}
-
 function showPortfolioSelector(model) {
-  const name = state.profile.name.trim() ? `Portfólio — ${state.profile.name.trim()}` : 'Portfólio principal'
-  const current = getPortfolioModel(state.profile.selectedModel)
-  modal(`<div class="model-dialog">${modelDialogHead('Escolha qual portfólio deseja aplicar este modelo', `Você está aplicando ${model.name}.`)}<div class="model-portfolio-choice">${modelPreview(current, true)}<div><h3>${esc(name)}</h3><p>Modelo atual: ${esc(current.name)}</p><span class="model-status ${state.published ? 'available' : 'locked'}">${state.published ? 'Publicado' : 'Não publicado'}</span></div><button class="primary-button" type="button" data-select-portfolio>Selecionar</button></div><div class="modal-actions"><button class="secondary-button" data-close-modal>Cancelar</button></div></div>`)
-  $('[data-select-portfolio]').onclick = async event => {
-    const button = event.currentTarget
-    setButtonLoading(button, true, 'Aplicando...')
+  const name = state.profile.name.trim() ? `Portfólio — ${state.profile.name.trim()}` : 'Portfólio Pessoal'
+  const drawer = document.createElement('dialog')
+  drawer.className = 'model-drawer'
+  drawer.setAttribute('aria-label', 'Portfólios')
+  drawer.innerHTML = `<div class="model-drawer-head"><h2>Portfólios</h2><button type="button" class="model-drawer-close" aria-label="Fechar" data-close-drawer>×</button></div><div class="model-drawer-list"><div class="model-drawer-row"><span class="model-drawer-folder" data-icon="folder"></span><div><strong>${esc(name)}</strong><p>Meu portfólio principal</p></div><button type="button" data-select-portfolio>Aplicar</button></div></div>`
+  document.body.append(drawer)
+  hydrateIcons(drawer)
+  drawer.addEventListener('close', () => drawer.remove(), { once: true })
+  drawer.querySelector('[data-close-drawer]').onclick = () => drawer.close()
+  drawer.querySelector('[data-select-portfolio]').onclick = async () => {
+    drawer.close()
+    if (!model.available) { showUpgradeModel(model); return }
+    screenLoading.show('Aplicando modelo...')
     try {
       await savePortfolioModel(currentUser.id, model.id)
       state.profile.selectedModel = model.id
-      modal(`<div class="model-applied"><span class="model-applied-icon" data-icon="check"></span><h2>Modelo aplicado</h2><p>O novo modelo foi aplicado ao seu portfólio com sucesso.</p><div class="modal-actions"><button class="secondary-button" type="button" data-close-modal>Voltar para Modelos</button>${state.published ? `<a class="primary-button" href="${esc(publicPortfolioUrl())}" target="_blank" rel="noopener">Ver portfólio</a>` : ''}</div></div>`)
       render({ preserveScroll: true })
-    } catch (error) {
-      reportError('Não foi possível aplicar o modelo.', error)
-      setButtonLoading(button, false)
-    }
+      toast('Modelo aplicado ao portfólio.')
+    } catch (error) { reportError('Não foi possível aplicar o modelo.', error) }
+    finally { screenLoading.hide() }
   }
+  drawer.showModal()
 }
 
 function applyModel(id) {
   const model = portfolioModels.find(item => item.id === id)
   if (!model) return
-  if (!model.available) { showUpgradeModel(model); return }
-  showModelLoading(model)
+  showPortfolioSelector(model)
 }
 
 function portfolioEditorView() {
@@ -334,7 +324,7 @@ function updateUserChrome() {
 
 function bindActions() {
   $$('[data-route-button]').forEach(button => button.onclick = () => { location.hash = button.dataset.routeButton })
-  $('[data-promo-plans]')?.addEventListener('click', event => { event.preventDefault(); screenLoading.leaveDashboard(() => location.assign('index.html#planos')) })
+  $('[data-promo-plans]')?.addEventListener('click', event => { event.preventDefault(); location.assign('index.html#planos') })
   $$('[data-copy]').forEach(button => button.onclick = () => copyText(button.dataset.copy))
   $$('[data-open-preview]').forEach(button => button.onclick = () => window.open(publicPortfolioUrl(), '_blank', 'noopener'))
   $$('[data-edit-portfolio]').forEach(button => button.onclick = () => { location.hash = 'portfolio-editar' })
@@ -537,9 +527,6 @@ async function handleAvatarUpload(event) {
 async function showProject(id) {
   const project = state.projects.find(item => item.id === id)
   if (!project) return
-  screenLoading.show('Abrindo projeto...')
-  await new Promise(resolve => window.setTimeout(resolve, 950))
-  screenLoading.hide()
   const projectLink = normalizeExternalUrl(project.link)
   const githubLink = project.github ? normalizeExternalUrl(project.github.includes('/') && !project.github.includes('.') ? `github.com/${project.github}` : project.github) : ''
   modal(`<div class="project-detail"><div class="project-cover detail-cover">${project.image ? `<img class="project-cover-image" src="${esc(project.image)}" alt="">` : `<span>${esc(project.name.slice(0, 2).toUpperCase())}</span>`}</div>${projectTypeChip(project)}<h2>${esc(project.name)}</h2>${project.description ? `<p>${esc(project.description)}</p>` : ''}<div class="tag-row">${project.tech.split(',').filter(Boolean).map(item => `<span>${esc(item.trim())}</span>`).join('')}</div><div class="modal-actions"><button class="secondary-button" data-close-modal>Fechar</button>${githubLink ? `<a class="secondary-button" href="${esc(githubLink)}" target="_blank" rel="noopener">GitHub</a>` : ''}${projectLink ? `<a class="primary-button" href="${esc(projectLink)}" target="_blank" rel="noopener">Ver projeto <span data-icon="external"></span></a>` : ''}<button class="icon-button edit-action" data-edit-project="${project.id}" aria-label="Editar projeto" title="Editar projeto"><span data-icon="edit"></span></button></div></div>`)
@@ -911,8 +898,8 @@ function renderWithTransition() {
   closeUserMenu()
   if (bootstrapping) { render(); return }
   const route = views[location.hash.slice(1)] ? location.hash.slice(1) : 'inicio'
-  if (route === renderedRoute) { screenLoading.resetPage(); return }
-  screenLoading.navigate(render)
+  if (route === renderedRoute) return
+  render()
 }
 window.addEventListener('hashchange', renderWithTransition)
 

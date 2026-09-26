@@ -136,6 +136,40 @@ export async function uploadAvatar(userId, file) {
   return `${data.publicUrl}?v=${Date.now()}`
 }
 
+export function portfolioBannerUrl(userId) {
+  return supabase.storage.from('avatars').getPublicUrl(`${userId}/banner`).data.publicUrl
+}
+
+export async function uploadPortfolioBanner(userId, file) {
+  const { error } = await supabase.storage.from('avatars').upload(`${userId}/banner`, file, {
+    upsert: true,
+    contentType: file.type,
+    cacheControl: '3600',
+  })
+  if (error) throw error
+  return `${portfolioBannerUrl(userId)}?v=${Date.now()}`
+}
+
+export async function removePortfolioBanner(userId) {
+  const { error } = await supabase.storage.from('avatars').remove([`${userId}/banner`])
+  if (error) throw error
+}
+
+export async function updateProfileAvatar(userId, avatarUrl) {
+  const { error } = await supabase.from('profiles').update({ avatar_url: avatarUrl, updated_at: new Date().toISOString() }).eq('user_id', userId)
+  if (error) throw error
+}
+
+export async function updateProjectDetails(userId, projectId, changes) {
+  const allowed = ['name', 'description', 'tech', 'link', 'github', 'image_url']
+  const values = Object.fromEntries(allowed.filter(key => key in changes).map(key => [key, changes[key]]))
+  const { data, error } = await supabase.from('projects')
+    .update({ ...values, updated_at: new Date().toISOString() })
+    .eq('id', projectId).eq('user_id', userId).select().single()
+  if (error) throw error
+  return mapProject(data)
+}
+
 export async function uploadProjectImage(userId, projectId, file) {
   const path = `${userId}/${projectId}/cover`
   const { error } = await supabase.storage.from('project-images').upload(path, file, {
