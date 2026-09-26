@@ -9,7 +9,7 @@
   <link rel="icon" type="image/png" href="assets/devifolio-logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="dashboard-reference.css">
   <link rel="stylesheet" href="dashboard-light.css">
   <link rel="stylesheet" href="dashboard-rounded.css">
@@ -18,11 +18,12 @@
   <link rel="stylesheet" href="visual-adjustments.css">
   <link rel="stylesheet" href="screen-loading.css">
   <link rel="stylesheet" href="interaction-refinements.css">
+  <link rel="stylesheet" href="reference-fidelity.css">
 </head>
 <body class="dashboard-app">
   <div class="app-shell">
     <aside class="sidebar" id="sidebar" aria-label="Menu principal">
-      <div class="sidebar-resize-handle" id="sidebar-resize-handle" role="separator" aria-label="Redimensionar menu lateral" aria-orientation="vertical" aria-valuemin="200" aria-valuemax="320" aria-valuenow="244" tabindex="0"></div>
+      <div class="sidebar-resize-handle" id="sidebar-resize-handle" role="separator" aria-label="Redimensionar menu lateral" aria-orientation="vertical" aria-valuemin="180" aria-valuemax="320" aria-valuenow="190" tabindex="0"></div>
       <div class="brand-crop" aria-label="Devifolio"><span class="brand-mark devifolio-mark"><img src="assets/devifolio-brand-original.png" alt=""></span><span class="brand-name">Devifolio</span></div>
       <button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Recolher menu" aria-expanded="true" data-tooltip="Recolher menu"><span data-icon="menu"></span></button>
       <nav class="side-nav side-nav-primary" id="side-nav">
@@ -34,6 +35,11 @@
         <a class="nav-item" href="#perfil" data-route="perfil" data-tooltip="Perfil"><span data-icon="profile"></span><span>Perfil</span></a>
       </nav>
       <div class="sidebar-spacer"></div>
+      <a class="sidebar-referral" href="#indicacao" aria-label="Indique a DeviFolio e receba 1 mês de Devi Plus">
+        <span class="sidebar-referral-icon" aria-hidden="true">✦</span>
+        <strong>Receba 1 mês de<br>Devi Plus</strong>
+        <span class="sidebar-referral-cta">Indicar <span aria-hidden="true">→</span></span>
+      </a>
       <button class="user-mini" id="user-menu-toggle" type="button" aria-expanded="false" aria-controls="user-menu" data-tooltip="Conta">
         <span class="avatar"></span><span><b>Sua conta</b><small></small></span><span data-icon="chevron"></span>
       </button>
