@@ -14,6 +14,7 @@ create table if not exists public.profiles (
   website text not null default '',
   avatar_url text not null default '',
   published boolean not null default false,
+  selected_model text not null default 'white' check (selected_model in ('black', 'white', 'blue', 'red', 'orange', 'pink', 'lime', 'yellow', 'green', 'purple')),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -69,6 +70,7 @@ create table if not exists public.referrals (
 create index if not exists referrals_user_id_idx on public.referrals(user_id);
 
 alter table public.profiles add column if not exists avatar_url text not null default '';
+alter table public.profiles add column if not exists selected_model text not null default 'white';
 alter table public.projects add column if not exists image_url text;
 alter table public.analytics_events add column if not exists visitor_id text;
 create unique index if not exists referrals_user_email_idx on public.referrals(user_id, referred_email);

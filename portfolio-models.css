@@ -1,0 +1,47 @@
+html, body { margin: 0; background: #f7f7f6; font-family: "Google Sans", Arial, sans-serif; }
+.portfolio-page { min-width: 0; }
+.public-hero { min-height: 490px; color: var(--hero-ink); background: #f5f5f5 var(--hero-image) center center / cover no-repeat; }
+.portfolio-page .public-nav { height: 112px; max-width: 1810px; margin: 0 auto; padding: 26px clamp(24px, 5vw, 90px) 0; border: 0; background: transparent; display: flex; align-items: flex-start; justify-content: space-between; }
+.portfolio-page .public-brand { color: var(--hero-ink); }
+.portfolio-page .nav-action { min-height: 42px; padding: 0 18px; border-radius: 6px !important; background: #101113; border-color: #101113; color: #fff; font-size: 13px; }
+.portfolio-page[data-model="black"] .nav-action { background: #fff; border-color: #fff; color: #111; }
+.portfolio-page[data-model="black"] .public-brand .devifolio-logo img { filter: brightness(0) invert(1) !important; }
+.portfolio-page .profile-header { width: min(650px, calc(100% - 40px)); min-height: 375px; margin: 0 auto; padding: 0 0 32px; border: 0; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0; }
+.portfolio-page .profile-copy { min-width: 0; max-width: 100%; }
+.portfolio-page .public-avatar { width: 136px; height: 136px; margin: -52px 0 17px; border: 0; border-radius: 50% !important; background: rgba(20,20,20,.2); color: var(--hero-ink); font-size: 38px; box-shadow: 0 3px 12px rgba(0,0,0,.13); }
+.portfolio-page .public-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50% !important; }
+.portfolio-page .profile-copy .kicker { margin: 0 0 7px; color: var(--hero-muted); font-size: 11px; font-weight: 700; letter-spacing: .2em; }
+.portfolio-page .profile-copy h1 { margin: 0; color: var(--hero-ink); font-size: clamp(42px, 4vw, 56px); font-weight: 700; letter-spacing: -.055em; line-height: 1.03; }
+.portfolio-page .profile-copy h1, .portfolio-page .profile-copy .bio { overflow-wrap: anywhere; }
+.portfolio-page .profile-copy h2 { margin: 8px 0 0; color: var(--hero-muted); font-size: clamp(17px, 1.3vw, 20px); font-weight: 400; }
+.portfolio-page .profile-copy .bio { max-width: 470px; margin: 11px auto 0; color: var(--hero-muted); font-size: 14px; line-height: 1.42; }
+.portfolio-page .profile-links { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin: 22px 0 0; }
+.portfolio-page .profile-links a { padding: 8px 13px; border: 0; border-radius: 7px !important; background: rgba(255,255,255,.73); color: #101113; font-size: 13px; font-weight: 600; text-decoration: none; }
+.portfolio-page[data-model="white"] .profile-links a { background: #161719; color: #fff; }
+.portfolio-page .profile-links a:hover { transform: translateY(-1px); background: #fff; color: #111; }
+.portfolio-page .profile-skills { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin: 13px auto 0; }
+.portfolio-page .profile-skills span { font-size: 11px; color: var(--hero-muted); }
+.portfolio-page .profile-skills span + span::before { content: '·'; padding-right: 8px; }
+.portfolio-page .projects-section { padding: 40px 0 70px; background: #f9f9f8; }
+.portfolio-page .projects-inner { width: min(1380px, calc(100% - 48px)); margin: 0 auto; }
+.portfolio-page .section-heading { display: flex; align-items: baseline; justify-content: space-between; margin: 0 0 16px; }
+.portfolio-page .section-heading h2 { margin: 0; font-size: 27px; font-weight: 700; letter-spacing: -.04em; color: #151719; }
+.portfolio-page .section-heading span { font-size: 12px; color: #697077; }
+.portfolio-page .public-projects { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 18px; border: 0; }
+.portfolio-page .public-project { display: flex; min-width: 0; flex-direction: column; overflow: hidden; background: #fff; border: 1px solid #dfe1e1 !important; border-radius: 9px !important; box-shadow: none; }
+.portfolio-page .project-image { display: grid; place-items: center; width: calc(100% - 12px); margin: 6px 6px 0; aspect-ratio: 1.9; overflow: hidden; border: 0; border-radius: 5px !important; background: #e9ebed; color: #737b80; font-size: 26px; }
+.portfolio-page .project-image img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.portfolio-page .project-content { display: flex; flex: 1; min-width: 0; flex-direction: column; align-items: stretch; padding: 13px 16px 14px; }
+.portfolio-page .project-content h3 { margin: 0; color: #17191b; font-size: 15px; font-weight: 650; line-height: 1.25; }
+.portfolio-page .project-content p { flex: 1; min-height: 36px; margin: 5px 0 13px; color: #656c76; font-size: 12px; line-height: 1.45; }
+.portfolio-page .project-card-bottom { display: flex; align-items: flex-end; justify-content: space-between; gap: 5px; margin-top: auto; }
+.portfolio-page .project-content .skills { display: flex; gap: 5px; flex-wrap: wrap; margin: 0; }
+.portfolio-page .project-content .skills span { padding: 5px 8px; border: 0; border-radius: 12px !important; background: #f0f1f1; color: #50565b; font-size: 10px; }
+.portfolio-page .project-actions { display: flex; flex: none; align-items: center; gap: 5px; margin: 0; padding: 0; border: 0; }
+.portfolio-page .public-project-arrow { display: grid; place-items: center; width: 25px; height: 25px; color: #17191b; text-decoration: none; font-size: 21px; }
+.portfolio-page .public-project-github { color: #50565b; text-decoration: none; font-size: 10px; }
+.portfolio-page .empty-projects { border-radius: 9px !important; }
+.public-footer { background: #f9f9f8; }
+@media (max-width: 1300px) { .portfolio-page .public-projects { grid-template-columns: repeat(3,minmax(0,1fr)); } }
+@media (max-width: 820px) { .portfolio-page .public-projects { grid-template-columns: repeat(2,minmax(0,1fr)); } .portfolio-page .public-nav { height: 100px; } .portfolio-page .public-avatar { margin-top: -35px; } }
+@media (max-width: 600px) { .public-hero { min-height: 0; } .portfolio-page .public-nav { height: 82px; padding: 20px 18px 0; } .portfolio-page .public-brand .devifolio-logo { --brand-visible-height: 26px; } .portfolio-page .nav-action { min-height: 37px; padding: 0 10px; font-size: 11px; } .portfolio-page .profile-header { width: calc(100% - 32px); min-height: 0; padding: 8px 0 44px; } .portfolio-page .public-avatar { width: 108px; height: 108px; margin: 0 0 16px; } .portfolio-page .profile-copy h1 { font-size: 42px; } .portfolio-page .profile-copy .bio { font-size: 13px; } .portfolio-page .projects-section { padding: 30px 0 60px; } .portfolio-page .projects-inner { width: calc(100% - 28px); } .portfolio-page .public-projects { grid-template-columns: 1fr; gap: 14px; } .portfolio-page .project-image { aspect-ratio: 2.1; } .portfolio-page .project-content p { min-height: 0; } }

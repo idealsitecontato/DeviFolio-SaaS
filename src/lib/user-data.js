@@ -14,6 +14,7 @@ const mapProfile = row => row ? {
   website: row.website || '',
   avatar: row.avatar_url || '',
   published: Boolean(row.published),
+  selectedModel: row.selected_model || 'white',
   userId: row.user_id,
 } : null
 
@@ -75,6 +76,14 @@ export async function saveProfile(userId, profile, published) {
     published: Boolean(published),
     updated_at: new Date().toISOString(),
   }, { onConflict: 'user_id' })
+  if (error) throw error
+}
+
+export async function savePortfolioModel(userId, modelId) {
+  const { error } = await supabase.from('profiles').update({
+    selected_model: modelId,
+    updated_at: new Date().toISOString(),
+  }).eq('user_id', userId)
   if (error) throw error
 }
 
@@ -147,12 +156,19 @@ export async function removeProjectImage(userId, projectId) {
 export async function loadPublicPortfolio(username) {
   const normalized = String(username || '').trim().toLowerCase()
   if (!normalized) return null
-  const { data: profileRow, error: profileError } = await supabase
+  let { data: profileRow, error: profileError } = await supabase
     .from('profiles')
-    .select('user_id,name,username,role,bio,skills,linkedin,github,website,avatar_url,published')
+    .select('user_id,name,username,role,bio,skills,linkedin,github,website,avatar_url,published,selected_model')
     .eq('username', normalized)
     .eq('published', true)
     .maybeSingle()
+  if (profileError?.code === '42703') {
+    const legacy = await supabase.from('profiles')
+      .select('user_id,name,username,role,bio,skills,linkedin,github,website,avatar_url,published')
+      .eq('username', normalized).eq('published', true).maybeSingle()
+    profileRow = legacy.data
+    profileError = legacy.error
+  }
   if (profileError) throw profileError
   if (!profileRow) return null
   const { data: projectRows, error: projectsError } = await supabase
