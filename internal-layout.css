@@ -1,0 +1,181 @@
+/* Give the existing internal screens a fuller, balanced use of the workspace. */
+html body.dashboard-app .page-content {
+  width: 100%;
+  max-width: none;
+  padding-inline: clamp(20px, 2.8vw, 52px);
+  padding-bottom: 36px;
+}
+html body.dashboard-app .page-head { margin-bottom: 20px; }
+html body.dashboard-app .page-head > div { max-width: 800px; }
+
+/* Home: share the same two rows across the existing left and right columns. */
+html body.dashboard-app .home-page .dashboard-layout {
+  grid-template-columns: minmax(0, 1.68fr) minmax(360px, 1fr);
+  gap: 18px 20px;
+}
+html body.dashboard-app .home-page .dashboard-main-column,
+html body.dashboard-app .home-page .dashboard-side-column { gap: 18px; }
+html body.dashboard-app .home-page .dashboard-metrics { gap: 12px; margin-top: 22px; }
+html body.dashboard-app .home-page .dashboard-metrics button {
+  min-height: 108px;
+  padding: 14px 16px;
+  justify-content: center;
+}
+html body.dashboard-app .home-page .dashboard-metrics strong { font-size: 24px; }
+html body.dashboard-app .home-page .github-summary {
+  display: flex;
+  flex-direction: column;
+  min-height: 190px;
+  padding: 18px;
+}
+html body.dashboard-app .home-page .github-summary .dashboard-action { min-height: 44px; margin-top: auto; }
+html body.dashboard-app .home-page .projects-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 430px;
+  padding: 18px;
+}
+html body.dashboard-app .home-page .projects-card .section-card-head { flex: none; margin-bottom: 12px; }
+html body.dashboard-app .home-page .projects-card .projects-empty {
+  display: grid;
+  flex: 1;
+  place-items: center;
+}
+html body.dashboard-app .home-page .projects-card .empty-state-content {
+  width: 100%;
+  min-height: 0;
+  padding: 20px;
+}
+html body.dashboard-app .home-page .recent-project {
+  grid-template-columns: 96px minmax(0,1fr) auto auto;
+  min-height: 76px;
+  gap: 12px;
+  padding: 8px 10px;
+}
+html body.dashboard-app .home-page .recent-project-image { width: 88px; height: 62px; }
+html body.dashboard-app .home-page .recent-project-copy p {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  margin-top: 4px;
+  font-size: 11px;
+}
+html body.dashboard-app .home-page .link-summary { min-height: 430px; padding: 18px; }
+html body.dashboard-app .home-page .home-qr-card { display: flex !important; flex-direction: column; }
+html body.dashboard-app .home-page .home-qr-card .dashboard-qr {
+  display: grid !important;
+  width: 100%;
+  flex: 1;
+  grid-template-columns: minmax(0, 1fr);
+  place-items: center stretch;
+  min-height: 170px;
+  margin: 10px 0;
+}
+html body.dashboard-app .home-page .home-qr-area { width: 100%; justify-self: stretch; }
+html body.dashboard-app .home-page .home-qr-area .qr-wrap { width: 156px; height: 156px; margin-inline: auto; }
+html body.dashboard-app .home-page .home-qr-area .qr-wrap canvas { width: 132px !important; height: 132px !important; }
+html body.dashboard-app .home-page .home-qr-download .secondary-button { min-height: 40px; }
+
+/* Full-width lists and empty states use the available content area. */
+html body.dashboard-app .project-grid { gap: 18px; }
+html body.dashboard-app .project-grid > .empty-state {
+  grid-column: 1 / -1;
+  display: grid;
+  place-items: center;
+  min-height: clamp(340px, 55vh, 560px);
+}
+html body.dashboard-app .project-grid > .empty-state .empty-state-content { width: 100%; }
+html body.dashboard-app .project-card-body { padding: 22px; }
+html body.dashboard-app .project-cover { min-height: 170px; }
+html body.dashboard-app .portfolio-list-item {
+  min-height: clamp(240px, 36vh, 360px);
+  padding: clamp(22px, 2vw, 32px);
+}
+html body.dashboard-app .portfolio-list-item > div:first-child { max-width: 720px; }
+html body.dashboard-app .editor-layout { gap: 20px; }
+html body.dashboard-app .portfolio-editor .public-preview { min-height: clamp(380px, 52vh, 560px); }
+html body.dashboard-app .share-card { min-height: clamp(400px, 58vh, 620px); }
+
+/* GitHub: fill the central area while keeping repository rows scannable. */
+html body.dashboard-app .github-page .connect-card {
+  min-height: clamp(350px, 48vh, 500px);
+  padding: 34px;
+}
+html body.dashboard-app .github-page .connect-card p { max-width: 600px; }
+html body.dashboard-app .github-page .connected-account { min-height: 100px; padding: 20px 24px; }
+html body.dashboard-app .github-page .repo-panel { min-height: 380px; padding: 24px; }
+html body.dashboard-app .github-page .repo-row { min-height: 82px; padding: 14px 16px; }
+html body.dashboard-app .github-page .repo-panel > .projects-empty { display: grid; place-items: center; min-height: 250px; }
+
+/* Analytics, profile and settings gain width without stretching their controls. */
+html body.dashboard-app .analytics-metrics { gap: 18px; }
+html body.dashboard-app .analytic-stat { min-height: 150px; padding: 20px; }
+html body.dashboard-app .monthly-chart { padding: 22px; }
+html body.dashboard-app .month-bars { height: clamp(240px, 31vh, 330px); }
+html body.dashboard-app .analytics-layout { gap: 20px; }
+html body.dashboard-app .analytics-layout > .card { min-height: 280px; }
+html body.dashboard-app .analytics-empty { min-height: clamp(330px, 46vh, 500px); display: grid; place-items: center; }
+html body.dashboard-app .compact-panel-page .compact-panel {
+  width: min(1180px, 100%);
+  min-height: clamp(520px, 68vh, 760px);
+  padding: clamp(24px, 2.2vw, 36px);
+}
+html body.dashboard-app #profile-form.compact-panel { margin-inline: auto; min-height: 0; }
+html body.dashboard-app .compact-panel .panel-section { padding-block: 24px; }
+html body.dashboard-app .settings-card .setting-row { min-height: 76px; }
+
+@media (min-width: 1181px) {
+  html body.dashboard-app .home-page .dashboard-layout {
+    grid-template-rows: minmax(220px, auto) minmax(430px, 1fr);
+    min-height: clamp(660px, calc(100dvh - 175px), 860px);
+    align-items: stretch;
+  }
+  html body.dashboard-app .home-page :is(.dashboard-main-column,.dashboard-side-column) {
+    grid-row: span 2;
+    grid-template-rows: subgrid;
+    align-content: stretch;
+  }
+  html body.dashboard-app .home-page :is(.projects-card,.home-qr-card) {
+    align-self: stretch;
+    min-height: 430px;
+  }
+}
+@media (max-width: 1180px) {
+  html body.dashboard-app .home-page .dashboard-layout {
+    grid-template-columns: minmax(0,1fr);
+    grid-template-rows: auto;
+    min-height: 0;
+  }
+  html body.dashboard-app .home-page :is(.dashboard-main-column,.dashboard-side-column) {
+    grid-row: auto;
+    grid-template-rows: auto;
+    align-content: start;
+  }
+  html body.dashboard-app .home-page .dashboard-side-column { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  html body.dashboard-app .home-page .link-summary { min-height: 380px; }
+}
+@media (max-width: 820px) {
+  html body.dashboard-app .page-content { padding-inline: 18px; }
+  html body.dashboard-app .project-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  html body.dashboard-app .compact-panel-page .compact-panel { width: 100%; min-height: 0; }
+}
+@media (max-width: 620px) {
+  html body.dashboard-app .page-content { padding-inline: 14px; }
+  html body.dashboard-app .home-page .dashboard-side-column { grid-template-columns: minmax(0,1fr); }
+  html body.dashboard-app .home-page .dashboard-metrics { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  html body.dashboard-app .home-page .dashboard-metrics button { min-height: 96px; }
+  html body.dashboard-app .home-page .projects-card { min-height: 310px; }
+  html body.dashboard-app .home-page .recent-project { grid-template-columns: 54px minmax(0,1fr) auto; gap: 8px; }
+  html body.dashboard-app .home-page .recent-project-image { width: 48px; height: 44px; }
+  html body.dashboard-app .home-page .recent-project-copy p { display: none; }
+  html body.dashboard-app .home-page .link-summary { min-height: 350px; }
+  html body.dashboard-app .project-grid { grid-template-columns: minmax(0,1fr); }
+  html body.dashboard-app .project-grid > .empty-state { min-height: 300px; }
+  html body.dashboard-app .portfolio-list-item { min-height: 0; }
+  html body.dashboard-app .github-page .repo-panel { min-height: 0; padding: 16px; }
+  html body.dashboard-app .github-page .connect-card { min-height: 350px; padding: 24px; }
+  html body.dashboard-app .compact-panel-page .compact-panel { padding: 18px; }
+  html body.dashboard-app .analytic-stat { min-height: 125px; padding: 15px; }
+  html body.dashboard-app .month-bars { height: 220px; }
+}
