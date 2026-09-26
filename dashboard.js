@@ -176,11 +176,16 @@ function linkQrView() {
 function projectCards(items) {
   if (!items.length && state.projects.length) return `<div class="card empty-state">${emptyState('search', 'Nenhum projeto encontrado.', 'Ajuste a busca ou os filtros para encontrar seus projetos.')}</div>`
   if (!items.length) return `<div class="card empty-state">${emptyState('folder', 'Você ainda não possui projetos.', 'Crie seu primeiro projeto para começar.', '<button class="primary-button" data-new-project>Novo projeto</button>')}</div>`
-  return items.map(project => `<article class="card project-card"><div class="project-cover">${project.image ? `<img class="project-cover-image" src="${esc(project.image)}" alt="Capa do projeto ${esc(project.name)}">` : `<span>${esc(project.name.slice(0, 2).toUpperCase())}</span>`}${projectTypeChip(project)}</div><div class="project-card-body"><div class="project-card-title"><h2>${esc(project.name)}</h2></div>${project.description ? `<p>${esc(project.description)}</p>` : ''}<div class="tag-row">${project.tech.split(',').filter(Boolean).map(item => `<span>${esc(item.trim())}</span>`).join('')}</div><div class="project-actions"><button class="secondary-button" data-view-project="${project.id}"><span data-icon="eye"></span>Visualizar</button><button class="icon-button" data-edit-project="${project.id}" aria-label="Editar"><span data-icon="edit"></span></button><button class="icon-button danger-ghost" data-delete-project="${project.id}" aria-label="Excluir"><span data-icon="trash"></span></button></div></div></article>`).join('')
+  return items.map(project => {
+    const tone = Math.abs(Number(project.id) || project.name.length) % 4
+    const status = project.status === 'published' ? 'Publicado' : project.status === 'progress' ? 'Em desenvolvimento' : 'Rascunho'
+    const description = project.description || 'Adicione uma descrição para este projeto.'
+    return `<article class="card project-card"><div class="project-cover project-cover-tone-${tone}">${project.image ? `<img class="project-cover-image" src="${esc(project.image)}" alt="Capa do projeto ${esc(project.name)}">` : `<div class="project-cover-fallback"><strong>${esc(project.name)}</strong><small>${esc(description)}</small><span>${esc(project.tech.split(',')[0]?.trim() || 'Projeto')}</span></div>`}<span class="project-cover-emblem" data-icon="folder" aria-hidden="true"></span><details class="project-card-menu"><summary aria-label="Opções de ${esc(project.name)}">⋯</summary><div><button type="button" data-delete-project="${project.id}">Excluir projeto</button></div></details></div><div class="project-card-body"><h2>${esc(project.name)}</h2><p>${esc(description)}</p><div class="project-card-footer"><span class="project-card-status ${esc(project.status)}"><i aria-hidden="true"></i>${status}</span><div class="project-actions"><button class="primary-button" data-view-project="${project.id}">Acessar <span data-icon="arrow"></span></button><button class="icon-button" data-edit-project="${project.id}" aria-label="Editar ${esc(project.name)}" title="Editar projeto"><span data-icon="edit"></span></button></div></div></div></article>`
+  }).join('')
 }
 
 function projectsView() {
-  return `<section class="page-enter">${pageHead('Projetos', 'Organize e publique os trabalhos que contam a sua história.', '<button class="primary-button" data-new-project><span data-icon="plus"></span>Novo projeto</button>')}<div class="toolbar"><label class="search-field"><span data-icon="search"></span><input id="project-search" type="search" placeholder="Buscar projetos" aria-label="Buscar projetos"></label><select id="type-filter" aria-label="Filtrar por tipo"><option value="all">Todos os tipos</option><option value="landing">Landing page</option><option value="site">Site</option></select><select id="project-sort" aria-label="Ordenar projetos"><option value="recent">Mais recentes</option><option value="name">Nome: A–Z</option><option value="type">Tipo</option></select></div><div class="project-grid" id="project-grid">${projectCards(state.projects)}</div></section>`
+  return `<section class="page-enter projects-page">${pageHead('Projetos', 'Organize e publique os trabalhos que contam a sua história.', '<button class="primary-button" data-new-project><span data-icon="plus"></span>Novo projeto</button>')}<div class="toolbar"><label class="search-field"><span data-icon="search"></span><input id="project-search" type="search" placeholder="Buscar projetos..." aria-label="Buscar projetos"></label><select id="type-filter" aria-label="Filtrar projetos"><option value="all">Todos os status</option><optgroup label="Status"><option value="status:published">Publicado</option><option value="status:progress">Em desenvolvimento</option><option value="status:draft">Rascunho</option></optgroup><optgroup label="Tipo"><option value="type:landing">Landing page</option><option value="type:site">Site</option></optgroup></select><select id="project-sort" aria-label="Ordenar projetos"><option value="recent">Mais recentes</option><option value="name">Nome: A–Z</option><option value="type">Tipo</option></select></div><div class="project-grid" id="project-grid">${projectCards(state.projects)}</div></section>`
 }
 
 function previewMarkup() {
@@ -261,7 +266,7 @@ function githubView() {
     ? `<div class="card connected-account"><span class="avatar">GH</span><div><small>Conta conectada</small><h2>@${esc(state.githubUsername || 'GitHub')}</h2></div><button class="secondary-button" data-sync-repos><span data-icon="refresh"></span>Sincronizar</button></div>`
     : `<div class="card connect-card"><span class="connect-icon" data-icon="github"></span><h2>Conecte seu GitHub</h2><p>Conecte a conta para sincronizar e importar seus repositórios reais.</p><button class="primary-button" data-connect-github><span data-icon="github"></span>Conectar com GitHub</button></div>`
   const status = hasRealRepos ? `${state.repos.length} encontrado${state.repos.length === 1 ? '' : 's'}` : '5 exemplos de referência'
-  const message = !hasRealRepos ? `<p class="repo-reference-note">${reposLoading ? 'Sincronizando seus repositórios. Os exemplos exibidos são apenas uma prévia.' : repoLoadFailed ? 'Não foi possível carregar seus repositórios. Sincronize novamente; estes exemplos não podem ser importados.' : 'Exemplos de visualização. Conecte ou sincronize sua conta para importar repositórios reais.'}</p>` : ''
+  const message = !hasRealRepos ? `<div class="repo-reference-note"><span>${reposLoading ? 'Sincronizando seus repositórios. Os exemplos exibidos são apenas uma prévia.' : repoLoadFailed ? 'Não foi possível carregar seus repositórios. Estes exemplos não podem ser importados.' : 'Exemplos de visualização. Conecte ou sincronize sua conta para importar repositórios reais.'}</span>${repoLoadFailed ? '<button type="button" data-retry-repos>Tentar novamente</button>' : ''}</div>` : ''
   return `<section class="page-enter github-page">${pageHead('GitHub', 'Selecione os repositórios que deseja transformar em projetos.', state.githubConnected ? '<button class="secondary-button" data-disconnect-github>Desconectar</button>' : '')}${account}<div class="card repo-panel"><div class="section-card-head"><div><h2>Seus repositórios</h2><p>${status}</p></div><button class="primary-button" data-import-selected ${hasRealRepos ? '' : 'disabled'}><span data-icon="upload"></span>Importar selecionados</button></div>${content}${message}</div></section>`
 }
 
@@ -313,8 +318,9 @@ const views = { 'link-qrcode': linkQrView, inicio: homeView, projetos: projectsV
 function render({ preserveScroll = false } = {}) {
   const route = views[location.hash.slice(1)] ? location.hash.slice(1) : 'inicio'
   renderedRoute = route
+  document.body.classList.toggle('projects-route', route === 'projetos')
   $('#page-content').innerHTML = views[route]()
-  const routeLabel = { 'link-qrcode': 'Seu Link, Seu QR Code', inicio: 'Dashboard', projetos: 'Projetos', portfolio: 'Meus portfólios', modelos: 'Modelos', 'portfolio-editar': 'Editar portfólio', github: 'GitHub', analise: 'Análise', perfil: 'Perfil', configuracoes: 'Configurações', indicacao: 'Indicação' }[route]
+  const routeLabel = { 'link-qrcode': 'Seu Link, Seu QR Code', inicio: 'Dashboard', projetos: 'Meus projetos', portfolio: 'Meus portfólios', modelos: 'Modelos', 'portfolio-editar': 'Editar portfólio', github: 'GitHub', analise: 'Análise', perfil: 'Perfil', configuracoes: 'Configurações', indicacao: 'Indicação' }[route]
   document.title = `${routeLabel} — Devifolio`
   if ($('#breadcrumb-page')) $('#breadcrumb-page').textContent = routeLabel
   if ($('#breadcrumb-section')) $('#breadcrumb-section').textContent = route === 'inicio' ? 'Início' : 'Painel'
@@ -353,8 +359,8 @@ function bindActions() {
   const search = $('#project-search'), filter = $('#type-filter'), sort = $('#project-sort')
   if (search && filter && sort) {
     const update = () => {
-      const query = search.value.toLowerCase(), type = filter.value
-      const items = state.projects.filter(project => `${project.name} ${project.description} ${project.tech}`.toLowerCase().includes(query) && (type === 'all' || projectVisualType(project) === type))
+      const query = search.value.toLowerCase(), selection = filter.value
+      const items = state.projects.filter(project => `${project.name} ${project.description} ${project.tech}`.toLowerCase().includes(query) && (selection === 'all' || selection === `status:${project.status}` || selection === `type:${projectVisualType(project)}`))
       if (sort.value === 'name') items.sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'))
       if (sort.value === 'type') items.sort((a, b) => projectVisualType(a).localeCompare(projectVisualType(b), 'pt-BR'))
       $('#project-grid').innerHTML = projectCards(items)
@@ -373,6 +379,7 @@ function bindActions() {
   $('[data-connect-github]')?.addEventListener('click', connectGithub)
   $('[data-disconnect-github]')?.addEventListener('click', disconnectGithub)
   $('[data-sync-repos]')?.addEventListener('click', fetchGithubRepos)
+  $('[data-retry-repos]')?.addEventListener('click', fetchGithubRepos)
   $('[data-import-selected]')?.addEventListener('click', importSelected)
   $$('[data-setting]').forEach(button => button.onclick = () => updateSetting(button.dataset.setting))
   $('[data-export]')?.addEventListener('click', exportData)
