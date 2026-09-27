@@ -27,6 +27,7 @@ const mapProject = row => ({
   github: row.github || '',
   image: row.image_url || '',
   status: row.status || 'draft',
+  sortOrder: Number(row.sort_order) || 0,
 })
 
 function coreWorkspaceAvailable(results) {
@@ -98,7 +99,7 @@ export async function saveProject(userId, project, sortOrder = 0) {
     github: project.github || null,
     image_url: project.image || null,
     status: project.status || 'draft',
-    sort_order: sortOrder,
+    sort_order: project.sortOrder ?? sortOrder,
     updated_at: new Date().toISOString(),
   }).select().single()
   if (error) throw error
@@ -108,6 +109,14 @@ export async function saveProject(userId, project, sortOrder = 0) {
 export async function removeProject(userId, projectId) {
   const { error } = await supabase.from('projects').delete().eq('id', projectId).eq('user_id', userId)
   if (error) throw error
+}
+
+export async function moveProject(userId, projectId, sortOrder) {
+  const { data, error } = await supabase.from('projects')
+    .update({ sort_order: sortOrder, updated_at: new Date().toISOString() })
+    .eq('id', projectId).eq('user_id', userId).select().single()
+  if (error) throw error
+  return mapProject(data)
 }
 
 export async function saveSettings(userId, settings) {

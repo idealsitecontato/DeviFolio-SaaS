@@ -1,0 +1,228 @@
+/* Portfolio explorer and the project cards shared by its three surfaces. */
+html body.dashboard-app.projects-route,
+html body.dashboard-app.projects-route .main-content,
+html body.dashboard-app.projects-route .desktop-topbar {
+  background: #f8f9fb !important;
+  color: #111820 !important;
+}
+html body.dashboard-app.projects-route .desktop-topbar,
+html body.dashboard-app.projects-route .desktop-topbar strong { color: #61718b !important; }
+html body.dashboard-app.projects-route .projects-page { color: #111820; }
+html body.dashboard-app.projects-route .projects-page .page-head h1 { color: #080d14; }
+html body.dashboard-app.projects-route .projects-page .page-head p:not(.eyebrow) { color: #61718b; }
+html body.dashboard-app.projects-route .projects-page .search-field,
+html body.dashboard-app.projects-route .projects-page .toolbar select {
+  background: #fff !important;
+  border-color: #d9e1ec !important;
+  color: #101820 !important;
+}
+html body.dashboard-app.projects-route .projects-page .search-field input { color: #101820 !important; }
+html body.dashboard-app.projects-route .projects-page .search-field input::placeholder { color: #7a8aa4; }
+html body.dashboard-app.projects-route .projects-page .toolbar select option,
+html body.dashboard-app.projects-route .projects-page .toolbar select optgroup { background: #fff; color: #101820; }
+
+html body.dashboard-app .portfolio-manager-page .portfolio-workspace { display: flex; align-items: flex-start; gap: 26px; }
+html body.dashboard-app .portfolio-manager-page .portfolio-list {
+  grid-template-columns: repeat(4, 190px);
+  gap: 36px;
+  margin: 38px 0 0 48px;
+  flex: none;
+}
+html body.dashboard-app .portfolio-manager-page .portfolio-list-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 190px;
+  min-height: 170px !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  cursor: default;
+}
+html body.dashboard-app .portfolio-manager-page .portfolio-list-item:hover,
+html body.dashboard-app .portfolio-manager-page .portfolio-list-item.explorer-drop-target { background: transparent !important; border: 0 !important; }
+html body.dashboard-app .portfolio-manager-page .portfolio-folder {
+  position: relative;
+  display: block;
+  flex: none;
+  width: 148px;
+  height: 111px;
+  margin: 0 0 13px;
+  filter: drop-shadow(0 7px 8px rgba(173, 113, 0, .12));
+}
+html body.dashboard-app .portfolio-manager-page .portfolio-folder svg { display: none; }
+html body.dashboard-app .portfolio-manager-page .portfolio-folder::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 82px;
+  height: 36px;
+  border-radius: 11px 12px 0 0;
+  background: linear-gradient(180deg, #ffc714, #e5a300);
+  clip-path: polygon(0 0, 83% 0, 100% 45%, 100% 100%, 0 100%);
+}
+html body.dashboard-app .portfolio-manager-page .portfolio-folder::after {
+  content: '';
+  position: absolute;
+  top: 23px;
+  left: 0;
+  width: 145px;
+  height: 87px;
+  border-radius: 8px 9px 10px 10px;
+  background: linear-gradient(145deg, #fff064 0%, #ffdd28 45%, #ffbf08 100%);
+  border-top: 3px solid #ffe87b;
+  transform: skewX(-2deg);
+}
+html body.dashboard-app .portfolio-manager-page .portfolio-list-item h2 {
+  margin: 0;
+  color: #0c1118;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+html body.dashboard-app .portfolio-manager-page .portfolio-list-item .edit-action {
+  position: absolute;
+  top: 70px;
+  left: 115px;
+  z-index: 1;
+  width: 46px;
+  height: 46px;
+  background: #fff !important;
+  border: 1px solid #d9e0e8 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 11px rgba(14, 25, 43, .17) !important;
+}
+html body.dashboard-app .portfolio-manager-page .portfolio-integration {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  color: #65748d;
+  font-size: 14px;
+  white-space: nowrap;
+}
+html body.dashboard-app .portfolio-manager-page .portfolio-integration .github-icon { width: 25px; height: 25px; }
+html body.dashboard-app .portfolio-manager-page .portfolio-list-item.explorer-drop-target .portfolio-folder { transform: translateY(-5px) scale(1.05); }
+
+html body.dashboard-app .projects-page .project-grid,
+html body.dashboard-app .portfolio-manager-page .project-grid,
+html body.dashboard-app .portfolio-folder-modal .project-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 17px;
+}
+html body.dashboard-app .explorer-project {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 13px !important;
+  background: #fff !important;
+  border: 1px solid #dfe5ed !important;
+  border-radius: 13px !important;
+  box-shadow: 0 5px 12px rgba(18, 28, 45, .04) !important;
+  cursor: grab;
+  user-select: none;
+}
+html body.dashboard-app .explorer-project:active { cursor: grabbing; }
+html body.dashboard-app .explorer-project .project-cover {
+  display: block;
+  width: 100%;
+  height: 136px;
+  min-height: 0 !important;
+  overflow: hidden;
+  border: 0 !important;
+  border-radius: 6px !important;
+  background: #12233b !important;
+}
+html body.dashboard-app .explorer-project .project-cover-image { width: 100%; height: 100%; object-fit: cover; }
+html body.dashboard-app .explorer-project .project-card-body { display: block; padding: 13px 3px 0 !important; }
+html body.dashboard-app .explorer-project .project-card-body h2 {
+  margin: 0 0 12px;
+  color: #0c1118 !important;
+  font-size: 17px !important;
+  font-weight: 700;
+  line-height: 1.2;
+}
+html body.dashboard-app .explorer-project .project-actions { display: grid !important; grid-template-columns: 1.25fr 1fr; gap: 11px; border: 0 !important; }
+html body.dashboard-app .explorer-project .project-actions button {
+  width: 100%;
+  min-height: 42px !important;
+  padding: 0 10px !important;
+  border-radius: 7px !important;
+  font-size: 14px !important;
+  font-weight: 500;
+}
+html body.dashboard-app .explorer-project .project-actions .primary-button { background: #05080c !important; border: 1px solid #05080c !important; color: #fff !important; }
+html body.dashboard-app .explorer-project .project-actions .secondary-button { background: #fff !important; border: 1px solid #dce4ef !important; color: #080d14 !important; }
+html body.dashboard-app .portfolio-manager-page .loose-projects { width: min(270px, 100%); margin-top: 38px; }
+html body.dashboard-app .portfolio-manager-page .loose-projects > h2 { margin: 0 0 16px; color: #1a2535; font-size: 19px; }
+html body.dashboard-app .portfolio-manager-page .loose-projects .project-grid { grid-template-columns: minmax(0, 1fr); }
+
+html body.dashboard-app .modal-backdrop.portfolio-folder-modal-backdrop { background: rgba(9, 15, 27, .74) !important; backdrop-filter: none; }
+html body.dashboard-app .modal-backdrop.portfolio-folder-modal-backdrop::before { background: transparent !important; }
+html body.dashboard-app .modal.portfolio-folder-modal {
+  position: relative;
+  width: min(1300px, calc(100vw - 100px));
+  max-height: min(76vh, 740px);
+  margin-top: 52px;
+  padding: 58px 30px 28px;
+  overflow: visible;
+  background: linear-gradient(145deg, #ffeb43 0%, #ffd428 65%, #ffc315 100%) !important;
+  border: 2px solid #f4b500 !important;
+  border-radius: 25px !important;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, .36) !important;
+  animation: folderOpen .25s ease-out both;
+}
+html body.dashboard-app .portfolio-folder-window { max-height: calc(76vh - 100px); overflow: auto; }
+html body.dashboard-app .portfolio-folder-tab {
+  position: absolute;
+  top: -54px;
+  left: -2px;
+  width: 330px;
+  height: 75px;
+  border-radius: 30px 65px 0 0;
+  background: linear-gradient(135deg, #ffca18, #ffad00);
+  clip-path: polygon(0 0, 86% 0, 100% 72%, 100% 100%, 0 100%);
+  z-index: 0;
+}
+html body.dashboard-app .portfolio-folder-window > h2 { position: relative; margin: 0 0 13px; color: #080b0e; font-size: 32px; line-height: 1.15; }
+html body.dashboard-app .portfolio-folder-window .folder-close { position: absolute; top: 10px; right: 12px; z-index: 2; background: rgba(255,255,255,.6); }
+html body.dashboard-app .portfolio-folder-window .folder-empty { grid-column: 1 / -1; color: #3f3400; }
+@keyframes folderOpen { from { opacity: .3; transform: translateY(34px) scale(.94); } to { opacity: 1; transform: none; } }
+
+html body.dashboard-app .github-page .repo-panel { padding: 8px 0 0; background: transparent !important; border: 0 !important; }
+html body.dashboard-app .github-page .repo-panel .section-card-head { margin-bottom: 20px; }
+html body.dashboard-app .github-page .repo-row { border-radius: 11px !important; background: #1e2228 !important; }
+html body.dashboard-app .github-page .repo-copy b { font-size: 17px; }
+html body.dashboard-app .github-page .repo-empty { margin-top: 22px; color: #66748a; }
+
+.explorer-dragging .explorer-project { cursor: grabbing; }
+.explorer-drag-source { opacity: .48; }
+.explorer-drop-target { outline: 3px solid #f3b800 !important; outline-offset: 3px; }
+.explorer-drop-blocked { cursor: not-allowed !important; }
+.explorer-drag-return { animation: explorerReturn .35s ease-out; }
+@keyframes explorerReturn { 35% { transform: translateX(-9px); } 70% { transform: translateX(5px); } to { transform: translateX(0); } }
+@media (prefers-reduced-motion: reduce) { .explorer-drag-return, html body.dashboard-app .modal.portfolio-folder-modal { animation: none; } }
+@media (max-width: 1200px) {
+  html body.dashboard-app .portfolio-manager-page .portfolio-workspace { flex-wrap: wrap; }
+  html body.dashboard-app .portfolio-manager-page .portfolio-list { grid-template-columns: repeat(2, 190px); }
+  html body.dashboard-app .projects-page .project-grid,
+  html body.dashboard-app .portfolio-manager-page .project-grid,
+  html body.dashboard-app .portfolio-folder-modal .project-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 700px) {
+  html body.dashboard-app .portfolio-manager-page .portfolio-workspace { display: block; }
+  html body.dashboard-app .portfolio-manager-page .portfolio-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 8px; margin-left: 0; }
+  html body.dashboard-app .portfolio-manager-page .portfolio-list-item { width: 160px; }
+  html body.dashboard-app .portfolio-manager-page .portfolio-list-item h2 { font-size: 14px; white-space: normal; }
+  html body.dashboard-app .projects-page .project-grid,
+  html body.dashboard-app .portfolio-manager-page .project-grid,
+  html body.dashboard-app .portfolio-folder-modal .project-grid { grid-template-columns: minmax(0, 1fr); }
+  html body.dashboard-app .modal.portfolio-folder-modal { width: calc(100vw - 28px); padding: 34px 15px 18px; }
+  html body.dashboard-app .portfolio-folder-tab { width: 190px; }
+  html body.dashboard-app .portfolio-folder-window > h2 { font-size: 23px; }
+}

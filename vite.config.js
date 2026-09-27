@@ -9,6 +9,9 @@ export default defineConfig(({ mode }) => {
   }
 
   return {
+    server: {
+      watch: { ignored: ['**/.visual-*/**', '**/.reference-images/**'] },
+    },
     build: {
       rollupOptions: {
         input: {

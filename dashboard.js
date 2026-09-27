@@ -3,6 +3,7 @@ import {
   deleteCurrentAccount,
   loadPublicPortfolio,
   loadWorkspace,
+  moveProject,
   removeProject,
   removeProjectImage,
   saveProfile,
@@ -15,18 +16,12 @@ import {
 import QRCode from 'qrcode'
 import { createScreenLoading } from './screen-loading.js'
 import { portfolioModels, getPortfolioModel } from './src/lib/portfolio-models.js'
+import { portfolioFolders, projectLocation, allowedMove, nextSortOrder } from './src/lib/project-location.js'
 import { kapteiView, bindKapteiActions } from './kaptei.js'
 
 const githubIconUrl = new URL('./assets/github-icon.png', import.meta.url).href
 const bannerUrl = new URL('./assets/devi-plus-banner-original.png', import.meta.url).href
 const placeholderUrl = new URL('./assets/user-placeholder.png', import.meta.url).href
-const referenceRepositories = [
-  { name: 'dev-landing', description: 'Landing page moderna e responsiva - HTML, CSS e JavaScript' },
-  { name: 'ecommerce-api', description: 'API de e-commerce com Node.js e Express' },
-  { name: 'portfolio-pro', description: 'Meu portfólio pessoal com Next.js e Tailwind' },
-  { name: 'task-manager', description: 'Aplicação de gerenciamento de tarefas com React' },
-  { name: 'landing-saas', description: 'Landing page para SaaS com foco em conversão' },
-]
 
 const $ = (selector, root = document) => root.querySelector(selector)
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)]
@@ -94,7 +89,7 @@ function hydrateIcons(root = document) {
 
 const blankProfile = { name: '', username: '', email: '', role: '', bio: '', skills: '', linkedin: '', github: '', website: '', avatar: '', selectedModel: 'white' }
 const blankSettings = { email: true, product: true, publicProfile: true, compact: false }
-const state = { projects: [], profile: { ...blankProfile }, published: false, githubConnected: false, githubUsername: '', repos: [], analytics: [], referrals: [], settings: { ...blankSettings } }
+const state = { projects: [], folderNames: {}, profile: { ...blankProfile }, published: false, githubConnected: false, githubUsername: '', repos: [], analytics: [], referrals: [], settings: { ...blankSettings } }
 const statusLabel = { published: 'Publicado', progress: 'Não publicado', draft: 'Rascunho' }
 const projectVisualType = project => /(?:^|[\s/_-])landing(?:[\s/_-]|$)/i.test(`${project.name} ${project.description || ''} ${project.link || ''}`) ? 'landing' : 'site'
 const projectTypeChip = project => {
@@ -113,6 +108,8 @@ const onboardingRequested = new URLSearchParams(location.search).get('onboarding
 const realName = () => state.profile.name.trim() || currentUser?.user_metadata?.full_name || currentUser?.user_metadata?.name || currentUser?.email?.split('@')[0] || 'Você'
 const initials = () => realName().split(/\s+/).filter(Boolean).map(part => part[0]).slice(0, 2).join('').toUpperCase()
 const profileComplete = () => Boolean(state.profile.name.trim() && state.profile.username.trim())
+const folderName = id => state.folderNames[id] || portfolioFolders.find(folder => folder.id === id)?.name || ''
+const projectsAt = destination => state.projects.filter(project => projectLocation(project) === destination)
 const publicPortfolioUrl = () => {
   const username = encodeURIComponent(state.profile.username.trim().toLowerCase())
   return /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? `${location.origin}/portfolio.html?username=${username}` : `${location.origin}/portfolio/${username}`
@@ -175,18 +172,18 @@ function linkQrView() {
 }
 
 function projectCards(items) {
-  if (!items.length && state.projects.length) return `<div class="card empty-state">${emptyState('search', 'Nenhum projeto encontrado.', 'Ajuste a busca ou os filtros para encontrar seus projetos.')}</div>`
-  if (!items.length) return `<div class="card empty-state">${emptyState('folder', 'Você ainda não possui projetos.', 'Crie seu primeiro projeto para começar.', '<button class="primary-button" data-new-project>Novo projeto</button>')}</div>`
-  return items.map(project => {
-    const tone = Math.abs(Number(project.id) || project.name.length) % 4
-    const status = project.status === 'published' ? 'Publicado' : project.status === 'progress' ? 'Em desenvolvimento' : 'Rascunho'
-    const description = project.description || 'Adicione uma descrição para este projeto.'
-    return `<article class="card project-card"><div class="project-cover project-cover-tone-${tone}">${project.image ? `<img class="project-cover-image" src="${esc(project.image)}" alt="Capa do projeto ${esc(project.name)}">` : `<div class="project-cover-fallback"><strong>${esc(project.name)}</strong><small>${esc(description)}</small><span>${esc(project.tech.split(',')[0]?.trim() || 'Projeto')}</span></div>`}<span class="project-cover-emblem" data-icon="folder" aria-hidden="true"></span><details class="project-card-menu"><summary aria-label="Opções de ${esc(project.name)}">⋯</summary><div><button type="button" data-delete-project="${project.id}">Excluir projeto</button></div></details></div><div class="project-card-body"><h2>${esc(project.name)}</h2><p>${esc(description)}</p><div class="project-card-footer"><span class="project-card-status ${esc(project.status)}"><i aria-hidden="true"></i>${status}</span><div class="project-actions"><button class="primary-button" data-view-project="${project.id}">Acessar <span data-icon="arrow"></span></button><button class="icon-button" data-edit-project="${project.id}" aria-label="Editar ${esc(project.name)}" title="Editar projeto"><span data-icon="edit"></span></button></div></div></div></article>`
-  }).join('')
+  if (!items.length) return `<div class="card empty-state">${emptyState('folder', 'Nenhum projeto nesta seção.', 'Crie um projeto ou mova um card para cá.', '<button class="primary-button" data-new-project>Novo projeto</button>')}</div>`
+  return items.map(projectCard).join('')
+}
+
+function projectCard(project) {
+  const tone = Math.abs(Number(project.id) || project.name.length) % 4
+  const description = project.description || 'Adicione uma descrição para este projeto.'
+  return `<article class="card project-card explorer-project" draggable="true" data-drag-project="${project.id}" aria-label="Projeto ${esc(project.name)}. Arraste para organizar."><div class="project-cover project-cover-tone-${tone}">${project.image ? `<img class="project-cover-image" src="${esc(project.image)}" alt="Capa do projeto ${esc(project.name)}">` : `<div class="project-cover-fallback"><strong>${esc(project.name)}</strong><small>${esc(description)}</small></div>`}</div><div class="project-card-body"><h2>${esc(project.name)}</h2><div class="project-actions"><button class="primary-button" type="button" data-open-project="${project.id}">Acessar</button><button class="secondary-button" type="button" data-view-project="${project.id}">Ver</button></div></div></article>`
 }
 
 function projectsView() {
-  return `<section class="page-enter projects-page">${pageHead('Projetos', 'Organize e publique os trabalhos que contam a sua história.', '<button class="primary-button" data-new-project><span data-icon="plus"></span>Novo projeto</button>')}<div class="toolbar"><label class="search-field"><span data-icon="search"></span><input id="project-search" type="search" placeholder="Buscar projetos..." aria-label="Buscar projetos"></label><select id="type-filter" aria-label="Filtrar projetos"><option value="all">Todos os status</option><optgroup label="Status"><option value="status:published">Publicado</option><option value="status:progress">Em desenvolvimento</option><option value="status:draft">Rascunho</option></optgroup><optgroup label="Tipo"><option value="type:landing">Landing page</option><option value="type:site">Site</option></optgroup></select><select id="project-sort" aria-label="Ordenar projetos"><option value="recent">Mais recentes</option><option value="name">Nome: A–Z</option><option value="type">Tipo</option></select></div><div class="project-grid" id="project-grid">${projectCards(state.projects)}</div></section>`
+  return `<section class="page-enter projects-page" data-drop-zone="projects">${pageHead('Projetos', 'Organize e publique os trabalhos que contam a sua história.', '<button class="primary-button" data-new-project><span data-icon="plus"></span>Novo projeto</button>')}<div class="toolbar"><label class="search-field"><span data-icon="search"></span><input id="project-search" type="search" placeholder="Buscar projetos..." aria-label="Buscar projetos"></label><select id="type-filter" aria-label="Filtrar projetos"><option value="all">Todos os status</option><optgroup label="Status"><option value="status:published">Publicado</option><option value="status:progress">Em desenvolvimento</option><option value="status:draft">Rascunho</option></optgroup><optgroup label="Tipo"><option value="type:landing">Landing page</option><option value="type:site">Site</option></optgroup></select><select id="project-sort" aria-label="Ordenar projetos"><option value="recent">Mais recentes</option><option value="name">Nome: A–Z</option><option value="type">Tipo</option></select></div><div class="project-grid" id="project-grid">${projectCards(projectsAt('projects'))}</div></section>`
 }
 
 function previewMarkup() {
@@ -196,13 +193,27 @@ function previewMarkup() {
 }
 
 function portfolioManagerView() {
-  const folders = [
-    { name: state.profile.name ? `Portfólio — ${state.profile.name}` : 'Portfólio principal' },
-    { name: 'Portfólio profissional' },
-    { name: 'Projetos em destaque' },
-    { name: 'Portfólio GitHub', integrated: true },
-  ]
-  return `<section class="page-enter portfolio-manager-page">${pageHead('Meus portfólios', 'Gerencie seus portfólios em um só lugar.')}<div class="portfolio-list">${folders.map(folder => `<article class="portfolio-list-item"><span class="portfolio-folder" data-icon="folder" aria-hidden="true"></span><h2>${esc(folder.name)}</h2>${folder.integrated ? '<span class="portfolio-integration"><span data-icon="github" aria-hidden="true"></span>Integrado</span>' : ''}<button class="icon-button edit-action" type="button" data-edit-portfolio aria-label="Editar ${esc(folder.name)}" title="Editar ${esc(folder.name)}"><span data-icon="edit"></span></button></article>`).join('')}</div></section>`
+  const looseProjects = projectsAt('loose')
+  return `<section class="page-enter portfolio-manager-page" data-drop-zone="loose">${pageHead('Meus portfólios', 'Gerencie seus portfólios em um só lugar.')}<div class="portfolio-workspace"><div class="portfolio-list">${portfolioFolders.map(folder => `<article class="portfolio-list-item" data-folder-id="${folder.id}" data-drop-zone="${folder.id}" tabindex="0" aria-label="Abrir ${esc(folderName(folder.id))} com duplo clique"><span class="portfolio-folder" data-icon="folder" aria-hidden="true"></span><button class="icon-button edit-action" type="button" data-edit-folder="${folder.id}" aria-label="Renomear ${esc(folderName(folder.id))}" title="Renomear ${esc(folderName(folder.id))}"><span data-icon="edit"></span></button><h2>${esc(folderName(folder.id))}</h2>${folder.id === 'principal' && state.githubConnected ? '<span class="portfolio-integration"><span data-icon="github" aria-hidden="true"></span>Conectado com GitHub</span>' : ''}</article>`).join('')}</div>${looseProjects.length ? `<div class="loose-projects"><h2>Projetos fora das pastas</h2><div class="project-grid">${looseProjects.map(projectCard).join('')}</div></div>` : ''}</div></section>`
+}
+
+function openPortfolioFolder(id) {
+  if (!portfolioFolders.some(folder => folder.id === id)) return
+  const projects = projectsAt(id)
+  modal(`<div class="portfolio-folder-window"><div class="portfolio-folder-tab" aria-hidden="true"></div><button class="icon-button folder-close" type="button" data-close-modal aria-label="Fechar pasta"><span data-icon="x"></span></button><h2>${esc(folderName(id))}</h2><div class="project-grid">${projects.length ? projects.map(projectCard).join('') : '<p class="folder-empty">Arraste projetos para esta pasta.</p>'}</div></div>`, { folderWindow: true })
+  bindProjectGrid($('#modal-root'))
+}
+
+function renamePortfolioFolder(id) {
+  if (!portfolioFolders.some(folder => folder.id === id)) return
+  modal(`<form id="folder-name-form"><div class="modal-head"><h2>Renomear pasta</h2><button class="icon-button" type="button" data-close-modal aria-label="Fechar"><span data-icon="x"></span></button></div><label class="field"><span>Nome da pasta</span><input name="name" required maxlength="60" value="${esc(folderName(id))}"></label><div class="modal-actions"><button class="secondary-button" type="button" data-close-modal>Cancelar</button><button class="primary-button" type="submit">Salvar</button></div></form>`)
+  $('#folder-name-form').onsubmit = event => {
+    event.preventDefault()
+    state.folderNames[id] = new FormData(event.currentTarget).get('name').trim()
+    localStorage.setItem(`devifolio_folder_names_${currentUser.id}`, JSON.stringify(state.folderNames))
+    closeModal()
+    render({ preserveScroll: true })
+  }
 }
 
 function modelPreview(model, compact = false) {
@@ -264,15 +275,13 @@ function portfolioEditorView() {
 }
 
 function githubView() {
-  const hasRealRepos = state.repos.length > 0
-  const repositories = hasRealRepos ? state.repos : referenceRepositories
-  const content = `<div class="repo-list">${repositories.map((repository, index) => `<div class="repo-row${hasRealRepos ? '' : ' repo-example'}"><label class="repo-select"><input type="checkbox" value="${index}" aria-label="${hasRealRepos ? 'Selecionar' : 'Exemplo'} ${esc(repository.name)}" ${hasRealRepos ? '' : 'disabled'}><span class="repo-icon" data-icon="github"></span><span class="repo-copy"><b>${esc(repository.name)}</b><small>${esc(repository.description || 'Sem descrição')}</small></span></label>${hasRealRepos ? `<a class="repo-open" href="${esc(repository.html_url)}" target="_blank" rel="noopener" aria-label="Abrir ${esc(repository.name)} no GitHub"><span data-icon="external"></span></a>` : '<span class="repo-open" aria-hidden="true"><span data-icon="external"></span></span>'}</div>`).join('')}</div>`
+  const content = `<div class="repo-list">${state.repos.map((repository, index) => `<div class="repo-row"><label class="repo-select"><input type="checkbox" value="${index}" aria-label="Selecionar ${esc(repository.name)}"><span class="repo-icon" data-icon="github"></span><span class="repo-copy"><b>${esc(repository.name)}</b></span></label></div>`).join('')}</div>`
   const account = state.githubConnected
     ? `<div class="card connected-account"><span class="avatar">GH</span><div><small>Conta conectada</small><h2>@${esc(state.githubUsername || 'GitHub')}</h2></div><button class="secondary-button" data-sync-repos><span data-icon="refresh"></span>Sincronizar</button></div>`
     : `<div class="card connect-card"><span class="connect-icon" data-icon="github"></span><h2>Conecte seu GitHub</h2><p>Conecte a conta para sincronizar e importar seus repositórios reais.</p><button class="primary-button" data-connect-github><span data-icon="github"></span>Conectar com GitHub</button></div>`
-  const status = hasRealRepos ? `${state.repos.length} encontrado${state.repos.length === 1 ? '' : 's'}` : '5 exemplos de referência'
-  const message = !hasRealRepos ? `<div class="repo-reference-note"><span>${reposLoading ? 'Sincronizando seus repositórios. Os exemplos exibidos são apenas uma prévia.' : repoLoadFailed ? 'Não foi possível carregar seus repositórios. Estes exemplos não podem ser importados.' : 'Exemplos de visualização. Conecte ou sincronize sua conta para importar repositórios reais.'}</span>${repoLoadFailed ? '<button type="button" data-retry-repos>Tentar novamente</button>' : ''}</div>` : ''
-  return `<section class="page-enter github-page">${pageHead('GitHub', 'Selecione os repositórios que deseja transformar em projetos.', state.githubConnected ? '<button class="secondary-button" data-disconnect-github>Desconectar</button>' : '')}${account}<div class="card repo-panel"><div class="section-card-head"><div><h2>Seus repositórios</h2><p>${status}</p></div><button class="primary-button" data-import-selected ${hasRealRepos ? '' : 'disabled'}><span data-icon="upload"></span>Importar selecionados</button></div>${content}${message}</div></section>`
+  const status = reposLoading ? 'Carregando repositórios...' : repoLoadFailed ? 'Não foi possível carregar os repositórios.' : `${state.repos.length} repositório${state.repos.length === 1 ? '' : 's'} encontrado${state.repos.length === 1 ? '' : 's'}`
+  const message = repoLoadFailed ? '<div class="repo-reference-note"><button type="button" data-retry-repos>Tentar novamente</button></div>' : state.githubConnected && reposLoaded && !state.repos.length ? '<p class="repo-empty">Nenhum repositório encontrado nesta conta.</p>' : ''
+  return `<section class="page-enter github-page">${pageHead('GitHub', 'Selecione os repositórios que deseja transformar em projetos.', state.githubConnected ? '<button class="secondary-button" data-disconnect-github>Desconectar</button>' : '')}${account}${state.githubConnected ? `<div class="repo-panel"><div class="section-card-head"><div><h2>Seus repositórios</h2><p>${status}</p></div><button class="primary-button" data-import-selected ${state.repos.length ? '' : 'disabled'}><span data-icon="download"></span>Importar selecionados</button></div>${content}${message}</div>` : ''}</section>`
 }
 
 function analyticsView() {
@@ -355,6 +364,11 @@ function bindActions() {
   $$('[data-copy]').forEach(button => button.onclick = () => copyText(button.dataset.copy))
   $$('[data-open-preview]').forEach(button => button.onclick = () => window.open(publicPortfolioUrl(), '_blank', 'noopener'))
   $$('[data-edit-portfolio]').forEach(button => button.onclick = () => { location.hash = 'portfolio-editar' })
+  $$('[data-edit-folder]').forEach(button => button.onclick = () => renamePortfolioFolder(button.dataset.editFolder))
+  $$('[data-folder-id]').forEach(folder => {
+    folder.ondblclick = event => { if (!event.target.closest('button')) openPortfolioFolder(folder.dataset.folderId) }
+    folder.onkeydown = event => { if (event.key === 'Enter' && event.target === folder) openPortfolioFolder(folder.dataset.folderId) }
+  })
   $$('[data-new-portfolio]').forEach(button => button.onclick = () => toast('A conta possui um portfólio principal. A criação de múltiplos portfólios será liberada quando o modelo de dados for expandido.', 'error'))
   $$('[data-apply-model]').forEach(button => button.onclick = () => applyModel(button.dataset.applyModel))
   $$('[data-share-portfolio]').forEach(button => button.onclick = sharePortfolio)
@@ -367,12 +381,13 @@ function bindActions() {
   if (search && filter && sort) {
     const update = () => {
       const query = search.value.toLowerCase(), selection = filter.value
-      const items = state.projects.filter(project => `${project.name} ${project.description} ${project.tech}`.toLowerCase().includes(query) && (selection === 'all' || selection === `status:${project.status}` || selection === `type:${projectVisualType(project)}`))
+      const items = projectsAt('projects').filter(project => `${project.name} ${project.description} ${project.tech}`.toLowerCase().includes(query) && (selection === 'all' || selection === `status:${project.status}` || selection === `type:${projectVisualType(project)}`))
       if (sort.value === 'name') items.sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'))
       if (sort.value === 'type') items.sort((a, b) => projectVisualType(a).localeCompare(projectVisualType(b), 'pt-BR'))
       $('#project-grid').innerHTML = projectCards(items)
       hydrateIcons($('#project-grid'))
       bindProjectGrid()
+      $('[data-new-project]', $('#project-grid'))?.addEventListener('click', () => projectModal())
     }
     search.oninput = update; filter.onchange = update; sort.onchange = update
   }
@@ -408,11 +423,115 @@ async function downloadPortfolioQR() {
   }
 }
 
-function bindProjectGrid() {
-  $$('[data-view-project]').forEach(button => button.onclick = () => showProject(Number(button.dataset.viewProject)))
-  $$('[data-edit-project]').forEach(button => button.onclick = () => projectModal(Number(button.dataset.editProject)))
-  $$('[data-delete-project]').forEach(button => button.onclick = () => confirmDelete(Number(button.dataset.deleteProject)))
+function bindProjectGrid(root = document) {
+  $$('[data-view-project]', root).forEach(button => button.onclick = () => showProject(Number(button.dataset.viewProject)))
+  $$('[data-open-project]', root).forEach(button => button.onclick = () => {
+    const project = state.projects.find(item => item.id === Number(button.dataset.openProject))
+    const url = normalizeExternalUrl(project?.link)
+    if (url) window.open(url, '_blank', 'noopener')
+    else if (project) showProject(project.id)
+  })
+  $$('[data-edit-project]', root).forEach(button => button.onclick = () => projectModal(Number(button.dataset.editProject)))
+  $$('[data-delete-project]', root).forEach(button => button.onclick = () => confirmDelete(Number(button.dataset.deleteProject)))
 }
+
+let draggedProjectId = null
+let draggedProjectElement = null
+let dragAccepted = false
+let dragBlockedSection = false
+let dragFailureNotified = false
+let projectMovePending = false
+
+function dropDestination(target) {
+  const element = target instanceof Element ? target : target?.parentElement
+  if (!element) return null
+  const nav = element.closest('#side-nav [data-route]')
+  if (nav) return nav.dataset.route === 'portfolio' ? 'loose' : nav.dataset.route === 'projetos' ? 'projects' : 'blocked'
+  const folder = element.closest('[data-folder-id]')
+  if (folder) return folder.dataset.folderId
+  const folderBackdrop = element.closest('.portfolio-folder-modal-backdrop')
+  if (folderBackdrop) return element.closest('.portfolio-folder-modal') ? null : 'loose'
+  return element.closest('[data-drop-zone]')?.dataset.dropZone || null
+}
+
+function clearDropHighlight() {
+  document.querySelectorAll('.explorer-drop-target,.explorer-drop-blocked').forEach(element => element.classList.remove('explorer-drop-target', 'explorer-drop-blocked'))
+}
+
+document.addEventListener('dragstart', event => {
+  const card = event.target.closest?.('[data-drag-project]')
+  if (!card) return
+  if (projectMovePending) { event.preventDefault(); return }
+  draggedProjectId = Number(card.dataset.dragProject)
+  draggedProjectElement = card
+  dragAccepted = false
+  dragBlockedSection = false
+  dragFailureNotified = false
+  event.dataTransfer.effectAllowed = 'move'
+  event.dataTransfer.setData('text/plain', String(draggedProjectId))
+  document.body.classList.add('explorer-dragging')
+  requestAnimationFrame(() => card.classList.add('explorer-drag-source'))
+})
+
+document.addEventListener('dragover', event => {
+  if (draggedProjectId === null) return
+  event.preventDefault()
+  const project = state.projects.find(item => item.id === draggedProjectId)
+  const destination = dropDestination(event.target)
+  const allowed = project && destination && allowedMove(projectLocation(project), destination)
+  dragBlockedSection = destination === 'blocked' || Boolean(destination && !allowed)
+  event.dataTransfer.dropEffect = allowed ? 'move' : 'none'
+  clearDropHighlight()
+  const target = event.target.closest?.('[data-folder-id],#side-nav [data-route],.portfolio-folder-modal-backdrop,[data-drop-zone]')
+  if (target) target.classList.add(allowed ? 'explorer-drop-target' : 'explorer-drop-blocked')
+})
+
+document.addEventListener('drop', async event => {
+  if (draggedProjectId === null) return
+  event.preventDefault()
+  const id = draggedProjectId
+  const project = state.projects.find(item => item.id === id)
+  const destination = dropDestination(event.target)
+  clearDropHighlight()
+  if (!project || !destination || !allowedMove(projectLocation(project), destination)) {
+    toast('Não foi possível enviar para esta seção.', 'error')
+    dragFailureNotified = true
+    return
+  }
+  if (projectLocation(project) === destination) { dragAccepted = true; return }
+  dragAccepted = true
+  projectMovePending = true
+  try {
+    const saved = await moveProject(currentUser.id, id, nextSortOrder(state.projects, destination))
+    state.projects.splice(state.projects.findIndex(item => item.id === id), 1, saved)
+    if (destination === 'projects') location.hash = 'projetos'
+    else if (destination === 'loose') location.hash = 'portfolio'
+    if (destination === 'loose') closeModal()
+    render({ preserveScroll: true })
+  } catch (error) {
+    dragAccepted = false
+    reportError('Não foi possível mover o projeto.', error)
+    render({ preserveScroll: true })
+    const card = $(`[data-drag-project="${id}"]`)
+    card?.classList.add('explorer-drag-return')
+    if (card) setTimeout(() => card.classList.remove('explorer-drag-return'), 380)
+  } finally { projectMovePending = false }
+})
+
+document.addEventListener('dragend', () => {
+  clearDropHighlight()
+  document.body.classList.remove('explorer-dragging')
+  if (!dragAccepted && dragBlockedSection && !dragFailureNotified) toast('Não foi possível enviar para esta seção.', 'error')
+  if (!dragAccepted && draggedProjectElement?.isConnected) {
+    const card = draggedProjectElement
+    card.classList.remove('explorer-drag-source')
+    card.classList.add('explorer-drag-return')
+    setTimeout(() => card.classList.remove('explorer-drag-return'), 380)
+  } else draggedProjectElement?.classList.remove('explorer-drag-source')
+  draggedProjectId = null
+  draggedProjectElement = null
+  dragBlockedSection = false
+})
 
 async function savePortfolioForm(event) {
   event.preventDefault()
@@ -590,7 +709,7 @@ function projectModal(id) {
     event.preventDefault()
     const button = event.currentTarget.querySelector('[type="submit"]')
     const data = Object.fromEntries(new FormData(event.currentTarget))
-    const next = { id: id || Date.now(), image: project.image || '', ...data }
+    const next = { id: id || Date.now(), image: project.image || '', sortOrder: project.sortOrder, ...data }
     const imageFile = imageInput.files?.[0]
     const validationError = validateProjectImage(imageFile)
     if (validationError) return toast(validationError, 'error')
@@ -673,9 +792,15 @@ async function fetchGithubRepos({ reportFailure = true } = {}) {
     const data = await authenticatedApi('/api/github/repos')
     state.repos = Array.isArray(data.repositories) ? data.repositories : []
     state.githubConnected = true
+    if (!state.githubUsername) {
+      try {
+        const account = await authenticatedApi('/api/github/connection')
+        state.githubUsername = account.connection?.github_username || ''
+      } catch (error) { console.warn('[Devifolio] Não foi possível atualizar o nome da conta GitHub.', error) }
+    }
     repoLoadFailed = false
     loaded = true
-  } catch (error) { repoLoadFailed = true; if (reportFailure && state.githubConnected) reportError('Não foi possível carregar os repositórios.', error); else console.error('[Devifolio] Não foi possível carregar os repositórios.', error) } finally { reposLoading = false; reposLoaded = true; render() }
+  } catch (error) { state.repos = []; repoLoadFailed = true; if (reportFailure && state.githubConnected) reportError('Não foi possível carregar os repositórios.', error); else console.error('[Devifolio] Não foi possível carregar os repositórios.', error) } finally { reposLoading = false; reposLoaded = true; render() }
   return loaded
 }
 
@@ -824,11 +949,11 @@ async function copyText(text) {
 }
 
 
-function modal(content, { creationPanel = false, dismissible = true } = {}) {
+function modal(content, { creationPanel = false, dismissible = true, folderWindow = false } = {}) {
   const root = $('#modal-root')
   const opener = screenLoading.modalOpener() || document.activeElement
   screenLoading.closeModal({ immediate: true, restoreFocus: false })
-  root.innerHTML = `<div class="modal-backdrop${creationPanel ? ' creation-backdrop' : ''}"><div class="modal${creationPanel ? ' creation-panel' : ''}" role="dialog" aria-modal="true">${content}</div></div>`
+  root.innerHTML = `<div class="modal-backdrop${creationPanel ? ' creation-backdrop' : ''}${folderWindow ? ' portfolio-folder-modal-backdrop' : ''}"><div class="modal${creationPanel ? ' creation-panel' : ''}${folderWindow ? ' portfolio-folder-modal' : ''}" role="dialog" aria-modal="true">${content}</div></div>`
   const backdrop = root.querySelector('.modal-backdrop')
   hydrateIcons(root)
   $$('[data-close-modal]').forEach(button => button.onclick = closeModal)
@@ -942,6 +1067,7 @@ async function bootstrap() {
   const { data, error } = await supabase.auth.getSession()
   if (error || !data.session) { entrance.abort(); location.replace('cadastro.html#login'); return }
   currentUser = data.session.user
+  try { state.folderNames = JSON.parse(localStorage.getItem(`devifolio_folder_names_${currentUser.id}`) || '{}') } catch { state.folderNames = {} }
   render()
   try {
     const workspace = await loadWorkspace(currentUser.id)
