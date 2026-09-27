@@ -21,12 +21,12 @@ html body.dashboard-app.projects-route .projects-page .search-field input::place
 html body.dashboard-app.projects-route .projects-page .toolbar select option,
 html body.dashboard-app.projects-route .projects-page .toolbar select optgroup { background: #fff; color: #101820; }
 
-html body.dashboard-app .portfolio-manager-page .portfolio-workspace { display: flex; align-items: flex-start; gap: 26px; }
+html body.dashboard-app .portfolio-manager-page .portfolio-workspace { display: block; }
 html body.dashboard-app .portfolio-manager-page .portfolio-list {
+  display: grid;
   grid-template-columns: repeat(4, 190px);
-  gap: 36px;
-  margin: 38px 0 0 48px;
-  flex: none;
+  gap: 25px;
+  margin: 38px 0 0 45px;
 }
 html body.dashboard-app .portfolio-manager-page .portfolio-list-item {
   position: relative;
@@ -39,7 +39,7 @@ html body.dashboard-app .portfolio-manager-page .portfolio-list-item {
   background: transparent !important;
   border: 0 !important;
   box-shadow: none !important;
-  cursor: default;
+  cursor: pointer;
 }
 html body.dashboard-app .portfolio-manager-page .portfolio-list-item:hover,
 html body.dashboard-app .portfolio-manager-page .portfolio-list-item.explorer-drop-target { background: transparent !important; border: 0 !important; }
@@ -50,31 +50,67 @@ html body.dashboard-app .portfolio-manager-page .portfolio-folder {
   width: 148px;
   height: 111px;
   margin: 0 0 13px;
-  filter: drop-shadow(0 7px 8px rgba(173, 113, 0, .12));
+  filter: drop-shadow(0 7px 9px rgba(139, 96, 0, .16));
+  transition: transform 280ms cubic-bezier(.2,.75,.25,1), filter 280ms ease;
+  transform-origin: center bottom;
 }
-html body.dashboard-app .portfolio-manager-page .portfolio-folder svg { display: none; }
-html body.dashboard-app .portfolio-manager-page .portfolio-folder::before {
-  content: '';
+html body.dashboard-app .portfolio-manager-page .portfolio-folder-back {
   position: absolute;
-  top: 0;
+  inset: 19px 1px 5px;
+  border-radius: 9px;
+  background: linear-gradient(165deg, #ffbc00, #eaa600);
+}
+html body.dashboard-app .portfolio-manager-page .portfolio-folder-back::before {
+  content: "";
+  position: absolute;
+  top: -19px;
   left: 0;
-  width: 82px;
-  height: 36px;
-  border-radius: 11px 12px 0 0;
-  background: linear-gradient(180deg, #ffc714, #e5a300);
-  clip-path: polygon(0 0, 83% 0, 100% 45%, 100% 100%, 0 100%);
+  width: 77px;
+  height: 30px;
+  border-radius: 9px 12px 0 0;
+  clip-path: polygon(0 0, 82% 0, 100% 45%, 100% 100%, 0 100%);
+  background: linear-gradient(180deg, #ffc819, #efa900);
 }
-html body.dashboard-app .portfolio-manager-page .portfolio-folder::after {
-  content: '';
+html body.dashboard-app .portfolio-manager-page .portfolio-folder-paper {
   position: absolute;
+  z-index: 1;
+  top: 30px;
+  left: 12px;
+  width: 124px;
+  height: 70px;
+  border-radius: 6px 6px 3px 3px;
+  background: linear-gradient(180deg, #fffdf2, #fff);
+  box-shadow: 0 1px 3px rgba(102, 67, 0, .12);
+  transform: translateY(13px);
+  transition: transform 320ms cubic-bezier(.2,.75,.25,1);
+}
+html body.dashboard-app .portfolio-manager-page .portfolio-folder-front {
+  position: absolute;
+  z-index: 2;
   top: 23px;
   left: 0;
-  width: 145px;
+  width: 148px;
   height: 87px;
   border-radius: 8px 9px 10px 10px;
-  background: linear-gradient(145deg, #fff064 0%, #ffdd28 45%, #ffbf08 100%);
-  border-top: 3px solid #ffe87b;
-  transform: skewX(-2deg);
+  background-image: linear-gradient(145deg, #fff064 0%, #ffde2b 47%, #ffc10b 100%);
+  border-top: 2px solid #ffe989;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  transform-origin: center bottom;
+  transition: transform 300ms cubic-bezier(.2,.75,.25,1), clip-path 300ms cubic-bezier(.2,.75,.25,1);
+}
+@media (hover: hover) {
+  html body.dashboard-app .portfolio-manager-page .portfolio-list-item:hover .portfolio-folder,
+  html body.dashboard-app .portfolio-manager-page .portfolio-list-item:focus-visible .portfolio-folder {
+    transform: translateY(-6px);
+    filter: drop-shadow(0 13px 13px rgba(139, 96, 0, .2));
+  }
+  html body.dashboard-app .portfolio-manager-page .portfolio-list-item:hover .portfolio-folder-paper,
+  html body.dashboard-app .portfolio-manager-page .portfolio-list-item:focus-visible .portfolio-folder-paper { transform: translateY(-7px); }
+  html body.dashboard-app .portfolio-manager-page .portfolio-list-item:hover .portfolio-folder-front,
+  html body.dashboard-app .portfolio-manager-page .portfolio-list-item:focus-visible .portfolio-folder-front {
+    transform: scaleY(.64);
+    clip-path: polygon(8% 0, 92% 0, 100% 100%, 0 100%);
+  }
 }
 html body.dashboard-app .portfolio-manager-page .portfolio-list-item h2 {
   margin: 0;
@@ -106,8 +142,6 @@ html body.dashboard-app .portfolio-manager-page .portfolio-integration {
   white-space: nowrap;
 }
 html body.dashboard-app .portfolio-manager-page .portfolio-integration .github-icon { width: 25px; height: 25px; }
-html body.dashboard-app .portfolio-manager-page .portfolio-list-item.explorer-drop-target .portfolio-folder { transform: translateY(-5px) scale(1.05); }
-
 html body.dashboard-app .projects-page .project-grid,
 html body.dashboard-app .portfolio-manager-page .project-grid,
 html body.dashboard-app .portfolio-folder-modal .project-grid {
@@ -139,6 +173,7 @@ html body.dashboard-app .explorer-project .project-cover {
   background: #12233b !important;
 }
 html body.dashboard-app .explorer-project .project-cover-image { width: 100%; height: 100%; object-fit: cover; }
+html body.dashboard-app .portfolio-manager-page .explorer-project .project-cover { height: 161px; }
 html body.dashboard-app .explorer-project .project-card-body { display: block; padding: 13px 3px 0 !important; }
 html body.dashboard-app .explorer-project .project-card-body h2 {
   margin: 0 0 12px;
@@ -147,6 +182,7 @@ html body.dashboard-app .explorer-project .project-card-body h2 {
   font-weight: 700;
   line-height: 1.2;
 }
+html body.dashboard-app .portfolio-manager-page .explorer-project .project-card-body h2 { margin-bottom: 2px; }
 html body.dashboard-app .explorer-project .project-actions { display: grid !important; grid-template-columns: 1.25fr 1fr; gap: 11px; border: 0 !important; }
 html body.dashboard-app .explorer-project .project-actions button {
   width: 100%;
@@ -158,9 +194,11 @@ html body.dashboard-app .explorer-project .project-actions button {
 }
 html body.dashboard-app .explorer-project .project-actions .primary-button { background: #05080c !important; border: 1px solid #05080c !important; color: #fff !important; }
 html body.dashboard-app .explorer-project .project-actions .secondary-button { background: #fff !important; border: 1px solid #dce4ef !important; color: #080d14 !important; }
-html body.dashboard-app .portfolio-manager-page .loose-projects { width: min(270px, 100%); margin-top: 38px; }
-html body.dashboard-app .portfolio-manager-page .loose-projects > h2 { margin: 0 0 16px; color: #1a2535; font-size: 19px; }
-html body.dashboard-app .portfolio-manager-page .loose-projects .project-grid { grid-template-columns: minmax(0, 1fr); }
+html body.dashboard-app .portfolio-manager-page .loose-projects { width: 100%; margin-top: 55px; }
+html body.dashboard-app .portfolio-manager-page .loose-projects > h2 { margin: 0 0 3px; color: #101820; font-size: 21px; font-weight: 700; }
+html body.dashboard-app .portfolio-manager-page .loose-projects > p { margin: 0; color: #68778c; font-size: 14px; }
+html body.dashboard-app .portfolio-manager-page .loose-projects .project-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); margin-top: 13px; gap: 14px; }
+html body.dashboard-app .portfolio-manager-page .loose-projects .empty-state { grid-column: 1 / -1; }
 
 html body.dashboard-app .modal-backdrop.portfolio-folder-modal-backdrop { background: rgba(9, 15, 27, .74) !important; backdrop-filter: none; }
 html body.dashboard-app .modal-backdrop.portfolio-folder-modal-backdrop::before { background: transparent !important; }
@@ -194,34 +232,50 @@ html body.dashboard-app .portfolio-folder-window .folder-close { position: absol
 html body.dashboard-app .portfolio-folder-window .folder-empty { grid-column: 1 / -1; color: #3f3400; }
 @keyframes folderOpen { from { opacity: .3; transform: translateY(34px) scale(.94); } to { opacity: 1; transform: none; } }
 
-html body.dashboard-app .github-page .repo-panel { padding: 8px 0 0; background: transparent !important; border: 0 !important; }
+html body.dashboard-app .github-page .connected-account { min-height: 91px; margin-bottom: 28px; }
+html body.dashboard-app .github-page .connected-account > div { min-width: 0; }
+html body.dashboard-app .github-page .connected-account h2 { font-size: 16px; overflow-wrap: anywhere; }
+html body.dashboard-app .github-page .connected-account [data-sync-repos] { margin-left: auto; }
+html body.dashboard-app .github-page .repo-panel { padding: 0; background: transparent !important; border: 0 !important; }
 html body.dashboard-app .github-page .repo-panel .section-card-head { margin-bottom: 20px; }
-html body.dashboard-app .github-page .repo-row { border-radius: 11px !important; background: #1e2228 !important; }
+html body.dashboard-app .github-page .repo-panel .section-card-head h2 { font-size: 23px; }
+html body.dashboard-app .github-page .repo-list { gap: 8px; }
+html body.dashboard-app .github-page .repo-row { min-height: 84px; padding: 14px 22px; border-radius: 11px !important; background: #1e2228 !important; }
 html body.dashboard-app .github-page .repo-copy b { font-size: 17px; }
 html body.dashboard-app .github-page .repo-empty { margin-top: 22px; color: #66748a; }
 
 .explorer-dragging .explorer-project { cursor: grabbing; }
 .explorer-drag-source { opacity: .48; }
-.explorer-drop-target { outline: 3px solid #f3b800 !important; outline-offset: 3px; }
 .explorer-drop-blocked { cursor: not-allowed !important; }
 .explorer-drag-return { animation: explorerReturn .35s ease-out; }
 @keyframes explorerReturn { 35% { transform: translateX(-9px); } 70% { transform: translateX(5px); } to { transform: translateX(0); } }
-@media (prefers-reduced-motion: reduce) { .explorer-drag-return, html body.dashboard-app .modal.portfolio-folder-modal { animation: none; } }
+@media (max-width: 1500px) and (min-width: 1201px) {
+  html body.dashboard-app .portfolio-manager-page .loose-projects .project-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .explorer-drag-return, html body.dashboard-app .modal.portfolio-folder-modal { animation: none; }
+  html body.dashboard-app .portfolio-manager-page .portfolio-folder,
+  html body.dashboard-app .portfolio-manager-page .portfolio-folder-paper,
+  html body.dashboard-app .portfolio-manager-page .portfolio-folder-front { transition: none; }
+}
 @media (max-width: 1200px) {
-  html body.dashboard-app .portfolio-manager-page .portfolio-workspace { flex-wrap: wrap; }
   html body.dashboard-app .portfolio-manager-page .portfolio-list { grid-template-columns: repeat(2, 190px); }
   html body.dashboard-app .projects-page .project-grid,
   html body.dashboard-app .portfolio-manager-page .project-grid,
   html body.dashboard-app .portfolio-folder-modal .project-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  html body.dashboard-app .portfolio-manager-page .loose-projects .project-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 @media (max-width: 700px) {
-  html body.dashboard-app .portfolio-manager-page .portfolio-workspace { display: block; }
   html body.dashboard-app .portfolio-manager-page .portfolio-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 8px; margin-left: 0; }
   html body.dashboard-app .portfolio-manager-page .portfolio-list-item { width: 160px; }
   html body.dashboard-app .portfolio-manager-page .portfolio-list-item h2 { font-size: 14px; white-space: normal; }
   html body.dashboard-app .projects-page .project-grid,
   html body.dashboard-app .portfolio-manager-page .project-grid,
   html body.dashboard-app .portfolio-folder-modal .project-grid { grid-template-columns: minmax(0, 1fr); }
+  html body.dashboard-app .portfolio-manager-page .loose-projects { margin-top: 40px; }
+  html body.dashboard-app .portfolio-manager-page .loose-projects .project-grid { grid-template-columns: minmax(0, 1fr); }
+  html body.dashboard-app .github-page .connected-account [data-sync-repos] { width: 100%; margin-left: 0; }
+  html body.dashboard-app .github-page .repo-row { min-height: 74px; padding: 12px; }
   html body.dashboard-app .modal.portfolio-folder-modal { width: calc(100vw - 28px); padding: 34px 15px 18px; }
   html body.dashboard-app .portfolio-folder-tab { width: 190px; }
   html body.dashboard-app .portfolio-folder-window > h2 { font-size: 23px; }
