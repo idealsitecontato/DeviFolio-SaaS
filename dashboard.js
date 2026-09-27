@@ -15,6 +15,7 @@ import {
 import QRCode from 'qrcode'
 import { createScreenLoading } from './screen-loading.js'
 import { portfolioModels, getPortfolioModel } from './src/lib/portfolio-models.js'
+import { kapteiView, bindKapteiActions } from './kaptei.js'
 
 const githubIconUrl = new URL('./assets/github-icon.png', import.meta.url).href
 const bannerUrl = new URL('./assets/devi-plus-banner-original.png', import.meta.url).href
@@ -313,14 +314,15 @@ function referralView() {
 }
 
 
-const views = { 'link-qrcode': linkQrView, inicio: homeView, projetos: projectsView, portfolio: portfolioManagerView, modelos: modelsView, 'portfolio-editar': portfolioEditorView, github: githubView, analise: analyticsView, perfil: profileView, configuracoes: settingsView, indicacao: referralView }
+const views = { 'link-qrcode': linkQrView, inicio: homeView, projetos: projectsView, portfolio: portfolioManagerView, modelos: modelsView, 'portfolio-editar': portfolioEditorView, github: githubView, analise: analyticsView, kaptei: kapteiView, perfil: profileView, configuracoes: settingsView, indicacao: referralView }
 
 function render({ preserveScroll = false } = {}) {
   const route = views[location.hash.slice(1)] ? location.hash.slice(1) : 'inicio'
   renderedRoute = route
   document.body.classList.toggle('projects-route', route === 'projetos')
+  document.body.classList.toggle('kaptei-route', route === 'kaptei')
   $('#page-content').innerHTML = views[route]()
-  const routeLabel = { 'link-qrcode': 'Seu Link, Seu QR Code', inicio: 'Dashboard', projetos: 'Meus projetos', portfolio: 'Meus portfólios', modelos: 'Modelos', 'portfolio-editar': 'Editar portfólio', github: 'GitHub', analise: 'Análise', perfil: 'Perfil', configuracoes: 'Configurações', indicacao: 'Indicação' }[route]
+  const routeLabel = { 'link-qrcode': 'Seu Link, Seu QR Code', inicio: 'Dashboard', projetos: 'Meus projetos', portfolio: 'Meus portfólios', modelos: 'Modelos', 'portfolio-editar': 'Editar portfólio', github: 'GitHub', analise: 'Análise', kaptei: 'Kaptei', perfil: 'Perfil', configuracoes: 'Configurações', indicacao: 'Indicação' }[route]
   document.title = `${routeLabel} — Devifolio`
   if ($('#breadcrumb-page')) $('#breadcrumb-page').textContent = routeLabel
   if ($('#breadcrumb-section')) $('#breadcrumb-section').textContent = route === 'inicio' ? 'Início' : 'Painel'
@@ -355,6 +357,7 @@ function bindActions() {
   $$('[data-download-qr]').forEach(button => button.onclick = downloadPortfolioQR)
   $$('[data-new-project]').forEach(button => button.onclick = () => projectModal())
   bindProjectGrid()
+  bindKapteiActions({ modal, toast })
 
   const search = $('#project-search'), filter = $('#type-filter'), sort = $('#project-sort')
   if (search && filter && sort) {

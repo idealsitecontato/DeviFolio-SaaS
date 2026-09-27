@@ -1,0 +1,263 @@
+/* Kaptei uses the existing DeviFolio shell and the supplied product artwork. */
+html body.dashboard-app .nav-item .kaptei-nav-mark {
+  position: relative;
+  display: block;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  overflow: hidden;
+}
+
+html body.dashboard-app .kaptei-nav-mark img {
+  position: absolute;
+  width: 116px;
+  height: auto;
+  max-width: none;
+  left: -15px;
+  top: -20px;
+}
+
+html body.dashboard-app.kaptei-route .desktop-topbar { display: none; }
+html body.dashboard-app.kaptei-route .main-content { padding-top: 0 !important; }
+html body.dashboard-app.kaptei-route .page-content {
+  max-width: none !important;
+  padding: 0 !important;
+  background: #f7fafc;
+}
+
+html body.dashboard-app .kaptei-page {
+  min-height: 100dvh;
+  background: #f7fafc;
+  color: #111820;
+  font-family: "Google Sans", Arial, sans-serif;
+}
+
+html body.dashboard-app .kaptei-banner {
+  width: 100%;
+  height: 147px;
+  overflow: hidden;
+  background: #006d63;
+}
+
+html body.dashboard-app .kaptei-banner img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+html body.dashboard-app .kaptei-content { padding: 13px 26px 40px; }
+html body.dashboard-app .kaptei-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 17px;
+}
+
+html body.dashboard-app .kaptei-heading { min-width: 235px; }
+html body.dashboard-app .kaptei-heading h1 {
+  margin: 0 0 2px;
+  color: #111820;
+  font-size: 24px;
+  line-height: 1.15;
+  font-weight: 700;
+}
+html body.dashboard-app .kaptei-heading p {
+  margin: 0;
+  color: #6c747b;
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+html body.dashboard-app .kaptei-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+  flex: 1;
+}
+html body.dashboard-app .kaptei-controls button,
+html body.dashboard-app .kaptei-controls select,
+html body.dashboard-app .kaptei-search {
+  height: 35px;
+  min-height: 35px;
+  margin: 0;
+  border-radius: 5px !important;
+  font: inherit;
+  font-size: 12px;
+  box-shadow: none !important;
+}
+html body.dashboard-app .kaptei-controls .kaptei-download {
+  flex: none;
+  padding: 0 13px;
+  border: 1px solid #0c1522 !important;
+  background: #0c1522 !important;
+  color: #fff !important;
+  cursor: pointer;
+}
+html body.dashboard-app .kaptei-controls .kaptei-download:hover { background: #253447 !important; }
+html body.dashboard-app .kaptei-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: min(322px, 100%);
+  padding: 0 12px;
+  border: 1px solid #d5d9dc !important;
+  background: #fff !important;
+  color: #17202b;
+}
+html body.dashboard-app .kaptei-search [data-icon] { display: inline-flex; width: 15px; height: 15px; flex: none; }
+html body.dashboard-app .kaptei-search svg { width: 15px; height: 15px; stroke-width: 2; }
+html body.dashboard-app .kaptei-search input {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 0;
+  border: 0 !important;
+  outline: 0;
+  background: transparent !important;
+  color: #1a2531;
+  font: inherit;
+  font-size: 12px;
+}
+html body.dashboard-app .kaptei-search input::placeholder { color: #5d6671; opacity: 1; }
+html body.dashboard-app .kaptei-search:focus-within { outline: 2px solid #6fc9b6; outline-offset: 1px; }
+html body.dashboard-app .kaptei-controls select {
+  width: 194px;
+  flex: none;
+  padding: 0 13px;
+  border: 1px solid #d5d9dc !important;
+  background: #fff !important;
+  color: #28303b;
+  cursor: pointer;
+}
+
+html body.dashboard-app .kaptei-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #e3e7eb;
+  border-radius: 5px;
+  background: #fff;
+  box-shadow: 0 2px 4px rgb(18 31 43 / 4%);
+}
+html body.dashboard-app .kaptei-table {
+  width: 100%;
+  min-width: 1130px;
+  border-collapse: collapse;
+  table-layout: fixed;
+  color: #141a20;
+  font-size: 12px;
+  line-height: 1.25;
+}
+html body.dashboard-app .kaptei-table th,
+html body.dashboard-app .kaptei-table td {
+  height: 36px;
+  padding: 6px 10px;
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-bottom: 1px solid #eef0f2;
+}
+html body.dashboard-app .kaptei-table thead th {
+  height: 36px;
+  background: #f4f6f9;
+  color: #18212a;
+  font-weight: 700;
+}
+html body.dashboard-app .kaptei-table tbody tr:last-child td { border-bottom: 0; }
+html body.dashboard-app .kaptei-table tbody tr:hover { background: #f8fbfa; }
+html body.dashboard-app .kaptei-table th:nth-child(1) { width: 4%; }
+html body.dashboard-app .kaptei-table th:nth-child(2) { width: 12%; }
+html body.dashboard-app .kaptei-table th:nth-child(3) { width: 15%; }
+html body.dashboard-app .kaptei-table th:nth-child(4) { width: 11%; }
+html body.dashboard-app .kaptei-table th:nth-child(5) { width: 10%; }
+html body.dashboard-app .kaptei-table th:nth-child(6) { width: 12%; }
+html body.dashboard-app .kaptei-table th:nth-child(7) { width: 10%; }
+html body.dashboard-app .kaptei-table th:nth-child(8) { width: 9%; }
+html body.dashboard-app .kaptei-table th:nth-child(9) { width: 17%; }
+html body.dashboard-app .kaptei-table .kaptei-check-cell { text-align: center; }
+html body.dashboard-app .kaptei-table input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  accent-color: #008268;
+  vertical-align: middle;
+  cursor: pointer;
+}
+html body.dashboard-app .kaptei-table strong { font-weight: 700; }
+html body.dashboard-app .kaptei-potential { display: inline-flex; align-items: center; gap: 8px; }
+html body.dashboard-app .kaptei-potential i { display: inline-block; width: 12px; height: 12px; flex: none; border-radius: 50%; background: #149679; }
+html body.dashboard-app .kaptei-potential.médio i { background: #fac840; }
+html body.dashboard-app .kaptei-potential.baixo i { background: #f34469; }
+html body.dashboard-app .kaptei-table .kaptei-actions-cell { padding-right: 8px; text-align: right; }
+html body.dashboard-app .kaptei-actions-cell button {
+  min-height: 0;
+  height: 22px;
+  margin-left: 4px;
+  padding: 0 8px;
+  border: 0 !important;
+  border-radius: 14px !important;
+  background: #005440 !important;
+  color: #fff !important;
+  font: inherit;
+  font-size: 10px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+html body.dashboard-app .kaptei-actions-cell button:hover { background: #08775e !important; }
+html body.dashboard-app .kaptei-empty { margin: 20px 0; color: #596672; text-align: center; }
+html body.dashboard-app .kaptei-empty[hidden] { display: none; }
+
+html body.dashboard-app .kaptei-detail { color: #17202b; }
+html body.dashboard-app .kaptei-detail h2 { margin: 0 0 5px; font-size: 22px; }
+html body.dashboard-app .kaptei-detail p { margin: 0 0 20px; color: #596672; }
+html body.dashboard-app .kaptei-detail dl { display: grid; gap: 12px; margin: 0 0 22px; }
+html body.dashboard-app .kaptei-detail dl div { display: grid; gap: 3px; }
+html body.dashboard-app .kaptei-detail dt { color: #6b7480; font-size: 12px; }
+html body.dashboard-app .kaptei-detail dd { margin: 0; overflow-wrap: anywhere; }
+
+@media (max-width: 1100px) {
+  html body.dashboard-app .kaptei-toolbar { align-items: flex-start; flex-direction: column; }
+  html body.dashboard-app .kaptei-controls { width: 100%; justify-content: flex-start; }
+}
+
+@media (max-width: 820px) {
+  html body.dashboard-app .kaptei-page { min-height: calc(100dvh - 58px); }
+  html body.dashboard-app .kaptei-banner { height: 120px; }
+  html body.dashboard-app .kaptei-content { padding: 18px; }
+}
+
+@media (max-width: 700px) {
+  html body.dashboard-app .kaptei-page,
+  html body.dashboard-app .kaptei-content,
+  html body.dashboard-app .kaptei-toolbar,
+  html body.dashboard-app .kaptei-controls { min-width: 0; box-sizing: border-box; }
+  html body.dashboard-app .kaptei-banner { height: 95px; }
+  html body.dashboard-app .kaptei-content { padding: 18px 14px 30px; }
+  html body.dashboard-app .kaptei-heading h1 { font-size: 22px; }
+  html body.dashboard-app .kaptei-controls { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 9px; }
+  html body.dashboard-app .kaptei-controls > * { min-width: 0 !important; box-sizing: border-box; }
+  html body.dashboard-app .kaptei-controls .kaptei-download { grid-column: 1; width: 100%; }
+  html body.dashboard-app .kaptei-search { grid-column: 1 / -1; grid-row: 2; width: 100%; }
+  html body.dashboard-app .kaptei-controls select { grid-column: 2; grid-row: 1; width: 100%; }
+  html body.dashboard-app .kaptei-table-wrap { border: 0; overflow: visible; background: transparent; box-shadow: none; }
+  html body.dashboard-app .kaptei-table,
+  html body.dashboard-app .kaptei-table tbody,
+  html body.dashboard-app .kaptei-table tr,
+  html body.dashboard-app .kaptei-table td { display: block; width: 100%; min-width: 0; }
+  html body.dashboard-app .kaptei-table thead { display: none; }
+  html body.dashboard-app .kaptei-table tbody { display: grid; gap: 12px; }
+  html body.dashboard-app .kaptei-table tr { position: relative; box-sizing: border-box; padding: 15px; border: 1px solid #e3e7eb; border-radius: 7px; background: #fff; }
+  html body.dashboard-app .kaptei-table th,
+  html body.dashboard-app .kaptei-table td { height: auto; padding: 4px 0; border: 0; white-space: normal; }
+  html body.dashboard-app .kaptei-table td::before { content: attr(data-label); display: block; margin-bottom: 2px; color: #68727c; font-size: 10px; font-weight: 600; }
+  html body.dashboard-app .kaptei-table .kaptei-check-cell { position: absolute; top: 17px; right: 15px; width: 20px; padding: 0; }
+  html body.dashboard-app .kaptei-table td:nth-child(2) { padding-right: 28px; font-size: 15px; }
+  html body.dashboard-app .kaptei-table td:nth-child(2)::before { display: none; }
+  html body.dashboard-app .kaptei-table .kaptei-actions-cell { padding: 12px 0 0; text-align: left; }
+  html body.dashboard-app .kaptei-actions-cell button { height: 30px; margin: 5px 6px 0 0; padding: 0 12px; font-size: 11px; }
+}
