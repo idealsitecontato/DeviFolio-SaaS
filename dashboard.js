@@ -196,9 +196,13 @@ function previewMarkup() {
 }
 
 function portfolioManagerView() {
-  const title = state.profile.name ? `Portfólio — ${state.profile.name}` : 'Portfólio Principal'
-  const publicationAction = state.published ? 'Despublicar' : 'Publicar'
-  return `<section class="page-enter portfolio-manager-page">${pageHead('Meus portfólios', 'Gerencie a versão pública associada à sua conta.', '<button class="primary-button" data-new-portfolio><span data-icon="plus"></span>Adicionar novo portfólio</button>')}<div class="portfolio-list"><article class="card portfolio-list-item"><span class="portfolio-folder" data-icon="folder" aria-hidden="true"></span><details class="portfolio-card-menu"><summary aria-label="Opções do portfólio">⋮</summary><div><button type="button" data-toggle-publish>${publicationAction}</button></div></details><div class="portfolio-card-copy"><h2>${esc(title)}</h2><p>Atualizado em —</p></div><div class="portfolio-list-actions"><button class="primary-button" data-open-preview>Acessar</button><button class="icon-button edit-action" data-edit-portfolio aria-label="Editar portfólio" title="Editar portfólio"><span data-icon="edit"></span></button></div></article></div></section>`
+  const folders = [
+    { name: state.profile.name ? `Portfólio — ${state.profile.name}` : 'Portfólio principal' },
+    { name: 'Portfólio profissional' },
+    { name: 'Projetos em destaque' },
+    { name: 'Portfólio GitHub', integrated: true },
+  ]
+  return `<section class="page-enter portfolio-manager-page">${pageHead('Meus portfólios', 'Gerencie seus portfólios em um só lugar.')}<div class="portfolio-list">${folders.map(folder => `<article class="portfolio-list-item"><span class="portfolio-folder" data-icon="folder" aria-hidden="true"></span><h2>${esc(folder.name)}</h2>${folder.integrated ? '<span class="portfolio-integration"><span data-icon="github" aria-hidden="true"></span>Integrado</span>' : ''}<button class="icon-button edit-action" type="button" data-edit-portfolio aria-label="Editar ${esc(folder.name)}" title="Editar ${esc(folder.name)}"><span data-icon="edit"></span></button></article>`).join('')}</div></section>`
 }
 
 function modelPreview(model, compact = false) {

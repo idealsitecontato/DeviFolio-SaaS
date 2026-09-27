@@ -360,3 +360,75 @@ html body.dashboard-app.projects-route .projects-page .project-grid > .empty-sta
   html body.dashboard-app.projects-route .projects-page .project-grid { grid-template-columns: minmax(0,1fr); }
   html body.dashboard-app.projects-route .projects-page .page-head { align-items: flex-start; }
 }
+
+/* Portfolio folders without the old card frame. */
+html body.dashboard-app .portfolio-manager-page .portfolio-list {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 28px;
+  margin-top: 32px;
+}
+html body.dashboard-app .portfolio-manager-page .portfolio-list-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-content: start;
+  align-items: center;
+  column-gap: 8px;
+  min-height: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+html body.dashboard-app .portfolio-manager-page .portfolio-list-item:hover {
+  background: transparent !important;
+  border: 0 !important;
+}
+html body.dashboard-app .portfolio-manager-page .portfolio-folder {
+  grid-column: 1 / -1;
+  width: 92px;
+  height: 82px;
+  margin-bottom: 13px;
+}
+html body.dashboard-app .portfolio-manager-page .portfolio-folder svg {
+  width: 88px;
+  height: 78px;
+  fill: #ffc335;
+  stroke: #ffb915;
+}
+html body.dashboard-app .portfolio-manager-page .portfolio-list-item h2 {
+  min-width: 0;
+  margin: 0;
+  color: #111820;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+html body.dashboard-app .portfolio-manager-page .portfolio-list-item .edit-action {
+  width: 38px;
+  height: 38px;
+  border: 1px solid #d3dae3 !important;
+  border-radius: 7px !important;
+  background: #fff !important;
+  color: #141a22 !important;
+}
+html body.dashboard-app .portfolio-manager-page .portfolio-list-item .edit-action svg { width: 18px; height: 18px; }
+html body.dashboard-app .portfolio-manager-page .portfolio-integration {
+  grid-column: 1 / -1;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  width: fit-content;
+  margin-top: 9px;
+  color: #303b49;
+  font-size: 13px;
+  font-weight: 500;
+}
+html body.dashboard-app .portfolio-manager-page .portfolio-integration .github-icon { width: 17px; height: 17px; }
+@media (max-width: 1200px) {
+  html body.dashboard-app .portfolio-manager-page .portfolio-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 700px) {
+  html body.dashboard-app .portfolio-manager-page .portfolio-list { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+}
