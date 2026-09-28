@@ -21,7 +21,7 @@ import { bindExplorerDrag } from './src/lib/explorer-drag.js'
 import { kapteiView, bindKapteiActions } from './kaptei.js'
 
 const githubIconUrl = new URL('./assets/github-icon.png', import.meta.url).href
-const bannerUrl = new URL('./assets/banner-devi-plus.jpg', import.meta.url).href
+const bannerUrl = new URL('./assets/foliodev-banner-original.jpg', import.meta.url).href
 const placeholderUrl = new URL('./assets/user-placeholder.png', import.meta.url).href
 
 const $ = (selector, root = document) => root.querySelector(selector)
@@ -125,7 +125,7 @@ const normalizeExternalUrl = value => {
 }
 
 function pageHead(title, description, action = '') {
-  return `<header class="page-head"><div><p class="eyebrow">Painel Devifolio</p><h1>${title}</h1><p>${description}</p></div>${action}</header>`
+  return `<header class="page-head"><div><p class="eyebrow">Painel FolioDev</p><h1>${title}</h1><p>${description}</p></div>${action}</header>`
 }
 
 function emptyState(icon, title, description, action = '') {
@@ -190,7 +190,7 @@ function homeView() {
       <div class="home-qr-download"><button class="secondary-button" data-copy="${esc(publicPortfolioUrl())}"><span data-icon="copy"></span>Copiar link</button><button class="secondary-button" data-download-qr><span data-icon="download"></span>Baixar QR Code</button></div>`
     : '<div class="dashboard-link-empty"><span data-icon="qr"></span><p>Conclua o perfil para gerar seu link público e QR Code.</p><button class="secondary-button" data-route-button="portfolio-editar">Configurar portfólio</button></div>'
   return `<section class="page-enter home-page" aria-label="Painel de início">
-    <a class="dashboard-promo-banner" href="index.html#planos" data-promo-plans aria-label="Ver planos Devi Plus"><img src="${bannerUrl}" width="4095" height="527" alt="Assine o Devi Plus e tenha acesso ilimitado" loading="eager" fetchpriority="high" draggable="false"></a>
+    <a class="dashboard-promo-banner" href="index.html#planos" data-promo-plans aria-label="Ver planos FolioDev Plus"><img src="${bannerUrl}" width="1536" height="185" alt="Assine o Devi Plus e tenha acesso ilimitado" loading="eager" fetchpriority="high" draggable="false"></a>
     <div class="dashboard-layout">
       <div class="dashboard-main-column">
         <div class="dashboard-metrics" aria-label="Resumo do portfólio">
@@ -199,6 +199,7 @@ function homeView() {
           <button data-route-button="analise"><span data-icon="users"></span><small>Seguidores</small><strong>${summary.visitors || '0'}</strong></button>
           <button data-route-button="link-qrcode"><span data-icon="link"></span><small>Links ativos</small><strong>${state.published ? '1' : '0'}</strong></button>
         </div>
+        <article class="card projects-card"><header class="section-card-head"><h2>Seus projetos recentes</h2></header><div class="recent-project-list">${projectRows()}</div></article>
       </div>
       <aside class="dashboard-side-column">
         <article class="card github-summary"><div class="summary-title"><span data-icon="github"></span><h2>${state.githubConnected ? 'GitHub conectado' : 'Conectar GitHub'}</h2></div>${githubCopy}</article>
@@ -235,7 +236,7 @@ function previewMarkup() {
 }
 
 function portfolioManagerView() {
-  return `<section class="page-enter portfolio-manager-page" data-drop-zone="loose">${pageHead('Meus portfólios', 'Gerencie seus portfólios em um só lugar.')}<div class="portfolio-create-actions"><button class="secondary-button" data-new-project data-project-destination="loose"><span data-icon="plus"></span>Adicionar novo projeto</button><button class="primary-button" data-new-portfolio><span data-icon="plus"></span>Adicionar novo portfólio</button></div><section class="portfolio-workspace" aria-labelledby="portfolios-heading"><header class="portfolio-section-head"><h2 id="portfolios-heading">Portfólios</h2><p>Organize e gerencie seus portfólios.</p></header><div class="portfolio-list">${visiblePortfolioFolders().map(folder => `<article class="portfolio-list-item" data-folder-id="${folder.id}" data-drag-folder="${folder.id}" draggable="true" data-drop-zone="${folder.id}" tabindex="0" role="group" aria-label="Abrir ${esc(folderName(folder.id))}. Use Alt e as setas para reordenar."><span class="portfolio-folder" aria-hidden="true"><span class="portfolio-folder-back"></span><span class="portfolio-folder-paper"></span><span class="portfolio-folder-front"></span></span><button class="icon-button portfolio-more" type="button" data-portfolio-menu="${folder.id}" aria-label="Ações de ${esc(folderName(folder.id))}" aria-haspopup="dialog">⋯</button><h2>${esc(folderName(folder.id))}</h2>${folder.id === 'principal' && state.githubConnected ? '<span class="portfolio-integration"><span data-icon="github" aria-hidden="true"></span>Conectado com GitHub</span>' : ''}</article>`).join('')}</div><div class="project-grid portfolio-project-grid" aria-label="Projetos fora das pastas">${projectCards(rootPortfolioProjects())}</div></section></section>`
+  return `<section class="page-enter portfolio-manager-page" data-drop-zone="loose">${pageHead('Meus portfólios', 'Gerencie seus portfólios em um só lugar.')}<div class="portfolio-create-actions"><button class="secondary-button" data-new-project data-project-destination="loose"><span data-icon="plus"></span>Adicionar novo projeto</button><button class="primary-button" data-new-portfolio><span data-icon="plus"></span>Adicionar novo portfólio</button></div><section class="portfolio-workspace" aria-labelledby="portfolios-heading"><div class="portfolio-folders-column"><header class="portfolio-section-head"><h2 id="portfolios-heading">Portfólios</h2><p>Organize e gerencie seus portfólios.</p></header><div class="portfolio-list">${visiblePortfolioFolders().map(folder => `<article class="portfolio-list-item" data-folder-id="${folder.id}" data-drag-folder="${folder.id}" draggable="true" data-drop-zone="${folder.id}" tabindex="0" role="group" aria-label="Abrir ${esc(folderName(folder.id))}. Use Alt e as setas para reordenar."><span class="portfolio-folder" aria-hidden="true"><span class="portfolio-folder-back"></span><span class="portfolio-folder-paper"></span><span class="portfolio-folder-front"></span></span><button class="icon-button portfolio-more" type="button" data-portfolio-menu="${folder.id}" aria-label="Ações de ${esc(folderName(folder.id))}" aria-haspopup="dialog">⋯</button><h2>${esc(folderName(folder.id))}</h2>${folder.id === 'principal' && state.githubConnected ? '<span class="portfolio-integration"><span data-icon="github" aria-hidden="true"></span>Conectado com GitHub</span>' : ''}</article>`).join('')}</div></div><div class="portfolio-projects-column"><header class="portfolio-section-head"><h2>Projetos</h2><p>Organize e gerencie seus projetos.</p></header><div class="project-grid portfolio-project-grid" aria-label="Projetos fora das pastas">${projectCards(rootPortfolioProjects())}</div></div></section></section>`
 }
 
 function folderProjectCard(project) {
@@ -425,7 +426,7 @@ function referralView() {
   const code = state.profile.username.trim().toLowerCase()
   const link = code ? `${location.origin}/?ref=${encodeURIComponent(code)}` : ''
   const active = state.referrals.filter(item => item.status === 'active').length
-  return `<section class="page-enter referral-page">${pageHead('Indique a DeviFolio', 'Indique para um desenvolvedor e receba 1 mês grátis de Devi Plus.')}
+  return `<section class="page-enter referral-page">${pageHead('Indique a FolioDev', 'Indique para um desenvolvedor e receba 1 mês grátis de FolioDev Plus.')}
     <div class="referral-layout">
       <article class="card referral-primary">
         <h2>Seu link de indicação</h2><p>Compartilhe com quem ainda não tem conta. Seus convites aparecerão no histórico após o cadastro.</p>
@@ -442,17 +443,17 @@ const views = { 'link-qrcode': linkQrView, inicio: homeView, projetos: projectsV
 
 function render({ preserveScroll = false } = {}) {
   const requestedRoute = location.hash.slice(1)
-  const route = requestedRoute === 'projetos' ? 'portfolio' : views[requestedRoute] ? requestedRoute : 'inicio'
-  if (requestedRoute === 'projetos') history.replaceState(null, '', location.pathname + location.search + '#portfolio')
+  const route = views[requestedRoute] ? requestedRoute : 'inicio'
   renderedRoute = route
   document.body.classList.toggle('static-page-route', ['inicio', 'analise', 'perfil'].includes(route))
   document.body.classList.toggle('home-route', route === 'inicio')
+  document.body.classList.toggle('portfolio-route', route === 'portfolio')
   document.body.classList.toggle('github-route', route === 'github')
   document.body.classList.toggle('projects-route', route === 'projetos')
   document.body.classList.toggle('kaptei-route', route === 'kaptei')
   $('#page-content').innerHTML = views[route]()
   const routeLabel = { 'link-qrcode': 'Seu Link, Seu QR Code', inicio: 'Dashboard', projetos: 'Meus projetos', portfolio: 'Meus portfólios', modelos: 'Modelos', 'portfolio-editar': 'Editar portfólio', github: 'GitHub', analise: 'Análise', kaptei: 'Kaptei', perfil: 'Perfil', configuracoes: 'Configurações', indicacao: 'Indicação' }[route]
-  document.title = `${routeLabel} — Devifolio`
+  document.title = `${routeLabel} — FolioDev`
   if ($('#breadcrumb-page')) $('#breadcrumb-page').textContent = routeLabel
   if ($('#breadcrumb-section')) $('#breadcrumb-section').textContent = route === 'inicio' ? 'Início' : 'Painel'
   $$('.nav-item').forEach(item => item.classList.toggle('active', item.dataset.route === route))
@@ -1207,8 +1208,7 @@ function renderWithTransition() {
   closeUserMenu()
   if (bootstrapping) { render(); return }
   const requestedRoute = location.hash.slice(1)
-  const route = requestedRoute === 'projetos' ? 'portfolio' : views[requestedRoute] ? requestedRoute : 'inicio'
-  if (requestedRoute === 'projetos') history.replaceState(null, '', location.pathname + location.search + '#portfolio')
+  const route = views[requestedRoute] ? requestedRoute : 'inicio'
   if (route === renderedRoute) return
   render()
 }

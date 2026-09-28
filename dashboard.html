@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Gerencie seus projetos, portfólio e resultados no Devifolio.">
+  <meta name="description" content="Gerencie seus projetos, portfólio e resultados no FolioDev.">
   <meta name="theme-color" content="#121619">
-  <title>Início — Devifolio</title>
+  <title>Início — FolioDev</title>
   <link rel="icon" type="image/png" href="assets/devifolio-logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,15 +30,17 @@
   <link rel="stylesheet" href="dashboard-home.css">
   <link rel="stylesheet" href="dashboard-github.css">
   <link rel="stylesheet" href="dashboard-frontend.css">
+  <link rel="stylesheet" href="foliodev-reference.css">
 </head>
 <body class="dashboard-app">
   <div class="app-shell">
     <aside class="sidebar" id="sidebar" aria-label="Menu principal">
       <div class="sidebar-resize-handle" id="sidebar-resize-handle" role="separator" aria-label="Redimensionar menu lateral" aria-orientation="vertical" aria-valuemin="180" aria-valuemax="320" aria-valuenow="190" tabindex="0"></div>
-      <div class="brand-crop" aria-label="Devifolio"><span class="brand-mark devifolio-mark"><img src="assets/devifolio-brand-original.png" alt=""></span><span class="brand-name">Devifolio</span></div>
+      <div class="brand-crop" aria-label="FolioDev"><span class="brand-mark devifolio-mark"><img src="assets/devifolio-brand-original.png" alt=""></span><span class="brand-name">FolioDev</span></div>
       <button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Recolher menu" aria-expanded="true" data-tooltip="Recolher menu"><span data-icon="menu"></span></button>
       <nav class="side-nav side-nav-primary" id="side-nav">
         <a class="nav-item active" href="#inicio" data-route="inicio" data-tooltip="Início"><span data-icon="home"></span><span>Início</span></a>
+        <a class="nav-item" href="#projetos" data-route="projetos" data-tooltip="Projetos"><span data-icon="folder"></span><span>Projetos</span></a>
         <a class="nav-item" href="#portfolio" data-route="portfolio" data-tooltip="Meus Portfólios"><span data-icon="layout"></span><span>Meus Portfólios</span></a>
         <a class="nav-item" href="#modelos" data-route="modelos" data-tooltip="Modelos"><span data-icon="edit"></span><span>Modelos</span></a>
         <a class="nav-item" href="#github" data-route="github" data-tooltip="GitHub"><span data-icon="github"></span><span>GitHub</span></a>
@@ -47,9 +49,9 @@
         <a class="nav-item" href="#perfil" data-route="perfil" data-tooltip="Perfil"><span data-icon="profile"></span><span>Perfil</span></a>
       </nav>
       <div class="sidebar-spacer"></div>
-      <a class="sidebar-referral" href="#indicacao" aria-label="Indique a DeviFolio e receba 1 mês de Devi Plus">
+      <a class="sidebar-referral" href="#indicacao" aria-label="Indique a FolioDev e receba 1 mês de FolioDev Plus">
         <span class="sidebar-referral-icon" aria-hidden="true">✦</span>
-        <strong>Receba 1 mês de<br>Devi Plus</strong>
+        <strong>Receba 1 mês de<br>FolioDev Plus</strong>
         <span class="sidebar-referral-cta">Indicar <span aria-hidden="true">→</span></span>
       </a>
       <button class="user-mini" id="user-menu-toggle" type="button" aria-expanded="false" aria-controls="user-menu" data-tooltip="Conta">
@@ -68,7 +70,7 @@
 
     <div class="mobile-topbar">
       <button class="icon-button" id="menu-toggle" aria-label="Abrir menu" aria-expanded="false"><span data-icon="menu"></span></button>
-      <div class="brand-crop brand-mobile" aria-label="Devifolio"><span class="brand-mark devifolio-mark"><img src="assets/devifolio-brand-original.png" alt=""></span><span class="brand-name">Devifolio</span></div>
+      <div class="brand-crop brand-mobile" aria-label="FolioDev"><span class="brand-mark devifolio-mark"><img src="assets/devifolio-brand-original.png" alt=""></span><span class="brand-name">FolioDev</span></div>
       <button class="avatar avatar-small" type="button" data-route-button="perfil" aria-label="Abrir perfil"></button>
     </div>
 
