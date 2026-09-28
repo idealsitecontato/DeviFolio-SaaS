@@ -29,6 +29,15 @@ if (reviewTrack) {
 }
 
 
+const referralCode = new URLSearchParams(window.location.search).get('ref')?.trim().toLowerCase() || ''
+if (/^[a-z0-9._-]{1,80}$/.test(referralCode)) {
+  document.querySelectorAll('a[href^="cadastro.html"]').forEach(link => {
+    const target = new URL(link.getAttribute('href'), window.location.href)
+    target.searchParams.set('ref', referralCode)
+    link.href = target.toString()
+  })
+}
+
 const landingPath = window.location.pathname
 if (landingPath.startsWith('/portfolio/')) {
   let username = landingPath.slice('/portfolio/'.length)

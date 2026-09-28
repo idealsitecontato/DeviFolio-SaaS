@@ -148,6 +148,26 @@ async function renderPortfolioQR() {
   }
 }
 
+async function renderReferralQR() {
+  const canvas = $('#referral-qr')
+  if (!canvas || !state.profile.username.trim()) return
+  try {
+    await QRCode.toCanvas(canvas, `${location.origin}/?ref=${encodeURIComponent(state.profile.username.trim().toLowerCase())}`, { width: 176, margin: 2, color: { dark: '#000000', light: '#ffffff' } })
+  } catch (error) { reportError('Não foi possível gerar o QR Code da indicação.', error) }
+}
+
+async function downloadReferralQR() {
+  if (!state.profile.username.trim()) return
+  try {
+    const url = `${location.origin}/?ref=${encodeURIComponent(state.profile.username.trim().toLowerCase())}`
+    const dataUrl = await QRCode.toDataURL(url, { width: 1024, margin: 2, color: { dark: '#000000', light: '#ffffff' } })
+    const anchor = document.createElement('a')
+    anchor.href = dataUrl
+    anchor.download = 'devifolio-indicacao-qr.png'
+    anchor.click()
+  } catch (error) { reportError('Não foi possível baixar o QR Code da indicação.', error) }
+}
+
 function projectRows(items = state.projects.slice(0, 5)) {
   if (!items.length) return `<div class="projects-empty">${emptyState('folder', 'Você ainda não possui projetos.', 'Crie seu primeiro projeto para começar.', '<button class="primary-button" data-new-project>Criar primeiro projeto</button>')}</div>`
   return items.map(project => {
@@ -361,9 +381,19 @@ function settingsView() {
 }
 
 function referralView() {
-  const link = `${location.origin}/cadastro.html?ref=${encodeURIComponent(state.profile.username)}#cadastro`
+  const code = state.profile.username.trim().toLowerCase()
+  const link = code ? `${location.origin}/?ref=${encodeURIComponent(code)}` : ''
   const active = state.referrals.filter(item => item.status === 'active').length
-  return `<section class="page-enter">${pageHead('Indicação', 'Convide outros devs e acompanhe indicações reais.')}<div class="referral-hero card"><div><span class="badge">PROGRAMA DE INDICAÇÃO</span><h2>Compartilhe o Devifolio.</h2><p>Seu convite usa um link exclusivo vinculado à sua conta.</p><div class="url-field referral-link"><span>${esc(link)}</span><button class="icon-button" data-copy="${esc(link)}"><span data-icon="copy"></span></button></div><button class="primary-button" data-share-referral data-share-url="${esc(link)}"><span data-icon="users"></span>Compartilhar convite</button></div><div class="benefit-orbit"><span data-icon="users"></span><strong>${active}</strong><small>amigos ativos</small></div></div><div class="referral-stats"><article class="card"><small>Indicações registradas</small><strong>${state.referrals.length}</strong></article><article class="card"><small>Amigos ativos</small><strong>${active}</strong></article><article class="card"><small>Pendentes</small><strong>${state.referrals.length - active}</strong></article></div><article class="card history-card"><div class="section-card-head"><div><h2>Histórico de indicações</h2><p>Acompanhe o status dos seus convites.</p></div></div>${state.referrals.length ? state.referrals.map(item => `<div class="history-row"><span class="avatar avatar-small">${esc(item.referred_email.slice(0, 1).toUpperCase())}</span><div><b>${esc(item.referred_email)}</b><small>${new Date(item.created_at).toLocaleDateString('pt-BR')}</small></div><span class="status ${item.status === 'active' ? 'published' : 'progress'}">${item.status === 'active' ? 'Ativa' : 'Pendente'}</span></div>`).join('') : `<div class="projects-empty">${emptyState('users', 'Nenhuma indicação registrada.', 'Compartilhe seu link para começar.')}</div>`}</article></section>`
+  return `<section class="page-enter referral-page">${pageHead('Indique a DeviFolio', 'Indique para um desenvolvedor e receba 1 mês grátis de Devi Plus.')}
+    <div class="referral-layout">
+      <article class="card referral-primary">
+        <h2>Seu link de indicação</h2><p>Compartilhe com quem ainda não tem conta. Seus convites aparecerão no histórico após o cadastro.</p>
+        ${link ? `<div class="url-field referral-link"><span>${esc(link)}</span></div><div class="referral-actions"><button class="primary-button" data-copy="${esc(link)}"><span data-icon="copy"></span>Copiar link</button><button class="secondary-button" data-share-referral data-share-url="${esc(link)}"><span data-icon="share"></span>Compartilhar</button></div><div class="referral-qr"><canvas id="referral-qr" width="176" height="176" aria-label="QR Code do link de indicação"></canvas><button class="secondary-button" data-download-referral-qr><span data-icon="download"></span>Baixar QR Code</button></div>` : `<div class="dashboard-link-empty"><p>Complete seu perfil para criar o link de indicação.</p><button class="secondary-button" data-route-button="perfil">Completar perfil</button></div>`}
+      </article>
+      <div class="referral-side"><article class="card referral-benefit"><span class="eyebrow">DEVI PLUS</span><strong>1 mês grátis</strong><p>por indicação válida</p></article><article class="card referral-totals"><div><small>Indicações registradas</small><strong>${state.referrals.length}</strong></div><div><small>Cadastros concluídos</small><strong>${active}</strong></div><p>Acompanhe os convites feitos pelo seu link.</p></article></div>
+    </div>
+    <article class="card history-card"><div class="section-card-head"><div><h2>Histórico de indicações</h2><p>Cadastros associados ao seu link.</p></div></div>${state.referrals.length ? state.referrals.map(item => `<div class="history-row"><span class="avatar avatar-small">${esc(item.referred_email.slice(0, 1).toUpperCase())}</span><div><b>${esc(item.referred_email)}</b><small>${new Date(item.created_at).toLocaleDateString('pt-BR')}</small></div><span class="status ${item.status === 'active' ? 'published' : 'progress'}">${item.status === 'active' ? 'Ativa' : 'Pendente'}</span></div>`).join('') : `<div class="projects-empty">${emptyState('users', 'Nenhuma indicação registrada.', 'Compartilhe seu link para começar.')}</div>`}</article>
+  </section>`
 }
 
 
@@ -383,6 +413,7 @@ function render({ preserveScroll = false } = {}) {
   hydrateIcons($('#page-content'))
   bindActions()
   if (route === 'link-qrcode' || route === 'inicio') renderPortfolioQR()
+  if (route === 'indicacao') renderReferralQR()
   if (route === 'github' && !bootstrapping && (state.githubConnected || !githubConnectionChecked) && !reposLoaded && !reposLoading) reposPromise = fetchGithubRepos({ reportFailure: !new URLSearchParams(location.search).has('github') })
   updateUserChrome()
   closeMenu()
@@ -424,6 +455,7 @@ function bindActions() {
   $$('[data-apply-model]').forEach(button => button.onclick = () => applyModel(button.dataset.applyModel))
   $$('[data-share-portfolio]').forEach(button => button.onclick = sharePortfolio)
   $$('[data-download-qr]').forEach(button => button.onclick = downloadPortfolioQR)
+  $('[data-download-referral-qr]')?.addEventListener('click', downloadReferralQR)
   $$('[data-new-project]').forEach(button => button.onclick = () => projectModal(null, button.dataset.projectDestination || (location.hash === '#portfolio' ? 'loose' : 'projects')))
   bindProjectGrid()
   bindKapteiActions({ modal, toast })
