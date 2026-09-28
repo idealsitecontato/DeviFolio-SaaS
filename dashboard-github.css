@@ -19,7 +19,7 @@ html body.dashboard-app.github-route .github-page .connected-account {
   margin-bottom: 44px;
 }
 html body.dashboard-app.github-route .github-page .connected-account > .avatar { width: 38px; height: 38px; }
-html body.dashboard-app.github-route .github-page .repo-panel { margin-inline: 17px; }
+html body.dashboard-app.github-route .github-page .repo-panel { margin-inline: 17px; padding: 0; background: transparent !important; border: 0 !important; }
 html body.dashboard-app.github-route .github-page .repo-panel .section-card-head { margin-bottom: 18px; }
 html body.dashboard-app.github-route .github-page .repo-panel .section-card-head h2 { font-size: 21px; }
 html body.dashboard-app.github-route .github-page .repo-panel [data-import-selected] {
@@ -28,8 +28,14 @@ html body.dashboard-app.github-route .github-page .repo-panel [data-import-selec
   font-size: 14px;
   border-radius: 6px !important;
 }
-html body.dashboard-app.github-route .github-page .repo-list { display: grid; gap: 10px; }
+html body.dashboard-app.github-route .github-page .repo-list { display: grid; gap: 10px; margin-top: 0; }
 html body.dashboard-app.github-route .github-page .repo-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 32px;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-width: 0;
   min-height: 73.5px;
   padding: 14px 19px;
   background: #222222 !important;
@@ -38,7 +44,9 @@ html body.dashboard-app.github-route .github-page .repo-row {
   transition: background-color .18s ease, border-color .18s ease;
 }
 html body.dashboard-app.github-route .github-page .repo-row[hidden] { display: none !important; }
-html body.dashboard-app.github-route .github-page .repo-select { grid-template-columns: 18px 38px minmax(0,1fr); gap: 23px; }
+html body.dashboard-app.github-route .github-page .repo-select { display: grid; width: 100%; min-width: 0; grid-template-columns: 18px 38px minmax(0,1fr); gap: 23px; }
+html body.dashboard-app.github-route .github-page .repo-copy { display: block; width: 100%; min-width: 0; }
+html body.dashboard-app.github-route .github-page .repo-copy :is(b,small) { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; overflow-wrap: normal; word-break: normal; }
 html body.dashboard-app.github-route .github-page .repo-row .repo-copy b { font-size: 15px; }
 html body.dashboard-app.github-route .github-page .repo-row .repo-copy small { font-size: 13px; }
 html body.dashboard-app.github-route .github-page .repo-row .repo-more { font-size: 24px; line-height: 1; flex: none; }
