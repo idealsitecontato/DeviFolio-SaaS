@@ -21,7 +21,7 @@ import { bindExplorerDrag } from './src/lib/explorer-drag.js'
 import { kapteiView, bindKapteiActions } from './kaptei.js'
 
 const githubIconUrl = new URL('./assets/github-icon.png', import.meta.url).href
-const bannerUrl = new URL('./assets/devi-plus-banner-original.png', import.meta.url).href
+const bannerUrl = new URL('./assets/banner-devi-plus.jpg', import.meta.url).href
 const placeholderUrl = new URL('./assets/user-placeholder.png', import.meta.url).href
 
 const $ = (selector, root = document) => root.querySelector(selector)
@@ -183,9 +183,28 @@ function homeView() {
     ? `<p>Conta conectada como <strong>@${esc(state.githubUsername || 'GitHub')}</strong>.</p><button class="dashboard-action" data-route-button="github"><span data-icon="github"></span>Gerenciar GitHub<span data-icon="arrow"></span></button>`
     : '<p>Importe seus repositórios e transforme-os em projetos do portfólio.</p><button class="dashboard-action" data-route-button="github"><span data-icon="github"></span>Conectar com GitHub<span data-icon="arrow"></span></button>'
   const qrMarkup = linkReady
-    ? `<div class="dashboard-url home-public-url"><span data-icon="link"></span><span>${esc(publicPortfolioUrl())}</span></div><div class="dashboard-qr"><div class="home-qr-area"><div class="qr-wrap"><canvas id="portfolio-qr" width="150" height="150" aria-label="QR Code do portfólio público"></canvas></div></div></div><div class="home-qr-download"><button class="secondary-button" data-copy="${esc(publicPortfolioUrl())}"><span data-icon="copy"></span>Copiar link</button><button class="secondary-button" data-download-qr><span data-icon="download"></span>Baixar QR Code</button></div>`
+    ? `<div class="dashboard-url home-public-url"><span data-icon="link"></span><input type="url" readonly aria-label="Link público do portfólio" value="${esc(publicPortfolioUrl())}"></div>
+      <div class="dashboard-qr"><div class="home-qr-area"><div class="qr-wrap"><canvas id="portfolio-qr" width="150" height="150" aria-label="QR Code do portfólio público"></canvas></div></div></div>
+      <div class="home-qr-download"><button class="secondary-button" data-copy="${esc(publicPortfolioUrl())}"><span data-icon="copy"></span>Copiar link</button><button class="secondary-button" data-download-qr><span data-icon="download"></span>Baixar QR Code</button></div>`
     : '<div class="dashboard-link-empty"><span data-icon="qr"></span><p>Conclua o perfil para gerar seu link público e QR Code.</p><button class="secondary-button" data-route-button="portfolio-editar">Configurar portfólio</button></div>'
-  return `<section class="page-enter home-page"><div class="dashboard-layout"><div class="dashboard-main-column"><article class="card welcome-card"><div class="welcome-copy"><p>Bem-vindo de volta,</p><h1>${esc(realName())}!</h1><span>Seu portfólio, projetos e estatísticas, tudo em um só lugar.</span></div><span class="welcome-brand" aria-hidden="true"><img src="assets/devifolio-brand-original.png" alt=""></span><div class="dashboard-metrics"><button data-route-button="portfolio"><span data-icon="folder"></span><small>Portfólios</small><strong>${state.published ? '1' : '0'}</strong></button><button data-route-button="analise"><span data-icon="eye"></span><small>Visualizações</small><strong>${summary.views || '0'}</strong></button><button data-route-button="analise"><span data-icon="users"></span><small>Seguidores</small><strong>${summary.visitors || '0'}</strong></button><button data-route-button="link-qrcode"><span data-icon="link"></span><small>Links ativos</small><strong>${state.published ? '1' : '0'}</strong></button></div></article><section class="card projects-card"><div class="section-card-head"><h2>Seus projetos recentes</h2>${state.projects.length ? '<button class="link-button" data-route-button="projetos">Ver todos <span data-icon="arrow"></span></button>' : ''}</div>${projectRows(state.projects.slice(0, 5))}</section></div><aside class="dashboard-side-column"><article class="card github-summary"><div class="summary-title"><span data-icon="github"></span><h2>${state.githubConnected ? 'GitHub conectado' : 'Conectar GitHub'}</h2></div>${githubCopy}</article><article class="card link-summary home-qr-card"><h2>Seu Link, Seu QR Code</h2><p>Compartilhe seu portfólio por link ou QR Code.</p>${qrMarkup}</article></aside></div><a class="dashboard-promo-banner" href="index.html#planos" data-promo-plans aria-label="Ver planos DeviFolio"><img src="${bannerUrl}" width="3350" height="469" alt="Devi Plus: mais portfólios, projetos e possibilidades" loading="eager"></a></section>`
+  return `<section class="page-enter home-page" aria-label="Painel de início">
+    <a class="dashboard-promo-banner" href="index.html#planos" data-promo-plans aria-label="Ver planos Devi Plus"><img src="${bannerUrl}" width="4095" height="527" alt="Assine o Devi Plus e tenha acesso ilimitado" loading="eager" fetchpriority="high"></a>
+    <div class="dashboard-layout">
+      <div class="dashboard-main-column">
+        <div class="dashboard-metrics" aria-label="Resumo do portfólio">
+          <button data-route-button="portfolio"><span data-icon="folder"></span><small>Portfólios</small><strong>${state.published ? '1' : '0'}</strong></button>
+          <button data-route-button="analise"><span data-icon="eye"></span><small>Visualizações</small><strong>${summary.views || '0'}</strong></button>
+          <button data-route-button="analise"><span data-icon="users"></span><small>Seguidores</small><strong>${summary.visitors || '0'}</strong></button>
+          <button data-route-button="link-qrcode"><span data-icon="link"></span><small>Links ativos</small><strong>${state.published ? '1' : '0'}</strong></button>
+        </div>
+        <section class="card projects-card"><div class="section-card-head"><h2>Seus projetos recentes</h2>${state.projects.length ? '<button class="link-button" data-route-button="projetos">Ver todos <span data-icon="arrow"></span></button>' : ''}</div>${projectRows(state.projects.slice(0, 5))}</section>
+      </div>
+      <aside class="dashboard-side-column">
+        <article class="card github-summary"><div class="summary-title"><span data-icon="github"></span><h2>${state.githubConnected ? 'GitHub conectado' : 'Conectar GitHub'}</h2></div>${githubCopy}</article>
+        <article class="card link-summary home-qr-card"><h2>Seu Link, Seu QR Code</h2><p>Compartilhe seu portfólio por link ou QR Code.</p>${qrMarkup}</article>
+      </aside>
+    </div>
+  </section>`
 }
 
 function linkQrView() {
@@ -402,6 +421,7 @@ const views = { 'link-qrcode': linkQrView, inicio: homeView, projetos: projectsV
 function render({ preserveScroll = false } = {}) {
   const route = views[location.hash.slice(1)] ? location.hash.slice(1) : 'inicio'
   renderedRoute = route
+  document.body.classList.toggle('home-route', route === 'inicio')
   document.body.classList.toggle('projects-route', route === 'projetos')
   document.body.classList.toggle('kaptei-route', route === 'kaptei')
   $('#page-content').innerHTML = views[route]()

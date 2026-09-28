@@ -98,7 +98,6 @@ body.dashboard-app .home-qr-area .qr-wrap { width: 124px; height: 124px; }
 body.dashboard-app .home-qr-area .qr-wrap canvas { width: 104px !important; height: 104px !important; }
 body.dashboard-app .home-qr-download .secondary-button { background: #000 !important; color: #fff !important; }
 body.dashboard-app .home-qr-download .secondary-button svg { color: #fff !important; }
-body.dashboard-app .home-page .dashboard-promo-banner { display: none !important; }
 body.dashboard-app :is(button,a,input,textarea,select):focus-visible { outline: 2px solid var(--devi-blue) !important; outline-offset: 3px !important; }
 
 body.dashboard-app .sidebar-referral { display: grid; gap: 7px; padding: 12px; margin: 8px 0; color: #fff; background: linear-gradient(130deg,#06204e 0%,#0050bc 55%,#070d16 100%); border: 1px solid #1b4b92; border-radius: 3px; text-decoration: none; }
