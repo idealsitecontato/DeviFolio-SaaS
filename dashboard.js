@@ -354,13 +354,15 @@ function portfolioEditorView() {
 }
 
 function githubView() {
-  const content = `<div class="repo-list">${state.repos.map((repository, index) => `<div class="repo-row"><label class="repo-select"><input type="checkbox" value="${index}" aria-label="Selecionar ${esc(repository.name)}"><span class="repo-icon" data-icon="github"></span><span class="repo-copy"><b>${esc(repository.name)}</b><small>@${esc(repository.full_name?.split('/')[0] || state.githubUsername)} <span aria-hidden="true">•</span> ${repository.private ? 'Privado' : 'Público'}</small></span></label><button class="icon-button repo-more" data-repo-menu="${index}" aria-label="Ações de ${esc(repository.name)}" aria-haspopup="dialog">···</button></div>`).join('')}</div>`
+  const content = `<div class="repo-list">${state.repos.map((repository, index) => `<article class="repo-row" data-repository-index="${index}" ${index >= 5 ? 'hidden' : ''}><label class="repo-select"><input type="checkbox" value="${index}" aria-label="Selecionar ${esc(repository.name)}"><span class="repo-icon" data-icon="github"></span><span class="repo-copy"><b>${esc(repository.name)}</b><small>@${esc(repository.full_name?.split('/')[0] || state.githubUsername)} <span aria-hidden="true">•</span> ${repository.private ? 'Privado' : 'Público'}</small></span></label><button class="icon-button repo-more" data-repo-menu="${index}" aria-label="Ações de ${esc(repository.name)}" aria-haspopup="dialog">⋯</button></article>`).join('')}</div>`
+  const pageCount = Math.ceil(state.repos.length / 5)
+  const pagination = pageCount > 1 ? `<nav class="repo-pagination" aria-label="Páginas de repositórios"><button class="secondary-button" data-repo-page-change="-1" disabled>Anterior</button><span data-repo-page-status aria-live="polite">Página 1 de ${pageCount}</span><button class="secondary-button" data-repo-page-change="1">Próxima</button></nav>` : ''
   const account = state.githubConnected
     ? `<div class="card connected-account"><span class="avatar">GH</span><div><small>Conta conectada</small><h2>@${esc(state.githubUsername || 'GitHub')}</h2></div><button class="secondary-button" data-sync-repos><span data-icon="refresh"></span>Sincronizar</button></div>`
     : `<div class="card connect-card"><span class="connect-icon" data-icon="github"></span><h2>Conecte seu GitHub</h2><p>Conecte a conta para sincronizar e importar seus repositórios reais.</p><button class="primary-button" data-connect-github><span data-icon="github"></span>Conectar com GitHub</button></div>`
   const status = reposLoading ? 'Carregando repositórios...' : repoLoadFailed ? 'Não foi possível carregar os repositórios.' : `${state.repos.length} repositório${state.repos.length === 1 ? '' : 's'} encontrado${state.repos.length === 1 ? '' : 's'}`
   const message = repoLoadFailed ? '<div class="repo-reference-note"><button type="button" data-retry-repos>Tentar novamente</button></div>' : state.githubConnected && reposLoaded && !state.repos.length ? '<p class="repo-empty">Nenhum repositório encontrado nesta conta.</p>' : ''
-  return `<section class="page-enter github-page">${pageHead('GitHub', 'Selecione os repositórios que deseja transformar em projetos.', state.githubConnected ? '<button class="secondary-button" data-disconnect-github>Desconectar</button>' : '')}${account}${state.githubConnected ? `<div class="repo-panel"><div class="section-card-head"><div><h2>Seus repositórios</h2><p>${status}</p></div><button class="primary-button" data-import-selected ${state.repos.length ? '' : 'disabled'}><span data-icon="download"></span>Importar selecionados</button></div>${content}${message}</div>` : ''}</section>`
+  return `<section class="page-enter github-page">${pageHead('GitHub', 'Selecione os repositórios que deseja transformar em projetos.', state.githubConnected ? '<button class="secondary-button" data-disconnect-github>Desconectar</button>' : '')}${account}${state.githubConnected ? `<div class="repo-panel"><div class="section-card-head"><div><h2>Seus repositórios</h2><p>${status}</p></div><button class="primary-button" data-import-selected ${state.repos.length ? '' : 'disabled'}><span data-icon="download"></span>Importar selecionados</button></div>${content}${pagination}${message}</div>` : ''}</section>`
 }
 
 function analyticsView() {
@@ -422,6 +424,7 @@ function render({ preserveScroll = false } = {}) {
   const route = views[location.hash.slice(1)] ? location.hash.slice(1) : 'inicio'
   renderedRoute = route
   document.body.classList.toggle('home-route', route === 'inicio')
+  document.body.classList.toggle('github-route', route === 'github')
   document.body.classList.toggle('projects-route', route === 'projetos')
   document.body.classList.toggle('kaptei-route', route === 'kaptei')
   $('#page-content').innerHTML = views[route]()
@@ -507,6 +510,7 @@ function bindActions() {
   $('[data-retry-repos]')?.addEventListener('click', fetchGithubRepos)
   $('[data-import-selected]')?.addEventListener('click', importSelected)
   $$('[data-repo-menu]').forEach(button => button.onclick = () => repositoryMenu(Number(button.dataset.repoMenu)))
+  bindGithubPagination()
   $$('[data-setting]').forEach(button => button.onclick = () => updateSetting(button.dataset.setting))
   $('[data-export]')?.addEventListener('click', exportData)
   $('[data-delete-account]')?.addEventListener('click', confirmAccountDeletion)
@@ -549,6 +553,26 @@ function bindProjectGrid(root = document) {
       if (!event.altKey || !['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) return
       event.preventDefault()
       void nudgeProject(Number(card.dataset.dragProject), ['ArrowLeft', 'ArrowUp'].includes(event.key) ? -1 : 1)
+    }
+  })
+}
+
+// Keep all real rows and their checkboxes mounted so selection survives page changes.
+function bindGithubPagination() {
+  const root = $('.github-page')
+  const controls = root && $('.repo-pagination', root)
+  if (!controls) return
+  const rows = $$('.repo-row', root)
+  const pageCount = Math.ceil(rows.length / 5)
+  let page = 0
+  $$('[data-repo-page-change]', controls).forEach(button => {
+    button.onclick = () => {
+      page = Math.max(0, Math.min(pageCount - 1, page + Number(button.dataset.repoPageChange)))
+      rows.forEach((row, index) => { row.hidden = Math.floor(index / 5) !== page })
+      $('[data-repo-page-status]', controls).textContent = `Página ${page + 1} de ${pageCount}`
+      $('[data-repo-page-change="-1"]', controls).disabled = page === 0
+      $('[data-repo-page-change="1"]', controls).disabled = page === pageCount - 1
+      $('.repo-panel', root).scrollIntoView({ block: 'start', behavior: 'instant' })
     }
   })
 }
