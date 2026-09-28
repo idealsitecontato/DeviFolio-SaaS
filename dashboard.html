@@ -4,87 +4,164 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Gerencie seus projetos, portfólio e resultados no FolioDev.">
-  <meta name="theme-color" content="#121619">
+  <meta name="theme-color" content="#FAFAF9">
+  <meta property="og:title" content="Seu painel — FolioDev">
+<meta property="og:description" content="Organize seus projetos e gerencie seu portfólio.">
+<meta property="og:image" content="/assets/devifolio-mark.png">
   <title>Início — FolioDev</title>
-  <link rel="icon" type="image/png" href="assets/devifolio-logo.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="dashboard-reference.css">
-  <link rel="stylesheet" href="dashboard-light.css">
-  <link rel="stylesheet" href="dashboard-rounded.css">
-  <link rel="stylesheet" href="brand-logo.css">
-  <link rel="stylesheet" href="dashboard-v3.css">
-  <link rel="stylesheet" href="visual-adjustments.css">
-  <link rel="stylesheet" href="screen-loading.css">
-  <link rel="stylesheet" href="interaction-refinements.css">
-  <link rel="stylesheet" href="reference-fidelity.css">
-  <link rel="stylesheet" href="ui-polish.css">
-  <link rel="stylesheet" href="internal-layout.css">
-  <link rel="stylesheet" href="models.css">
-  <link rel="stylesheet" href="dashboard-scale.css">
-  <link rel="stylesheet" href="models-reference.css">
-  <link rel="stylesheet" href="dashboard-final.css">
-  <link rel="stylesheet" href="kaptei.css">
-  <link rel="stylesheet" href="dashboard-explorer.css">
-  <link rel="stylesheet" href="dashboard-home.css">
-  <link rel="stylesheet" href="dashboard-github.css">
-  <link rel="stylesheet" href="dashboard-frontend.css">
-  <link rel="stylesheet" href="foliodev-reference.css">
+  <link rel="icon" type="image/png" href="assets/devifolio-mark.png">
+  <link rel="stylesheet" href="foliodev-system.css">
+  <link rel="stylesheet" href="foliodev-app.css">
 </head>
 <body class="dashboard-app">
+<a class="skip-link" href="#page-content">Ir para o conteúdo</a>
   <div class="app-shell">
     <aside class="sidebar" id="sidebar" aria-label="Menu principal">
-      <div class="sidebar-resize-handle" id="sidebar-resize-handle" role="separator" aria-label="Redimensionar menu lateral" aria-orientation="vertical" aria-valuemin="180" aria-valuemax="320" aria-valuenow="190" tabindex="0"></div>
-      <div class="brand-crop" aria-label="FolioDev"><span class="brand-mark devifolio-mark"><img src="assets/devifolio-brand-original.png" alt=""></span><span class="brand-name">FolioDev</span></div>
-      <button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Recolher menu" aria-expanded="true" data-tooltip="Recolher menu"><span data-icon="menu"></span></button>
-      <nav class="side-nav side-nav-primary" id="side-nav">
-        <a class="nav-item active" href="#inicio" data-route="inicio" data-tooltip="Início"><span data-icon="home"></span><span>Início</span></a>
-        <a class="nav-item" href="#projetos" data-route="projetos" data-tooltip="Projetos"><span data-icon="folder"></span><span>Projetos</span></a>
-        <a class="nav-item" href="#portfolio" data-route="portfolio" data-tooltip="Meus Portfólios"><span data-icon="layout"></span><span>Meus Portfólios</span></a>
-        <a class="nav-item" href="#modelos" data-route="modelos" data-tooltip="Modelos"><span data-icon="edit"></span><span>Modelos</span></a>
-        <a class="nav-item" href="#github" data-route="github" data-tooltip="GitHub"><span data-icon="github"></span><span>GitHub</span></a>
-        <a class="nav-item" href="#analise" data-route="analise" data-tooltip="Análise"><span data-icon="chart"></span><span>Análise</span></a>
-        <a class="nav-item" href="#kaptei" data-route="kaptei" data-tooltip="Kaptei"><span class="kaptei-nav-mark" aria-hidden="true"><img src="assets/kaptei/14890.png" alt=""></span><span>Kaptei</span></a>
-        <a class="nav-item" href="#perfil" data-route="perfil" data-tooltip="Perfil"><span data-icon="profile"></span><span>Perfil</span></a>
-      </nav>
-      <div class="sidebar-spacer"></div>
-      <a class="sidebar-referral" href="#indicacao" aria-label="Indique a FolioDev e receba 1 mês de FolioDev Plus">
-        <span class="sidebar-referral-icon" aria-hidden="true">✦</span>
-        <strong>Receba 1 mês de<br>FolioDev Plus</strong>
-        <span class="sidebar-referral-cta">Indicar <span aria-hidden="true">→</span></span>
-      </a>
+      <div class="sidebar-resize-handle" id="sidebar-resize-handle" role="separator" aria-label="Redimensionar menu lateral" aria-orientation="vertical" aria-valuemin="180" aria-valuemax="320" aria-valuenow="190" tabindex="0">
+</div>
+      <a class="brand-crop" href="#inicio" aria-label="FolioDev, início">
+<span class="folio-brand">
+<img src="assets/devifolio-mark.png" alt="" width="30" height="34">
+<span class="brand-name">FolioDev</span>
+</span>
+</a>
+      <button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Recolher menu" aria-expanded="true" data-tooltip="Recolher menu">
+<span data-icon="menu">
+</span>
+</button>
       <button class="user-mini" id="user-menu-toggle" type="button" aria-expanded="false" aria-controls="user-menu" data-tooltip="Conta">
-        <span class="avatar"></span><span><b>Sua conta</b><small></small></span><span data-icon="chevron"></span>
+        <span class="avatar">
+</span>
+<span>
+<b>Sua conta</b>
+<small>
+</small>
+</span>
+<span data-icon="chevron">
+</span>
       </button>
       <div class="user-menu" id="user-menu" hidden>
-        <button type="button" data-route-button="perfil"><span data-icon="profile"></span>Perfil</button>
-        <button type="button" data-route-button="configuracoes"><span data-icon="settings"></span>Configurações</button>
-        <a href="cadastro.html#login" data-logout><span data-icon="logout"></span>Sair</a>
+        <button type="button" data-route-button="perfil">
+<span data-icon="profile">
+</span>Perfil</button>
+        <button type="button" data-route-button="configuracoes">
+<span data-icon="settings">
+</span>Configurações</button>
+        <a href="cadastro.html#login" data-logout>
+<span data-icon="logout">
+</span>Sair</a>
       </div>
+      <nav class="side-nav side-nav-primary" id="side-nav">
+        <a class="nav-item active" href="#inicio" data-route="inicio" data-tooltip="Início">
+<span data-icon="home">
+</span>
+<span>Início</span>
+</a>
+        <a class="nav-item" href="#portfolio" data-route="portfolio" data-tooltip="Portfólios">
+<span data-icon="layout">
+</span>
+<span>Portfólios</span>
+</a>
+        <a class="nav-item" href="#projetos" data-route="projetos" data-tooltip="Projetos">
+<span data-icon="folder">
+</span>
+<span>Projetos</span>
+</a>
+        <a class="nav-item" href="#modelos" data-route="modelos" data-tooltip="Modelos">
+<span data-icon="edit">
+</span>
+<span>Modelos</span>
+</a>
+        <a class="nav-item" href="#publicacoes" data-route="publicacoes" data-tooltip="Publicações">
+<span data-icon="rocket">
+</span>
+<span>Publicações</span>
+</a>
+        <a class="nav-item" href="#planos" data-route="planos" data-tooltip="Planos">
+<span data-icon="card">
+</span>
+<span>Planos</span>
+</a>
+        <a class="nav-item" href="#github" data-route="github" data-tooltip="GitHub">
+<span data-icon="github">
+</span>
+<span>GitHub</span>
+</a>
+        <a class="nav-item" href="#analise" data-route="analise" data-tooltip="Análise">
+<span data-icon="chart">
+</span>
+<span>Análise</span>
+</a>
+        <a class="nav-item" href="#kaptei" data-route="kaptei" data-tooltip="Kaptei">
+<span class="kaptei-nav-mark" aria-hidden="true">
+<img src="assets/kaptei/14890.webp" alt="">
+</span>
+<span>Kaptei</span>
+</a>
+        <a class="nav-item" href="#perfil" data-route="perfil" data-tooltip="Perfil">
+<span data-icon="profile">
+</span>
+<span>Perfil</span>
+</a>
+      </nav>
+      <div class="sidebar-spacer">
+</div>
+      <a class="sidebar-referral" href="#indicacao">
+<strong>Indique o FolioDev</strong>
+<span>Seu link de indicação →</span>
+</a>
+
       <nav class="side-nav side-nav-utility" aria-label="Conta">
-        <a class="nav-item" href="#configuracoes" data-route="configuracoes" data-tooltip="Configurações"><span data-icon="settings"></span><span>Configurações</span></a>
-        <a class="nav-item" href="cadastro.html#login" data-logout data-tooltip="Sair"><span data-icon="logout"></span><span>Sair</span></a>
+        <a class="nav-item" href="#configuracoes" data-route="configuracoes" data-tooltip="Configurações">
+<span data-icon="settings">
+</span>
+<span>Configurações</span>
+</a>
+        <a class="nav-item" href="cadastro.html#login" data-logout data-tooltip="Sair">
+<span data-icon="logout">
+</span>
+<span>Sair</span>
+</a>
       </nav>
     </aside>
 
     <div class="mobile-topbar">
-      <button class="icon-button" id="menu-toggle" aria-label="Abrir menu" aria-expanded="false"><span data-icon="menu"></span></button>
-      <div class="brand-crop brand-mobile" aria-label="FolioDev"><span class="brand-mark devifolio-mark"><img src="assets/devifolio-brand-original.png" alt=""></span><span class="brand-name">FolioDev</span></div>
-      <button class="avatar avatar-small" type="button" data-route-button="perfil" aria-label="Abrir perfil"></button>
+      <button class="icon-button" id="menu-toggle" aria-label="Abrir menu" aria-expanded="false">
+<span data-icon="menu">
+</span>
+</button>
+      <a class="brand-crop brand-mobile" href="#inicio" aria-label="FolioDev">
+<span class="folio-brand">
+<img src="assets/devifolio-mark.png" alt="" width="30" height="34">
+<span>FolioDev</span>
+</span>
+</a>
+      <button class="avatar avatar-small" type="button" data-route-button="perfil" aria-label="Abrir perfil">
+</button>
     </div>
 
     <main class="main-content">
       <header class="desktop-topbar" aria-label="Localização atual">
-        <span id="breadcrumb-section">Início</span><i aria-hidden="true">/</i><strong id="breadcrumb-page">Dashboard</strong>
+        <span id="breadcrumb-section">Início</span>
+<i aria-hidden="true">/</i>
+<strong id="breadcrumb-page">Dashboard</strong>
       </header>
-      <div id="page-content" class="page-content" aria-live="polite"></div>
+      <div id="page-content" class="page-content" aria-live="polite">
+</div>
     </main>
   </div>
-  <div class="screen-loading" id="app-loading" role="status" aria-live="polite" aria-hidden="false"><span class="spinner" aria-hidden="true"></span><p>Carregando...</p></div>
-  <div class="sidebar-overlay" id="sidebar-overlay"></div>
-  <div id="modal-root"></div>
-  <div class="toast-stack" id="toast-stack" aria-live="polite"></div>
-  <script type="module" src="dashboard.js"></script>
+  <div class="screen-loading" id="app-loading" role="status" aria-live="polite" aria-hidden="false">
+<span class="spinner" aria-hidden="true">
+</span>
+<p>Carregando...</p>
+</div>
+  <div class="sidebar-overlay" id="sidebar-overlay">
+</div>
+  <div id="modal-root">
+</div>
+  <div class="toast-stack" id="toast-stack" aria-live="polite">
+</div>
+  <script type="module" src="dashboard.js">
+</script>
 </body>
 </html>

@@ -1,0 +1,407 @@
+.portfolio-page{
+  min-height:100dvh;
+  padding:24px 32px 0}
+.public-nav{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  max-width:1080px;
+  margin:0 auto 24px;
+  gap:16px;
+  font-size:13px;
+  color:var(--text-muted)}
+.public-nav>a{
+  min-height:44px;
+  display:inline-flex;
+  align-items:center}
+.nav-action{
+  padding:10px 16px;
+  border:1px solid var(--border-strong);
+  border-radius:8px;
+  background:var(--surface);
+  color:var(--text)}
+.portfolio-shell{
+  max-width:1080px;
+  margin:auto}
+.public-hero{
+  position:relative;
+  border:1px solid var(--border);
+  border-radius:16px;
+  background:var(--surface);
+  overflow:hidden}
+.public-banner-image{
+  display:none;
+  width:100%;
+  height:200px;
+  object-fit:cover;
+  border-bottom:1px solid var(--border)}
+.public-hero.has-banner .public-banner-image{
+  display:block}
+.profile-header{
+  padding:56px 32px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  gap:24px}
+.public-avatar{
+  position:relative;
+  overflow:visible;
+  display:block;
+  width:112px;
+  height:112px;
+  border-radius:50%;
+  border:1px solid var(--border);
+  background:var(--surface-muted)}
+.public-avatar>img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  border-radius:50%}
+.profile-copy{
+  max-width:650px}
+.profile-copy h1{
+  font-size:40px;
+  line-height:1.1;
+  overflow-wrap:anywhere}
+.profile-copy h2{
+  font-size:18px;
+  font-weight:500;
+  letter-spacing:0;
+  color:var(--text-muted);
+  margin-top:16px}
+.profile-copy .bio{
+  font-size:15px;
+  color:var(--text-muted);
+  margin:20px auto 0;
+  max-width:580px}
+.profile-links{
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-top:24px}
+.profile-links a{
+  padding:8px 12px;
+  min-height:44px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  font-size:13px;
+  background:var(--surface)}
+.profile-links a:hover{
+  border-color:var(--border-strong);
+  background:var(--surface-muted)}
+.projects-section{
+  padding:40px 0 56px}
+.section-heading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:24px}
+.section-heading h2{
+  font-size:28px}
+.section-heading>span{
+  font:400 12px var(--font-mono);
+  color:var(--text-muted)}
+.public-projects{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:24px}
+.public-project{
+  border:1px solid var(--border);
+  border-radius:12px;
+  overflow:hidden;
+  background:var(--surface);
+  min-width:0}
+.project-image{
+  position:relative;
+  height:240px;
+  background:var(--surface-muted);
+  border-bottom:1px solid var(--border);
+  display:grid;
+  place-items:center}
+.project-image>img{
+  width:100%;
+  height:100%;
+  object-fit:cover}
+.project-image>span{
+  font:500 48px var(--font-mono);
+  color:var(--text-muted)}
+.project-content{
+  padding:24px}
+.project-content h3{
+  font-size:24px;
+  overflow-wrap:anywhere}
+.project-content>p{
+  color:var(--text-muted);
+  font-size:14px;
+  margin:12px 0 16px;
+  overflow-wrap:anywhere}
+.public-project .project-actions{
+  display:flex;
+  gap:8px;
+  margin-top:24px}
+.public-project .tag-row{
+  margin-top:16px}
+.banner-edit-button{
+  position:absolute;
+  right:16px;
+  top:16px;
+  border:1px solid var(--border);
+  background:var(--surface)}
+.avatar-edit-button{
+  position:absolute;
+  right:-4px;
+  bottom:-4px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:8px;
+  color:var(--text)}
+.project-edit-button{
+  position:absolute;
+  right:12px;
+  top:12px;
+  background:var(--surface);
+  border:1px solid var(--border)}
+.empty-projects{
+  padding:48px 24px;
+  text-align:center;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:var(--surface);
+  color:var(--text-muted)}
+.public-footer{
+  max-width:1080px;
+  margin:auto;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:24px;
+  padding:24px 0;
+  border-top:1px solid var(--border);
+  font-size:12px;
+  color:var(--text-muted)}
+.public-footer .folio-brand{
+  font-size:17px;
+  color:var(--text)}
+.public-footer .folio-brand img{
+  width:22px;
+  height:25px}
+.public-state{
+  max-width:600px;
+  min-height:100dvh;
+  display:grid;
+  align-content:center;
+  justify-items:start;
+  gap:20px;
+  margin:auto;
+  padding:40px 24px}
+.public-state h1{
+  font-size:32px}
+.public-state p{
+  color:var(--text-muted)}
+.public-state .skeleton{
+  width:100%;
+  height:160px}
+.public-state .skeleton-title{
+  height:24px;
+  width:60%}
+.portfolio-dialog-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  margin-bottom:24px}
+.portfolio-dialog-head h2{
+  font-size:24px}
+.portfolio-dialog-head>button{
+  display:grid;
+  place-items:center;
+  width:44px;
+  height:44px;
+  background:transparent;
+  border:1px solid var(--border);
+  border-radius:8px;
+  font-size:24px}
+.portfolio-edit-form{
+  display:grid;
+  gap:20px}
+.portfolio-edit-form label{
+  display:grid;
+  gap:8px;
+  font-size:14px;
+  font-weight:500}
+.portfolio-edit-form label input,.portfolio-edit-form label textarea{
+  font-weight:400}
+.portfolio-dialog-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-top:24px}
+.portfolio-dialog-error{
+  padding:12px;
+  margin-top:20px;
+  border-radius:8px;
+  background:var(--danger-bg);
+  color:var(--danger-fg);
+  font-size:14px}
+.portfolio-project-detail>img{
+  width:100%;
+  max-height:360px;
+  object-fit:cover;
+  border-radius:12px;
+  margin-bottom:24px}
+.portfolio-project-detail p{
+  color:var(--text-muted)}
+.portfolio-project-detail small{
+  display:block;
+  margin-top:16px;
+  font-family:var(--font-mono)}
+.portfolio-page[data-model="black"] .profile-header{
+  background:#171719;
+  color:white}
+.portfolio-page[data-model="black"] .profile-copy h2,.portfolio-page[data-model="black"] .profile-copy .bio{
+  color:#C6C6CA}
+.portfolio-page[data-model="black"] .profile-links a{
+  color:var(--text)}
+.portfolio-page[data-model="blue"] .public-hero{
+  border-top:3px solid #2952E3}
+.portfolio-page[data-model="red"] .public-hero{
+  border-top:3px solid #B3261E}
+.portfolio-page[data-model="orange"] .public-hero{
+  border-top:3px solid #A24E12}
+.portfolio-page[data-model="pink"] .public-hero{
+  border-top:3px solid #A13F70}
+.portfolio-page[data-model="lime"] .public-hero{
+  border-top:3px solid #627B21}
+.portfolio-page[data-model="yellow"] .public-hero{
+  border-top:3px solid #8A6410}
+.portfolio-page[data-model="green"] .public-hero{
+  border-top:3px solid #1E7A3E}
+.portfolio-page[data-model="purple"] .public-hero{
+  border-top:3px solid #685091}
+.error-layout{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  min-height:100dvh}
+.error-copy{
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  padding:48px;
+  gap:64px}
+.error-copy>div{
+  max-width:440px;
+  width:100%;
+  margin:auto}
+.error-code{
+  font-size:14px;
+  color:var(--text-muted);
+  margin-bottom:24px}
+.error-copy h1{
+  font-size:40px}
+.error-copy>div>p:not(.error-code){
+  margin:20px 0 28px;
+  color:var(--text-muted);
+  font-size:15px}
+.error-actions{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap}
+.error-copy>small{
+  font-size:12px;
+  color:var(--text-muted)}
+.error-panel{
+  padding:64px;
+  display:grid;
+  align-content:center;
+  gap:48px;
+  background:var(--text);
+  color:white}
+.error-panel h2{
+  font-size:36px;
+  line-height:1.12}
+.error-panel .document-frame{
+  color:var(--text);
+  max-width:520px}
+.error-panel .document-toolbar{
+  color:var(--text-muted)}
+
+@media(max-width:900px){
+  .profile-copy h1{
+  font-size:36px}
+.error-panel{
+  padding:40px}
+.error-copy{
+  padding:40px}
+.error-copy h1{
+  font-size:32px}
+.error-panel h2{
+  font-size:30px}
+}
+@media(max-width:640px){
+  .portfolio-page{
+  padding:16px 20px 0}
+.public-nav{
+  margin-bottom:16px;
+  font-size:12px}
+.nav-action{
+  padding:10px 12px;
+  font-size:12px}
+.profile-header{
+  padding:40px 20px;
+  gap:20px}
+.public-avatar{
+  width:88px;
+  height:88px}
+.profile-copy h1{
+  font-size:30px}
+.profile-copy h2{
+  font-size:16px;
+  margin-top:12px}
+.profile-copy .bio{
+  font-size:14px;
+  margin-top:16px}
+.public-banner-image{
+  height:140px}
+.projects-section{
+  padding:32px 0 40px}
+.section-heading h2{
+  font-size:24px}
+.section-heading>span{
+  font-size:11px}
+.public-projects{
+  grid-template-columns:1fr;
+  gap:20px}
+.project-image{
+  height:180px}
+.project-content{
+  padding:20px}
+.project-content h3{
+  font-size:22px}
+.public-footer{
+  flex-wrap:wrap;
+  gap:16px}
+.portfolio-edit-button{
+  width:44px;
+  height:44px}
+.public-state h1{
+  font-size:28px}
+.error-layout{
+  grid-template-columns:1fr}
+.error-panel{
+  display:none}
+.error-copy{
+  padding:32px 24px;
+  gap:64px;
+  min-height:100dvh}
+.error-copy h1{
+  font-size:36px}
+.error-actions>a{
+  flex:1;
+  font-size:13px}
+.public-state{
+  padding:32px 24px}
+}

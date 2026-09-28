@@ -3,20 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Entre ou crie sua conta na Devifolio e transforme seu GitHub em um portfólio profissional.">
-  <meta name="theme-color" content="#090B0D">
-  <title>Entrar ou criar conta — Devifolio</title>
-  <link rel="icon" type="image/png" href="assets/devifolio-logo.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="auth-reference.css">
-  <link rel="stylesheet" href="auth-rounded.css">
-  <link rel="stylesheet" href="brand-logo.css">
-  <link rel="stylesheet" href="visual-adjustments.css">
-  <link rel="stylesheet" href="screen-loading.css">
-  <link rel="stylesheet" href="reference-fidelity.css">
-  <link rel="stylesheet" href="ui-polish.css">
+  <meta name="description" content="Entre ou crie sua conta no FolioDev e transforme seu GitHub em um portfólio profissional.">
+  <meta name="theme-color" content="#FAFAF9">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="Acesse sua conta — FolioDev">
+<meta property="og:description" content="Entre ou crie sua conta para organizar e publicar seus projetos.">
+<meta property="og:image" content="/assets/devifolio-mark.png">
+  <title>Entrar ou criar conta — FolioDev</title>
+  <link rel="icon" type="image/png" href="assets/devifolio-mark.png">
+  <link rel="stylesheet" href="foliodev-system.css">
+  <link rel="stylesheet" href="foliodev-auth.css">
 </head>
 <body class="auth-body">
 
@@ -24,13 +20,23 @@
 
     <!-- Painel visual -->
     <aside class="auth-right">
-      <h2 class="auth-right-heading">Seu portfólio<br>de forma<br>descomplicada.</h2>
-    </aside>
+<div class="auth-story">
+
+<h2>Do repositório<br>à apresentação.</h2>
+<p>Organize o que você construiu. Publique um portfólio que conta essa história.</p>
+<div id="auth-product-preview">
+</div>
+<small>Conecte projetos. Organize seu trabalho. Compartilhe um link.</small>
+</div>
+</aside>
 
     <!-- Login e cadastro -->
     <section class="auth-left">
-      <a class="auth-brand" href="index.html" aria-label="Devifolio, início">
-        <span class="devifolio-logo" aria-hidden="true"><img src="assets/devifolio-brand-original.png" alt=""></span>
+      <a class="auth-brand" href="index.html" aria-label="FolioDev, início">
+        <span class="folio-brand">
+<img src="assets/devifolio-mark.png" alt="" width="30" height="34">
+<span>FolioDev</span>
+</span>
       </a>
 
       <div class="auth-form-wrap">
@@ -39,6 +45,17 @@
           <h1>Entrar em sua conta</h1>
           <p class="auth-sub">Entre com seus dados para acessar seu portfólio.</p>
 
+<div class="auth-providers">          <a class="button button-github" href="#" id="github-login">
+            <svg viewBox="0 0 98 98" role="img" aria-hidden="true">
+<path fill="currentColor" d="M49 0C21.94 0 0 21.94 0 49c0 21.64 14.03 39.99 33.47 46.47 2.45.45 3.35-1.06 3.35-2.36 0-1.17-.04-4.27-.07-8.37-13.62 2.96-16.5-6.56-16.5-6.56-2.23-5.66-5.45-7.17-5.45-7.17-4.45-3.04.34-2.98.34-2.98 4.92.35 7.51 5.05 7.51 5.05 4.38 7.5 11.48 5.34 14.28 4.09.44-3.18 1.71-5.34 3.11-6.57-10.87-1.24-22.3-5.44-22.3-24.2 0-5.35 1.91-9.71 5.05-13.13-.5-1.24-2.19-6.23.48-12.97 0 0 4.12-1.32 13.49 5.02a46.7 46.7 0 0 1 12.29-1.66c4.17.02 8.37.56 12.29 1.66 9.37-6.34 13.49-5.02 13.49-5.02 2.67 6.74.99 11.73.48 12.97 3.14 3.42 5.05 7.78 5.05 13.13 0 18.82-11.46 22.94-22.37 24.15 1.76 1.52 3.33 4.51 3.33 9.1 0 6.57-.06 11.87-.06 13.49 0 1.31.89 2.84 3.38 2.35C83.99 88.95 98 70.62 98 49 98 21.94 76.06 0 49 0Z"/>
+</svg>
+            Continuar com GitHub
+          </a>
+
+          <button class="button button-google" type="button" data-google-soon>
+<img class="google-g" src="assets/google-g.png" alt="" aria-hidden="true">Continuar com Google <small>Em breve</small>
+</button>
+</div>          <div class="auth-divider">ou use seu e-mail</div>
           <form id="form-login">
             <div class="auth-field">
               <label for="login-email">E-mail</label>
@@ -49,21 +66,17 @@
               <input type="password" id="login-senha" placeholder="Sua senha" autocomplete="current-password" required>
             </div>
             <div class="auth-row-between">
-              <label class="auth-remember"><input type="checkbox"> Lembrar de mim</label>
+              <span class="auth-session-note">Sessão mantida neste navegador</span>
               <a class="auth-forgot" href="#">Esqueci a senha</a>
             </div>
             <button class="button button-submit" type="submit">Entrar</button>
           </form>
 
-          <div class="auth-divider">ou continue com</div>
 
-          <a class="button button-github" href="#" id="github-login">
-            <svg viewBox="0 0 98 98" role="img" aria-hidden="true"><path fill="currentColor" d="M49 0C21.94 0 0 21.94 0 49c0 21.64 14.03 39.99 33.47 46.47 2.45.45 3.35-1.06 3.35-2.36 0-1.17-.04-4.27-.07-8.37-13.62 2.96-16.5-6.56-16.5-6.56-2.23-5.66-5.45-7.17-5.45-7.17-4.45-3.04.34-2.98.34-2.98 4.92.35 7.51 5.05 7.51 5.05 4.38 7.5 11.48 5.34 14.28 4.09.44-3.18 1.71-5.34 3.11-6.57-10.87-1.24-22.3-5.44-22.3-24.2 0-5.35 1.91-9.71 5.05-13.13-.5-1.24-2.19-6.23.48-12.97 0 0 4.12-1.32 13.49 5.02a46.7 46.7 0 0 1 12.29-1.66c4.17.02 8.37.56 12.29 1.66 9.37-6.34 13.49-5.02 13.49-5.02 2.67 6.74.99 11.73.48 12.97 3.14 3.42 5.05 7.78 5.05 13.13 0 18.82-11.46 22.94-22.37 24.15 1.76 1.52 3.33 4.51 3.33 9.1 0 6.57-.06 11.87-.06 13.49 0 1.31.89 2.84 3.38 2.35C83.99 88.95 98 70.62 98 49 98 21.94 76.06 0 49 0Z"/></svg>
-            Entrar com GitHub
-          </a>
 
-          <button class="button button-google" type="button" data-google-soon><img class="google-g" src="assets/google-g.png" alt="" aria-hidden="true">Entrar com Google</button>
-          <p class="auth-switch">Não tem uma conta? <a href="#cadastro" data-switch="cadastro">Criar conta</a></p>
+
+          <p class="auth-switch">Não tem uma conta? <a href="#cadastro" data-switch="cadastro">Criar conta</a>
+</p>
         </div>
 
         <!-- Cadastro -->
@@ -71,6 +84,17 @@
           <h1>Criar sua conta</h1>
           <p class="auth-sub">Cadastre-se para começar seu portfólio.</p>
 
+<div class="auth-providers">          <a class="button button-github" href="#" id="github-cadastro">
+            <svg viewBox="0 0 98 98" role="img" aria-hidden="true">
+<path fill="currentColor" d="M49 0C21.94 0 0 21.94 0 49c0 21.64 14.03 39.99 33.47 46.47 2.45.45 3.35-1.06 3.35-2.36 0-1.17-.04-4.27-.07-8.37-13.62 2.96-16.5-6.56-16.5-6.56-2.23-5.66-5.45-7.17-5.45-7.17-4.45-3.04.34-2.98.34-2.98 4.92.35 7.51 5.05 7.51 5.05 4.38 7.5 11.48 5.34 14.28 4.09.44-3.18 1.71-5.34 3.11-6.57-10.87-1.24-22.3-5.44-22.3-24.2 0-5.35 1.91-9.71 5.05-13.13-.5-1.24-2.19-6.23.48-12.97 0 0 4.12-1.32 13.49 5.02a46.7 46.7 0 0 1 12.29-1.66c4.17.02 8.37.56 12.29 1.66 9.37-6.34 13.49-5.02 13.49-5.02 2.67 6.74.99 11.73.48 12.97 3.14 3.42 5.05 7.78 5.05 13.13 0 18.82-11.46 22.94-22.37 24.15 1.76 1.52 3.33 4.51 3.33 9.1 0 6.57-.06 11.87-.06 13.49 0 1.31.89 2.84 3.38 2.35C83.99 88.95 98 70.62 98 49 98 21.94 76.06 0 49 0Z"/>
+</svg>
+            Continuar com GitHub
+          </a>
+
+          <button class="button button-google" type="button" data-google-soon>
+<img class="google-g" src="assets/google-g.png" alt="" aria-hidden="true">Continuar com Google <small>Em breve</small>
+</button>
+</div>          <div class="auth-divider">ou use seu e-mail</div>
           <form id="form-cadastro">
             <div class="auth-field">
               <label for="cad-nome">Nome</label>
@@ -91,22 +115,56 @@
             <button class="button button-submit" type="submit">Cadastrar</button>
           </form>
 
-          <div class="auth-divider">ou continue com</div>
 
-          <a class="button button-github" href="#" id="github-cadastro">
-            <svg viewBox="0 0 98 98" role="img" aria-hidden="true"><path fill="currentColor" d="M49 0C21.94 0 0 21.94 0 49c0 21.64 14.03 39.99 33.47 46.47 2.45.45 3.35-1.06 3.35-2.36 0-1.17-.04-4.27-.07-8.37-13.62 2.96-16.5-6.56-16.5-6.56-2.23-5.66-5.45-7.17-5.45-7.17-4.45-3.04.34-2.98.34-2.98 4.92.35 7.51 5.05 7.51 5.05 4.38 7.5 11.48 5.34 14.28 4.09.44-3.18 1.71-5.34 3.11-6.57-10.87-1.24-22.3-5.44-22.3-24.2 0-5.35 1.91-9.71 5.05-13.13-.5-1.24-2.19-6.23.48-12.97 0 0 4.12-1.32 13.49 5.02a46.7 46.7 0 0 1 12.29-1.66c4.17.02 8.37.56 12.29 1.66 9.37-6.34 13.49-5.02 13.49-5.02 2.67 6.74.99 11.73.48 12.97 3.14 3.42 5.05 7.78 5.05 13.13 0 18.82-11.46 22.94-22.37 24.15 1.76 1.52 3.33 4.51 3.33 9.1 0 6.57-.06 11.87-.06 13.49 0 1.31.89 2.84 3.38 2.35C83.99 88.95 98 70.62 98 49 98 21.94 76.06 0 49 0Z"/></svg>
-            Entrar com GitHub
-          </a>
 
-          <button class="button button-google" type="button" data-google-soon><img class="google-g" src="assets/google-g.png" alt="" aria-hidden="true">Entrar com Google</button>
-          <p class="auth-switch">Já tem uma conta? <a href="#login" data-switch="login">Entrar</a></p>
+
+          <p class="auth-switch">Já tem uma conta? <a href="#login" data-switch="login">Entrar</a>
+</p>
         </div>
 
+<div class="auth-panel" id="panel-recuperar" hidden role="tabpanel" aria-label="Recuperar senha">
+<h1>Recuperar acesso</h1>
+<p class="auth-sub">Receba as instruções no e-mail da sua conta.</p>
+<form id="form-recuperar">
+<label class="auth-field">
+<span>E-mail</span>
+<input id="recovery-email" type="email" autocomplete="email" required>
+</label>
+<button class="button button-submit" type="submit">Enviar instruções</button>
+</form>
+<button class="secondary-button auth-resend" type="button" data-resend hidden>Reenviar instruções</button>
+<p class="auth-switch">
+<a href="#login" data-switch="login">Voltar para o login</a>
+</p>
+</div>
+<div class="auth-panel" id="panel-redefinir" hidden role="tabpanel" aria-label="Redefinir senha">
+<h1>Defina uma nova senha</h1>
+<p class="auth-sub">Use pelo menos 8 caracteres.</p>
+<form id="form-redefinir">
+<label class="auth-field">
+<span>Nova senha</span>
+<input id="reset-password" type="password" autocomplete="new-password" minlength="8" required>
+</label>
+<label class="auth-field">
+<span>Confirmar nova senha</span>
+<input id="reset-confirm" type="password" autocomplete="new-password" minlength="8" required>
+</label>
+<button class="button button-submit" type="submit">Salvar nova senha</button>
+</form>
+<p class="auth-switch">
+<a href="#recuperar" data-switch="recuperar">Solicitar outro link</a>
+</p>
+</div>
       </div>
     </section>
   </main>
-  <div class="screen-loading" id="auth-loading" role="status" aria-live="polite" aria-hidden="true" hidden><span class="spinner" aria-hidden="true"></span><p>Carregando...</p></div>
-  <script type="module" src="auth.js"></script>
+  <div class="screen-loading" id="auth-loading" role="status" aria-live="polite" aria-hidden="true" hidden>
+<span class="spinner" aria-hidden="true">
+</span>
+<p>Carregando...</p>
+</div>
+  <script type="module" src="auth.js">
+</script>
 
 </body>
 </html>

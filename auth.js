@@ -1,8 +1,11 @@
+import { documentPreview } from './src/ui/components.js'
 import { createScreenLoading } from './screen-loading.js'
 
 const panels = {
   login: document.getElementById('panel-login'),
   cadastro: document.getElementById('panel-cadastro'),
+  recuperar: document.getElementById('panel-recuperar'),
+  redefinir: document.getElementById('panel-redefinir'),
 }
 
 let redirecting = false
@@ -18,14 +21,14 @@ function getSupabase() {
 }
 
 function showPanel(name, updateHash = false) {
-  const selected = name === 'cadastro' ? 'cadastro' : 'login'
+  const selected = Object.hasOwn(panels, name) ? name : 'login'
   Object.entries(panels).forEach(([key, panel]) => {
     const active = key === selected
     panel.classList.toggle('is-active', active)
     panel.hidden = !active
   })
   document.body.dataset.authView = selected
-  document.title = selected === 'cadastro' ? 'Criar conta — Devifolio' : 'Entrar — Devifolio'
+  document.title = `${({login:'Entrar',cadastro:'Criar conta',recuperar:'Recuperar acesso',redefinir:'Nova senha'})[selected]} — FolioDev`
   clearMessage()
   if (updateHash) history.replaceState(null, '', `#${selected}`)
 }
@@ -56,20 +59,20 @@ function clearMessage() {
 function friendlyError(error) {
   const message = error?.message?.toLowerCase() || ''
   const code = error?.code || ''
-  if (code === 'supabase_configuration_missing') return 'A autenticação não foi configurada neste ambiente. Configure as variáveis públicas do Supabase e reinicie o site.'
-  if (code === 'supabase_configuration_invalid') return 'A configuração do Supabase neste ambiente é inválida. Verifique a URL e a publishable key.'
+  if (code === 'supabase_configuration_missing') return 'Não foi possível iniciar o acesso neste ambiente. Entre em contato com o suporte.'
+  if (code === 'supabase_configuration_invalid') return 'Não foi possível iniciar o acesso. Entre em contato com o suporte.'
   if (message.includes('failed to fetch') || message.includes('networkerror') || message.includes('network request failed')) return 'Não foi possível conectar ao servidor de autenticação. Verifique sua conexão e tente novamente.'
-  if (message.includes('invalid api key') || message.includes('invalid jwt') || message.includes('apikey')) return 'A credencial pública do Supabase é inválida neste ambiente.'
+  if (message.includes('invalid api key') || message.includes('invalid jwt') || message.includes('apikey')) return 'Não foi possível validar o acesso neste ambiente. Entre em contato com o suporte.'
   if (message.includes('signups not allowed') || message.includes('signup is disabled')) return 'Novos cadastros estão temporariamente desativados.'
   if (message.includes('invalid login credentials')) return 'E-mail ou senha incorretos.'
   if (message.includes('already registered') || message.includes('already been registered')) return 'Este e-mail já possui uma conta.'
-  if (message.includes('email not confirmed')) return 'A confirmação de e-mail ainda está ativa no Supabase. Desative essa exigência para entrar imediatamente.'
+  if (message.includes('email not confirmed')) return 'Confirme seu e-mail antes de entrar. Confira também a caixa de spam.'
   if (message.includes('rate limit')) return 'Muitas tentativas. Aguarde um pouco e tente novamente.'
   if (message.includes('weak password')) return 'A senha informada não atende aos requisitos de segurança.'
   if (message.includes('password')) return 'A senha precisa ter pelo menos 8 caracteres.'
   if (message.includes('email')) return 'Digite um endereço de e-mail válido.'
   if (Number(error?.status) >= 500) return 'O servidor de autenticação está indisponível no momento. Tente novamente em alguns instantes.'
-  return error?.message ? `Falha na autenticação: ${error.message}` : 'Falha inesperada na autenticação. Recarregue a página e tente novamente.'
+  return 'Não foi possível concluir o acesso. Tente novamente ou entre em contato com o suporte.'
 }
 
 function reportAuthError(action, error) {
@@ -86,6 +89,7 @@ function reportAuthError(action, error) {
 function setLoading(button, active, label) {
   if (!button.dataset.originalLabel) button.dataset.originalLabel = button.textContent
   button.disabled = active
+  button.classList.toggle('is-loading', active)
   button.textContent = active ? label : button.dataset.originalLabel
 }
 
@@ -109,7 +113,7 @@ document.getElementById('cad-confirmar-senha')?.addEventListener('input', event 
 
 function currentAuthView() {
   const hashView = window.location.hash.replace('#', '')
-  if (hashView === 'login' || hashView === 'cadastro') return hashView
+  if (Object.hasOwn(panels, hashView)) return hashView
   return window.location.pathname.toLowerCase().endsWith('/cadastro.html') ? 'cadastro' : 'login'
 }
 
@@ -200,21 +204,44 @@ document.querySelectorAll('[data-google-soon]').forEach(button => {
   button.addEventListener('click', () => showMessage('Login com Google estará disponível em breve.', 'success'))
 })
 
-document.querySelector('.auth-forgot')?.addEventListener('click', async event => {
-  event.preventDefault()
-  const email = document.getElementById('login-email')
-  if (!email.value.trim() || !email.reportValidity()) return
+let recoveryEmail = ''
+let resendTimer = null
+let recoverySession = false
+function cooldown() {
+  const button = document.querySelector('[data-resend]'); button.hidden = false; let remaining = 60
+  clearInterval(resendTimer)
+  const tick = () => { button.disabled = remaining > 0; button.textContent = remaining > 0 ? 'Reenviar em ' + remaining-- + 's' : 'Reenviar instruções'; if (!button.disabled) clearInterval(resendTimer) }
+  tick(); resendTimer = setInterval(tick, 1000)
+}
+async function sendRecovery(button) {
+  clearMessage(); setLoading(button, true, 'Enviando...'); let sent=false
   try {
     const supabase = await getSupabase()
-    const { error } = await supabase.auth.resetPasswordForEmail(email.value.trim(), {
-      redirectTo: `${window.location.origin}/cadastro.html#login`,
-    })
+    const { error } = await supabase.auth.resetPasswordForEmail(recoveryEmail, { redirectTo: window.location.origin + '/cadastro.html#login' })
     if (error) return reportAuthError('Falha na recuperação de senha', error)
-    showMessage('Enviamos as instruções para o seu e-mail.', 'success')
-  } catch (error) {
-    reportAuthError('Erro inesperado na recuperação de senha', error)
-  }
+    showMessage('Enviamos um link para ' + recoveryEmail + '. Confira também a caixa de spam.', 'success'); sent=true
+  } catch (error) { reportAuthError('Erro inesperado na recuperação de senha', error) }
+  finally { setLoading(button, false); if(sent)cooldown() }
+}
+document.querySelector('.auth-forgot')?.addEventListener('click', event => { event.preventDefault(); document.getElementById('recovery-email').value = document.getElementById('login-email').value; showPanel('recuperar', true) })
+document.getElementById('form-recuperar').addEventListener('submit', event => { event.preventDefault(); if (!event.currentTarget.reportValidity()) return; recoveryEmail = document.getElementById('recovery-email').value.trim(); void sendRecovery(event.currentTarget.querySelector('[type="submit"]')) })
+document.querySelector('[data-resend]').onclick = event => { if(recoveryEmail) void sendRecovery(event.currentTarget) }
+document.getElementById('form-redefinir').addEventListener('submit', async event => {
+  event.preventDefault(); clearMessage(); const form=event.currentTarget, password=document.getElementById('reset-password'), confirm=document.getElementById('reset-confirm'), button=form.querySelector('[type="submit"]')
+  confirm.setCustomValidity(''); if(password.value !== confirm.value) confirm.setCustomValidity('As senhas precisam ser iguais.'); if(!form.reportValidity()) return
+  if(!recoverySession) return showMessage('Abra o link enviado por e-mail para redefinir sua senha. Se ele expirou, solicite outro.')
+  setLoading(button,true,'Salvando...')
+  try { const supabase=await getSupabase(); const {error}=await supabase.auth.updateUser({password:password.value}); if(error) return reportAuthError('Falha ao redefinir senha',error); form.reset(); showMessage('Senha atualizada. Você pode entrar com a nova senha.','success'); button.hidden=true }
+  catch(error){reportAuthError('Falha ao redefinir senha',error)}finally{setLoading(button,false)}
 })
+// URL/session handling remains owned by the existing Supabase client.
+if (/(?:^|[&#?])type=recovery(?:&|$)/.test(location.hash + location.search)) {
+  const supabase = await getSupabase()
+  supabase.auth.onAuthStateChange(event => { if (event === 'PASSWORD_RECOVERY') { recoverySession=true; showPanel('redefinir') } })
+  const {data,error}=await supabase.auth.getSession()
+  if(!error && data.session){recoverySession=true;showPanel('redefinir')}
+  else {showPanel('recuperar');showMessage('Este link não pôde ser validado. Solicite um novo link de recuperação.')}
+}
 
 async function completeGithubLogin() {
   const params = new URLSearchParams(window.location.search)
@@ -236,7 +263,7 @@ async function completeGithubLogin() {
     showMessage('Concluindo login com GitHub...', 'success')
     const response = await fetch('/api/auth/github/session', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
     const payload = await response.json().catch(() => ({}))
-    if (!response.ok) throw new Error(payload.error || 'Não foi possível criar a sessão do Devifolio.')
+    if (!response.ok) throw new Error(payload.error || 'Não foi possível concluir o login. Tente novamente.')
     const supabase = await getSupabase()
     const { error } = await supabase.auth.setSession({ access_token: payload.access_token, refresh_token: payload.refresh_token })
     if (error) throw error
@@ -259,3 +286,9 @@ try {
 } catch (error) {
   reportAuthError('Falha ao inicializar a autenticação', error)
 }
+
+const preview = document.getElementById('auth-product-preview')
+if(preview) preview.innerHTML=documentPreview({profile:{name:'Seu portfólio',username:'seu-nome',role:'Projetos, contexto e links profissionais'},projects:[{name:'Projeto principal',description:'O que você construiu e por que importa.',tech:'repo / main'},{name:'Mais do seu trabalho',description:'Organize os projetos que quer apresentar.',tech:'publicado'}],compact:true})
+document.querySelectorAll('input[type="password"]').forEach(input=>{const wrap=document.createElement('div');wrap.className='password-field';input.replaceWith(wrap);wrap.append(input);const button=document.createElement('button');button.type='button';button.className='password-toggle';button.textContent='Mostrar';button.setAttribute('aria-label','Mostrar senha');button.onclick=()=>{const show=input.type==='password';input.type=show?'text':'password';button.textContent=show?'Ocultar':'Mostrar';button.setAttribute('aria-label',show?'Ocultar senha':'Mostrar senha')};wrap.append(button)})
+const signupPassword=document.getElementById('cad-senha');const strength=document.createElement('small');strength.className='password-strength';strength.setAttribute('aria-live','polite');signupPassword.closest('.auth-field').append(strength);signupPassword.addEventListener('input',()=>{const v=signupPassword.value;strength.textContent=!v?'':v.length<8?'Use pelo menos 8 caracteres.':v.length<12?'Comprimento suficiente. Uma senha mais longa é mais segura.':'Bom comprimento de senha.'})
+document.querySelectorAll('form input').forEach(input=>{input.addEventListener('invalid',()=>{input.setAttribute('aria-invalid','true');let msg=input.closest('.auth-field')?.querySelector('.field-error');if(!msg){msg=document.createElement('small');msg.className='field-error';msg.id=input.id+'-error';input.closest('.auth-field')?.append(msg)}msg.textContent=input.validity.valueMissing?'Preencha este campo.':input.validity.typeMismatch?'Digite um e-mail válido.':input.validity.tooShort?'Use pelo menos '+input.minLength+' caracteres.':input.validity.customError?input.validationMessage:'Confira o valor deste campo.';input.setAttribute('aria-describedby',msg.id)});input.addEventListener('input',()=>{input.removeAttribute('aria-invalid');input.closest('.auth-field')?.querySelector('.field-error')?.remove();input.removeAttribute('aria-describedby');if(input.id==='reset-confirm')input.setCustomValidity('')})})

@@ -47,8 +47,8 @@ function profileLink(label, value) {
 
 function projectCard(project, ownerId) {
   const projectUrl = normalizeUrl(project.link)
-  const editor = isOwner ? `<button class="portfolio-edit-button project-edit-button" type="button" data-edit-project="${project.id}" aria-label="Editar projeto ${esc(project.name)}">✎</button>` : ''
-  return `<article class="public-project"><div class="project-image">${project.image ? `<img src="${esc(project.image)}" alt="Capa de ${esc(project.name)}">` : `<span>${esc(project.name.slice(0, 2).toUpperCase())}</span>`}${editor}</div><div class="project-content"><h3>${esc(project.name)}</h3><p>${esc(project.description || 'Conheça este projeto.')}</p><div class="project-actions">${projectUrl ? `<a class="public-button" href="${esc(projectUrl)}" target="_blank" rel="noopener" data-project-link="${project.id}" data-owner="${ownerId}">Acessar</a>` : `<button class="public-button" type="button" data-view-project="${project.id}">Acessar</button>`}<button class="public-button secondary" type="button" data-view-project="${project.id}">Ver</button></div></div></article>`
+  const editor = isOwner ? `<button class="portfolio-edit-button project-edit-button" type="button" data-edit-project="${project.id}" aria-label="Editar projeto ${esc(project.name)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4z"/></svg></button>` : ''
+  return `<article class="public-project"><div class="project-image">${project.image ? `<img src="${esc(project.image)}" alt="Capa de ${esc(project.name)}" loading="lazy" width="540" height="300">` : `<span>${esc(project.name.slice(0, 2).toUpperCase())}</span>`}${editor}</div><div class="project-content"><h3>${esc(project.name)}</h3><p>${esc(project.description || 'Conheça este projeto.')}</p>${project.tech?`<div class="tag-row">${project.tech.split(',').filter(Boolean).map(tech=>`<span class="tag mono">${esc(tech.trim())}</span>`).join('')}</div>`:''}<div class="project-actions">${projectUrl ? `<a class="public-button" href="${esc(projectUrl)}" target="_blank" rel="noopener" data-project-link="${project.id}" data-owner="${ownerId}">Acessar</a>` : `<button class="public-button" type="button" data-view-project="${project.id}">Acessar</button>`}<button class="public-button secondary" type="button" data-view-project="${project.id}">Ver</button></div></div></article>`
 }
 
 function renderPage() {
@@ -57,8 +57,13 @@ function renderPage() {
   const name = profile.name || profile.username
   const avatar = profile.avatar || placeholderUrl
   const banner = `${portfolioBannerUrl(profile.userId)}${bannerRevision ? `?v=${bannerRevision}` : ''}`
-  document.title = `${name} — Devifolio`
-  root.innerHTML = `<article class="portfolio-page" data-model="${model.id}" style="--model-image:url('${model.image}');--model-ink:${model.ink}"><header class="public-nav"><a href="/" class="public-brand" aria-label="Devifolio, início"><img src="${brandUrl}" alt="Devifolio"></a><a href="/cadastro.html#cadastro" class="nav-action">Criar meu portfólio</a></header><div class="portfolio-shell"><section class="public-hero"><img class="public-banner-image" src="${esc(banner)}" alt="" aria-hidden="true">${isOwner ? '<button class="portfolio-edit-button banner-edit-button" type="button" data-edit-banner aria-label="Editar banner">✎</button>' : ''}<div class="profile-header"><div class="public-avatar"><img src="${esc(avatar)}" alt="${profile.avatar ? `Foto de ${esc(name)}` : 'Ícone de usuário'}">${isOwner ? '<button class="portfolio-edit-button avatar-edit-button" type="button" data-edit-avatar aria-label="Editar foto de perfil">✎</button>' : ''}</div><div class="profile-copy"><h1>${esc(name)}</h1>${profile.role ? `<h2>${esc(profile.role)}</h2>` : ''}${profile.bio ? `<p class="bio">${esc(profile.bio)}</p>` : ''}<nav class="profile-links">${profileLink('GitHub', profile.github)}${profileLink('LinkedIn', profile.linkedin)}${profileLink('Meu site', profile.website)}</nav></div></div></section><section class="projects-section"><div class="section-heading"><h2>Meus projetos</h2><span>${projects.length} projeto${projects.length === 1 ? '' : 's'}</span></div>${projects.length ? `<div class="public-projects">${projects.map(project => projectCard(project, profile.userId)).join('')}</div>` : '<div class="empty-projects">Ainda não existem projetos publicados.</div>'}</section></div></article>`
+  document.title = `${name} — FolioDev`
+  const description=profile.bio || `Projetos de ${name}. Portfólio criado com FolioDev.`
+  document.querySelector('meta[name="description"]').content=description
+  document.querySelector('meta[property="og:title"]').content=document.title
+  document.querySelector('meta[property="og:description"]').content=description
+  if(profile.avatar)document.querySelector('meta[property="og:image"]').content=profile.avatar
+  root.innerHTML = `<article class="portfolio-page" data-model="${model.id}" style="--model-image:url('${model.image}');--model-ink:${model.ink}"><header class="public-nav"><a href="/" aria-label="Voltar ao FolioDev">← FolioDev</a><a href="/cadastro.html#cadastro" class="nav-action">Criar meu portfólio</a></header><div class="portfolio-shell"><section class="public-hero"><img class="public-banner-image" src="${esc(banner)}" alt="" aria-hidden="true">${isOwner ? '<button class="portfolio-edit-button banner-edit-button" type="button" data-edit-banner aria-label="Editar banner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4z"/></svg></button>' : ''}<div class="profile-header"><div class="public-avatar"><img src="${esc(avatar)}" alt="${profile.avatar ? `Foto de ${esc(name)}` : 'Ícone de usuário'}" width="112" height="112">${isOwner ? '<button class="portfolio-edit-button avatar-edit-button" type="button" data-edit-avatar aria-label="Editar foto de perfil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4z"/></svg></button>' : ''}</div><div class="profile-copy"><h1>${esc(name)}</h1>${profile.role ? `<h2>${esc(profile.role)}</h2>` : ''}${profile.bio ? `<p class="bio">${esc(profile.bio)}</p>` : ''}<nav class="profile-links">${profileLink('GitHub', profile.github)}${profileLink('LinkedIn', profile.linkedin)}${profileLink('Meu site', profile.website)}</nav></div></div></section><section class="projects-section"><div class="section-heading"><h2>Meus projetos</h2><span>${projects.length} projeto${projects.length === 1 ? '' : 's'}</span></div>${projects.length ? `<div class="public-projects">${projects.map(project => projectCard(project, profile.userId)).join('')}</div>` : '<div class="empty-projects">Ainda não existem projetos publicados.</div>'}</section></div><footer class="public-footer"><a href="/" aria-label="Criado com FolioDev"><span class="folio-brand"><img src="${brandUrl}" alt="" width="22" height="25"><span>FolioDev</span></span></a><span>Trabalho de ${esc(name)}.</span></footer></article>`
 
   const bannerImage = root.querySelector('.public-banner-image')
   bannerImage.addEventListener('load', () => root.querySelector('.public-hero')?.classList.add('has-banner'))
@@ -112,22 +117,22 @@ function editBanner() {
     const file = dialog.querySelector('input').files[0]
     try {
       validateImage(file)
-      button.disabled = true
+      button.disabled = true; button.classList.add("is-loading")
       await uploadPortfolioBanner(portfolio.profile.userId, file)
       bannerRevision = Date.now()
       dialog.close()
       renderPage()
-    } catch (error) { showDialogError(dialog, error) } finally { button.disabled = false }
+    } catch (error) { showDialogError(dialog, error) } finally { button.disabled = false; button.classList.remove("is-loading") }
   }
   dialog.querySelector('[data-remove-banner]').onclick = async event => {
     const button = event.currentTarget
     try {
-      button.disabled = true
+      button.disabled = true; button.classList.add("is-loading")
       await removePortfolioBanner(portfolio.profile.userId)
       bannerRevision = Date.now()
       dialog.close()
       renderPage()
-    } catch (error) { showDialogError(dialog, error) } finally { button.disabled = false }
+    } catch (error) { showDialogError(dialog, error) } finally { button.disabled = false; button.classList.remove("is-loading") }
   }
 }
 
@@ -140,13 +145,13 @@ function editAvatar() {
     const file = dialog.querySelector('input').files[0]
     try {
       validateImage(file)
-      button.disabled = true
+      button.disabled = true; button.classList.add("is-loading")
       const url = await uploadAvatar(portfolio.profile.userId, file)
       await updateProfileAvatar(portfolio.profile.userId, url)
       portfolio.profile.avatar = url
       dialog.close()
       renderPage()
-    } catch (error) { showDialogError(dialog, error) } finally { button.disabled = false }
+    } catch (error) { showDialogError(dialog, error) } finally { button.disabled = false; button.classList.remove("is-loading") }
   }
 }
 
@@ -162,14 +167,14 @@ function editProject(id) {
     const cover = form.elements.namedItem('cover').files[0]
     try {
       if (cover) validateImage(cover)
-      button.disabled = true
+      button.disabled = true; button.classList.add("is-loading")
       const changes = Object.fromEntries(['name', 'description', 'tech', 'link', 'github'].map(key => [key, form.elements.namedItem(key).value.trim()]))
       if (!changes.name) throw new Error('Informe o título do projeto.')
       if (cover) changes.image_url = await uploadProjectImage(portfolio.profile.userId, id, cover)
       Object.assign(project, await updateProjectDetails(portfolio.profile.userId, id, changes))
       dialog.close()
       renderPage()
-    } catch (error) { showDialogError(dialog, error) } finally { button.disabled = false }
+    } catch (error) { showDialogError(dialog, error) } finally { button.disabled = false; button.classList.remove("is-loading") }
   }
 }
 
@@ -186,7 +191,7 @@ async function start() {
   try {
     const [data, identity] = await Promise.all([loadPublicPortfolio(username), supabase.auth.getUser().catch(() => ({ data: { user: null } }))])
     if (!data) {
-      root.innerHTML = '<section class="public-state"><h1>Portfólio indisponível</h1><p>Este portfólio não existe ou ainda não foi publicado.</p><a class="public-button" href="/">Voltar ao Devifolio</a></section>'
+      root.innerHTML = '<section class="public-state"><h1>Portfólio indisponível</h1><p>Este portfólio não existe ou ainda não foi publicado.</p><a class="public-button" href="/">Voltar ao FolioDev</a></section>'
       return
     }
     portfolio = data
@@ -195,7 +200,7 @@ async function start() {
     if (!isOwner) trackPublicEvent(data.profile.userId, 'portfolio_view', null, visitorId())
   } catch (error) {
     console.error('[Devifolio] Falha ao carregar portfólio público', error)
-    root.innerHTML = `<section class="public-state"><h1>Não foi possível carregar</h1><p>${esc(error.message || 'Tente novamente em instantes.')}</p><button class="public-button" onclick="location.reload()">Tentar novamente</button></section>`
+    root.innerHTML = `<section class="public-state"><h1>Não foi possível carregar</h1><p>Confira sua conexão e tente novamente. Se persistir, entre em contato com o suporte.</p><button class="public-button" onclick="location.reload()">Tentar novamente</button></section>`
   }
 }
 

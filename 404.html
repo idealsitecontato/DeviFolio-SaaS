@@ -1,25 +1,56 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#fafafa">
-  <title>Página não encontrada — DeviFolio</title>
-  <link rel="icon" type="image/png" href="/assets/devifolio-mark.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/not-found.css">
-  <link rel="stylesheet" href="/reference-fidelity.css">
-  <link rel="stylesheet" href="/ui-polish.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="A página solicitada não foi encontrada. Volte ao FolioDev para continuar.">
+<meta name="theme-color" content="#FAFAF9">
+<title>Página não encontrada — FolioDev</title>
+<meta property="og:title" content="Página não encontrada — FolioDev">
+<meta property="og:description" content="Volte ao FolioDev para continuar.">
+<meta property="og:image" content="/assets/devifolio-mark.png">
+<link rel="icon" type="image/png" href="/assets/devifolio-mark.png">
+<link rel="stylesheet" href="/foliodev-system.css">
+<link rel="stylesheet" href="/foliodev-auth.css">
+<link rel="stylesheet" href="/foliodev-public.css">
 </head>
-<body>
-  <main class="not-found">
-    <div class="not-found-copy">
-      <h1>404</h1>
-      <h2>Ops, algo deu errado...</h2>
-      <a class="retry-button" href="/">Voltar</a>
-    </div>
-  </main>
+<body class="error-page">
+<main class="error-layout">
+<section class="error-copy">
+<a href="/" aria-label="FolioDev, início">
+<span class="folio-brand">
+<img src="/assets/devifolio-mark.png" alt="" width="30" height="34">
+<span>FolioDev</span>
+</span>
+</a>
+<div>
+<p class="error-code mono">404</p>
+<h1>Este endereço<br>não leva a uma página.</h1>
+<p>O link pode ter mudado. Volte ao início ou entre na sua conta para continuar.</p>
+<div class="error-actions">
+<a class="primary-button" href="/">Voltar ao início</a>
+<a class="secondary-button" href="/cadastro.html#login">Entrar na conta</a>
+</div>
+</div>
+<small>FolioDev · Seu trabalho, bem apresentado.</small>
+</section>
+<aside class="error-panel">
+<h2>Todo projeto merece<br>um lugar para ser lido.</h2>
+<div class="document-frame">
+<div class="document-toolbar mono">foliodev.app/seu-nome</div>
+<div class="document-content">
+<div class="document-person">
+<span class="avatar">FD</span>
+<h3>Seu próximo portfólio</h3>
+<p>Projetos, contexto e experiências em uma página.</p>
+</div>
+<div class="document-project">
+<h4>Um novo ponto de partida.</h4>
+<p>Organize seu trabalho e compartilhe o que você construiu.</p>
+</div>
+</div>
+</div>
+</aside>
+</main>
 </body>
 </html>

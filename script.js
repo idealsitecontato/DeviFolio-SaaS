@@ -1,215 +1,40 @@
 import { renderPlanCards } from './plans.js'
+import { documentPreview, projectCardMarkup } from './src/ui/components.js'
+import { portfolioModels } from './src/lib/portfolio-models.js'
 
-const plansGrid = document.getElementById('landing-plans-grid')
-if (plansGrid) plansGrid.innerHTML = renderPlanCards()
-
-const reviewTrack = document.getElementById('review-track')
-if (reviewTrack) {
-  const originals = [...reviewTrack.children].map(card => card.cloneNode(true))
-  const viewport = reviewTrack.parentElement
-  const gap = Number.parseFloat(getComputedStyle(reviewTrack).gap) || 0
-  const firstWidth = originals[0]?.getBoundingClientRect().width || 325
-  const groupWidth = originals.length * (firstWidth + gap)
-  let repetitions = 0
-  const fillTrack = () => {
-    const next = Math.max(1, Math.ceil((viewport.clientWidth + firstWidth) / groupWidth))
-    if (next === repetitions) return
-    repetitions = next
-    reviewTrack.replaceChildren()
-    for (let group = 0; group < repetitions * 2; group += 1) {
-      originals.forEach(card => {
-        const copy = card.cloneNode(true)
-        if (group > 0) copy.setAttribute('aria-hidden', 'true')
-        reviewTrack.append(copy)
-      })
-    }
-  }
-  fillTrack()
-  window.addEventListener('resize', fillTrack, { passive: true })
-}
-
-
-const referralCode = new URLSearchParams(window.location.search).get('ref')?.trim().toLowerCase() || ''
-if (/^[a-z0-9._-]{1,80}$/.test(referralCode)) {
-  document.querySelectorAll('a[href^="cadastro.html"]').forEach(link => {
-    const target = new URL(link.getAttribute('href'), window.location.href)
-    target.searchParams.set('ref', referralCode)
-    link.href = target.toString()
-  })
-}
-
-const landingPath = window.location.pathname
-if (landingPath.startsWith('/portfolio/')) {
-  let username = landingPath.slice('/portfolio/'.length)
-  try { username = decodeURIComponent(username) } catch {}
-  window.location.replace('/portfolio.html?username=' + encodeURIComponent(username))
-} else if (landingPath !== '/' && landingPath !== '/index.html') {
-  window.location.replace('/404.html')
-}
-
-const header = document.getElementById('site-header');
-const menuToggle = document.querySelector('.menu-toggle');
-const mobileMenu = document.getElementById('mobile-menu');
-const mobileLinks = mobileMenu ? mobileMenu.querySelectorAll('a') : [];
-let ticking = false;
-let lastScrollY = window.scrollY;
-
-function syncHeader(){
-  const currentY = window.scrollY;
-  const scrolled = currentY > 8;
-  const direction = currentY > lastScrollY ? 'down' : currentY < lastScrollY ? 'up' : 'still';
-  document.body.dataset.scrollDirection = direction;
-  header?.classList.toggle('is-scrolled', scrolled);
-  lastScrollY = currentY;
-  ticking = false;
-}
-window.addEventListener('scroll', () => {
-  if (!ticking) {
-    window.requestAnimationFrame(syncHeader);
-    ticking = true;
-  }
-}, { passive:true });
-syncHeader();
-
-menuToggle?.addEventListener('click', () => {
-  const open = mobileMenu?.classList.toggle('open') ?? false;
-  menuToggle.setAttribute('aria-expanded', String(open));
-  menuToggle.setAttribute('aria-label', open ? 'Fechar menu' : 'Abrir menu');
-});
-mobileLinks.forEach(link => link.addEventListener('click', () => {
-  mobileMenu?.classList.remove('open');
-  menuToggle?.setAttribute('aria-expanded','false');
-  menuToggle?.setAttribute('aria-label','Abrir menu');
-}));
-
-const faqItems = document.querySelectorAll('.faq-item');
-faqItems.forEach(item => {
-  const button = item.querySelector('.faq-question');
-  const answer = item.querySelector('.faq-answer');
-  const icon = button?.querySelector('i');
-  button?.addEventListener('click', () => {
-    const willOpen = !item.classList.contains('is-open');
-    faqItems.forEach(other => {
-      other.classList.remove('is-open');
-      other.querySelector('.faq-question')?.setAttribute('aria-expanded', 'false');
-      other.querySelector('.faq-answer')?.setAttribute('aria-hidden', 'true');
-      const otherIcon = other.querySelector('.faq-question i');
-      if (otherIcon) otherIcon.textContent = '+';
-    });
-    item.classList.toggle('is-open', willOpen);
-    button.setAttribute('aria-expanded', String(willOpen));
-    answer?.setAttribute('aria-hidden', String(!willOpen));
-    if (icon) icon.textContent = willOpen ? '−' : '+';
-  });
-});
-
-
-const githubInput = document.getElementById('github-link-input');
-const pasteGithub = document.getElementById('paste-github');
-const githubNext = document.getElementById('github-next');
-const githubStatus = document.getElementById('github-link-status');
-
-function syncGithubNext(){
-  const hasLink = Boolean(githubInput?.value.trim());
-  githubNext?.setAttribute('aria-disabled', String(!hasLink));
-}
-
-pasteGithub?.addEventListener('click', async () => {
-  if (!githubInput) return;
-  try {
-    const text = await navigator.clipboard.readText();
-    githubInput.value = text.trim();
-    githubStatus.textContent = githubInput.value ? 'Link colado. Agora continue.' : 'Não encontramos um link na área de transferência.';
-    syncGithubNext();
-  } catch {
-    githubStatus.textContent = 'Cole o link manualmente no campo ao lado.';
-    githubInput.focus();
-  }
-});
-
-githubInput?.addEventListener('input', () => {
-  githubStatus.textContent = githubInput.value.trim() ? 'Link pronto. Agora continue.' : 'Cole o link e continue.';
-  syncGithubNext();
-});
-
-githubNext?.addEventListener('click', event => {
-  if (!githubInput?.value.trim()) {
-    event.preventDefault();
-    githubStatus.textContent = 'Primeiro, cole o link do seu GitHub.';
-    githubInput?.focus();
-  }
-});
-
-syncGithubNext();
-
-document.querySelectorAll('a[href^="#"]').forEach(link => {
-  link.addEventListener('click', event => {
-    const id = link.getAttribute('href');
-    if (!id || id === '#') return;
-    const target = document.querySelector(id);
-    if (!target) return;
-    event.preventDefault();
-    target.scrollIntoView({behavior:'auto', block:'start'});
-  });
-});
-
-const plansAnchor = document.getElementById('planos')
-if (location.hash === '#planos' && plansAnchor) {
-  const showPlans = () => window.scrollTo({ top: plansAnchor.getBoundingClientRect().top + window.scrollY - 100, behavior: 'instant' })
-  requestAnimationFrame(() => requestAnimationFrame(showPlans))
-  window.addEventListener('load', showPlans, { once: true })
-}
-
-
-const hero = document.querySelector('.hero-devifolio')
-if (hero) {
-  const reducedHeroMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
-  let heroFrame = 0
-  let mouseDrag = null
-
-  function updateHeroProgress() {
-    heroFrame = 0
-    const rect = hero.getBoundingClientRect()
-    const range = Math.max(280, rect.height * .68)
-    const progress = reducedHeroMotion.matches ? 0 : Math.min(1, Math.max(0, -rect.top / range))
-    hero.style.setProperty('--hero-drag-progress', progress.toFixed(4))
-    hero.style.setProperty('--hero-copy-shift', (-16 * progress).toFixed(2) + 'px')
-    hero.style.setProperty('--hero-visual-shift-x', (-11 * progress).toFixed(2) + 'px')
-    hero.style.setProperty('--hero-visual-shift-y', (-34 * progress).toFixed(2) + 'px')
-    hero.style.setProperty('--hero-visual-scale', (1 - .025 * progress).toFixed(4))
-  }
-
-  function scheduleHeroProgress() {
-    if (!heroFrame) heroFrame = window.requestAnimationFrame(updateHeroProgress)
-  }
-
-  window.addEventListener('scroll', scheduleHeroProgress, { passive: true })
-  window.addEventListener('resize', scheduleHeroProgress, { passive: true })
-  reducedHeroMotion.addEventListener?.('change', scheduleHeroProgress)
-
-  hero.addEventListener('pointerdown', event => {
-    if (event.pointerType !== 'mouse' || event.button !== 0 || event.target.closest('a, button, input, textarea, select')) return
-    mouseDrag = { id: event.pointerId, lastY: event.clientY }
-    hero.setPointerCapture(event.pointerId)
-    event.preventDefault()
-  })
-
-  hero.addEventListener('pointermove', event => {
-    if (!mouseDrag || event.pointerId !== mouseDrag.id) return
-    const delta = mouseDrag.lastY - event.clientY
-    mouseDrag.lastY = event.clientY
-    if (Math.abs(delta) < 1) return
-    event.preventDefault()
-    window.scrollBy(0, delta)
-    scheduleHeroProgress()
-  })
-
-  function endHeroDrag(event) {
-    if (!mouseDrag || event.pointerId !== mouseDrag.id) return
-    if (hero.hasPointerCapture(event.pointerId)) hero.releasePointerCapture(event.pointerId)
-    mouseDrag = null
-  }
-  hero.addEventListener('pointerup', endHeroDrag)
-  hero.addEventListener('pointercancel', endHeroDrag)
-  updateHeroProgress()
-}
+// Local examples use the product components; this page never loads user data.
+const exampleProfile={name:'Ana Ribeiro',username:'ana-ribeiro',role:'Desenvolvedora frontend',bio:'Interfaces acessíveis. Projetos com contexto. Software feito com cuidado.'}
+const exampleProjects=[{id:1,name:'Atlas — Dashboard',description:'Uma interface para acompanhar operações e tomar decisões com contexto.',tech:'React, TypeScript',github:'ana/atlas',status:'published'},{id:2,name:'Notas',description:'Um editor simples para registrar ideias e organizar documentos.',tech:'JavaScript, CSS',github:'ana/notas',status:'progress'}]
+document.getElementById('hero-product-preview').innerHTML=documentPreview({profile:exampleProfile,projects:exampleProjects})
+document.getElementById('landing-project-preview').innerHTML=projectCardMarkup(exampleProjects[0])
+document.getElementById('landing-public-preview').innerHTML=documentPreview({profile:exampleProfile,projects:exampleProjects,compact:true})
+document.getElementById('landing-models').innerHTML=portfolioModels.filter(model=>model.available).slice(0,3).map(model=>`<a class="landing-model-card" href="cadastro.html#cadastro" aria-label="Escolher modelo ${model.name}">${documentPreview({profile:exampleProfile,projects:exampleProjects,model,compact:true})}<span>${model.name} →</span></a>`).join('')
+document.getElementById('landing-plans-grid').innerHTML=renderPlanCards()
+document.getElementById('copyright-year').textContent=String(new Date().getFullYear())
+const referralCode=new URLSearchParams(location.search).get('ref')?.trim().toLowerCase()||''
+if(/^[a-z0-9._-]{1,80}$/.test(referralCode)){document.querySelectorAll('a[href^="cadastro.html"]').forEach(link=>{const target=new URL(link.getAttribute('href'),location.href);target.searchParams.set('ref',referralCode);link.href=target.toString()})}
+const landingPath=location.pathname
+if(landingPath.startsWith('/portfolio/')){let username=landingPath.slice('/portfolio/'.length);try{username=decodeURIComponent(username)}catch{}location.replace('/portfolio.html?username='+encodeURIComponent(username))}
+else if(landingPath!=='/'&&landingPath!=='/index.html')location.replace('/404.html')
+const menuToggle=document.querySelector('.menu-toggle'),mobileMenu=document.getElementById('mobile-menu')
+const closeMenu=()=>{mobileMenu.hidden=true;menuToggle.setAttribute('aria-expanded','false');menuToggle.setAttribute('aria-label','Abrir menu')}
+menuToggle.addEventListener('click',()=>{const open=mobileMenu.hidden;mobileMenu.hidden=!open;menuToggle.setAttribute('aria-expanded',String(open));menuToggle.setAttribute('aria-label',open?'Fechar menu':'Abrir menu')})
+mobileMenu.querySelectorAll('a').forEach(link=>link.addEventListener('click',closeMenu))
+document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!mobileMenu.hidden){closeMenu();menuToggle.focus()}})
+document.querySelectorAll('.faq-question').forEach(button=>button.addEventListener('click',()=>{const item=button.closest('.faq-item'),open=!item.classList.contains('is-open');document.querySelectorAll('.faq-item').forEach(other=>{const active=other===item&&open;other.classList.toggle('is-open',active);other.querySelector('button').setAttribute('aria-expanded',String(active));other.querySelector('.faq-answer').setAttribute('aria-hidden',String(!active));other.querySelector('i').textContent=active?'−':'+'})}))
+const githubInput=document.getElementById('github-link-input'),githubNext=document.getElementById('github-next'),githubStatus=document.getElementById('github-link-status')
+const syncGithubNext=()=>githubNext.setAttribute('aria-disabled',String(!githubInput.value.trim()))
+document.getElementById('paste-github').addEventListener('click',async()=>{try{githubInput.value=(await navigator.clipboard.readText()).trim();githubStatus.textContent=githubInput.value?'Endereço colado. Agora continue.':'Nenhum endereço na área de transferência.';syncGithubNext()}catch{githubStatus.textContent='Cole o endereço manualmente no campo.';githubInput.focus()}})
+githubInput.addEventListener('input',()=>{githubStatus.textContent=githubInput.value.trim()?'Endereço pronto. Agora continue.':'Cole o endereço para continuar.';syncGithubNext()})
+githubNext.addEventListener('click',event=>{if(!githubInput.value.trim()){event.preventDefault();githubStatus.textContent='Primeiro, cole o endereço do seu GitHub.';githubInput.focus()}})
+syncGithubNext()
+const reviewTrack=document.getElementById('review-track'),originalReviews=[...reviewTrack.children].map(card=>card.cloneNode(true))
+let reviewRepetitions=0
+function fillReviews(){const cardWidth=matchMedia('(max-width:640px)').matches?300:360,gap=24,groupWidth=originalReviews.length*(cardWidth+gap),repetitions=Math.max(1,Math.ceil((innerWidth+cardWidth)/groupWidth));if(repetitions!==reviewRepetitions){reviewRepetitions=repetitions;reviewTrack.replaceChildren();for(let group=0;group<repetitions*2;group++)originalReviews.forEach(card=>{const copy=card.cloneNode(true);if(group>0)copy.setAttribute('aria-hidden','true');reviewTrack.append(copy)})}reviewTrack.style.setProperty('--review-distance',`${groupWidth*repetitions}px`)}
+fillReviews();window.addEventListener('resize',fillReviews,{passive:true})
+document.getElementById('pause-reviews').addEventListener('click',event=>{const paused=reviewTrack.classList.toggle('is-paused');event.currentTarget.setAttribute('aria-pressed',String(paused));event.currentTarget.textContent=paused?'Retomar avaliações':'Pausar avaliações'})
+const video=document.querySelector('.final-video'),reduced=matchMedia('(prefers-reduced-motion: reduce)')
+new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting&&!reduced.matches)video.play().catch(()=>{});else video.pause()})},{rootMargin:'100px'}).observe(video)
+reduced.addEventListener('change',()=>{if(reduced.matches)video.pause()})
+window.addEventListener('offline',()=>{if(document.querySelector('.offline-notice'))return;const notice=document.createElement('div');notice.className='offline-notice';notice.setAttribute('role','status');notice.textContent='Você está sem conexão. Os links voltam a funcionar quando a conexão retornar.';document.getElementById('site-header').append(notice)})
+window.addEventListener('online',()=>document.querySelector('.offline-notice')?.remove())
