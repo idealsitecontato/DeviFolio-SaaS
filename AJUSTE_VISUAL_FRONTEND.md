@@ -2,6 +2,26 @@
 
 Especificação: `prompt-codex-ajuste-frontend-foliodev.md`, as cinco capturas anexadas e `FolioDev_logos(2).zip`, fornecidos em 29/09/2026. Branch de entrega: `ajuste-visual-frontend`. Base: `a123fcf`.
 
+## Reabertura da revisão — versão publicada e sessão real
+
+Após o relato de que as alterações não apareciam, o frontend local e o endereço `https://devi-folio-saa-s.vercel.app` foram abertos no navegador. O endereço publicado ainda mostra a logo anterior; o HTML não tem o novo asset do ZIP nem o nome “Portifólios e Projetos”. A implantação de produção é da branch `main`, publicada em 28/09/2026. O push da branch de revisão não a substituiu.
+
+O preview da branch `ajuste-visual-frontend`, commit `cf4c242`, falhou no build por ausência de `VITE_SUPABASE_URL` e `VITE_SUPABASE_PUBLISHABLE_KEY`. A listagem de configurações confirmou que as sete variáveis do projeto existem somente em Production. Nenhum valor, escopo de variável ou configuração de backend foi modificado para contornar a falha.
+
+Correções adicionais de apresentação nesta revisão:
+
+- Modelos passa a ter cinco colunas também entre 1201 e 1440 px. Nessa faixa, o rodapé do card usa duas linhas para preservar os textos e botões; a grade tem largura máxima para evitar crescimento dos cards em monitores maiores.
+- Organização e próximos passos do Início ficam numa seção recolhível abaixo dos projetos. Os controles e seus handlers continuam presentes.
+- O acesso GitHub e a explicação sobre publicação nas pastas ficam numa seção recolhível, reduzindo a presença de conteúdo ausente da referência sem remover o acesso funcional.
+
+Build local e os nove testes existentes passaram após essas correções. Os atalhos recolhíveis foram exercitados por teclado e seus botões aparecem ao abrir. A comparação visual de componentes e a validação pública foram repetidas; elas **não comprovam o resultado das cinco telas com uma conta autenticada**.
+
+O frontend local está em `http://127.0.0.1:5173`. Um transporte temporário de desenvolvimento, fora dos arquivos versionados, encaminha `/api` para os endpoints reais já existentes do mesmo projeto; foi confirmada a mesma URL de Supabase nos frontends local e publicado. As APIs responderam com JSON e 401 sem sessão, conforme esperado. Não há mocks de dados, login ou API nesse servidor.
+
+Os perfis de teste disponíveis redirecionaram para login. O acesso à aba existente pelo conector falhou com erro de ACL do ambiente. Uma janela interativa de revisão foi aberta para login na conta existente, sem pedir ou ler senha pelo chat. A verificação visual autenticada das cinco telas e dos repositórios reais está pendente dessa sessão; o aceite integral permanece em aberto.
+
+Também foi preparado um build completo da Vercel com as configurações de produção já existentes, sem editar variáveis. A tentativa de disponibilizá-lo num endereço separado, sem promoção do domínio, foi bloqueada pela revisão automática: o pedido autorizou commit/push da branch, mas não publicação externa. O usuário escolheu manter a revisão somente no ambiente local; nenhum novo deployment foi criado. Em seguida, solicitou commit e push das correções locais, mesmo com a validação autenticada pendente. A revisão visual real das cinco telas continua em aberto e não é considerada concluída pelo envio da branch.
+
 ## Auditoria e medidas antes da implementação
 
 - Projeto existente: HTML, JavaScript e Vite. Não há troca de framework ou dependências.
