@@ -48,3 +48,11 @@ Arquivos: `dashboard.js` (classe de apresentação), `foliodev-dashboard-visual.
 Alterações: quatro cards de 542 px, espaçamento de 14 px, cinza claro, azul saturado e gradiente azul/preto, preços alinhados e botões de 41 px. O arquivo `plans.js`, os valores e os botões desabilitados não mudaram.
 
 Verificado: comparação visual em 1798 × 875 px; primeiro card em x=459,5/y=236,2 px, largura de 267,5 px e altura de 542 px, praticamente coincidindo com a referência. As cores foram comparadas com pixels da captura; o último gradiente foi ajustado à aparência da imagem. Pendência: não há checkout ativo para testar, conforme o comportamento já existente.
+
+### GitHub
+
+Arquivos: `dashboard.js` (markup do estado conectado), `foliodev-dashboard-visual.css`.
+
+Alterações: conta conectada com ícone oficial existente, repositórios carvão, ícones brancos e chips de visibilidade derivados de `repository.private`. Checkbox, importação, menu, paginação, sincronização, desconexão e estados de erro continuam nos mecanismos originais. A seleção aparece ao passar o mouse, ao focar ou ao selecionar; em telas pequenas permanece visível.
+
+Verificado: renderização isolada do estado conectado em 1787 × 880 px, sem importar Supabase/API; conta em y=196,8 px/94 px de altura, painel em y=312,8 px/270,4 px de altura e linhas com 66 px. Pendência: conexão, importação, sincronização e desconexão com a conta real, pois não há sessão de teste acessível ao agente.
