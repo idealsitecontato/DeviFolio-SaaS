@@ -40,3 +40,11 @@ Arquivos: `dashboard.js`, `foliodev-dashboard-visual.css`.
 Alterações: métricas seguidas de importação GitHub e compartilhamento/QR lado a lado, com projetos em toda a largura. Os atalhos de organização e próximos passos continuam disponíveis abaixo. Nenhum contador ou endereço de exemplo foi colocado no produto.
 
 Verificado: comparação visual em 1800 × 873 px, métricas em y=193 px, cards em y=315 px com altura de 321 px, projetos em y=654 px; os alinhamentos principais diferem da captura em aproximadamente 1–2 px. Renderização dos componentes existentes em 360, 768, 1280 e 1920 px, sem erros ou overflow horizontal. Pendência: cópia e download do QR com a conta real e fluxos autenticados.
+
+### Planos
+
+Arquivos: `dashboard.js` (classe de apresentação), `foliodev-dashboard-visual.css`.
+
+Alterações: quatro cards de 542 px, espaçamento de 14 px, cinza claro, azul saturado e gradiente azul/preto, preços alinhados e botões de 41 px. O arquivo `plans.js`, os valores e os botões desabilitados não mudaram.
+
+Verificado: comparação visual em 1798 × 875 px; primeiro card em x=459,5/y=236,2 px, largura de 267,5 px e altura de 542 px, praticamente coincidindo com a referência. As cores foram comparadas com pixels da captura; o último gradiente foi ajustado à aparência da imagem. Pendência: não há checkout ativo para testar, conforme o comportamento já existente.

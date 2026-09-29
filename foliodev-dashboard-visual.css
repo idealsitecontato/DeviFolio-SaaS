@@ -23,6 +23,32 @@
   --visual-folder:#ffbf35;
   font-size:14px;
 }
+
+/* Planos: the reference image takes precedence over the textual color examples. */
+.dashboard-app .plans-page .page-head {margin-bottom:28px;}
+.dashboard-app .plans-page .plans-availability {margin-bottom:21px;}
+.dashboard-app .plans-page .devi-plan-grid {grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;}
+.dashboard-app .plans-page .devi-plan-card {min-height:542px;padding:20px;border-radius:12px;}
+.dashboard-app .plans-page .devi-plan-head {min-height:64px;gap:8px;}
+.dashboard-app .plans-page .devi-plan-head h3 {font-size:18px;line-height:1.3;}
+.dashboard-app .plans-page .devi-plan-description {font-size:13px;line-height:1.5;min-height:48px;}
+.dashboard-app .plans-page .devi-plan-price {padding:24px 0;gap:6px;}
+.dashboard-app .plans-page .devi-plan-price strong {font-size:28px;font-weight:600;line-height:1.2;letter-spacing:-1px;}
+.dashboard-app .plans-page .devi-plan-price span {font-size:12px;}
+.dashboard-app .plans-page .devi-plan-card ul {gap:10px;margin:24px 0;}
+.dashboard-app .plans-page .devi-plan-card li {font-size:13px;line-height:1.4;gap:6px;}
+.dashboard-app .plans-page .devi-plan-card>button {min-height:41px;height:41px;padding:9px;font-size:13px;border-radius:8px;}
+.dashboard-app .plans-page .devi-plan-card--essencial {background:color-mix(in srgb,var(--visual-plan-gray) 7%,#f6fafc);border-color:transparent;}
+.dashboard-app .plans-page .devi-plan-card--avancado {background:var(--visual-plan-blue);border-color:var(--visual-plan-blue);color:#fff;}
+.dashboard-app .plans-page .devi-plan-card--plus {background:linear-gradient(145deg,var(--visual-plan-blue) 0%,#000 90%);border-color:transparent;color:#fff;}
+.dashboard-app .plans-page .devi-plan-card--avancado ul {align-content:start;gap:16px;}
+.dashboard-app .plans-page :is(.devi-plan-card--avancado,.devi-plan-card--plus) :is(.devi-plan-description,.devi-plan-price span) {color:#fff;}
+.dashboard-app .plans-page :is(.devi-plan-card--avancado,.devi-plan-card--plus) .devi-plan-price {border-color:rgb(255 255 255 / 38%);}
+.dashboard-app .plans-page .devi-plan-badge {background:#eef5ff;border:0;color:var(--visual-plan-blue);padding:3px 7px;border-radius:7px;font-size:10px;}
+.dashboard-app .plans-page .devi-plan-card>button:disabled {background:#f2f4f5;border-color:#e0e4e7;color:#667486;opacity:1;}
+@media(min-width:1600px) {.dashboard-app .plans-page {margin-left:8px;}}
+@media(max-width:1200px) {.dashboard-app .plans-page .devi-plan-grid {grid-template-columns:repeat(2,minmax(0,1fr));}}
+@media(max-width:640px) {.dashboard-app .plans-page .devi-plan-grid {grid-template-columns:1fr;}.dashboard-app .plans-page .devi-plan-card {min-height:500px;}}
 .dashboard-app .app-shell {--sidebar-width:var(--sidebar-expanded-width,var(--visual-sidebar));}
 .dashboard-app .app-shell.sidebar-collapsed {--sidebar-width:72px;}
 .dashboard-app .sidebar {padding:22px 15px 12px;}
