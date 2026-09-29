@@ -32,3 +32,11 @@ Arquivos: `assets/brand/*`, `public/assets/brand/*`, `assets/fonts/google-sans-l
 Verificado: integridade dos assets em relação ao ZIP; ordem dos links e conservação das rotas; carregamento real das páginas públicas e proteção do painel sem sessão. Pendência: teste com conta autenticada, pois o acesso ao navegador existente falhou.
 
 As etapas seguintes e o checklist final serão preenchidos após as verificações.
+
+### Início
+
+Arquivos: `dashboard.js`, `foliodev-dashboard-visual.css`.
+
+Alterações: métricas seguidas de importação GitHub e compartilhamento/QR lado a lado, com projetos em toda a largura. Os atalhos de organização e próximos passos continuam disponíveis abaixo. Nenhum contador ou endereço de exemplo foi colocado no produto.
+
+Verificado: comparação visual em 1800 × 873 px, métricas em y=193 px, cards em y=315 px com altura de 321 px, projetos em y=654 px; os alinhamentos principais diferem da captura em aproximadamente 1–2 px. Renderização dos componentes existentes em 360, 768, 1280 e 1920 px, sem erros ou overflow horizontal. Pendência: cópia e download do QR com a conta real e fluxos autenticados.
