@@ -31,8 +31,6 @@ Arquivos: `assets/brand/*`, `public/assets/brand/*`, `assets/fonts/google-sans-l
 
 Verificado: integridade dos assets em relação ao ZIP; ordem dos links e conservação das rotas; carregamento real das páginas públicas e proteção do painel sem sessão. Pendência: teste com conta autenticada, pois o acesso ao navegador existente falhou.
 
-As etapas seguintes e o checklist final serão preenchidos após as verificações.
-
 ### Início
 
 Arquivos: `dashboard.js`, `foliodev-dashboard-visual.css`.
@@ -64,3 +62,51 @@ Arquivos: `dashboard.js` (título e renderização), `foliodev-dashboard-visual.
 Alterações: nome exato exigido pelo MD, coluna de pastas de 212 px, cards de 86 px, pastas amarelas e painel de projetos de 886 × 460 px. A rota `portfolio`, atributos de drag/drop, dados de localização, menus e animação da pasta permanecem. O atalho GitHub e a explicação sobre pastas foram mantidos, embora não apareçam na captura.
 
 Verificado: comparação em 1805 × 871 px; conteúdo em x=451 px, painel em x=685/y=267,2 px e altura de 460 px. Pendência: mover, persistir e publicar projetos da conta real; a renderização isolada não comprova essas operações.
+
+### Modelos
+
+Arquivos: `dashboard.js` (card), `foliodev-dashboard-visual.css`.
+
+Alterações: previews de cor sólida, sem texturas; cards de aproximadamente 267 × 225 px; cinco colunas no desktop de referência. Responsividade: três colunas entre 1201–1440 px, duas até 1200 px, uma até 640 px. Os 10 IDs e os 3 modelos disponíveis continuam exatamente no catálogo original. Aplicar, pré-visualizar, modal e carregamento usam os handlers anteriores. Os templates publicados e seus assets não foram alterados.
+
+Verificado: comparação em 1672 × 941 px; grade em x=244/y=170,8 px, previews de aproximadamente 233 × 141 px. Testados os 10 botões, 7 indicadores de bloqueio e abertura/fechamento do modal original em renderização isolada. Pendência: aplicar/persistir modelo com a conta real. A referência tem 15 modelos, nomes, cores e ordem diferentes; não foram criados modelos artificiais.
+
+## Verificação final
+
+- Build Vite concluído sem erros.
+- Cinco telas em 320, 360, 768, 1024, 1280, 1672 e 1800 px: nenhuma imagem quebrada, erro JavaScript ou scroll horizontal. Estados com projetos também renderizados.
+- Sidebar: os controladores originais foram exercitados em renderização isolada, incluindo recolher/expandir, redimensionar por mouse e teclado, persistir a largura local, abrir conta e abrir/fechar o menu no celular.
+- Seleção de repositórios por mouse e teclado, rótulos público/privado, modal de modelos e botões de planos desabilitados verificados em componentes isolados.
+- Páginas reais: landing, login, cadastro, recuperação, redefinição sem token, 404 e estado público sem username. Sem erros e imagens quebradas nas larguras de 360, 768, 1280 e 1920 px. Validação de campos vazios, mostrar senha e acesso à recuperação verificados. Nove rotas protegidas redirecionaram corretamente para o login sem sessão.
+- A suíte existente de localização de projetos passou nos 9 testes. Esses testes não comprovam persistência na conta real.
+- Comparação de código com `a123fcf`: `auth.js`, `src/lib/*`, `api/*`, `server/*`, `supabase/*`, planos, dependências e configuração não foram alterados. No dashboard, mudaram somente cinco funções de apresentação e o texto do breadcrumb/título. Os handlers e chamadas reais permanecem iguais.
+
+## Checklist de aceite — somente verificações realizadas
+
+- [x] Logos extraídas do ZIP, com os mesmos bytes e proporção preservada; nenhuma logo antiga nas páginas ativas.
+- [x] Nome FolioDev, GitHub preto na sidebar e Modelos imediatamente acima de Perfil.
+- [x] Estrutura e medidas das cinco telas comparadas às capturas; diferenças justificadas abaixo.
+- [x] Planos com altura, alinhamentos e aparência das cores comparados à referência, mantendo “Em breve”.
+- [x] Cards GitHub carvão, ícone branco e visibilidade real derivada dos dados verificados no renderer.
+- [x] Nome exato Portifólios e Projetos; rota e atributos do explorer preservados.
+- [x] Modelos compactos; quantidade e disponibilidade existentes verificadas.
+- [x] Responsividade, imagens e ausência de erros verificadas nas larguras descritas.
+- [x] Handlers existentes e módulos protegidos conferidos contra a base, sem mudanças de infraestrutura.
+- [x] Build sem erros e suíte existente com 9 testes passando.
+- [ ] Igualdade pixel a pixel: não alcançada pelos conflitos abaixo e por diferenças de renderização da fonte/imagens.
+- [ ] Login/cadastro completos e sessão autenticada com a conta de teste.
+- [ ] Envio de recuperação por e-mail e redefinição com token válido.
+- [ ] OAuth, sincronização, importação e desconexão reais do GitHub.
+- [ ] Drag and drop com persistência, deploy/undeploy e aplicação de modelo na conta real.
+
+## Diferenças e suposições de entrega
+
+1. A logo oficial do ZIP tem um símbolo F diferente daquele das capturas; foi usada a versão `FolioDev-logo-branca.png` nas superfícies claras, sem redesenhar ou recolorir.
+2. O catálogo atual tem 10 modelos e outra paleta/ordem; a referência tem 15. A disponibilidade real prevalece sobre o texto “Disponível” mostrado em cards com cadeado na captura.
+3. Nome da seção e posição de Modelos seguem as instruções expressas do MD. Dados pessoais, nomes de pastas, quantidades, URLs e repositórios dependem da conta real e não foram copiados das capturas.
+4. Atalhos funcionais extras do Início e o controle GitHub das pastas foram preservados; sua presença difere das capturas.
+5. Foi usada Google Sans oficial conforme o MD. Peso, contornos e antialiasing podem diferir da fonte efetivamente renderizada nas imagens. Não foram adicionadas texturas para reproduzir ruído/compressão da captura.
+6. As cores e o gradiente dos planos foram aproximados dos pixels da referência, usando a cláusula “a referência vence”; não são os hexadecimais sólidos citados como exemplo no texto.
+7. Nenhuma sessão autenticada ficou acessível ao agente: o acesso ao navegador existente falhou por erro do ambiente. As revisões isoladas de componentes não foram tratadas como testes autenticados e não substituíram fluxos reais.
+
+Entrega em commits pequenos por etapa na branch `ajuste-visual-frontend`. O resultado do push e o hash final são informados na resposta de entrega. A branch principal permanece na base anterior.

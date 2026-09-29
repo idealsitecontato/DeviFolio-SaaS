@@ -318,7 +318,7 @@ function modelPreview(model, compact = false) {
 }
 
 function modelCard(model) {
-return `<article class="card model-card">${documentPreview({profile:state.profile,projects:state.projects.filter(p=>p.status==='published'),model,compact:true})}<div class="model-card-footer"><div><h3>${esc(model.name)}</h3><p>${model.available?'Disponível':'Exclusivo — consulte os planos'}</p></div><div class="view-actions"><button class="icon-button" data-preview-model="${model.id}" aria-label="Pré-visualizar ${esc(model.name)}"><span data-icon="eye"></span></button><button class="secondary-button" data-apply-model="${model.id}">Aplicar</button></div></div></article>`
+return `<article class="card model-card"><button type="button" data-model-swatch="${esc(model.id)}" class="model-swatch ${model.available?'is-available':'is-locked'}" data-preview-model="${model.id}" aria-label="Pré-visualizar ${esc(model.name)}">${model.available?'':'<span class="model-lock" data-icon="lock" aria-hidden="true"></span>'}</button><div class="model-card-footer"><div><h3>${esc(model.name)}</h3><p>${model.available?'Disponível':'Bloqueado'}</p></div><div class="view-actions"><button class="icon-button" data-preview-model="${model.id}" aria-label="Pré-visualizar ${esc(model.name)}"><span data-icon="eye"></span></button><button class="secondary-button" data-apply-model="${model.id}">Aplicar</button></div></div></article>`
 }
 
 function modelsView() {
