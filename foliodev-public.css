@@ -186,8 +186,8 @@
   font-size:17px;
   color:var(--text)}
 .public-footer .folio-brand img{
-  width:22px;
-  height:25px}
+  width:calc(var(--brand-width) * 1.46565);
+  height:auto}
 .public-state{
   max-width:600px;
   min-height:100dvh;

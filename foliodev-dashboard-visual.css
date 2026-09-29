@@ -1,0 +1,80 @@
+/* Measures from the five supplied desktop references. Existing data and actions remain in dashboard.js. */
+.dashboard-app {
+  --bg:#f8f9f9;
+  --surface:#fff;
+  --surface-muted:#f1f2f3;
+  --text:#080b0e;
+  --text-muted:#667486;
+  --text-subtle:#7d8794;
+  --border:#e2e4e7;
+  --border-strong:#d6d9dd;
+  --accent:#0876ff;
+  --visual-sidebar:225px;
+  --visual-content:1200px;
+  --visual-page-x:40px;
+  --visual-page-y:44px;
+  --visual-header:52px;
+  --visual-gap:18px;
+  --visual-card-radius:12px;
+  --visual-button-height:44px;
+  --visual-plan-gray:#808080;
+  --visual-plan-blue:#006eff;
+  --visual-repo:#24292d;
+  --visual-folder:#ffbf35;
+  font-size:14px;
+}
+.dashboard-app .app-shell {--sidebar-width:var(--sidebar-expanded-width,var(--visual-sidebar));}
+.dashboard-app .app-shell.sidebar-collapsed {--sidebar-width:72px;}
+.dashboard-app .sidebar {padding:22px 15px 12px;}
+.dashboard-app .sidebar .brand-crop {margin:0 10px 32px;height:28px;flex:none;}
+.dashboard-app .sidebar .folio-brand {width:var(--brand-width);height:28px;}
+.dashboard-app .sidebar .folio-brand img,.dashboard-app .mobile-topbar .folio-brand img {
+  width:calc(var(--brand-width) * 1.46565);height:auto;
+}
+.dashboard-app .sidebar-toggle {top:20px;right:7px;width:28px;height:28px;background:transparent;}
+.dashboard-app .sidebar-toggle svg {width:16px;height:16px;}
+.dashboard-app .user-mini {min-height:57px;padding:10px 9px;margin-bottom:24px;border-radius:8px;gap:9px;}
+.dashboard-app .user-mini b {font-size:13px;font-weight:600;}
+.dashboard-app .user-mini small {font-size:11px;line-height:1.4;white-space:normal;overflow-wrap:anywhere;}
+.dashboard-app .nav-item {min-height:38px;padding:8px 12px;gap:10px;font-weight:400;font-size:14px;line-height:1.4;border-radius:9px;}
+.dashboard-app .nav-item.active {font-weight:600;}
+.dashboard-app .nav-item.active::before {background:var(--accent);top:11px;bottom:11px;}
+.dashboard-app .nav-item>span:first-child {width:20px;height:20px;}
+.dashboard-app .nav-item svg {width:18px;height:18px;stroke-width:1.7;}
+.dashboard-app .nav-item[data-route="github"] .github-icon img {filter:brightness(0);}
+.dashboard-app .kaptei-nav-mark img {width:16px;height:16px;}
+.dashboard-app .sidebar-referral {padding:15px 11px;font-size:12px;gap:4px;}
+.dashboard-app .sidebar-referral strong {font-weight:500;}
+.dashboard-app .sidebar-spacer {min-height:20px;}
+.dashboard-app .side-nav-utility {padding-top:8px;}
+.dashboard-app .desktop-topbar {height:var(--visual-header);padding:0 36px;font-size:12px;gap:12px;}
+.dashboard-app .page-content {max-width:var(--visual-content);padding:var(--visual-page-y) var(--visual-page-x);}
+.dashboard-app .page-head {margin-bottom:30px;gap:24px;}
+.dashboard-app .page-head .eyebrow {display:none;}
+.dashboard-app .page-head h1 {font-size:32px;font-weight:600;line-height:1.2;letter-spacing:-.025em;}
+.dashboard-app .page-head p {font-size:14px;line-height:1.6;margin-top:8px;}
+.dashboard-app :is(.primary-button,.secondary-button) {min-height:var(--visual-button-height);padding:11px 18px;font-size:14px;gap:10px;border-radius:8px;}
+.dashboard-app .page-head>button {margin-top:2px;}
+.dashboard-app .card {border-radius:var(--visual-card-radius);box-shadow:none;}
+.dashboard-app .section-card-head {display:flex;align-items:center;justify-content:space-between;gap:16px;}
+.dashboard-app .section-card-head h2 {font-size:22px;line-height:1.3;}
+.dashboard-app .section-card-head .link-button {font-size:12px;padding:4px 0;min-height:28px;}
+@media(min-width:821px) {
+  .dashboard-app .sidebar-collapsed .brand-crop {margin:0 0 12px;}
+  .dashboard-app .sidebar-collapsed .folio-brand {--brand-width:180px;width:38px;height:36px;}
+  .dashboard-app .sidebar-collapsed .folio-brand img {top:-52px;left:-42px;}
+  .dashboard-app .sidebar-collapsed .sidebar-toggle {position:static;margin:0 auto 16px;width:38px;}
+}
+@media(max-width:1200px) {.dashboard-app {--visual-page-x:28px;--visual-page-y:36px;}}
+@media(max-width:820px) {
+  .dashboard-app .app-shell,.dashboard-app .app-shell.sidebar-collapsed {--sidebar-width:0px;}
+  .dashboard-app .sidebar,.dashboard-app .sidebar-collapsed .sidebar {width:min(300px,85vw);}
+  .dashboard-app .sidebar-collapsed .brand-crop {margin:0 10px 32px;}
+  .dashboard-app .page-head {flex-wrap:wrap;}
+  .dashboard-app .mobile-topbar .folio-brand {width:var(--brand-width);height:28px;}
+}
+@media(max-width:640px) {
+  .dashboard-app {--visual-page-x:20px;--visual-page-y:28px;}
+  .dashboard-app .page-head h1 {font-size:28px;}
+  .dashboard-app .page-head>button {width:100%;margin:0;}
+}

@@ -29,7 +29,7 @@
   --radius-full:999px;
   --shadow-1:0 1px 2px rgba(11,11,12,.04);
   --shadow-overlay:0 12px 32px rgba(11,11,12,.10);
-  --font-sans:'Geist',Arial,sans-serif;
+  --font-sans:"Google Sans","Product Sans",system-ui,sans-serif;
   --font-mono:'Geist Mono',monospace;
   --motion:180ms;
   --ease:cubic-bezier(.2,.7,.2,1);
@@ -106,18 +106,22 @@ button:disabled,[aria-disabled="true"]{
 .subtle{
   color:var(--text-subtle)}
 .folio-brand{
-  display:inline-flex;
-  align-items:center;
-  gap:9px;
-  font-weight:600;
-  font-size:21px;
-  letter-spacing:-.7px;
-  line-height:1}
+  --brand-width:110px;
+  display:inline-block;
+  position:relative;
+  width:var(--brand-width);
+  height:28px;
+  overflow:hidden;
+  flex:none;
+  vertical-align:middle}
 .folio-brand img{
-  width:30px;
-  height:34px;
-  object-fit:contain;
-  flex:none}
+  position:absolute;
+  width:calc(var(--brand-width) * 1.46565);
+  height:auto;
+  max-width:none;
+  left:calc(var(--brand-width) * -.23378);
+  top:calc(var(--brand-width) * -.3063);
+  object-fit:contain}
 .skip-link{
   position:fixed;
   top:-100px;

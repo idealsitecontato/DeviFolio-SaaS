@@ -593,8 +593,8 @@
 .navbar .folio-brand{
   font-size:21px}
 .navbar .folio-brand img{
-  width:26px;
-  height:30px}
+  width:calc(var(--brand-width) * 1.46565);
+  height:auto}
 .nav-actions{
   display:none}
 .menu-toggle{
