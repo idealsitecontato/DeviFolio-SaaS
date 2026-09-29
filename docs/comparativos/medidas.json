@@ -1,0 +1,25 @@
+{
+  "hero": {
+    "size": [
+      4095,
+      2170
+    ],
+    "colors": {
+      "corner": "#0072F6",
+      "center": "#067CFE",
+      "navbar": "#FEFEFF",
+      "below": "#F8FCFF",
+      "green": "#0C8D5C"
+    }
+  },
+  "login": {
+    "size": [
+      4095,
+      2305
+    ],
+    "colors": {
+      "panel": "#046EFF",
+      "background": "#FFFFFF"
+    }
+  }
+}

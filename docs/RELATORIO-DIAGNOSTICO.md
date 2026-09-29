@@ -42,3 +42,54 @@ Os arquivos de revisões anteriores e o diretório guio-service não versionado 
 Consulta real a `/auth/v1/settings` retornou HTTP 200, e-mail habilitado, `google=false`, signup habilitado e confirmação automática de e-mail. GitHub usa os endpoints próprios existentes, por isso o indicador `github=false` no Supabase não desativa esse fluxo. Google requer habilitação externa e credenciais próprias; não há credenciais Google fornecidas.
 
 Portão da fase 2: **cumprido** com lint sem erros/warnings, `tsc --noEmit` limpo, 11 testes passando, build limpo e audit com zero vulnerabilidades. Commit da revisão concluído antes de alterar HTML/CSS da landing ou autenticação. A integração dos controles novos ocorrerá na fase visual; a configuração externa do Google está documentada.
+
+## Fase 3 — implementação e decisões documentadas
+
+- Hero reconstruída em HTML/CSS: navbar flutuante, três linhas do título, CTAs, foto com transparência ancorada na base, quatro cards independentes, spinner e entrada sequencial. As referências ficam somente em docs/referencias. Apenas a mulher foi extraída como asset; a imagem inteira nunca é servida como página ou fundo.
+- SVGs separados para FolioDev, Google, GitHub e Kaptei; fotografia WebP em 480/880/1200 px com srcset e dimensões. As regiões ocultas pelos cards da referência foram removidas da máscara e ficam sob os cards reais.
+- Login e Cadastro compartilham AuthLayout, AuthInput, AuthButton, SocialButton e Logo, renderizados no HTML pelo Vite. Divisão 50/50 no desktop; formulário central e painel azul oculto em telas menores.
+- Persistência real por checkbox: storage do Supabase alterna entre localStorage e sessionStorage, migra tokens/PKCE ao trocar a opção e remove tokens dos dois locais no logout. O navegador mantém sessionStorage durante a sessão; o fechamento da sessão encerra essa persistência conforme comportamento do navegador.
+- Cadastro exige nome, e-mail, senha com letras/números, confirmação e termos. Validação tanto no formulário quanto no novo endpoint /api/auth/signup; aceite datado registrado em metadados no cadastro por e-mail. Recuperação e redefinição existentes preservadas, com mensagens em pt-BR e resposta de recuperação sem enumeração de contas.
+- Google usa signInWithOAuth do Supabase e verifica o provedor antes de redirecionar. Como está desabilitado no projeto, exibe uma mensagem no formulário. GitHub mantém o OAuth próprio, cookies seguros e callback existente. As rotas privadas continuam verificando a sessão.
+- Termos e Privacidade agora são páginas acessíveis, com links reais. Navbar, FAQ, menu móvel, estados de foco e âncoras foram verificados. Landing inclui funcionalidades, etapas, integrações, captura de leads, preços, FAQ, CTA e footer. Valores e disponibilidade dos planos vêm do módulo existente.
+- Kaptei continua identificado como demonstração; +20 descreve expansão. A landing não passa a prometer uma integração que o backend não oferece. A seção de leads direciona aos recursos de contato existentes; não foi criado um backend fictício de captura.
+- CSS antigo da landing/autenticação foi substituído e suas importações isoladas das telas internas. Arquivos históricos sem uso compartilhados com outras telas não foram apagados indiscriminadamente.
+
+### Medições e fonte
+
+A imagem prevaleceu sobre valores aproximados do prompt: cantos da Hero #0072F6, região central #067CFE, painel do Login #046EFF, faixa inferior #F8FCFF e verde superior do card +20 #0C8D5C. Valores e regiões estão em comparativos/medidas.json. Os textos adicionais abaixo do recorte da referência receberam cores mais escuras para cumprir contraste acessível.
+
+Foram renderizadas Google Sans, Plus Jakarta Sans, Outfit, Figtree, DM Sans e Manrope no mesmo título/parágrafo. Google Sans, já disponível no projeto, foi a mais próxima no desenho de j/f/ç/ó, e permanece global com font-display: swap. A prancha comparativos/comparacao-fontes.png documenta a escolha. O cadastro segue o layout de Login porque não há imagem de cadastro no ZIP.
+
+### Comparação automatizada
+
+Playwright/Edge capturou Hero em 1512×801 e Login em 1456×816. As referências foram normalizadas diretamente para esses canvases; as capturas implementadas não foram retocadas. Pixelmatch, threshold 0,1, com antialiasing excluído, encontrou **6,172%** de pixels diferentes na Hero e **2,662%** no Login. Isso é uma contagem de pixels pelo algoritmo, não uma porcentagem de qualidade nem prova de identidade.
+
+Diferenças restantes: métricas de alguns glifos, brilho/sombras rasterizados da referência versus CSS, reconstrução vetorial dos símbolos e bordas da máscara da foto. Os campos vazios e o botão de mostrar senha são diferenças funcionais previstas no prompt. Não se declara o requisito de diferença imperceptível integralmente atingido.
+
+| Comparação | Lado a lado | Diferença |
+|---|---|---|
+| Hero | [Referência / implementação](comparativos/hero-lado-a-lado.png) | [Mapa pixelmatch](comparativos/hero-diferenca.png) |
+| Login | [Referência / implementação](comparativos/login-lado-a-lado.png) | [Mapa pixelmatch](comparativos/login-diferenca.png) |
+
+## Fase 4 — validação e limites verificáveis
+
+- Build, ESLint sem warnings, TypeScript e **12 testes** passaram; npm audit: **zero vulnerabilidades**.
+- **32 resultados** no navegador: Hero/Login/Cadastro, sete rotas em 375/768/1280/1920 px, imagens/âncoras, menu por teclado, FAQ, visibilidade da senha, recuperação, troca de formulários, termos, rejeição de senhas diferentes, redirecionamento de dashboard sem sessão e aviso do Google desabilitado. Zero pageerrors e zero requests falhadas nessa navegação. Evidência: comparativos/verificacao-browser.json.
+- Lighthouse 13.5, perfil móvel padrão, preview do build: **Performance 99, Acessibilidade 100, SEO 100**. Evidência completa: comparativos/lighthouse-landing.json. A primeira execução encontrou contraste insuficiente nos textos adicionados abaixo da Hero e robots.txt ausente; ambos corrigidos. As notas são do cenário medido, não garantia em toda conexão.
+- Não há conta de teste fornecida nem sessão autenticada acessível. Login bem-sucedido, recuperação recebida por e-mail e conclusão interativa do consentimento GitHub não foram comprovados nesta execução. Não foram criados usuários fictícios no banco.
+- Google está desabilitado no provedor; o checklist de três métodos de autenticação funcionando integralmente permanece pendente dessa configuração e de um teste com conta real.
+
+### Passos manuais restantes — somente Google e validação autenticada
+
+1. No Supabase, abra o projeto usado em VITE_SUPABASE_URL → Authentication → Sign In / Providers → Google e habilite o provedor.
+2. No Google Cloud Console → APIs & Services → Credentials, configure um OAuth Client ID do tipo Web application. Use em Authorized redirect URIs o callback exibido pelo Supabase, no formato https://SEU-PROJETO.supabase.co/auth/v1/callback.
+3. Informe Client ID e Client Secret nos campos do provedor Google no Supabase e salve. O segredo fica no provedor, nunca numa variável VITE_ ou no Git.
+4. Supabase → Authentication → URL Configuration: Site URL = https://devi-folio-saa-s.vercel.app; autorize https://devi-folio-saa-s.vercel.app/dashboard.html e https://devi-folio-saa-s.vercel.app/cadastro.html como destinos de retorno. Para previews, cadastre somente os domínios de teste desejados.
+5. Execute login por e-mail, Google e GitHub com sua conta; verifique dashboard, sair, recuperação e persistência com a opção marcada/desmarcada.
+
+Não há ação manual pendente de DNS, branch ou variáveis públicas para atualizar a produção: o problema de deploy foi corrigido e validado na Fase 1.
+
+### Como evitar a recorrência e verificar uma publicação
+
+O domínio de produção acompanha main. Um push apenas para ajuste-visual-frontend publica Preview. Antes de enviar a main, execute npm ci, npm run lint, npm run typecheck, npm test e npm run build. Após o push, espere Production READY e compare git rev-parse HEAD com https://devi-folio-saa-s.vercel.app/version.json; confira também a meta build-sha no HTML. /version.json usa no-store, e os assets compilados têm nomes com hash. O registro da publicação final será anexado em docs/publicacao-final.json.

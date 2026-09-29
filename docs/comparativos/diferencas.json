@@ -1,0 +1,22 @@
+[
+  {
+    "name": "hero",
+    "width": 1512,
+    "height": 801,
+    "method": "pixelmatch",
+    "threshold": 0.1,
+    "includeAA": false,
+    "differentPixels": 74753,
+    "differentPercent": 6.172
+  },
+  {
+    "name": "login",
+    "width": 1456,
+    "height": 816,
+    "method": "pixelmatch",
+    "threshold": 0.1,
+    "includeAA": false,
+    "differentPixels": 31623,
+    "differentPercent": 2.662
+  }
+]

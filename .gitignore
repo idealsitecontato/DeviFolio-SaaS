@@ -11,3 +11,4 @@ dist/
 
 # Browser profiles are private local test data, never product source.
 .visual-*/
+.validation-runtime/

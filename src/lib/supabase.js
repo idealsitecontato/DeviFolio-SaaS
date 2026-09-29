@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import { createAuthStorage } from './auth-storage.js'
 
 const runtimeEnv = import.meta.env || {}
 const supabaseUrl = runtimeEnv.VITE_SUPABASE_URL?.trim()
@@ -31,11 +32,21 @@ if (!isPublishableKey && !isLegacyAnonKey) {
   throw error
 }
 
+const authPersistence = createAuthStorage(window.localStorage, window.sessionStorage)
+export const setRememberMe = remember => authPersistence.setRememberMe(remember)
+export async function isGoogleEnabled() {
+  const response = await fetch(`${supabaseUrl}/auth/v1/settings`, { headers: { apikey: supabasePublishableKey } })
+  if (!response.ok) throw new Error('Failed to fetch authentication settings')
+  const settings = await response.json()
+  return settings.external?.google === true
+}
+
 export const supabase = createClient(supabaseUrl, supabasePublishableKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: true,
     storageKey: 'devifolio.supabase.auth',
+    storage: authPersistence.storage,
   },
 })

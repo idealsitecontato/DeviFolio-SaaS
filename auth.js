@@ -1,4 +1,3 @@
-import { documentPreview } from './src/ui/components.js'
 import { createScreenLoading } from './screen-loading.js'
 
 const panels = {
@@ -31,6 +30,7 @@ function showPanel(name, updateHash = false) {
   document.title = `${({login:'Entrar',cadastro:'Criar conta',recuperar:'Recuperar acesso',redefinir:'Nova senha'})[selected]} — FolioDev`
   clearMessage()
   if (updateHash) history.replaceState(null, '', `#${selected}`)
+  if (updateHash) panels[selected].querySelector('h1')?.focus({ preventScroll: true })
 }
 
 function messageElement() {
@@ -65,8 +65,9 @@ function friendlyError(error) {
   if (message.includes('invalid api key') || message.includes('invalid jwt') || message.includes('apikey')) return 'Não foi possível validar o acesso neste ambiente. Entre em contato com o suporte.'
   if (message.includes('signups not allowed') || message.includes('signup is disabled')) return 'Novos cadastros estão temporariamente desativados.'
   if (message.includes('invalid login credentials')) return 'E-mail ou senha incorretos.'
-  if (message.includes('already registered') || message.includes('already been registered')) return 'Este e-mail já possui uma conta.'
-  if (message.includes('email not confirmed')) return 'Confirme seu e-mail antes de entrar. Confira também a caixa de spam.'
+  if (message.includes('already registered') || message.includes('already been registered')) return 'Não foi possível concluir o cadastro. Confira seus dados ou recupere o acesso.'
+  if (message.includes('email not confirmed')) return 'Não foi possível concluir o acesso. Confira seus dados e as instruções enviadas por e-mail.'
+  if (message.includes('provider is not enabled') || message.includes('unsupported provider')) return 'O acesso com Google ainda precisa ser configurado. Use e-mail e senha ou GitHub.'
   if (message.includes('rate limit')) return 'Muitas tentativas. Aguarde um pouco e tente novamente.'
   if (message.includes('weak password')) return 'A senha informada não atende aos requisitos de segurança.'
   if (message.includes('password')) return 'A senha precisa ter pelo menos 8 caracteres.'
@@ -87,10 +88,11 @@ function reportAuthError(action, error) {
 }
 
 function setLoading(button, active, label) {
-  if (!button.dataset.originalLabel) button.dataset.originalLabel = button.textContent
+  if (!button.dataset.originalMarkup) button.dataset.originalMarkup = button.innerHTML
   button.disabled = active
   button.classList.toggle('is-loading', active)
-  button.textContent = active ? label : button.dataset.originalLabel
+  if (active) button.textContent = label
+  else button.innerHTML = button.dataset.originalMarkup
 }
 
 function goToDashboard(onboarding = false) {
@@ -130,6 +132,8 @@ document.getElementById('form-login').addEventListener('submit', async event => 
 
   setLoading(button, true, 'Entrando...')
   try {
+    const { setRememberMe } = await import('./src/lib/supabase.js')
+    setRememberMe(document.getElementById('login-remember').checked)
     const supabase = await getSupabase()
     const { data, error } = await supabase.auth.signInWithPassword({
       email: email.value.trim(),
@@ -160,21 +164,26 @@ document.getElementById('form-cadastro').addEventListener('submit', async event 
     passwordConfirmation.reportValidity()
     return
   }
+  if (password.value.length < 8 || !/[a-zA-Z]/.test(password.value) || !/[0-9]/.test(password.value)) {
+    password.setCustomValidity('Use pelo menos 8 caracteres, incluindo uma letra e um número.')
+    password.reportValidity()
+    return
+  }
 
   setLoading(button, true, 'Criando conta...')
   try {
+    const { setRememberMe } = await import('./src/lib/supabase.js')
+    setRememberMe(true)
     const supabase = await getSupabase()
-    const { data, error } = await supabase.auth.signUp({
-      email: email.value.trim(),
-      password: password.value,
-      options: {
-        data: { full_name: name.value.trim() },
-        emailRedirectTo: `${window.location.origin}/dashboard.html?onboarding=1#inicio`,
-      },
+    const response = await fetch('/api/auth/signup', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name.value.trim(), email: email.value.trim(), password: password.value, confirmation: passwordConfirmation.value, terms: document.getElementById('cad-termos').checked }),
     })
-
-    if (error) return reportAuthError('Falha no cadastro', error)
+    const data = await response.json()
+    if (!response.ok) { showMessage(data.error || 'Não foi possível concluir o cadastro.'); return }
     if (data.session) {
+      const { error } = await supabase.auth.setSession(data.session)
+      if (error) return reportAuthError('Falha ao iniciar a sessão', error)
       if (referralUsername) {
         const { registerReferral } = await import('./src/lib/user-data.js')
         await registerReferral(referralUsername)
@@ -190,18 +199,40 @@ document.getElementById('form-cadastro').addEventListener('submit', async event 
 })
 
 document.querySelectorAll('#github-login, #github-cadastro').forEach(button => {
-  button.addEventListener('click', event => {
+  button.addEventListener('click', async event => {
     event.preventDefault()
     clearMessage()
-    button.setAttribute('aria-disabled', 'true')
+    if (currentAuthView() === 'cadastro' && !document.getElementById('cad-termos').checked) {
+      document.getElementById('cad-termos').reportValidity()
+      return
+    }
+    try {
+      const { setRememberMe } = await import('./src/lib/supabase.js')
+      setRememberMe(currentAuthView() === 'cadastro' || document.getElementById('login-remember').checked)
+    } catch (error) { reportAuthError('Falha ao preparar a sessão', error); return }
+    button.disabled = true
     sessionStorage.setItem('devifolio_auth_intent', currentAuthView())
     const query = referralUsername ? `?ref=${encodeURIComponent(referralUsername)}` : ''
     window.location.assign(`/api/auth/github/start${query}`)
   })
 })
 
-document.querySelectorAll('[data-google-soon]').forEach(button => {
-  button.addEventListener('click', () => showMessage('Login com Google estará disponível em breve.', 'success'))
+document.querySelectorAll('[data-google-login]').forEach(button => {
+  button.addEventListener('click', async () => {
+    clearMessage()
+    const signup = currentAuthView() === 'cadastro'
+    if (signup && !document.getElementById('cad-termos').checked) { document.getElementById('cad-termos').reportValidity(); return }
+    setLoading(button, true, 'Conectando...')
+    try {
+      const { setRememberMe, isGoogleEnabled } = await import('./src/lib/supabase.js')
+      if (!await isGoogleEnabled()) { showMessage('O acesso com Google ainda precisa ser configurado. Use e-mail e senha ou GitHub.', 'error'); return }
+      setRememberMe(signup || document.getElementById('login-remember').checked)
+      const supabase = await getSupabase()
+      const { error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: `${window.location.origin}/dashboard.html${signup ? '?onboarding=1' : ''}#inicio` } })
+      if (error) reportAuthError('Falha ao conectar Google', error)
+    } catch (error) { reportAuthError('Falha ao conectar Google', error) }
+    finally { setLoading(button, false) }
+  })
 })
 
 let recoveryEmail = ''
@@ -219,7 +250,7 @@ async function sendRecovery(button) {
     const supabase = await getSupabase()
     const { error } = await supabase.auth.resetPasswordForEmail(recoveryEmail, { redirectTo: window.location.origin + '/cadastro.html#login' })
     if (error) return reportAuthError('Falha na recuperação de senha', error)
-    showMessage('Enviamos um link para ' + recoveryEmail + '. Confira também a caixa de spam.', 'success'); sent=true
+    showMessage('Se houver uma conta com esse e-mail, você receberá as instruções. Confira também a caixa de spam.', 'success'); sent=true
   } catch (error) { reportAuthError('Erro inesperado na recuperação de senha', error) }
   finally { setLoading(button, false); if(sent)cooldown() }
 }
@@ -287,8 +318,54 @@ try {
   reportAuthError('Falha ao inicializar a autenticação', error)
 }
 
-const preview = document.getElementById('auth-product-preview')
-if(preview) preview.innerHTML=documentPreview({profile:{name:'Seu portfólio',username:'seu-nome',role:'Projetos, contexto e links profissionais'},projects:[{name:'Projeto principal',description:'O que você construiu e por que importa.',tech:'repo / main'},{name:'Mais do seu trabalho',description:'Organize os projetos que quer apresentar.',tech:'publicado'}],compact:true})
-document.querySelectorAll('input[type="password"]').forEach(input=>{const wrap=document.createElement('div');wrap.className='password-field';input.replaceWith(wrap);wrap.append(input);const button=document.createElement('button');button.type='button';button.className='password-toggle';button.textContent='Mostrar';button.setAttribute('aria-label','Mostrar senha');button.onclick=()=>{const show=input.type==='password';input.type=show?'text':'password';button.textContent=show?'Ocultar':'Mostrar';button.setAttribute('aria-label',show?'Ocultar senha':'Mostrar senha')};wrap.append(button)})
-const signupPassword=document.getElementById('cad-senha');const strength=document.createElement('small');strength.className='password-strength';strength.setAttribute('aria-live','polite');signupPassword.closest('.auth-field').append(strength);signupPassword.addEventListener('input',()=>{const v=signupPassword.value;strength.textContent=!v?'':v.length<8?'Use pelo menos 8 caracteres.':v.length<12?'Comprimento suficiente. Uma senha mais longa é mais segura.':'Bom comprimento de senha.'})
-document.querySelectorAll('form input').forEach(input=>{input.addEventListener('invalid',()=>{input.setAttribute('aria-invalid','true');let msg=input.closest('.auth-field')?.querySelector('.field-error');if(!msg){msg=document.createElement('small');msg.className='field-error';msg.id=input.id+'-error';input.closest('.auth-field')?.append(msg)}msg.textContent=input.validity.valueMissing?'Preencha este campo.':input.validity.typeMismatch?'Digite um e-mail válido.':input.validity.tooShort?'Use pelo menos '+input.minLength+' caracteres.':input.validity.customError?input.validationMessage:'Confira o valor deste campo.';input.setAttribute('aria-describedby',msg.id)});input.addEventListener('input',()=>{input.removeAttribute('aria-invalid');input.closest('.auth-field')?.querySelector('.field-error')?.remove();input.removeAttribute('aria-describedby');if(input.id==='reset-confirm')input.setCustomValidity('')})})
+document.querySelectorAll('.auth-panel h1').forEach(title => title.tabIndex = -1)
+document.querySelectorAll('input[type="password"]').forEach(input => {
+  const wrap = document.createElement('div'); wrap.className = 'password-field'
+  input.replaceWith(wrap); wrap.append(input)
+  const button = document.createElement('button'); button.type = 'button'; button.className = 'password-toggle'
+  button.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>'
+  button.setAttribute('aria-label', 'Mostrar senha'); button.setAttribute('aria-pressed', 'false')
+  button.onclick = () => { const show = input.type === 'password'; input.type = show ? 'text' : 'password'; button.setAttribute('aria-label', show ? 'Ocultar senha' : 'Mostrar senha'); button.setAttribute('aria-pressed', String(show)) }
+  wrap.append(button)
+})
+const signupPassword = document.getElementById('cad-senha')
+const strength = document.createElement('small')
+strength.className = 'password-strength'
+strength.setAttribute('aria-live', 'polite')
+strength.id = 'password-strength'
+signupPassword.closest('.auth-field').append(strength)
+signupPassword.setAttribute('aria-describedby', strength.id)
+signupPassword.addEventListener('input', () => {
+  signupPassword.setCustomValidity('')
+  const value = signupPassword.value
+  strength.textContent = !value ? ''
+    : value.length < 8 || !/[a-zA-Z]/.test(value) || !/[0-9]/.test(value) ? 'Use 8 ou mais caracteres, com letras e números.'
+      : value.length < 12 ? 'Senha válida. Mais caracteres aumentam a segurança.' : 'Senha com bom comprimento.'
+})
+const remembered = document.getElementById('login-remember')
+remembered.checked = localStorage.getItem('foliodev.remember-me') !== 'false'
+document.querySelectorAll('form input').forEach(input => {
+  const container = input.closest('.auth-field') || input.closest('.auth-checkbox')
+  input.addEventListener('invalid', () => {
+    input.setAttribute('aria-invalid', 'true')
+    let message = container.querySelector('.field-error')
+    if (!message) {
+      message = document.createElement('small')
+      message.className = 'field-error'
+      message.id = input.id + '-error'
+      container.append(message)
+    }
+    message.textContent = input.validity.valueMissing ? input.type === 'checkbox' ? 'Aceite os termos para continuar.' : 'Preencha este campo.'
+      : input.validity.typeMismatch ? 'Digite um e-mail válido.'
+        : input.validity.tooShort ? `Use pelo menos ${input.minLength} caracteres.`
+          : input.validity.customError ? input.validationMessage : 'Confira o valor deste campo.'
+    input.setAttribute('aria-describedby', [input === signupPassword ? strength.id : '', message.id].filter(Boolean).join(' '))
+  })
+  input.addEventListener('input', () => {
+    input.removeAttribute('aria-invalid')
+    container.querySelector('.field-error')?.remove()
+    if (input === signupPassword) input.setAttribute('aria-describedby', strength.id)
+    else input.removeAttribute('aria-describedby')
+    if (input.id === 'reset-confirm') input.setCustomValidity('')
+  })
+})

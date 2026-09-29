@@ -1,0 +1,373 @@
+{
+  "checkedAt": "2026-09-29T14:00:00.601Z",
+  "base": "http://127.0.0.1:4180",
+  "results": [
+    {
+      "route": "/",
+      "geometry": {
+        ".navbar": {
+          "x": 154.21875,
+          "y": 32.5,
+          "width": 1202.046875,
+          "height": 70,
+          "font": "15px / 24px \"Google Sans\", \"Product Sans\", system-ui, sans-serif",
+          "background": "rgb(254, 254, 255)"
+        },
+        ".hero-copy h1": {
+          "x": 147.40625,
+          "y": 207.140625,
+          "width": 635.03125,
+          "height": 214.546875,
+          "font": "600 66.528px / 71.5176px \"Google Sans\", \"Product Sans\", system-ui, sans-serif",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        ".hero-copy p": {
+          "x": 147.40625,
+          "y": 445.6875,
+          "width": 460,
+          "height": 99.3125,
+          "font": "18px / 24.84px \"Google Sans\", \"Product Sans\", system-ui, sans-serif",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        ".hero-actions": {
+          "x": 147.40625,
+          "y": 573,
+          "width": 635.03125,
+          "height": 54,
+          "font": "15px / 24px \"Google Sans\", \"Product Sans\", system-ui, sans-serif",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        ".hero-person": {
+          "x": 716.375,
+          "y": 159.28125,
+          "width": 443.015625,
+          "height": 527,
+          "font": "15px / 24px \"Google Sans\", \"Product Sans\", system-ui, sans-serif",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        ".hero-status": {
+          "x": 1095.734375,
+          "y": 260.0625,
+          "width": 327.796875,
+          "height": 297.1875,
+          "font": "15px / 24px \"Google Sans\", \"Product Sans\", system-ui, sans-serif",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        ".integration-strip": {
+          "x": 151.203125,
+          "y": 705.28125,
+          "width": 1209.59375,
+          "height": 244,
+          "font": "15px / 24px \"Google Sans\", \"Product Sans\", system-ui, sans-serif",
+          "background": "rgba(0, 0, 0, 0)"
+        }
+      }
+    },
+    {
+      "route": "/cadastro.html#login",
+      "geometry": {
+        ".auth-logo": {
+          "x": 248.984375,
+          "y": 121.5,
+          "width": 200,
+          "height": 38,
+          "font": "15px / 24px \"Google Sans\", \"Product Sans\", system-ui, sans-serif",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        "#login-title": {
+          "x": 164.96875,
+          "y": 187.5,
+          "width": 412.046875,
+          "height": 33.59375,
+          "font": "700 30px / 33.6px \"Google Sans\", \"Product Sans\", system-ui, sans-serif",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        ".auth-sub": {
+          "x": 164.96875,
+          "y": 223.09375,
+          "width": 412.046875,
+          "height": 21.75,
+          "font": "14.5px / 21.75px \"Google Sans\", \"Product Sans\", system-ui, sans-serif",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        "#login-email": {
+          "x": 164.96875,
+          "y": 287.734375,
+          "width": 412.046875,
+          "height": 42.078125,
+          "font": "15px / 24px \"Google Sans\", \"Product Sans\", system-ui, sans-serif",
+          "background": "rgb(255, 255, 255)"
+        },
+        "#login-senha": {
+          "x": 164.96875,
+          "y": 371.703125,
+          "width": 412.046875,
+          "height": 42.078125,
+          "font": "15px / 24px \"Google Sans\", \"Product Sans\", system-ui, sans-serif",
+          "background": "rgb(255, 255, 255)"
+        },
+        ".auth-row-between": {
+          "x": 164.96875,
+          "y": 427.78125,
+          "width": 412.046875,
+          "height": 22.390625,
+          "font": "14px / 22.4px \"Google Sans\", \"Product Sans\", system-ui, sans-serif",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        "#form-login button[type=submit]": {
+          "x": 164.96875,
+          "y": 468.171875,
+          "width": 412.046875,
+          "height": 44.109375,
+          "font": "600 15px / 21px \"Google Sans\", \"Product Sans\", system-ui, sans-serif",
+          "background": "rgb(28, 28, 28)"
+        },
+        ".auth-divider": {
+          "x": 164.96875,
+          "y": 528.28125,
+          "width": 412.046875,
+          "height": 18.1875,
+          "font": "13px / 18.2px \"Google Sans\", \"Product Sans\", system-ui, sans-serif",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        ".auth-providers": {
+          "x": 164.96875,
+          "y": 562.46875,
+          "width": 412.046875,
+          "height": 98.21875,
+          "font": "15px / 24px \"Google Sans\", \"Product Sans\", system-ui, sans-serif",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        ".auth-switch": {
+          "x": 164.96875,
+          "y": 682.6875,
+          "width": 412.046875,
+          "height": 20.796875,
+          "font": "13px / 20.8px \"Google Sans\", \"Product Sans\", system-ui, sans-serif",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        ".auth-right": {
+          "x": 728,
+          "y": 0,
+          "width": 728,
+          "height": 816,
+          "font": "15px / 24px \"Google Sans\", \"Product Sans\", system-ui, sans-serif",
+          "background": "rgb(4, 110, 255)"
+        },
+        ".auth-story h2": {
+          "x": 791.328125,
+          "y": 121.5625,
+          "width": 664.671875,
+          "height": 160.6875,
+          "font": "48.048px / 53.5735px \"Google Sans\", \"Product Sans\", system-ui, sans-serif",
+          "background": "rgba(0, 0, 0, 0)"
+        }
+      }
+    },
+    {
+      "width": 375,
+      "route": "/",
+      "overflow": false,
+      "brokenImages": [],
+      "badAnchors": []
+    },
+    {
+      "width": 375,
+      "route": "/cadastro.html#login",
+      "overflow": false,
+      "brokenImages": [],
+      "badAnchors": []
+    },
+    {
+      "width": 375,
+      "route": "/cadastro.html#cadastro",
+      "overflow": false,
+      "brokenImages": [],
+      "badAnchors": []
+    },
+    {
+      "width": 375,
+      "route": "/cadastro.html#recuperar",
+      "overflow": false,
+      "brokenImages": [],
+      "badAnchors": []
+    },
+    {
+      "width": 375,
+      "route": "/termos.html",
+      "overflow": false,
+      "brokenImages": [],
+      "badAnchors": []
+    },
+    {
+      "width": 375,
+      "route": "/privacidade.html",
+      "overflow": false,
+      "brokenImages": [],
+      "badAnchors": []
+    },
+    {
+      "width": 375,
+      "route": "/404.html",
+      "overflow": false,
+      "brokenImages": [],
+      "badAnchors": []
+    },
+    {
+      "width": 768,
+      "route": "/",
+      "overflow": false,
+      "brokenImages": [],
+      "badAnchors": []
+    },
+    {
+      "width": 768,
+      "route": "/cadastro.html#login",
+      "overflow": false,
+      "brokenImages": [],
+      "badAnchors": []
+    },
+    {
+      "width": 768,
+      "route": "/cadastro.html#cadastro",
+      "overflow": false,
+      "brokenImages": [],
+      "badAnchors": []
+    },
+    {
+      "width": 768,
+      "route": "/cadastro.html#recuperar",
+      "overflow": false,
+      "brokenImages": [],
+      "badAnchors": []
+    },
+    {
+      "width": 768,
+      "route": "/termos.html",
+      "overflow": false,
+      "brokenImages": [],
+      "badAnchors": []
+    },
+    {
+      "width": 768,
+      "route": "/privacidade.html",
+      "overflow": false,
+      "brokenImages": [],
+      "badAnchors": []
+    },
+    {
+      "width": 768,
+      "route": "/404.html",
+      "overflow": false,
+      "brokenImages": [],
+      "badAnchors": []
+    },
+    {
+      "width": 1280,
+      "route": "/",
+      "overflow": false,
+      "brokenImages": [],
+      "badAnchors": []
+    },
+    {
+      "width": 1280,
+      "route": "/cadastro.html#login",
+      "overflow": false,
+      "brokenImages": [],
+      "badAnchors": []
+    },
+    {
+      "width": 1280,
+      "route": "/cadastro.html#cadastro",
+      "overflow": false,
+      "brokenImages": [],
+      "badAnchors": []
+    },
+    {
+      "width": 1280,
+      "route": "/cadastro.html#recuperar",
+      "overflow": false,
+      "brokenImages": [],
+      "badAnchors": []
+    },
+    {
+      "width": 1280,
+      "route": "/termos.html",
+      "overflow": false,
+      "brokenImages": [],
+      "badAnchors": []
+    },
+    {
+      "width": 1280,
+      "route": "/privacidade.html",
+      "overflow": false,
+      "brokenImages": [],
+      "badAnchors": []
+    },
+    {
+      "width": 1280,
+      "route": "/404.html",
+      "overflow": false,
+      "brokenImages": [],
+      "badAnchors": []
+    },
+    {
+      "width": 1920,
+      "route": "/",
+      "overflow": false,
+      "brokenImages": [],
+      "badAnchors": []
+    },
+    {
+      "width": 1920,
+      "route": "/cadastro.html#login",
+      "overflow": false,
+      "brokenImages": [],
+      "badAnchors": []
+    },
+    {
+      "width": 1920,
+      "route": "/cadastro.html#cadastro",
+      "overflow": false,
+      "brokenImages": [],
+      "badAnchors": []
+    },
+    {
+      "width": 1920,
+      "route": "/cadastro.html#recuperar",
+      "overflow": false,
+      "brokenImages": [],
+      "badAnchors": []
+    },
+    {
+      "width": 1920,
+      "route": "/termos.html",
+      "overflow": false,
+      "brokenImages": [],
+      "badAnchors": []
+    },
+    {
+      "width": 1920,
+      "route": "/privacidade.html",
+      "overflow": false,
+      "brokenImages": [],
+      "badAnchors": []
+    },
+    {
+      "width": 1920,
+      "route": "/404.html",
+      "overflow": false,
+      "brokenImages": [],
+      "badAnchors": []
+    },
+    {
+      "google": "disabled provider reported inside the form without navigation or console error"
+    },
+    {
+      "authControls": "password visibility, recovery, panel navigation, terms and mismatched passwords passed",
+      "protectedDashboard": "redirected to login without session"
+    }
+  ],
+  "errors": [],
+  "requests": []
+}
