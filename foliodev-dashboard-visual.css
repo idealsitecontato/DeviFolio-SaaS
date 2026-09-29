@@ -82,7 +82,7 @@
 .dashboard-app :is(.primary-button,.secondary-button) {min-height:var(--visual-button-height);padding:11px 18px;font-size:14px;gap:10px;border-radius:8px;}
 .dashboard-app .page-head>button {margin-top:2px;}
 .dashboard-app .card {border-radius:var(--visual-card-radius);box-shadow:none;}
-.dashboard-app .section-card-head {display:flex;align-items:center;justify-content:space-between;gap:16px;}
+.dashboard-app .section-card-head {display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px;}
 .dashboard-app .section-card-head h2 {font-size:22px;line-height:1.3;}
 .dashboard-app .section-card-head .link-button {font-size:12px;padding:4px 0;min-height:28px;}
 @media(min-width:821px) {

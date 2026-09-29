@@ -24,6 +24,27 @@ Também foi preparado um build completo da Vercel com as configurações de prod
 
 ## Auditoria e medidas antes da implementação
 
+### Investigação do relato “o projeto ainda é o mesmo”
+
+As páginas reais de desenvolvimento (`127.0.0.1:5173`), do build servido localmente (`127.0.0.1:4173`) e de produção foram abertas no navegador. A raiz `/` é a página de apresentação do produto; as cinco referências pertencem ao dashboard, em `/dashboard.html`, após login. As rotas e a proteção de sessão foram preservadas.
+
+O endereço publicado continua com a logo anterior e arquivos anteriores da branch `main`. Os logs do preview do commit `eb10d94` confirmaram a falha: `Configuração obrigatória ausente: VITE_SUPABASE_URL, VITE_SUPABASE_PUBLISHABLE_KEY`. O push foi recebido, mas esse build remoto falhou. Não foram modificadas as variáveis, o backend ou as regras do build; a revisão permanece local, conforme a escolha do usuário.
+
+Foi encontrado um defeito de frontend: o build extrai os estilos compartilhados numa ordem diferente da ordem dos links no HTML fonte. Regras gerais sobrescreviam regras de mesma prioridade na landing. Isso fazia o menu móvel aparecer no desktop e alterava o padding do card de projeto, a legenda do preview, títulos, padding e contraste dos exemplos de portfólio. Os seletores de apresentação foram vinculados à classe existente `landing-page`, preservando as regras responsivas. A margem de cabeçalhos dos cards do painel foi explicitada no estilo específico do dashboard; uma seção de organização recolhida tinha 24 px no build e 20 px no desenvolvimento.
+
+Arquivos alterados nesta correção: `foliodev-landing.css`, `foliodev-dashboard-visual.css` e este relatório. Nenhum handler, dado, rota, configuração ou módulo de autenticação foi alterado.
+
+Verificações realizadas:
+
+- Build Vite concluído com 98 módulos e sem erros.
+- Páginas reais de apresentação, login, cadastro, recuperação, 404, portfólio sem username e redirecionamento do dashboard sem sessão abertas em desenvolvimento e no build, em 360, 768 e 1366 px: sem erros JavaScript, requisições falhadas ou respostas de erro nos carregamentos observados.
+- Comparação da aparência da landing antes e depois de compilar, nas três larguras: nenhuma diferença nas propriedades e posições inspecionadas após a correção. As capturas de desktop e celular foram examinadas visualmente.
+- Menu móvel: visibilidade correta, abertura e fechamento com Escape; FAQ: abrir e fechar; ausência de overflow horizontal, nas páginas reais dos dois servidores e nas três larguras.
+- As cinco apresentações do dashboard foram renderizadas isoladamente com os estilos reais do build e comparadas às mesmas apresentações com os estilos de desenvolvimento: nenhuma diferença nas propriedades e posições inspecionadas. Essa comparação usa exemplos locais de componentes, não autentica uma conta e não substitui os testes de dados reais.
+- Comparação dos módulos protegidos e dos handlers do dashboard contra a base: nenhuma alteração em autenticação, Supabase, APIs, dados, planos, dependências ou configurações.
+
+Pendente: a janela interativa de revisão continua em `/cadastro.html#login`. Não houve sessão autenticada acessível. Portanto, a inspeção visual das cinco telas com a conta real e os fluxos GitHub, persistência e publicação continuam sem aceite; nenhuma conclusão de funcionamento integral foi atribuída ao build ou às comparações isoladas.
+
 - Projeto existente: HTML, JavaScript e Vite. Não há troca de framework ou dependências.
 - Login, sessão, recuperação, OAuth, queries, endpoints e persistência permanecem nos módulos atuais. As alterações se limitam a HTML de apresentação, CSS, imagens, fontes e textos visíveis.
 - As referências anexadas correspondem aos cinco arquivos citados no MD. Foram abertas integralmente antes das alterações; os caminhos temporários do chat foram usados como fonte das imagens.
@@ -87,7 +108,7 @@ Verificado: comparação em 1805 × 871 px; conteúdo em x=451 px, painel em x=6
 
 Arquivos: `dashboard.js` (card), `foliodev-dashboard-visual.css`.
 
-Alterações: previews de cor sólida, sem texturas; cards de aproximadamente 267 × 225 px; cinco colunas no desktop de referência. Responsividade: três colunas entre 1201–1440 px, duas até 1200 px, uma até 640 px. Os 10 IDs e os 3 modelos disponíveis continuam exatamente no catálogo original. Aplicar, pré-visualizar, modal e carregamento usam os handlers anteriores. Os templates publicados e seus assets não foram alterados.
+Alterações: previews de cor sólida, sem texturas; cards de aproximadamente 267 × 225 px; cinco colunas acima de 1200 px, com rodapé em duas linhas entre 1201–1440 px, duas colunas até 1200 px e uma até 640 px. Os 10 IDs e os 3 modelos disponíveis continuam exatamente no catálogo original. Aplicar, pré-visualizar, modal e carregamento usam os handlers anteriores. Os templates publicados e seus assets não foram alterados.
 
 Verificado: comparação em 1672 × 941 px; grade em x=244/y=170,8 px, previews de aproximadamente 233 × 141 px. Testados os 10 botões, 7 indicadores de bloqueio e abertura/fechamento do modal original em renderização isolada. Pendência: aplicar/persistir modelo com a conta real. A referência tem 15 modelos, nomes, cores e ordem diferentes; não foram criados modelos artificiais.
 

@@ -33,7 +33,7 @@
 .nav-actions>a{
   font-size:13px;
   padding:10px 16px}
-.menu-toggle,.mobile-menu{
+.landing-page .menu-toggle,.mobile-menu{
   display:none}
 .hero-grid{
   display:grid;
@@ -71,7 +71,7 @@
   height:72px}
 .hero-preview .document-project{
   padding:20px}
-.preview-caption{
+.landing-page .preview-caption{
   color:var(--text-muted);
   font-size:10px;
   text-align:right;
@@ -79,7 +79,7 @@
 .dark-section{
   background:var(--text);
   color:white}
-.dark-section p{
+.landing-page .dark-section p{
   color:#B6B6BA}
 .problem-grid{
   display:grid;
@@ -230,7 +230,8 @@
   max-width:390px}
 .product-organize{
   grid-row:span 2}
-.product-organize .project-card{
+.landing-page .product-organize .project-card{
+  padding:0;
   max-width:420px;
   margin:auto;
   background:var(--bg)}
@@ -260,12 +261,12 @@
   margin-top:24px}
 .product-public .document-projects{
   grid-template-columns:1fr 1fr}
-.product-public .document-content{
+.landing-page .product-public .document-content{
   padding:24px}
 .product-public .document-person .avatar{
   width:44px;
   height:44px}
-.product-public .document-person h3{
+.landing-page .product-public .document-person h3{
   font-size:20px}
 .landing-models{
   display:grid;
@@ -280,7 +281,7 @@
   color:var(--text)}
 .landing-model-card .document-projects{
   grid-template-columns:1fr}
-.landing-model-card .document-content{
+.landing-page .landing-model-card .document-content{
   padding:24px}
 .landing-model-card .document-person p:last-child{
   display:none}
@@ -494,7 +495,7 @@
   gap:24px}
 .landing-models{
   gap:16px}
-.landing-model-card .document-content{
+.landing-page .landing-model-card .document-content{
   padding:20px}
 .footer-grid{
   gap:32px}
@@ -506,7 +507,7 @@
   display:none}
 .nav-actions{
   margin-left:auto}
-.menu-toggle{
+.landing-page .menu-toggle{
   display:grid}
 .mobile-menu:not([hidden]){
   display:grid;
@@ -597,7 +598,7 @@
   height:auto}
 .nav-actions{
   display:none}
-.menu-toggle{
+.landing-page .menu-toggle{
   margin-left:auto}
 .mobile-menu:not([hidden]){
   padding-inline:20px}
@@ -630,7 +631,7 @@
   padding:16px}
 .hero-preview .document-project:last-child{
   display:none}
-.preview-caption{
+.landing-page .preview-caption{
   text-align:left;
   font-size:9px}
 .problem-grid h2,.section-intro h2,.faq-grid h2{
