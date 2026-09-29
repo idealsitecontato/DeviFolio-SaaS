@@ -1,0 +1,16 @@
+HTTP/1.1 200 OK
+Accept-Ranges: bytes
+Access-Control-Allow-Origin: *
+Age: 0
+Cache-Control: no-store
+Content-Disposition: inline; filename="version.json"
+Content-Length: 50
+Content-Type: application/json; charset=utf-8
+Date: Tue, 29 Sep 2026 13:24:25 GMT
+Etag: "c51b9af2a0f77807536855190e41e5cd"
+Last-Modified: Tue, 29 Sep 2026 13:24:25 GMT
+Server: Vercel
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+X-Vercel-Cache: MISS
+X-Vercel-Id: gru1::29nth-1790688264706-e18fab170116
+

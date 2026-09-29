@@ -7,6 +7,10 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return errorResponse(res, Object.assign(new Error('Método não permitido.'), { statusCode: 405 }))
   res.setHeader('Set-Cookie', secureCookieHeader(SESSION_COOKIE, '', '/api/auth/github/session', 0, 'Strict'))
   try {
+    const requestOrigin = req.headers.origin
+    if (requestOrigin && requestOrigin !== `https://${req.headers.host}` && requestOrigin !== `http://${req.headers.host}`) {
+      throw Object.assign(new Error('Origem de requisição inválida.'), { statusCode: 403 })
+    }
     const ticket = readLoginSessionCookie(cookieValue(req, SESSION_COOKIE))
     if (!ticket.tokenHash || ticket.expiresAt < Date.now()) throw Object.assign(new Error('O login com GitHub expirou. Tente novamente.'), { statusCode: 401 })
     const session = await exchangeSupabaseLoginTicket(ticket.tokenHash)

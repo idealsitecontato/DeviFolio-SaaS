@@ -11,7 +11,7 @@ export default async function handler(req, res) {
     const referral = String(req.query?.ref || '').trim().toLowerCase().slice(0, 80)
     const stateCookie = createLoginStateCookie({ nonce, referral, expiresAt: Date.now() + 10 * 60 * 1000 })
     const authorizationUrl = new URL('https://github.com/login/oauth/authorize')
-    authorizationUrl.search = new URLSearchParams({ client_id: config.clientId, redirect_uri: config.callbackUrl, state: nonce, prompt: 'select_account' }).toString()
+    authorizationUrl.search = new URLSearchParams({ client_id: config.clientId, redirect_uri: config.callbackUrl, state: nonce, scope: 'read:user user:email', prompt: 'select_account' }).toString()
     res.setHeader('Cache-Control', 'no-store')
     // The public callback forwards to /api/github/callback to validate state.
     res.setHeader('Set-Cookie', secureCookieHeader(STATE_COOKIE, encodeURIComponent(stateCookie), '/api/github', 600))

@@ -18,7 +18,6 @@ function clients() {
 }
 
 export async function verifiedGithubEmail(githubUser, token) {
-  if (githubUser.email) return String(githubUser.email).trim().toLowerCase()
   const emails = await githubApi('/user/emails', token)
   const selected = emails.find(item => item.primary && item.verified) || emails.find(item => item.verified)
   if (!selected?.email) {
@@ -91,4 +90,3 @@ export async function exchangeSupabaseLoginTicket(tokenHash) {
   if (error || !data.session) throw error || new Error('O ticket de login não gerou uma sessão.')
   return data.session
 }
-

@@ -8,3 +8,6 @@ dist/
 !.env.example
 
 .vercel/
+
+# Browser profiles are private local test data, never product source.
+.visual-*/

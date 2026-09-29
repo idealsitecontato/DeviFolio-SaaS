@@ -14,7 +14,7 @@ document.getElementById('copyright-year').textContent=String(new Date().getFullY
 const referralCode=new URLSearchParams(location.search).get('ref')?.trim().toLowerCase()||''
 if(/^[a-z0-9._-]{1,80}$/.test(referralCode)){document.querySelectorAll('a[href^="cadastro.html"]').forEach(link=>{const target=new URL(link.getAttribute('href'),location.href);target.searchParams.set('ref',referralCode);link.href=target.toString()})}
 const landingPath=location.pathname
-if(landingPath.startsWith('/portfolio/')){let username=landingPath.slice('/portfolio/'.length);try{username=decodeURIComponent(username)}catch{}location.replace('/portfolio.html?username='+encodeURIComponent(username))}
+if(landingPath.startsWith('/portfolio/')){let username=landingPath.slice('/portfolio/'.length);try{username=decodeURIComponent(username)}catch { /* Preserve the original encoded username when decoding fails. */ }location.replace('/portfolio.html?username='+encodeURIComponent(username))}
 else if(landingPath!=='/'&&landingPath!=='/index.html')location.replace('/404.html')
 const menuToggle=document.querySelector('.menu-toggle'),mobileMenu=document.getElementById('mobile-menu')
 const closeMenu=()=>{mobileMenu.hidden=true;menuToggle.setAttribute('aria-expanded','false');menuToggle.setAttribute('aria-label','Abrir menu')}

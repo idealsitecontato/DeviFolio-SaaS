@@ -3,7 +3,6 @@ import { renderPlanCards } from './plans.js'
 import { supabase } from './src/lib/supabase.js'
 import {
   deleteCurrentAccount,
-  loadPublicPortfolio,
   loadWorkspace,
   moveProject,
   removeProject,
@@ -23,8 +22,6 @@ import { bindExplorerDrag } from './src/lib/explorer-drag.js'
 import { kapteiView, bindKapteiActions } from './kaptei.js'
 
 const githubIconUrl = new URL('./assets/github-icon.webp', import.meta.url).href
-const bannerUrl = new URL('./assets/foliodev-banner-original.jpg', import.meta.url).href
-const placeholderUrl = new URL('./assets/user-placeholder.png', import.meta.url).href
 
 const $ = (selector, root = document) => root.querySelector(selector)
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)]
@@ -94,7 +91,6 @@ function hydrateIcons(root = document) {
 const blankProfile = { name: '', username: '', email: '', role: '', bio: '', skills: '', linkedin: '', github: '', website: '', avatar: '', selectedModel: 'white' }
 const blankSettings = { email: true, product: true, publicProfile: true, compact: false }
 const state = { projects: [], folderNames: {}, folderOrder: [], hiddenFolders: [], profile: { ...blankProfile }, published: false, githubConnected: false, githubUsername: '', repos: [], analytics: [], referrals: [], settings: { ...blankSettings } }
-const statusLabel = { published: 'Publicado', progress: 'Em desenvolvimento', draft: 'Rascunho' }
 const projectVisualType = project => /(?:^|[\s/_-])landing(?:[\s/_-]|$)/i.test(`${project.name} ${project.description || ''} ${project.link || ''}`) ? 'landing' : 'site'
 const projectTypeChip = project => {
   const type = projectVisualType(project)
@@ -106,7 +102,6 @@ let reposLoaded = false
 let reposPromise = null
 let githubConnectionChecked = false
 let repoLoadFailed = false
-let homeQrGenerated = true
 const onboardingRequested = new URLSearchParams(location.search).get('onboarding') === '1'
 
 const realName = () => state.profile.name.trim() || currentUser?.user_metadata?.full_name || currentUser?.user_metadata?.name || currentUser?.email?.split('@')[0] || 'Você'
@@ -311,12 +306,6 @@ function renamePortfolioFolder(id) {
   }
 }
 
-function modelPreview(model, compact = false) {
-  const name = state.profile.name.trim() || realName()
-  const project = state.projects.find(item => item.status === 'published')
-  return `<div class="model-preview ${compact ? 'model-preview-compact' : ''}" style="--model-image:url('${model.image}');--model-ink:${model.ink};--model-muted:${model.muted}"><div class="model-preview-nav"><span>FolioDev</span><i></i></div><div class="model-preview-person"><span class="model-preview-avatar">${state.profile.avatar ? `<img src="${esc(state.profile.avatar)}" alt="">` : esc(initials())}</span><small>PORTFÓLIO</small><strong>${esc(name)}</strong><span>${esc(state.profile.role || 'Seu portfólio')}</span></div><div class="model-preview-projects"><b>Projetos</b><span>${project ? esc(project.name) : 'Seu projeto'}</span></div></div>`
-}
-
 function modelCard(model) {
 return `<article class="card model-card"><button type="button" data-model-swatch="${esc(model.id)}" class="model-swatch ${model.available?'is-available':'is-locked'}" data-preview-model="${model.id}" aria-label="Pré-visualizar ${esc(model.name)}">${model.available?'':'<span class="model-lock" data-icon="lock" aria-hidden="true"></span>'}</button><div class="model-card-footer"><div><h3>${esc(model.name)}</h3><p>${model.available?'Disponível':'Bloqueado'}</p></div><div class="view-actions"><button class="icon-button" data-preview-model="${model.id}" aria-label="Pré-visualizar ${esc(model.name)}"><span data-icon="eye"></span></button><button class="secondary-button" data-apply-model="${model.id}">Aplicar</button></div></div></article>`
 }
@@ -325,7 +314,6 @@ function modelsView() {
   return `<section class="page-enter models-page">${pageHead('Modelos', 'Escolha um modelo para personalizar a aparência do seu portfólio.')}<div class="models-grid">${portfolioModels.map(modelCard).join('')}</div></section>`
 }
 
-const modelDialogHead = (title, description) => `<div class="modal-head model-dialog-head"><div><p class="eyebrow">MODELOS</p><h2>${title}</h2><p>${description}</p></div><button class="icon-button" type="button" data-close-modal aria-label="Fechar"><span data-icon="x"></span></button></div>`
 
 function showUpgradeModel(model) {
   location.assign('index.html#planos')
@@ -1066,41 +1054,7 @@ async function sharePortfolio() {
   } catch (error) { if (error.name !== 'AbortError') reportError('Não foi possível compartilhar.', error) }
 }
 
-async function ensurePublicPortfolio(button, loadingLabel) {
-  if (!profileComplete()) {
-    toast('Complete seu nome e username antes de gerar o portfólio.', 'error')
-    location.hash = 'perfil'
-    return false
-  }
-  setButtonLoading(button, true, loadingLabel)
-  try {
-    if (!state.published) {
-      await saveProfile(currentUser.id, state.profile, true)
-      state.published = true
-    }
-    const publicData = await loadPublicPortfolio(state.profile.username)
-    if (!publicData || publicData.profile.userId !== currentUser.id) throw new Error('O portfólio público ainda não pôde ser confirmado.')
-    return true
-  } catch (error) {
-    reportError('Não foi possível publicar o portfólio.', error)
-    return false
-  } finally {
-    setButtonLoading(button, false)
-  }
-}
 
-async function generatePortfolioLink(event) {
-  if (!await ensurePublicPortfolio(event.currentTarget, 'Gerando link...')) return
-  toast('Link público gerado com sucesso.')
-  render()
-}
-
-async function generatePortfolioQr(event) {
-  if (!await ensurePublicPortfolio(event.currentTarget, 'Gerando QR Code...')) return
-  homeQrGenerated = true
-  render()
-  toast('QR Code gerado com sucesso.')
-}
 
 async function copyText(text) {
   try { await navigator.clipboard.writeText(text); toast('Link copiado.') } catch (error) { reportError('Não foi possível copiar o link.', error) }
