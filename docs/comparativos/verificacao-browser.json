@@ -1,6 +1,6 @@
 {
-  "checkedAt": "2026-09-29T14:00:00.601Z",
-  "base": "http://127.0.0.1:4180",
+  "checkedAt": "2026-09-29T14:05:50.015Z",
+  "base": "https://devi-folio-saa-s.vercel.app",
   "results": [
     {
       "route": "/",

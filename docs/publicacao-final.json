@@ -1,0 +1,29 @@
+{
+  "checkedAt": "2026-09-29T14:04:20.965Z",
+  "base": "https://devi-folio-saa-s.vercel.app",
+  "expectedSha": "467e549a9560fe4f8b24551122e7ef635fea8283",
+  "publishedSha": "467e549a9560fe4f8b24551122e7ef635fea8283",
+  "versionStatus": 200,
+  "cacheControl": "no-store",
+  "htmlShaMatches": true,
+  "github": {
+    "status": 302,
+    "authorizationHost": "github.com",
+    "callback": "https://devi-folio-saa-s.vercel.app/api/auth/github/callback",
+    "verifiedEmailScope": true,
+    "secureCookieFlags": true
+  },
+  "signup": {
+    "invalidInputStatus": 422,
+    "unsupportedMethodStatus": 405,
+    "blockedOriginStatus": 403,
+    "createdAccounts": 0
+  },
+  "authSettings": {
+    "supabaseUrl": "https://mzawmkfdjceaqiicjinz.supabase.co",
+    "emailEnabled": true,
+    "googleEnabled": false,
+    "signupDisabled": false,
+    "emailAutoConfirm": true
+  }
+}

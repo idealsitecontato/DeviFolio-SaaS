@@ -76,20 +76,28 @@ Diferenças restantes: métricas de alguns glifos, brilho/sombras rasterizados d
 
 - Build, ESLint sem warnings, TypeScript e **12 testes** passaram; npm audit: **zero vulnerabilidades**.
 - **32 resultados** no navegador: Hero/Login/Cadastro, sete rotas em 375/768/1280/1920 px, imagens/âncoras, menu por teclado, FAQ, visibilidade da senha, recuperação, troca de formulários, termos, rejeição de senhas diferentes, redirecionamento de dashboard sem sessão e aviso do Google desabilitado. Zero pageerrors e zero requests falhadas nessa navegação. Evidência: comparativos/verificacao-browser.json.
-- Lighthouse 13.5, perfil móvel padrão, preview do build: **Performance 99, Acessibilidade 100, SEO 100**. Evidência completa: comparativos/lighthouse-landing.json. A primeira execução encontrou contraste insuficiente nos textos adicionados abaixo da Hero e robots.txt ausente; ambos corrigidos. As notas são do cenário medido, não garantia em toda conexão.
+- Lighthouse 13.5, perfil móvel padrão, preview do build: **Performance 99, Acessibilidade 100, SEO 100**. No domínio de **produção: Performance 100, Acessibilidade 100, SEO 100**. Evidências completas: comparativos/lighthouse-landing.json e comparativos/lighthouse-producao.json. A primeira execução encontrou contraste insuficiente nos textos adicionados abaixo da Hero e robots.txt ausente; ambos corrigidos. As notas são do cenário medido, não garantia em toda conexão.
+- A navegação com 32 resultados foi repetida no domínio público, com zero pageerrors e requests falhadas. As capturas da produção reproduziram os mesmos resultados visuais do build local; os comparativos entregues são da produção.
+- Publicação da aplicação comprovada no commit **467e549a9560fe4f8b24551122e7ef635fea8283**: /version.json HTTP 200/no-store e meta build-sha iguais. OAuth GitHub retorna 302 para github.com com callback correto, escopo read:user user:email e cookie HttpOnly/Secure/SameSite=Lax. Cadastro inválido retorna 422, método GET retorna 405 e Origin externo retorna 403; nenhuma conta criada. Registro em [publicacao-final.json](publicacao-final.json). A revisão posterior contém somente documentos/scripts de verificação; seu SHA também será conferido no domínio após o push.
 - Não há conta de teste fornecida nem sessão autenticada acessível. Login bem-sucedido, recuperação recebida por e-mail e conclusão interativa do consentimento GitHub não foram comprovados nesta execução. Não foram criados usuários fictícios no banco.
 - Google está desabilitado no provedor; o checklist de três métodos de autenticação funcionando integralmente permanece pendente dessa configuração e de um teste com conta real.
 
 ### Passos manuais restantes — somente Google e validação autenticada
 
 1. No Supabase, abra o projeto usado em VITE_SUPABASE_URL → Authentication → Sign In / Providers → Google e habilite o provedor.
-2. No Google Cloud Console → APIs & Services → Credentials, configure um OAuth Client ID do tipo Web application. Use em Authorized redirect URIs o callback exibido pelo Supabase, no formato https://SEU-PROJETO.supabase.co/auth/v1/callback.
+2. No Google Cloud → Google Auth Platform → Clients, configure OAuth Client ID do tipo Web application. Authorized JavaScript origins = https://devi-folio-saa-s.vercel.app. Authorized redirect URIs = https://mzawmkfdjceaqiicjinz.supabase.co/auth/v1/callback. Configure também Audience, Branding e os escopos openid, userinfo.email e userinfo.profile.
 3. Informe Client ID e Client Secret nos campos do provedor Google no Supabase e salve. O segredo fica no provedor, nunca numa variável VITE_ ou no Git.
-4. Supabase → Authentication → URL Configuration: Site URL = https://devi-folio-saa-s.vercel.app; autorize https://devi-folio-saa-s.vercel.app/dashboard.html e https://devi-folio-saa-s.vercel.app/cadastro.html como destinos de retorno. Para previews, cadastre somente os domínios de teste desejados.
+4. Supabase → Authentication → URL Configuration: Site URL = https://devi-folio-saa-s.vercel.app. Em Redirect URLs, inclua os três destinos usados pelo código: https://devi-folio-saa-s.vercel.app/dashboard.html#inicio; https://devi-folio-saa-s.vercel.app/dashboard.html?onboarding=1#inicio; https://devi-folio-saa-s.vercel.app/cadastro.html#redefinir. Para previews, cadastre somente os domínios de teste desejados.
 5. Execute login por e-mail, Google e GitHub com sua conta; verifique dashboard, sair, recuperação e persistência com a opção marcada/desmarcada.
 
 Não há ação manual pendente de DNS, branch ou variáveis públicas para atualizar a produção: o problema de deploy foi corrigido e validado na Fase 1.
 
+Configuração conferida nas documentações oficiais de [Google no Supabase](https://supabase.com/docs/guides/auth/social-login/auth-google) e [URLs de retorno](https://supabase.com/docs/guides/auth/redirect-urls). A disponibilidade e a allowlist externas devem ser confirmadas no painel; credenciais administrativas do Supabase/Google não estão disponíveis nesta sessão.
+
 ### Como evitar a recorrência e verificar uma publicação
 
 O domínio de produção acompanha main. Um push apenas para ajuste-visual-frontend publica Preview. Antes de enviar a main, execute npm ci, npm run lint, npm run typecheck, npm test e npm run build. Após o push, espere Production READY e compare git rev-parse HEAD com https://devi-folio-saa-s.vercel.app/version.json; confira também a meta build-sha no HTML. /version.json usa no-store, e os assets compilados têm nomes com hash. O registro da publicação final será anexado em docs/publicacao-final.json.
+
+## Arquivos e commits
+
+Lista completa com resumo por arquivo: [ARQUIVOS-ALTERADOS.md](ARQUIVOS-ALTERADOS.md). Os commits respeitam a sequência: 9c25d96 (deploy), 28aea0f (revisão), 467e549 (front-end), seguido do registro de validação. Os arquivos não versionados que já existiam, inclusive guio-service, não foram publicados nem apagados.
