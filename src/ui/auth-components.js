@@ -4,18 +4,18 @@ export function AuthInput(id, label, { type = 'text', autocomplete = '', minleng
 }
 export const AuthButton = label => `<button class="button button-submit" type="submit">${label}</button>`
 export function SocialButton(provider, signup = false) {
-  const label = `${signup ? 'Cadastrar' : 'Entrar'} com ${provider === 'google' ? 'Google' : 'GitHub'}`
+  const label = `${signup ? 'Continuar' : 'Entrar'} com ${provider === 'google' ? 'Google' : 'GitHub'}`
   return `<button class="button button-${provider}" type="button" ${provider === 'github' ? `id="github-${signup ? 'cadastro' : 'login'}"` : 'data-google-login'}><img src="/icons/${provider}${provider === 'github' ? '-white' : ''}.svg" width="26" height="26" alt="" aria-hidden="true">${label}</button>`
 }
 const social = signup => `<div class="auth-divider">ou continue com</div><div class="auth-providers">${SocialButton('google', signup)}${SocialButton('github', signup)}</div>`
 export function AuthLayout() {
-  return `<aside class="auth-right" aria-label="Seu portfólio de forma descomplicada"><div class="auth-story"><h2>Seu portfólio<br>de forma<br>descomplicada.</h2><div class="auth-integrations"><img src="/icons/github-white.svg" alt="GitHub" width="110" height="110"><img src="/brand/kaptei.svg" alt="Kaptei" width="110" height="110"></div></div></aside>
+  return `<aside class="auth-right" aria-label="Seu portfólio de forma descomplicada"><div class="auth-story"><h2>Seu portfólio<br>de forma<br>descomplicada.</h2><div class="auth-integrations auth-integrations-reference" aria-hidden="true"><span class="auth-integration-github"><img src="/icons/github.svg" alt="" width="75" height="75"></span><span class="auth-integration-k"><img src="/brand/kaptei.svg" alt="" width="105" height="105"></span></div><div class="auth-integrations auth-integrations-original" aria-hidden="true"><img src="/icons/github-white.svg" alt="" width="110" height="110"><img src="/brand/kaptei.svg" alt="" width="110" height="110"></div></div></aside>
   <section class="auth-left"><div class="auth-form-wrap"><a class="auth-brand" href="/" aria-label="FolioDev, início">${Logo()}</a>
   <div class="auth-panel" id="panel-login" aria-labelledby="login-title"><h1 id="login-title">Entrar</h1><p class="auth-sub">Entre com seus dados para acessar sua conta.</p><form id="form-login">
-  ${AuthInput('login-email', 'E-mail', { type: 'email', autocomplete: 'email', maxlength: '254' })}
-  ${AuthInput('login-senha', 'Senha', { type: 'password', autocomplete: 'current-password' })}
+  ${AuthInput('login-email', 'E-mail', { type: 'email', autocomplete: 'email', maxlength: '254', placeholder: 'voce@email.com' })}
+  ${AuthInput('login-senha', 'Senha', { type: 'password', autocomplete: 'current-password', placeholder: '••••••••' })}
   <div class="auth-row-between"><label class="auth-checkbox"><input type="checkbox" id="login-remember" checked><span>Lembrar de mim</span></label><a class="auth-forgot" href="#recuperar">Esqueci a senha</a></div>${AuthButton('Entrar')}</form>${social(false)}<p class="auth-switch">Novo por aqui? <a href="#cadastro" data-switch="cadastro">Criar conta</a></p></div>
-  <div class="auth-panel" id="panel-cadastro" hidden aria-labelledby="cadastro-title"><h1 id="cadastro-title">Criar conta</h1><p class="auth-sub">Preencha seus dados para começar a criar seu portfólio.</p><form id="form-cadastro">
+  <div class="auth-panel" id="panel-cadastro" hidden aria-labelledby="cadastro-title"><h1 id="cadastro-title">Criar conta</h1><p class="auth-sub">Crie sua conta para montar seu portfólio em minutos.</p><form id="form-cadastro">
   ${AuthInput('cad-nome', 'Nome completo', { autocomplete: 'name', minlength: '2', maxlength: '100' })}
   ${AuthInput('cad-email', 'E-mail', { type: 'email', autocomplete: 'email', maxlength: '254' })}
   ${AuthInput('cad-senha', 'Senha', { type: 'password', autocomplete: 'new-password', minlength: '8', maxlength: '128' })}
