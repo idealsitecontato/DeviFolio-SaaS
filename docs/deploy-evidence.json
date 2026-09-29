@@ -1,0 +1,256 @@
+{
+  "checkedAt": "2026-09-29T13:24:43.026Z",
+  "project": {
+    "id": "prj_IjEiVkDfoRYPbOLaJ7hIOVgvcn5X",
+    "name": "devi-folio-saa-s",
+    "framework": null,
+    "rootDirectory": null,
+    "outputDirectory": null,
+    "buildCommand": null,
+    "installCommand": null,
+    "link": {
+      "type": "github",
+      "repo": "DeviFolio-SaaS",
+      "org": "idealsitecontato",
+      "productionBranch": "main"
+    },
+    "targets": {
+      "production": {
+        "id": "dpl_6XW673ar5114RE35bA1X8gfHg5br",
+        "url": "devi-folio-saa-2cvrij20u-neylove28-6935.vercel.app",
+        "meta": {
+          "githubCommitAuthorName": "Idealsite",
+          "githubCommitAuthorEmail": "idealsitecontato@gmail.com",
+          "githubCommitMessage": "feat: reconstruir frontend FolioDev em Editorial Mono",
+          "githubCommitOrg": "idealsitecontato",
+          "githubCommitRef": "main",
+          "githubCommitRepo": "DeviFolio-SaaS",
+          "githubCommitSha": "a123fcfe2c7672ef843a1d941ebaba4a76911b8c",
+          "githubDeployment": "1",
+          "githubOrg": "idealsitecontato",
+          "githubRepo": "DeviFolio-SaaS",
+          "githubRepoOwnerType": "User",
+          "githubCommitRepoId": "1364674112",
+          "githubRepoId": "1364674112",
+          "githubRepoVisibility": "public",
+          "githubHost": "github.com",
+          "githubCommitAuthorLogin": "idealsitecontato",
+          "githubCommitVerification": "unverified",
+          "repoPushedAt": "1790619752000",
+          "branchAlias": "devi-folio-saa-s-git-main-neylove28-6935.vercel.app",
+          "lambdaRuntimeStats": "{\"nodejs\":7}"
+        }
+      },
+      "preview": {
+        "id": "dpl_99BZbyqYmTn5YnYygpmifNVGeiLJ",
+        "url": "devi-folio-saa-fpxzucg57-neylove28-6935.vercel.app",
+        "meta": {
+          "githubCommitAuthorName": "Idealsite",
+          "githubCommitAuthorEmail": "idealsitecontato@gmail.com",
+          "githubCommitMessage": "fix: preservar estilos ao compilar frontend",
+          "githubCommitOrg": "idealsitecontato",
+          "githubCommitRef": "ajuste-visual-frontend",
+          "githubCommitRepo": "DeviFolio-SaaS",
+          "githubCommitSha": "8f9226f7c9e820fd6ca6cf374bf70878bcf81956",
+          "githubDeployment": "1",
+          "githubOrg": "idealsitecontato",
+          "githubRepo": "DeviFolio-SaaS",
+          "githubRepoOwnerType": "User",
+          "githubCommitRepoId": "1364674112",
+          "githubRepoId": "1364674112",
+          "githubRepoVisibility": "public",
+          "githubHost": "github.com",
+          "githubCommitAuthorLogin": "idealsitecontato",
+          "githubCommitVerification": "unverified",
+          "repoPushedAt": "1790657436000",
+          "branchAlias": "devi-folio-saa-s-git-ajuste-visual-frontend-neylove28-6935.vercel.app"
+        }
+      }
+    }
+  },
+  "deployments": [
+    {
+      "uid": "dpl_99BZbyqYmTn5YnYygpmifNVGeiLJ",
+      "url": "devi-folio-saa-fpxzucg57-neylove28-6935.vercel.app",
+      "state": "ERROR",
+      "target": null,
+      "meta": {
+        "githubCommitAuthorName": "Idealsite",
+        "githubCommitAuthorEmail": "idealsitecontato@gmail.com",
+        "githubCommitMessage": "fix: preservar estilos ao compilar frontend",
+        "githubCommitOrg": "idealsitecontato",
+        "githubCommitRef": "ajuste-visual-frontend",
+        "githubCommitRepo": "DeviFolio-SaaS",
+        "githubCommitSha": "8f9226f7c9e820fd6ca6cf374bf70878bcf81956",
+        "githubDeployment": "1",
+        "githubOrg": "idealsitecontato",
+        "githubRepo": "DeviFolio-SaaS",
+        "githubRepoOwnerType": "User",
+        "githubCommitRepoId": "1364674112",
+        "githubRepoId": "1364674112",
+        "githubRepoVisibility": "public",
+        "githubHost": "github.com",
+        "githubCommitAuthorLogin": "idealsitecontato",
+        "githubCommitVerification": "unverified",
+        "repoPushedAt": "1790657436000",
+        "branchAlias": "devi-folio-saa-s-git-ajuste-visual-frontend-neylove28-6935.vercel.app"
+      }
+    },
+    {
+      "uid": "dpl_FBTicDRjbiZZtmbpPTByXno7oCim",
+      "url": "devi-folio-saa-o039p7pku-neylove28-6935.vercel.app",
+      "state": "ERROR",
+      "target": null,
+      "meta": {
+        "githubCommitAuthorName": "Idealsite",
+        "githubCommitAuthorEmail": "idealsitecontato@gmail.com",
+        "githubCommitMessage": "style: compactar modelos e recolher controles auxiliares",
+        "githubCommitOrg": "idealsitecontato",
+        "githubCommitRef": "ajuste-visual-frontend",
+        "githubCommitRepo": "DeviFolio-SaaS",
+        "githubCommitSha": "eb10d9416727f994ecc91c7aaaedf2daa1b68a67",
+        "githubDeployment": "1",
+        "githubOrg": "idealsitecontato",
+        "githubRepo": "DeviFolio-SaaS",
+        "githubRepoOwnerType": "User",
+        "githubCommitRepoId": "1364674112",
+        "githubRepoId": "1364674112",
+        "githubRepoVisibility": "public",
+        "githubHost": "github.com",
+        "githubCommitAuthorLogin": "idealsitecontato",
+        "githubCommitVerification": "unverified",
+        "repoPushedAt": "1790656291000",
+        "branchAlias": "devi-folio-saa-s-git-ajuste-visual-frontend-neylove28-6935.vercel.app"
+      }
+    },
+    {
+      "uid": "dpl_DT2HBBd3ovknGkT5vWZ51XskyjqZ",
+      "url": "devi-folio-saa-ms4v2gmsu-neylove28-6935.vercel.app",
+      "state": "ERROR",
+      "target": null,
+      "meta": {
+        "githubCommitAuthorName": "Idealsite",
+        "githubCommitAuthorEmail": "idealsitecontato@gmail.com",
+        "githubCommitMessage": "style: compactar modelos e concluir validação visual",
+        "githubCommitOrg": "idealsitecontato",
+        "githubCommitRef": "ajuste-visual-frontend",
+        "githubCommitRepo": "DeviFolio-SaaS",
+        "githubCommitSha": "cf4c242e431fcc84fe40d85730acc6ee3fe9f73c",
+        "githubDeployment": "1",
+        "githubOrg": "idealsitecontato",
+        "githubRepo": "DeviFolio-SaaS",
+        "githubRepoOwnerType": "User",
+        "githubCommitRepoId": "1364674112",
+        "githubRepoId": "1364674112",
+        "githubRepoVisibility": "public",
+        "githubHost": "github.com",
+        "githubCommitAuthorLogin": "idealsitecontato",
+        "githubCommitVerification": "unverified",
+        "repoPushedAt": "1790653777000",
+        "branchAlias": "devi-folio-saa-s-git-ajuste-visual-frontend-neylove28-6935.vercel.app"
+      }
+    },
+    {
+      "uid": "dpl_6XW673ar5114RE35bA1X8gfHg5br",
+      "url": "devi-folio-saa-2cvrij20u-neylove28-6935.vercel.app",
+      "state": "READY",
+      "target": "production",
+      "meta": {
+        "githubCommitAuthorName": "Idealsite",
+        "githubCommitAuthorEmail": "idealsitecontato@gmail.com",
+        "githubCommitMessage": "feat: reconstruir frontend FolioDev em Editorial Mono",
+        "githubCommitOrg": "idealsitecontato",
+        "githubCommitRef": "main",
+        "githubCommitRepo": "DeviFolio-SaaS",
+        "githubCommitSha": "a123fcfe2c7672ef843a1d941ebaba4a76911b8c",
+        "githubDeployment": "1",
+        "githubOrg": "idealsitecontato",
+        "githubRepo": "DeviFolio-SaaS",
+        "githubRepoOwnerType": "User",
+        "githubCommitRepoId": "1364674112",
+        "githubRepoId": "1364674112",
+        "githubRepoVisibility": "public",
+        "githubHost": "github.com",
+        "githubCommitAuthorLogin": "idealsitecontato",
+        "githubCommitVerification": "unverified",
+        "repoPushedAt": "1790619752000",
+        "branchAlias": "devi-folio-saa-s-git-main-neylove28-6935.vercel.app",
+        "lambdaRuntimeStats": "{\"nodejs\":7}"
+      }
+    },
+    {
+      "uid": "dpl_BuuoHkzvAVGjPqRZhK9g5RKDXfDk",
+      "url": "devi-folio-saa-18tcnpdjc-neylove28-6935.vercel.app",
+      "state": "READY",
+      "target": "production",
+      "meta": {
+        "githubCommitAuthorName": "Idealsite",
+        "githubCommitAuthorEmail": "idealsitecontato@gmail.com",
+        "githubCommitMessage": "Match FolioDev home and portfolios to supplied visual references",
+        "githubCommitOrg": "idealsitecontato",
+        "githubCommitRef": "main",
+        "githubCommitRepo": "DeviFolio-SaaS",
+        "githubCommitSha": "4e988aacdf2b050304c6e937357e63ee50ec8bc1",
+        "githubDeployment": "1",
+        "githubOrg": "idealsitecontato",
+        "githubRepo": "DeviFolio-SaaS",
+        "githubRepoOwnerType": "User",
+        "githubCommitRepoId": "1364674112",
+        "githubRepoId": "1364674112",
+        "githubRepoVisibility": "public",
+        "githubHost": "github.com",
+        "githubCommitAuthorLogin": "idealsitecontato",
+        "githubCommitVerification": "unverified",
+        "repoPushedAt": "1790614227000",
+        "branchAlias": "devi-folio-saa-s-git-main-neylove28-6935.vercel.app",
+        "lambdaRuntimeStats": "{\"nodejs\":7}"
+      }
+    }
+  ],
+  "environments": [
+    {
+      "key": "GITHUB_CALLBACK_URL",
+      "target": [
+        "production"
+      ]
+    },
+    {
+      "key": "SUPABASE_SERVICE_ROLE_KEY",
+      "target": [
+        "production"
+      ]
+    },
+    {
+      "key": "GITHUB_CLIENT_SECRET",
+      "target": [
+        "production"
+      ]
+    },
+    {
+      "key": "GITHUB_CLIENT_ID",
+      "target": [
+        "production"
+      ]
+    },
+    {
+      "key": "GITHUB_OAUTH_STATE_SECRET",
+      "target": [
+        "production"
+      ]
+    },
+    {
+      "key": "VITE_SUPABASE_PUBLISHABLE_KEY",
+      "target": [
+        "production",
+        "preview"
+      ]
+    },
+    {
+      "key": "VITE_SUPABASE_URL",
+      "target": [
+        "production",
+        "preview"
+      ]
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 import { resolve } from 'node:path'
+import { execFileSync } from 'node:child_process'
 import { defineConfig, loadEnv } from 'vite'
 
 export default defineConfig(({ mode }) => {
@@ -8,7 +9,18 @@ export default defineConfig(({ mode }) => {
     throw new Error(`Configuração obrigatória ausente: ${missing.join(', ')}`)
   }
 
+  const buildSha = process.env.VERCEL_GIT_COMMIT_SHA || execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim()
+
   return {
+    plugins: [{
+      name: 'build-version',
+      transformIndexHtml() {
+        return [{ tag: 'meta', attrs: { name: 'build-sha', content: buildSha }, injectTo: 'head' }]
+      },
+      generateBundle() {
+        this.emitFile({ type: 'asset', fileName: 'version.json', source: JSON.stringify({ sha: buildSha }) })
+      },
+    }],
     server: {
       watch: { ignored: ['**/.visual-*/**', '**/.reference-images/**'] },
     },
