@@ -56,3 +56,11 @@ Arquivos: `dashboard.js` (markup do estado conectado), `foliodev-dashboard-visua
 Alterações: conta conectada com ícone oficial existente, repositórios carvão, ícones brancos e chips de visibilidade derivados de `repository.private`. Checkbox, importação, menu, paginação, sincronização, desconexão e estados de erro continuam nos mecanismos originais. A seleção aparece ao passar o mouse, ao focar ou ao selecionar; em telas pequenas permanece visível.
 
 Verificado: renderização isolada do estado conectado em 1787 × 880 px, sem importar Supabase/API; conta em y=196,8 px/94 px de altura, painel em y=312,8 px/270,4 px de altura e linhas com 66 px. Pendência: conexão, importação, sincronização e desconexão com a conta real, pois não há sessão de teste acessível ao agente.
+
+### Portifólios e Projetos
+
+Arquivos: `dashboard.js` (título e renderização), `foliodev-dashboard-visual.css`.
+
+Alterações: nome exato exigido pelo MD, coluna de pastas de 212 px, cards de 86 px, pastas amarelas e painel de projetos de 886 × 460 px. A rota `portfolio`, atributos de drag/drop, dados de localização, menus e animação da pasta permanecem. O atalho GitHub e a explicação sobre pastas foram mantidos, embora não apareçam na captura.
+
+Verificado: comparação em 1805 × 871 px; conteúdo em x=451 px, painel em x=685/y=267,2 px e altura de 460 px. Pendência: mover, persistir e publicar projetos da conta real; a renderização isolada não comprova essas operações.
