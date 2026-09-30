@@ -1,4 +1,4 @@
-import { projectCardMarkup, documentPreview, statusBadge, emptyMarkup } from './src/ui/components.js'
+import { documentPreview, statusBadge, emptyMarkup } from './src/ui/components.js'
 import { renderPlanCards } from './plans.js'
 import { supabase } from './src/lib/supabase.js'
 import {
@@ -12,6 +12,8 @@ import {
   saveProject,
   saveSettings,
   uploadAvatar,
+  portfolioBannerUrl,
+  uploadPortfolioBanner,
   uploadProjectImage,
 } from './src/lib/user-data.js'
 import QRCode from 'qrcode'
@@ -21,6 +23,7 @@ import { portfolioModels, getPortfolioModel } from './src/lib/portfolio-models.j
 import { portfolioFolders, projectLocation, allowedMove, nextSortOrder, orderedFolders, restorePortfolioFolders, planProjectMove, persistProjectMove } from './src/lib/project-location.js'
 import { bindExplorerDrag } from './src/lib/explorer-drag.js'
 import { kapteiView, bindKapteiActions } from './kaptei.js'
+import { readVisualPublications, recordVisualPublication } from './src/lib/visual-publications.js'
 
 const githubIconUrl = new URL('./assets/github-icon.webp', import.meta.url).href
 
@@ -93,6 +96,11 @@ function hydrateIcons(root = document) {
 const blankProfile = { name: '', username: '', email: '', role: '', bio: '', skills: '', linkedin: '', github: '', website: '', avatar: '', selectedModel: 'white' }
 const blankSettings = { email: true, product: true, publicProfile: true, compact: false }
 const state = { projects: [], folderNames: {}, folderOrder: [], hiddenFolders: [], profile: { ...blankProfile }, published: false, githubConnected: false, githubUsername: '', repos: [], analytics: [], referrals: [], settings: { ...blankSettings } }
+let visualPublications = { folders: {}, events: [] }
+let selectedFolderId = null
+let portfolioLayout = 'grid'
+let profileBannerRevision = ''
+let publicationHistoryExpanded = false
 const projectVisualType = project => /(?:^|[\s/_-])landing(?:[\s/_-]|$)/i.test(`${project.name} ${project.description || ''} ${project.link || ''}`) ? 'landing' : 'site'
 const projectTypeChip = project => {
   const type = projectVisualType(project)
@@ -110,12 +118,18 @@ const realName = () => state.profile.name.trim() || currentUser?.user_metadata?.
 const initials = () => realName().split(/\s+/).filter(Boolean).map(part => part[0]).slice(0, 2).join('').toUpperCase()
 const profileComplete = () => Boolean(state.profile.name.trim() && state.profile.username.trim())
 const folderName = id => state.folderNames[id] || portfolioFolders.find(folder => folder.id === id)?.name || ''
-const visiblePortfolioFolders = () => orderedFolders(state.folderOrder).filter(folder => !state.hiddenFolders.includes(folder.id))
-const rootPortfolioProjects = () => state.projects.filter(project => ['projects', 'loose', ...state.hiddenFolders].includes(projectLocation(project))).sort((a, b) => a.sortOrder - b.sortOrder || a.id - b.id)
+const visiblePortfolioFolders = () => orderedFolders(state.folderOrder).filter(folder => !state.hiddenFolders.includes(folder.id) && (Object.hasOwn(state.folderNames, folder.id) || state.projects.some(project => projectLocation(project) === folder.id)))
 const projectsAt = destination => state.projects.filter(project => projectLocation(project) === destination).sort((a, b) => a.sortOrder - b.sortOrder || a.id - b.id)
 const publicPortfolioUrl = () => {
   const username = encodeURIComponent(state.profile.username.trim().toLowerCase())
   return /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? `${location.origin}/portfolio.html?username=${username}` : `${location.origin}/portfolio/${username}`
+}
+const secondaryPortfolioUrl = id => {
+  if (!state.profile.username.trim()) return ''
+  const url = new URL(publicPortfolioUrl())
+  url.searchParams.set('folder', id)
+  url.searchParams.set('name', folderName(id))
+  return url.href
 }
 const normalizeExternalUrl = value => {
   const text = String(value || '').trim()
@@ -215,7 +229,7 @@ function projectCards(items) {
 }
 
 function projectCard(project) {
-  return projectCardMarkup(project,{draggable:true,actions:`<button type="button" class="${project.status==='published'?'secondary-button':'deploy-button secondary-button'}" ${project.status==='published'?`data-undeploy-project="${project.id}"`:`data-deploy-project="${project.id}"`}>${project.status==='published'?'Undeploy':'Deploy'}</button><button class="icon-button" data-edit-project="${project.id}" aria-label="Editar ${esc(project.name)}"><span data-icon="edit"></span></button><button class="icon-button project-more" data-project-menu="${project.id}" aria-label="Ações de ${esc(project.name)}" aria-haspopup="dialog">⋯</button>`})
+  return `<article class="card project-card reference-project-card explorer-project" draggable="true" data-drag-project="${project.id}" tabindex="0" aria-label="Projeto ${esc(project.name)}"><button class="project-cover" type="button" data-view-project="${project.id}" aria-label="Visualizar ${esc(project.name)}">${project.image ? `<img src="${esc(project.image)}" alt="Capa de ${esc(project.name)}" loading="lazy" width="480" height="270" draggable="false">` : `<span class="project-cover-fallback"><strong>${esc(project.name)}</strong></span>`}</button><div class="project-card-body"><h2>${esc(project.name)}</h2><div class="project-actions"><button class="primary-button" type="button" data-open-project="${project.id}">Acessar</button><button class="secondary-button" type="button" data-view-project="${project.id}">Ver</button><button class="icon-button project-more" type="button" data-project-menu="${project.id}" aria-label="Mais ações para ${esc(project.name)}" aria-haspopup="dialog">⋯</button></div></div></article>`
 }
 
 function projectsView() {
@@ -229,33 +243,72 @@ function previewMarkup() {
 }
 
 function portfolioManagerView() {
-return `<section class="page-enter portfolio-manager-page" data-drop-zone="loose">${pageHead('Portifólios e Projetos','Pastas, projetos e publicação em um só lugar.','<button class="primary-button" data-new-portfolio><span data-icon="plus"></span>Novo portfólio</button>')}<div class="portfolio-workspace"><div class="portfolio-folders-column"><header class="portfolio-section-head"><h2>Portfólios</h2><span class="mono">${state.githubConnected?'GitHub conectado':'GitHub não conectado'}</span></header><div class="portfolio-list">${visiblePortfolioFolders().map(folder=>`<article class="portfolio-list-item" data-folder-id="${folder.id}" data-drag-folder="${folder.id}" data-drop-zone="${folder.id}" draggable="true" tabindex="0" role="group" aria-label="Abrir ${esc(folderName(folder.id))}"><span class="portfolio-folder" aria-hidden="true"><span class="portfolio-folder-back"></span><span class="portfolio-folder-paper"></span><span class="portfolio-folder-front"></span></span><div><h2>${esc(folderName(folder.id))}</h2><small class="mono">${projectsAt(folder.id).length} projetos</small></div><button class="icon-button portfolio-more" data-portfolio-menu="${folder.id}" aria-label="Ações de ${esc(folderName(folder.id))}" aria-haspopup="dialog">⋯</button></article>`).join('')}</div><details class="portfolio-support-disclosure"><summary>Conexão e publicação</summary><button class="secondary-button" data-route-button="github">${state.githubConnected?'Gerenciar GitHub':'Conectar GitHub'}</button><p class="workspace-note">As pastas organizam seus projetos. A publicação usa o portfólio público da sua conta.</p></details></div><div class="portfolio-projects-column"><header class="section-card-head"><div><h2>Projetos</h2><p>Arraste para organizar nas pastas.</p></div><div class="view-actions"><button class="icon-button" data-project-layout="grid" aria-label="Visualizar em grade" aria-pressed="true"><span data-icon="layout"></span></button><button class="icon-button" data-project-layout="list" aria-label="Visualizar em lista" aria-pressed="false"><span data-icon="menu"></span></button><button class="secondary-button" data-new-project data-project-destination="loose"><span data-icon="plus"></span>Novo projeto</button></div></header><div class="project-grid portfolio-project-grid">${rootPortfolioProjects().length?projectCards(rootPortfolioProjects()):`<div class="card empty-state portfolio-root-empty">${emptyState('folder','Nenhum projeto nesta seção.','Crie um projeto e mova o para o portfólio...', '<button class="primary-button" data-new-project>Novo projeto</button>')}</div>`}</div></div></div></section>`
+  const folders = visiblePortfolioFolders()
+  if (!folders.some(folder => folder.id === selectedFolderId)) selectedFolderId = folders[0]?.id || null
+  const selected = selectedFolderId
+  const projects = selected ? projectsAt(selected) : []
+  const isPublished = Boolean(selected && visualPublications.folders[selected])
+  const link = selected ? secondaryPortfolioUrl(selected) : ''
+  return `<section class="page-enter portfolio-manager-page">${pageHead('Portfólios secundários', 'Sem conexão com GitHub.', '<button class="primary-button" data-new-portfolio><span data-icon="plus"></span>Novo portfólio</button>')}
+    <div class="portfolio-workspace">
+      <div class="portfolio-folders-column"><header class="portfolio-section-head"><h2>Portfólios</h2></header>
+        <div class="portfolio-list">${folders.length ? folders.map(folder => `<article class="portfolio-list-item ${folder.id === selected ? 'is-selected' : ''}" data-folder-id="${folder.id}" data-drag-folder="${folder.id}" data-drop-zone="${folder.id}" draggable="true" tabindex="0" role="button" aria-pressed="${folder.id === selected}" aria-label="Abrir ${esc(folderName(folder.id))}"><span class="portfolio-folder" aria-hidden="true"><span class="portfolio-folder-back"></span><span class="portfolio-folder-paper"></span><span class="portfolio-folder-front"></span></span><div><h2>${esc(folderName(folder.id))}</h2><small class="mono">${projectsAt(folder.id).length} projeto${projectsAt(folder.id).length === 1 ? '' : 's'}</small></div><button class="icon-button portfolio-more" data-portfolio-menu="${folder.id}" aria-label="Ações de ${esc(folderName(folder.id))}" aria-haspopup="dialog">⋯</button></article>`).join('') : '<p class="portfolio-empty-copy">Crie seu primeiro portfólio secundário.</p>'}</div>
+      </div>
+      <div class="portfolio-projects-column">
+        <header class="section-card-head"><div><h2>Projetos</h2><p>Arraste para organizar nas pastas.</p></div><div class="view-actions"><label class="search-field portfolio-search"><span data-icon="search"></span><input id="portfolio-project-search" type="search" placeholder="Buscar projetos..." aria-label="Buscar projetos"></label><button class="icon-button" data-project-layout="grid" aria-label="Visualizar em grade" aria-pressed="${portfolioLayout === 'grid'}"><span data-icon="layout"></span></button><button class="icon-button" data-project-layout="list" aria-label="Visualizar em lista" aria-pressed="${portfolioLayout === 'list'}"><span data-icon="menu"></span></button><button class="secondary-button" data-new-project data-project-destination="${selected || 'loose'}"><span data-icon="plus"></span>Novo projeto</button></div></header>
+        ${selected ? `<div class="secondary-portfolio-detail"><div><strong>${esc(folderName(selected))}</strong><span class="status ${isPublished ? 'published' : 'draft'}">${isPublished ? 'Publicado' : 'Despublicado'}</span></div><div class="secondary-portfolio-link"><span>${esc(link)}</span><button class="icon-button" data-copy="${esc(link)}" aria-label="Copiar link"><span data-icon="copy"></span></button></div><div class="secondary-portfolio-actions"><button class="secondary-button" data-access-folder="${selected}">Acessar</button><button class="secondary-button" data-show-folder-info="${selected}">Ver informações</button><button class="${isPublished ? 'danger-button' : 'primary-button publish-button'}" data-folder-publish="${selected}">${isPublished ? 'Despublicar' : 'Publicar'}</button></div></div>` : ''}
+        <div class="project-grid portfolio-project-grid ${portfolioLayout === 'list' ? 'is-list' : ''}" data-drop-zone="${selected || 'loose'}">${selected ? projectCards(projects) : '<div class="card empty-state portfolio-root-empty"><div class="empty-state-content"><h3>Escolha ou crie um portfólio</h3><p>Seus projetos serão organizados manualmente aqui.</p></div></div>'}</div>
+      </div>
+    </div>
+  </section>`
 }
-
-function folderProjectCard(project) {
-  return `<article class="card explorer-project folder-project" draggable="true" data-drag-project="${project.id}" tabindex="0" aria-label="${esc(project.name)}. Use Alt e as setas para reordenar."><button class="folder-project-preview" type="button" data-view-project="${project.id}" aria-label="Visualizar ${esc(project.name)}"><span class="project-cover">${project.image ? `<img class="project-cover-image" src="${esc(project.image)}" alt="Capa do projeto ${esc(project.name)}" draggable="false">` : `<span class="project-cover-fallback"><strong>${esc(project.name)}</strong></span>`}</span></button><div class="folder-project-title"><button class="folder-project-name" data-select-project="${project.id}" aria-pressed="false">${esc(project.name)}</button><button class="icon-button project-more" data-project-menu="${project.id}" aria-label="Ações de ${esc(project.name)}" aria-haspopup="dialog">⋯</button></div></article>`
-}
-
 function openPortfolioFolder(id) {
   if (!visiblePortfolioFolders().some(folder => folder.id === id)) return
-  $$('[data-folder-id].is-open').forEach(folder => folder.classList.remove('is-open'))
-  $(`[data-folder-id="${id}"]`)?.classList.add('is-open')
-  const projects = projectsAt(id)
-  modal(`<div class="portfolio-folder-window" data-open-folder="${id}" data-drop-zone="${id}"><div class="portfolio-folder-tab" aria-hidden="true"></div><button class="icon-button folder-close" type="button" data-close-modal aria-label="Fechar pasta"><span data-icon="x"></span></button><h2>${esc(folderName(id))}</h2><p class="folder-summary">${projects.length} projeto${projects.length === 1 ? '' : 's'} • Organizado por você</p><div class="project-grid">${projects.length ? projects.map(folderProjectCard).join('') : '<p class="folder-empty">Arraste projetos para esta pasta.</p>'}</div><footer class="folder-public-actions"><button class="secondary-button folder-deploy ${state.published?'is-published':''}" data-folder-deploy><span data-icon="rocket"></span>${state.published ? 'Undeploy' : 'Deploy'}</button><button class="primary-button" data-open-preview><span data-icon="external"></span>Acessar portfólio</button></footer></div>`, { folderWindow: true })
-  bindProjectGrid($('#modal-root'))
-  $('[data-open-preview]', $('#modal-root')).onclick = () => {
-    if (!state.published) return toast('Publique seu portfólio antes de acessá-lo.', 'error')
-    window.open(publicPortfolioUrl(), '_blank', 'noopener')
-  }
-  $('[data-folder-deploy]').onclick = async event => {
-    await togglePublished(event)
-    openPortfolioFolder(id)
-  }
-  $('.portfolio-folder-modal').setAttribute('aria-label', folderName(id))
+  selectedFolderId = id
+  if (location.hash !== '#portfolio') location.hash = 'portfolio'
+  else render({ preserveScroll: true })
 }
 
+function showPortfolioFolderInfo(id) {
+  const folder = visiblePortfolioFolders().find(item => item.id === id)
+  if (!folder) return
+  const link = secondaryPortfolioUrl(id)
+  modal(`<div class="modal-head"><h2>${esc(folderName(id))}</h2><button class="icon-button" data-close-modal aria-label="Fechar"><span data-icon="x"></span></button></div><p>${projectsAt(id).length} projeto${projectsAt(id).length === 1 ? '' : 's'} organizado${projectsAt(id).length === 1 ? '' : 's'} manualmente.</p><div class="url-field"><span>${esc(link)}</span><button class="icon-button" data-copy="${esc(link)}" aria-label="Copiar link"><span data-icon="copy"></span></button></div><p class="workspace-note">O link público depende da publicação do portfólio principal.</p><div class="modal-actions"><button class="secondary-button" data-close-modal>Fechar</button><button class="primary-button" data-access-folder="${id}">Acessar</button></div>`)
+  $('[data-copy]', $('#modal-root')).onclick = event => copyText(event.currentTarget.dataset.copy)
+  $('[data-access-folder]', $('#modal-root')).onclick = () => accessPortfolioFolder(id)
+}
+
+function accessPortfolioFolder(id) {
+  if (!visualPublications.folders[id]) return toast('Publique este portfólio para acessar o link.', 'error')
+  if (!state.published) return toast('Publique o portfólio principal para disponibilizar este link aos visitantes.', 'error')
+  const url = secondaryPortfolioUrl(id)
+  if (url) window.open(url, '_blank', 'noopener')
+}
+
+function toggleFolderPublication(id) {
+  if (!visiblePortfolioFolders().some(folder => folder.id === id)) return
+  const publishing = !visualPublications.folders[id]
+  if (!publishing) {
+    modal(`<div class="confirm-dialog"><h2>Despublicar ${esc(folderName(id))}?</h2><p>O estado visual deste portfólio será atualizado no painel.</p><div class="modal-actions"><button class="secondary-button" data-close-modal>Cancelar</button><button class="danger-button" data-confirm-folder-unpublish>Despublicar</button></div></div>`)
+    $('[data-confirm-folder-unpublish]').onclick = () => saveFolderPublication(id, false)
+    return
+  }
+  saveFolderPublication(id, true)
+}
+
+function saveFolderPublication(id, published) {
+  try {
+    visualPublications = recordVisualPublication(localStorage, currentUser.id, visualPublications, {
+      folderId: id, name: folderName(id), published, url: secondaryPortfolioUrl(id),
+      snapshot: published ? { profile: { ...state.profile }, projects: projectsAt(id).map(project => ({ ...project })) } : null,
+    })
+    closeModal()
+    render({ preserveScroll: true })
+    toast(published ? 'Portfólio marcado como publicado.' : 'Portfólio despublicado no painel.')
+  } catch (error) { reportError('Não foi possível salvar o estado deste portfólio.', error) }
+}
 function createPortfolioFolder() {
-  modal(`<form id="new-folder-form"><div class="modal-head"><h2>Novo portfólio</h2><button class="icon-button" type="button" data-close-modal aria-label="Fechar"><span data-icon="x"></span></button></div><label class="field"><span>Nome do portfólio</span><input name="name" required maxlength="60" placeholder="Nome do portfólio"></label><p class="folder-creation-note">Organize os projetos deste portfólio. A publicação usa o link público da sua conta.</p><div class="modal-actions"><button class="secondary-button" type="button" data-close-modal>Cancelar</button><button class="primary-button" type="submit">Criar portfólio</button></div></form>`, { creationPanel: true })
+  modal(`<form id="new-folder-form"><div class="modal-head"><h2>Novo portfólio secundário</h2><button class="icon-button" type="button" data-close-modal aria-label="Fechar"><span data-icon="x"></span></button></div><label class="field"><span>Nome do portfólio</span><input name="name" required maxlength="60" placeholder="Nome do portfólio"></label><p class="folder-creation-note">Adicione e organize projetos manualmente, sem conectar o GitHub.</p><div class="modal-actions"><button class="secondary-button" type="button" data-close-modal>Cancelar</button><button class="primary-button" type="submit">Criar portfólio</button></div></form>`, { creationPanel: true })
   $('#new-folder-form').onsubmit = event => {
     event.preventDefault()
     const name = new FormData(event.currentTarget).get('name').trim()
@@ -267,6 +320,7 @@ function createPortfolioFolder() {
       localStorage.setItem(`devifolio_folder_names_${currentUser.id}`, JSON.stringify(names))
       state.folderNames = names
       restorePortfolioFolders(names, state.projects)
+      selectedFolderId = id
       closeModal(); render({ preserveScroll: true })
     } catch (error) { reportError('Não foi possível salvar a pasta.', error) }
   }
@@ -274,10 +328,11 @@ function createPortfolioFolder() {
 
 function portfolioActions(id) {
   if (!visiblePortfolioFolders().some(folder => folder.id === id)) return
-  modal(`<div class="modal-head"><h2>${esc(folderName(id))}</h2><button type="button" class="icon-button" data-close-modal aria-label="Fechar"><span data-icon="x"></span></button></div><div class="card-action-menu"><button type="button" class="danger-button" data-delete-portfolio><span data-icon="trash"></span>Deletar portfólio</button><button type="button" class="secondary-button ${state.published?'':'deploy-button'}" data-deploy-portfolio>${state.published?'Undeploy':'Deploy'}</button><button type="button" class="secondary-button" data-edit-portfolio-name><span data-icon="edit"></span>Editar</button></div>`)
+  modal(`<div class="modal-head"><h2>${esc(folderName(id))}</h2><button type="button" class="icon-button" data-close-modal aria-label="Fechar"><span data-icon="x"></span></button></div><div class="card-action-menu"><button type="button" class="danger-button" data-delete-portfolio><span data-icon="trash"></span>Deletar portfólio</button><button type="button" class="${visualPublications.folders[id] ? 'danger-button' : 'primary-button publish-button'}" data-deploy-portfolio>${visualPublications.folders[id] ? 'Despublicar' : 'Publicar'}</button><button type="button" class="secondary-button" data-edit-portfolio-name><span data-icon="edit"></span>Editar</button><button type="button" class="secondary-button" data-show-folder-info="${id}">Ver informações</button></div>`)
   $('[data-delete-portfolio]').onclick = () => confirmDeletePortfolio(id)
-  $('[data-deploy-portfolio]').onclick = () => { openPortfolioFolder(id); $('[data-folder-deploy]')?.click() }
+  $('[data-deploy-portfolio]').onclick = () => toggleFolderPublication(id)
   $('[data-edit-portfolio-name]').onclick = () => renamePortfolioFolder(id)
+  $('[data-show-folder-info]', $('#modal-root')).onclick = () => showPortfolioFolderInfo(id)
 }
 
 function confirmDeletePortfolio(id) {
@@ -355,13 +410,13 @@ function applyModel(id) {
 function portfolioEditorView() {
   const profile = state.profile
   const ready = state.published && profileComplete()
-  const publicationAction = state.published ? '<button class="secondary-button" type="button" data-toggle-publish>Undeploy</button>' : '<button class="secondary-button deploy-button" type="button" data-toggle-publish>Deploy</button>'
+  const publicationAction = state.published ? '<button class="danger-button" type="button" data-toggle-publish>Despublicar</button>' : '<button class="primary-button publish-button" type="button" data-toggle-publish>Publicar</button>'
   return `<section class="page-enter">${pageHead('Editar portfólio', 'Edite a prévia que seus visitantes receberão.')}<div class="portfolio-actions"><span class="status ${state.published ? 'published' : 'draft'}">${state.published ? 'Publicado' : 'Não publicado'}</span><button class="secondary-button" type="button" data-open-preview><span data-icon="eye"></span>Visualizar como visitante</button>${publicationAction}</div><div class="editor-layout portfolio-editor"><form class="card form-card" id="portfolio-form"><div class="card-title"><span data-icon="edit"></span><div><h2>Editar conteúdo</h2><p>Altere os campos e acompanhe a prévia ao lado.</p></div></div><div class="form-grid"><label class="field"><span>Nome <i data-icon="edit"></i></span><input name="name" required value="${esc(profile.name)}"></label><label class="field"><span>Título profissional <i data-icon="edit"></i></span><input name="role" value="${esc(profile.role)}"></label><label class="field full"><span>Sobre você <i data-icon="edit"></i></span><textarea name="bio" maxlength="240">${esc(profile.bio)}</textarea><small>Até 240 caracteres</small></label><label class="field full"><span>Habilidades <i data-icon="edit"></i></span><input name="skills" value="${esc(profile.skills)}"><small>Separe as habilidades por vírgulas</small></label><label class="field"><span>GitHub <i data-icon="edit"></i></span><input name="github" value="${esc(profile.github)}" placeholder="github.com/usuario"></label><label class="field"><span>LinkedIn <i data-icon="edit"></i></span><input name="linkedin" value="${esc(profile.linkedin)}" placeholder="linkedin.com/in/usuario"></label><label class="field full"><span>Site pessoal <i data-icon="edit"></i></span><input name="website" value="${esc(profile.website)}" placeholder="https://"></label></div><div class="form-footer"><button class="primary-button" type="submit"><span data-icon="save"></span>Salvar alterações</button></div></form><aside class="card preview-card"><div class="preview-toolbar"><span>Prévia do visitante</span>${ready ? '<button class="icon-button" type="button" data-open-preview aria-label="Abrir prévia"><span data-icon="external"></span></button>' : ''}</div>${previewMarkup()}${ready ? `<div class="url-field"><span>${esc(publicPortfolioUrl())}</span><button class="icon-button" data-copy="${esc(publicPortfolioUrl())}" aria-label="Copiar URL"><span data-icon="copy"></span></button></div>` : '<div class="preview-link-empty">Use Deploy quando seu conteúdo estiver pronto.</div>'}</aside></div></section>`
 }
 
 function githubView() {
-  const content = `<div class="repo-list">${state.repos.map((repository, index) => `<article class="repo-row" data-repository-index="${index}" ${index >= 5 ? 'hidden' : ''}><label class="repo-select" title="Selecionar ${esc(repository.name)}"><input type="checkbox" value="${index}" aria-label="Selecionar ${esc(repository.name)}"><span class="repo-icon" data-icon="github"></span><span class="repo-copy"><b title="${esc(repository.name)}">${esc(repository.name)}</b><small>@${esc(repository.full_name?.split('/')[0] || state.githubUsername)} <span aria-hidden="true">•</span> ${repository.private ? 'Privado' : 'Público'}</small></span><span class="repo-visibility ${repository.private?'is-private':'is-public'}">${repository.private?'<span data-icon="lock"></span>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c5 5 5 13 0 18-5-5-5-13 0-18z"/></svg>'}${repository.private?'Privado':'Público'}</span></label><button class="icon-button repo-more" data-repo-menu="${index}" aria-label="Ações de ${esc(repository.name)}" aria-haspopup="dialog">⋯</button></article>`).join('')}</div>`
-  const pageCount = Math.ceil(state.repos.length / 5)
+  const content = `<div class="repo-list">${state.repos.map((repository, index) => ({ repository, index })).sort((a, b) => Number(a.repository.private) - Number(b.repository.private)).map(({ repository, index }, position) => `<article class="repo-row" data-repository-index="${index}" ${position >= 1 ? 'hidden' : ''}><label class="repo-select" title="Selecionar ${esc(repository.name)}"><input type="checkbox" value="${index}" aria-label="Selecionar ${esc(repository.name)}"><span class="repo-icon" data-icon="github"></span><span class="repo-copy"><b title="${esc(repository.name)}">${esc(repository.name)}</b><small>@${esc(repository.full_name?.split('/')[0] || state.githubUsername)}</small></span><span class="repo-visibility ${repository.private?'is-private':'is-public'}">${repository.private?'<span data-icon="lock"></span>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c5 5 5 13 0 18-5-5-5-13 0-18z"/></svg>'}${repository.private?'Privado':'Público'}</span></label><button class="icon-button repo-more" data-repo-menu="${index}" aria-label="Ações de ${esc(repository.name)}" aria-haspopup="dialog">⋯</button></article>`).join('')}</div>`
+  const pageCount = state.repos.length
   const pagination = pageCount > 1 ? `<nav class="repo-pagination" aria-label="Páginas de repositórios"><button class="secondary-button" data-repo-page-change="-1" disabled>Anterior</button><span data-repo-page-status aria-live="polite">Página 1 de ${pageCount}</span><button class="secondary-button" data-repo-page-change="1">Próxima</button></nav>` : ''
   const account = state.githubConnected
     ? `<div class="card connected-account"><span class="connected-github-icon" data-icon="github" aria-hidden="true"></span><div><small>Conta conectada</small><h2>@${esc(state.githubUsername || 'GitHub')}</h2></div><button class="secondary-button" data-sync-repos><span data-icon="refresh"></span>Sincronizar</button></div>`
@@ -386,8 +441,8 @@ function analyticsView() {
   const ranking = state.projects.map(project => ({ project, count: projectCounts.get(project.id) || 0 })).filter(item => item.count).sort((a, b) => b.count - a.count)
   const max = ranking[0]?.count || 1
   const metrics = `<div class="analytics-metrics"><article class="card analytic-stat"><span data-icon="eye"></span><small>Visualizações</small><strong>${summary.views}</strong></article><article class="card analytic-stat"><span data-icon="link"></span><small>Cliques em links</small><strong>${summary.clicks}</strong></article><article class="card analytic-stat"><span data-icon="users"></span><small>Visitantes únicos</small><strong>${summary.visitors}</strong></article><article class="card analytic-stat"><span data-icon="trending"></span><small>Taxa de clique</small><strong>${summary.rate}%</strong></article></div>`
-  const details = state.analytics.length ? `<div class="analytics-layout"><article class="card chart-card"><div class="section-card-head"><div><h2>Atividade real</h2><p>Eventos registrados no portfólio público.</p></div><span class="chart-total">${state.analytics.length} total</span></div><div class="event-summary"><div><span>Visualizações</span><strong>${summary.views}</strong></div><div><span>Interações</span><strong>${summary.clicks}</strong></div></div></article><article class="card ranking-card"><div class="section-card-head"><div><h2>Projetos mais acessados</h2><p>Cliques registrados</p></div></div>${ranking.length ? ranking.slice(0, 5).map((item, index) => `<div class="rank-row"><span>${index + 1}</span><div><b>${esc(item.project.name)}</b><small>${item.count} acesso${item.count === 1 ? '' : 's'}</small></div><div class="rank-bar"><i style="width:${Math.round((item.count / max) * 100)}%"></i></div></div>`).join('') : `<div class="compact-empty">Nenhum projeto recebeu acessos ainda.</div>`}</article></div>` : `<article class="card analytics-empty">${emptyState('chart', 'Ainda não há dados de análise.', 'As métricas aparecerão quando o portfólio publicado receber visitas.')}</article>`
-  return `<section class="page-enter analytics-page">${pageHead('Análise', 'Entenda como as pessoas encontram e exploram seu portfólio.', `<label class="portfolio-select"><span>Selecionar portfólio</span><select aria-label="Selecionar portfólio"><option>${esc(state.profile.name ? `Portfólio — ${state.profile.name}` : 'Portfólio principal')}</option></select></label>`)}${metrics}${monthEvents.length?monthlyChart:''}${details}</section>`
+  const details = `<div class="analytics-layout"><article class="card chart-card"><div class="section-card-head"><div><h2>Atividade real</h2><p>Eventos registrados no portfólio público.</p></div><span class="chart-total">${state.analytics.length} total</span></div><div class="event-summary"><div><span>Visualizações</span><strong>${summary.views}</strong></div><div><span>Interações</span><strong>${summary.clicks}</strong></div></div></article><article class="card ranking-card"><div class="section-card-head"><div><h2>Projetos mais acessados</h2><p>Cliques registrados</p></div></div>${ranking.length ? ranking.slice(0, 5).map((item, index) => `<div class="rank-row"><span>${index + 1}</span><div><b>${esc(item.project.name)}</b><small>${item.count} acesso${item.count === 1 ? '' : 's'}</small></div><div class="rank-bar"><i style="width:${Math.round((item.count / max) * 100)}%"></i></div></div>`).join('') : '<div class="compact-empty">Nenhum projeto recebeu acessos ainda.</div>'}</article></div>`
+  return `<section class="page-enter analytics-page">${pageHead('Análise', 'Entenda como as pessoas encontram e exploram seu portfólio.', `<label class="portfolio-select"><span>Selecionar portfólio</span><select aria-label="Selecionar portfólio"><option>${esc(state.profile.name ? `Portfólio — ${state.profile.name}` : 'Portfólio principal')}</option></select></label>`)}${metrics}${monthlyChart}${details}</section>`
 }
 
 function avatarMarkup(className = 'avatar avatar-large') {
@@ -398,8 +453,17 @@ function profileField(label,name,value,{type='text',attributes='',full=false}={}
   return `<div class="field ${full?'full':''}"><label for="profile-${name}">${label}</label><div class="inline-edit-field"><input id="profile-${name}" name="${name}" type="${type}" value="${esc(value)}" ${attributes} ${String(value??'').trim()?'readonly':''}><button type="button" class="icon-button" data-unlock-field aria-label="Editar ${label.toLowerCase()}"><span data-icon="edit"></span></button></div></div>`
 }
 function profileView() {
-  const profile=state.profile
-  return `<section class="page-enter compact-panel-page"><form class="card form-card compact-panel" id="profile-form"><div class="profile-summary"><div class="profile-avatar-edit">${avatarMarkup()}<input id="avatar-file" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="icon-button avatar-edit-button nuda-browse" type="button" data-upload-avatar aria-label="Alterar foto de perfil">${UploadButton('Alterar foto')}</button></div><div><h1>${esc(realName())}</h1><p>${esc(profile.email)}</p></div></div><div class="panel-section"><h2>Informações pessoais</h2><div class="form-grid">${profileField('Nome','name',profile.name,{attributes:'required'})}${profileField('Usuário','username',profile.username,{attributes:'required pattern="[a-zA-Z0-9._-]+"'})}${profileField('E-mail','email',profile.email,{type:'email',attributes:'required',full:true})}</div></div><div class="form-footer"><button class="primary-button" type="submit">Salvar Perfil</button></div></form></section>`
+  const profile = state.profile
+  const banner = currentUser ? `${portfolioBannerUrl(currentUser.id)}${profileBannerRevision ? `?v=${profileBannerRevision}` : ''}` : ''
+  const portfolioCount = visiblePortfolioFolders().length + 1
+  const modelCount = portfolioModels.filter(model => model.available).length
+  return `<section class="page-enter profile-page"><form class="card profile-showcase" id="profile-form">
+    <div class="profile-cover"><img src="${esc(banner)}" alt="" aria-hidden="true" onerror="this.hidden=true"><input id="profile-banner-file" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="icon-button" type="button" data-upload-profile-banner aria-label="Alterar capa"><span data-icon="edit"></span></button></div>
+    <div class="profile-identity"><div class="profile-avatar-edit">${avatarMarkup()}<input id="avatar-file" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="icon-button avatar-edit-button" type="button" data-upload-avatar aria-label="Alterar foto de perfil"><span data-icon="edit"></span></button></div><h1>${esc(realName())}</h1><p>${esc(profile.email)}</p></div>
+    <div class="profile-stat-row"><div><strong>${portfolioCount}</strong><span>Portfólios</span></div><div><strong>${state.projects.length}</strong><span>Projetos</span></div><div><strong>${modelCount}</strong><span>Modelos</span></div><div><span>Usuário</span><strong class="profile-username">@${esc(profile.username || 'conta')}</strong></div></div>
+    <div class="profile-edit-fields">${profileField('Nome','name',profile.name,{attributes:'required',full:true})}${profileField('Nome de usuário','username',profile.username,{attributes:'required pattern="[a-zA-Z0-9._-]+"',full:true})}${profileField('E-mail','email',profile.email,{type:'email',attributes:'required',full:true})}</div>
+    <div class="form-footer"><button class="primary-button" type="submit">Salvar Perfil</button></div>
+  </form></section>`
 }
 
 function switchRow(icon, title, description, key, on) {
@@ -427,7 +491,31 @@ function referralView() {
 }
 
 
-function publicationsView(){return `<section class="page-enter">${pageHead('Publicações','O estado atual do seu portfólio público.')}<article class="card publication-panel"><div class="publication-heading"><h2>Portfólio de ${esc(realName())}</h2>${statusBadge(state.published?'published':'draft')}</div><div class="commit-timeline"><div><b>${state.published?'Disponível para visitantes':'Ainda não publicado'}</b><p>${state.published?'Sua página está no ar. Revise o conteúdo antes de compartilhar.':'Complete seu perfil e escolha os projetos que deseja apresentar.'}</p></div></div>${state.profile.username?`<div class="url-field"><span>${esc(publicPortfolioUrl())}</span><button class="icon-button" data-copy="${esc(publicPortfolioUrl())}" aria-label="Copiar endereço"><span data-icon="copy"></span></button></div>`:''}<div class="publication-actions"><button class="${state.published?'secondary-button':'secondary-button deploy-button'}" data-toggle-publish>${state.published?'Undeploy':'Deploy'}</button><button class="secondary-button" data-route-button="portfolio-editar"><span data-icon="edit"></span>Editar conteúdo</button>${state.published?'<button class="secondary-button" data-open-preview>Abrir portfólio</button>':''}</div><p class="workspace-note">Esta tela mostra a publicação atual do seu portfólio.</p></article></section>`}
+function publicationsView() {
+  const entries = publicationHistoryExpanded ? visualPublications.events : visualPublications.events.slice(0, 5)
+  return `<section class="page-enter publications-page">${pageHead('Publicações', 'O estado atual do seu portfólio público.')}
+    <article class="card publication-panel"><div class="publication-heading"><h2>Portfólio de ${esc(realName())}</h2>${statusBadge(state.published ? 'published' : 'draft')}</div><div class="commit-timeline"><div><b>${state.published ? 'Disponível para visitantes' : 'Ainda não publicado'}</b><p>${state.published ? 'Sua página está no ar. Revise o conteúdo antes de compartilhar.' : 'Revise seu conteúdo antes de publicar.'}</p></div></div>${state.profile.username ? `<div class="url-field"><span>${esc(publicPortfolioUrl())}</span><button class="icon-button" data-copy="${esc(publicPortfolioUrl())}" aria-label="Copiar endereço"><span data-icon="copy"></span></button></div>` : ''}<div class="publication-actions"><button class="${state.published ? 'danger-button' : 'primary-button publish-button'}" data-toggle-publish>${state.published ? 'Despublicar' : 'Publicar'}</button><button class="secondary-button" data-route-button="portfolio-editar"><span data-icon="edit"></span>Editar conteúdo</button>${state.published ? '<button class="secondary-button" data-open-preview>Abrir portfólio</button>' : ''}</div><p class="workspace-note">Esta tela mostra a publicação atual do seu portfólio.</p></article>
+    <article class="card publication-history"><div class="section-card-head"><div><h2>Histórico de publicações</h2><p>Todas as versões do seu portfólio publicadas.</p></div><button class="secondary-button" data-manage-publication-history><span data-icon="refresh"></span>Gerenciar histórico</button></div>
+      <div class="publication-table-wrap"><table class="publication-table"><thead><tr><th>Portfólio</th><th>Data</th><th>Horário</th><th>Status</th><th>Ações</th></tr></thead><tbody>${entries.length ? entries.map(event => { const date = new Date(event.createdAt); return `<tr><td>${esc(event.name)}</td><td>${date.toLocaleDateString('pt-BR')}</td><td>${date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</td><td><span class="status ${event.action === 'published' ? 'published' : 'draft'}">${event.action === 'published' ? 'Publicado' : 'Despublicado'}</span></td><td><button class="secondary-button" data-open-publication-id="${esc(event.id)}" ${event.snapshot ? '' : 'disabled'}>Abrir</button><button class="icon-button" data-publication-menu="${esc(event.id)}" aria-label="Ações do registro">⋮</button></td></tr>` }).join('') : '<tr><td colspan="5" class="publication-empty">Nenhuma publicação registrada ainda.</td></tr>'}</tbody></table></div>
+    </article>
+  </section>`
+}
+
+function showPublicationEvent(id) {
+  const event = visualPublications.events.find(item => item.id === id)
+  if (!event?.snapshot) return
+  modal(`<div class="modal-head"><h2>${esc(event.name)}</h2><button class="icon-button" data-close-modal aria-label="Fechar"><span data-icon="x"></span></button></div><p class="publication-version-date">Versão de ${new Date(event.createdAt).toLocaleString('pt-BR')}</p>${documentPreview({ profile: event.snapshot.profile, projects: event.snapshot.projects, compact: true })}<div class="modal-actions"><button class="secondary-button" data-close-modal>Fechar</button>${event.url ? `<button class="primary-button" data-open-publication-url="${esc(event.url)}">Abrir link</button>` : ''}</div>`)
+  $('[data-open-publication-url]', $('#modal-root'))?.addEventListener('click', () => window.open(event.url, '_blank', 'noopener'))
+}
+
+function publicationEventMenu(id) {
+  const event = visualPublications.events.find(item => item.id === id)
+  if (!event) return
+  modal(`<div class="modal-head"><h2>${esc(event.name)}</h2><button class="icon-button" data-close-modal aria-label="Fechar"><span data-icon="x"></span></button></div><p>${event.action === 'published' ? 'Portfólio publicado' : 'Portfólio despublicado'} em ${new Date(event.createdAt).toLocaleString('pt-BR')}.</p><div class="modal-actions">${event.snapshot ? `<button class="secondary-button" data-open-publication-id="${esc(event.id)}">Ver versão</button>` : ''}${event.url ? `<button class="secondary-button" data-copy="${esc(event.url)}">Copiar link</button>` : ''}</div>`)
+  $('[data-open-publication-id]', $('#modal-root'))?.addEventListener('click', () => showPublicationEvent(id))
+  $('[data-copy]', $('#modal-root'))?.addEventListener('click', button => copyText(button.currentTarget.dataset.copy))
+}
+
 function plansView(){return `<section class="page-enter plans-page">${pageHead('Planos','Compare os recursos disponíveis para seu portfólio.')}<p class="plans-availability">As assinaturas pagas estão em breve. Continue editando e publicando seu portfólio.</p><div class="devi-plan-grid">${renderPlanCards({internal:true})}</div></section>`}
 
 const views = { publicacoes: publicationsView, planos: plansView, 'link-qrcode': linkQrView, inicio: homeView, projetos: projectsView, portfolio: portfolioManagerView, modelos: modelsView, 'portfolio-editar': portfolioEditorView, github: githubView, analise: analyticsView, kaptei: kapteiView, perfil: profileView, configuracoes: settingsView, indicacao: referralView }
@@ -443,7 +531,7 @@ function render({ preserveScroll = false } = {}) {
   document.body.classList.toggle('projects-route', route === 'projetos')
   document.body.classList.toggle('kaptei-route', route === 'kaptei')
   $('#page-content').innerHTML = views[route]()
-  const routeLabel = { publicacoes:'Publicações', planos:'Planos', 'link-qrcode': 'Seu Link, Seu QR Code', inicio: 'Dashboard', projetos: 'Meus projetos', portfolio: 'Portifólios e Projetos', modelos: 'Modelos', 'portfolio-editar': 'Editar portfólio', github: 'GitHub', analise: 'Análise', kaptei: 'Kaptei', perfil: 'Perfil', configuracoes: 'Configurações', indicacao: 'Indicação' }[route]
+  const routeLabel = { publicacoes:'Publicações', planos:'Planos', 'link-qrcode': 'Seu Link, Seu QR Code', inicio: 'Dashboard', projetos: 'Projetos', portfolio: 'Portfólios secundários', modelos: 'Modelos', 'portfolio-editar': 'Editar portfólio', github: 'GitHub', analise: 'Análise', kaptei: 'Kaptei', perfil: 'Perfil', configuracoes: 'Configurações', indicacao: 'Indicação' }[route]
   document.title = `${routeLabel} — FolioDev`
   if ($('#breadcrumb-page')) $('#breadcrumb-page').textContent = routeLabel
   if ($('#breadcrumb-section')) $('#breadcrumb-section').textContent = route === 'inicio' ? 'Início' : 'Painel'
@@ -469,7 +557,7 @@ function updateUserChrome() {
 }
 
 function bindActions() {
-  $$('[data-project-layout]').forEach(button=>button.onclick=()=>{const grid=$('.portfolio-project-grid');grid?.classList.toggle('is-list',button.dataset.projectLayout==='list');$$('[data-project-layout]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)))})
+  $$('[data-project-layout]').forEach(button=>button.onclick=()=>{portfolioLayout=button.dataset.projectLayout;const grid=$('.portfolio-project-grid');grid?.classList.toggle('is-list',portfolioLayout==='list');$$('[data-project-layout]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)))})
   $$('[data-preview-model]').forEach(button=>button.onclick=()=>{modal(documentPreview({profile:state.profile,projects:state.projects.filter(p=>p.status==='published'),model:getPortfolioModel(button.dataset.previewModel)})+'<div class="modal-actions"><button class="secondary-button" data-close-modal>Fechar prévia</button></div>');$('.modal').classList.add('model-preview-modal')})
   $$('[data-settings-anchor]').forEach(link=>link.onclick=event=>{event.preventDefault();document.getElementById(link.dataset.settingsAnchor)?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'})})
   $$('[data-unlock-field]').forEach(button=>button.onclick=()=>{const input=button.closest('.field')?.querySelector('input,textarea');if(input){input.readOnly=false;input.focus()}})
@@ -479,6 +567,9 @@ function bindActions() {
   $$('[data-open-preview]').forEach(button => button.onclick = () => window.open(publicPortfolioUrl(), '_blank', 'noopener'))
   $$('[data-edit-portfolio]').forEach(button => button.onclick = () => { location.hash = 'portfolio-editar' })
   $$('[data-portfolio-menu]').forEach(button => button.onclick = () => portfolioActions(button.dataset.portfolioMenu))
+  $$('[data-show-folder-info]').forEach(button => button.onclick = () => showPortfolioFolderInfo(button.dataset.showFolderInfo))
+  $$('[data-access-folder]').forEach(button => button.onclick = () => accessPortfolioFolder(button.dataset.accessFolder))
+  $$('[data-folder-publish]').forEach(button => button.onclick = () => toggleFolderPublication(button.dataset.folderPublish))
   $$('[data-folder-id]').forEach(folder => {
     folder.onclick = event => { if (folder.tagName === 'BUTTON' || !event.target.closest('button')) openPortfolioFolder(folder.dataset.folderId) }
     folder.onkeydown = event => {
@@ -503,6 +594,16 @@ function bindActions() {
   bindProjectGrid()
   bindKapteiActions({ modal, toast })
 
+  const folderSearch = $('#portfolio-project-search')
+  if (folderSearch) folderSearch.oninput = () => {
+    const query = folderSearch.value.trim().toLocaleLowerCase('pt-BR')
+    const items = selectedFolderId ? projectsAt(selectedFolderId).filter(project => `${project.name} ${project.description} ${project.tech}`.toLocaleLowerCase('pt-BR').includes(query)) : []
+    const grid = $('.portfolio-project-grid')
+    grid.innerHTML = items.length || !query ? projectCards(items) : '<div class="projects-empty">Nenhum projeto encontrado.</div>'
+    hydrateIcons(grid)
+    bindProjectGrid(grid)
+  }
+
   const search = $('#project-search'), filter = $('#type-filter'), sort = $('#project-sort')
   if (search && filter && sort) {
     const update = () => {
@@ -520,10 +621,15 @@ function bindActions() {
 
   $('#portfolio-form')?.addEventListener('submit', savePortfolioForm)
   $('[data-toggle-publish]')?.addEventListener('click', togglePublished)
+  $('[data-manage-publication-history]')?.addEventListener('click', () => { publicationHistoryExpanded = !publicationHistoryExpanded; render({ preserveScroll: true }) })
+  $$('[data-open-publication-id]').forEach(button => button.onclick = () => showPublicationEvent(button.dataset.openPublicationId))
+  $$('[data-publication-menu]').forEach(button => button.onclick = () => publicationEventMenu(button.dataset.publicationMenu))
   $('#profile-form')?.addEventListener('submit', saveProfileForm)
   $('#password-form')?.addEventListener('submit', changePassword)
   $('[data-upload-avatar]')?.addEventListener('click', () => $('#avatar-file')?.click())
   $('#avatar-file')?.addEventListener('change', handleAvatarUpload)
+  $('[data-upload-profile-banner]')?.addEventListener('click', () => $('#profile-banner-file')?.click())
+  $('#profile-banner-file')?.addEventListener('change', handleProfileBannerUpload)
   $('[data-connect-github]')?.addEventListener('click', connectGithub)
   $('[data-disconnect-github]')?.addEventListener('click', disconnectGithub)
   $('[data-sync-repos]')?.addEventListener('click', fetchGithubRepos)
@@ -590,12 +696,12 @@ function bindGithubPagination() {
   const controls = root && $('.repo-pagination', root)
   if (!controls) return
   const rows = $$('.repo-row', root)
-  const pageCount = Math.ceil(rows.length / 5)
+  const pageCount = rows.length
   let page = 0
   $$('[data-repo-page-change]', controls).forEach(button => {
     button.onclick = () => {
       page = Math.max(0, Math.min(pageCount - 1, page + Number(button.dataset.repoPageChange)))
-      rows.forEach((row, index) => { row.hidden = Math.floor(index / 5) !== page })
+      rows.forEach((row, index) => { row.hidden = index !== page })
       $('[data-repo-page-status]', controls).textContent = `Página ${page + 1} de ${pageCount}`
       $('[data-repo-page-change="-1"]', controls).disabled = page === 0
       $('[data-repo-page-change="1"]', controls).disabled = page === pageCount - 1
@@ -620,7 +726,7 @@ function projectOrganizer(id) {
   if (!project) return
   const storedDestination = projectLocation(project)
   const destination = storedDestination === 'projects' || state.hiddenFolders.includes(storedDestination) ? 'loose' : storedDestination
-  modal(`<div class="modal-head"><h2>${esc(project.name)}</h2><button class="icon-button" data-close-modal aria-label="Fechar"><span data-icon="x"></span></button></div><div class="card-action-menu"><button class="danger-button" type="button" data-delete-project="${id}"><span data-icon="trash"></span>Deletar projeto</button><button class="secondary-button" type="button" data-deploy-project="${id}"><span data-icon="rocket"></span>Deploy</button><button class="secondary-button" type="button" data-edit-project="${id}"><span data-icon="edit"></span>Editar</button></div><details class="project-organize-options"><summary>Organizar projeto</summary><label class="field"><span>Mover para</span><select id="project-destination"><option value="loose" ${destination === 'loose' ? 'selected' : ''}>Área principal de portfólios</option>${visiblePortfolioFolders().map(folder => `<option value="${folder.id}" ${destination === folder.id ? 'selected' : ''}>${esc(folderName(folder.id))}</option>`).join('')}</select></label><div class="organizer-actions"><button class="secondary-button" data-move-project>Mover projeto</button><button class="secondary-button" data-order-project="-1">Mover antes</button><button class="secondary-button" data-order-project="1">Mover depois</button><button class="secondary-button" data-view-project="${id}">Visualizar</button><button class="secondary-button" data-open-project="${id}">Acessar</button></div></details>`)
+  modal(`<div class="modal-head"><h2>${esc(project.name)}</h2><button class="icon-button" data-close-modal aria-label="Fechar"><span data-icon="x"></span></button></div><div class="card-action-menu"><button class="danger-button" type="button" data-delete-project="${id}"><span data-icon="trash"></span>Deletar projeto</button><button class="${project.status === 'published' ? 'danger-button' : 'primary-button publish-button'}" type="button" ${project.status === 'published' ? `data-undeploy-project="${id}"` : `data-deploy-project="${id}"`}>${project.status === 'published' ? 'Despublicar' : 'Publicar'}</button><button class="secondary-button" type="button" data-edit-project="${id}"><span data-icon="edit"></span>Editar</button></div><details class="project-organize-options"><summary>Organizar projeto</summary><label class="field"><span>Mover para</span><select id="project-destination"><option value="loose" ${destination === 'loose' ? 'selected' : ''}>Projetos sem portfólio</option>${visiblePortfolioFolders().map(folder => `<option value="${folder.id}" ${destination === folder.id ? 'selected' : ''}>${esc(folderName(folder.id))}</option>`).join('')}</select></label><div class="organizer-actions"><button class="secondary-button" data-move-project>Mover projeto</button><button class="secondary-button" data-order-project="-1">Mover antes</button><button class="secondary-button" data-order-project="1">Mover depois</button><button class="secondary-button" data-view-project="${id}">Visualizar</button><button class="secondary-button" data-open-project="${id}">Acessar</button></div></details>`)
   bindProjectGrid($('#modal-root'))
   $('[data-move-project]').onclick = async event => {
     setButtonLoading(event.currentTarget, true, 'Movendo...')
@@ -649,22 +755,20 @@ function saveFolderOrder(order) {
 let organizingProject = false
 async function organizeProject(id, destination, beforeId = null) {
   if (organizingProject) throw new Error('Aguarde a organização anterior terminar.')
-  const openedFolder = $('[data-open-folder]')?.dataset.openFolder
   const changes = planProjectMove(state.projects, id, destination, beforeId)
   if (!changes.length) return
   organizingProject = true
   try {
     state.projects = await persistProjectMove(state.projects, changes, (projectId, order) => moveProject(currentUser.id, projectId, order))
-    if (openedFolder && openedFolder !== destination) closeModal()
+    if (destination !== 'projects' && destination !== 'loose') selectedFolderId = destination
     if (destination === 'projects') location.hash = 'projetos'
     else if (destination === 'loose') location.hash = 'portfolio'
+    else location.hash = 'portfolio'
     render({ preserveScroll: true })
-    if (openedFolder === destination) openPortfolioFolder(destination)
   } catch (error) {
     // The server remains the source of truth, including a failed rollback.
     try { const workspace = await loadWorkspace(currentUser.id); if (workspace.available) state.projects = workspace.projects } catch (reloadError) { console.error('[Devifolio] Organização não recarregada.', reloadError) }
     render({ preserveScroll: true })
-    if (openedFolder) openPortfolioFolder(openedFolder)
     throw error
   } finally { organizingProject = false }
 }
@@ -699,72 +803,48 @@ const waitForVisual = (started, targetMs) => new Promise(resolve => {
   window.setTimeout(resolve, Math.max(0, targetMs - (performance.now() - started)))
 })
 
-function createDeployPanel(button, text) {
-  const panel = document.createElement('div')
-  panel.className = 'deploy-status-panel'
-  panel.setAttribute('role', 'status')
-  panel.setAttribute('aria-live', 'polite')
-  panel.textContent = text
-  document.body.append(panel)
-
-  function position() {
-    const anchor = button.getBoundingClientRect()
-    const width = panel.offsetWidth
-    const height = panel.offsetHeight
-    const left = Math.min(Math.max(12, anchor.left), Math.max(12, innerWidth - width - 12))
-    const below = anchor.bottom + 9
-    const top = below + height <= innerHeight - 12 ? below : Math.max(12, anchor.top - height - 9)
-    panel.style.left = left + 'px'
-    panel.style.top = top + 'px'
+async function togglePublished() {
+  if (!state.published && !profileComplete()) return toast('Adicione seu nome e username antes de publicar.', 'error')
+  if (state.published) {
+    modal(`<div class="confirm-dialog"><h2>Despublicar portfólio?</h2><p>Seu portfólio público ficará indisponível para visitantes.</p><div class="modal-actions"><button class="secondary-button" data-close-modal>Cancelar</button><button class="danger-button" data-confirm-unpublish>Despublicar</button></div></div>`)
+    $('[data-confirm-unpublish]').onclick = () => runPortfolioPublication(false)
+    return
   }
-
-  window.addEventListener('scroll', position, { passive: true })
-  window.addEventListener('resize', position, { passive: true })
-  position()
-  window.requestAnimationFrame(() => panel.classList.add('is-visible'))
-  return {
-    set(text, error = false) {
-      panel.textContent = text
-      panel.classList.toggle('is-error', error)
-      position()
-    },
-    close() {
-      window.removeEventListener('scroll', position)
-      window.removeEventListener('resize', position)
-      panel.remove()
-    },
-  }
+  await runPortfolioPublication(true)
 }
 
-async function togglePublished(event) {
-  if (!state.published && !profileComplete()) return toast('Adicione seu nome e username antes de publicar.', 'error')
-  const button = event.currentTarget
-  const publishing = !state.published
+async function runPortfolioPublication(publishing) {
   const started = performance.now()
-  const panel = createDeployPanel(button, publishing ? 'Executando deploy...' : 'Executando undeploy...')
-  setButtonLoading(button, true, publishing ? 'Fazendo deploy...' : 'Despublicando...')
-  const nextStage = publishing
-    ? window.setTimeout(() => panel.set('Preparando portfólio...'), 1000)
-    : null
+  closeModal({ immediate: true })
+  screenLoading.show(publishing ? 'Publicando portfólio...' : 'Despublicando portfólio...')
   try {
     await saveProfile(currentUser.id, state.profile, publishing)
-    await waitForVisual(started, publishing ? 2000 : 700)
+    if (publishing) {
+      await waitForVisual(started, 1350)
+      screenLoading.show('Enviando projetos...')
+    }
     state.published = publishing
-    panel.set(publishing ? 'Deploy executado.' : 'Undeploy executado.')
-    await waitForVisual(started, publishing ? Math.max(3000, performance.now() - started + 500) : Math.max(1000, performance.now() - started + 300))
-    panel.close()
-    render()
-    toast(publishing ? 'Deploy realizado com sucesso.' : 'Portfólio despublicado.')
+    try {
+      visualPublications = recordVisualPublication(localStorage, currentUser.id, visualPublications, {
+        name: `Portfólio de ${realName()}`,
+        published: publishing,
+        url: publicPortfolioUrl(),
+        snapshot: publishing ? { profile: { ...state.profile }, projects: state.projects.filter(project => project.status === 'published').map(project => ({ ...project })) } : null,
+      })
+    } catch (storageError) { console.warn('[Devifolio] Histórico visual não salvo.', storageError) }
+    if (publishing) {
+      await waitForVisual(started, 2900)
+      screenLoading.show('Portfólio publicado!')
+      await waitForVisual(started, 4000)
+    } else {
+      await waitForVisual(started, 750)
+    }
+    render({ preserveScroll: true })
+    screenLoading.hide()
+    toast(publishing ? 'Portfólio publicado.' : 'Portfólio despublicado.')
   } catch (error) {
-    if (nextStage !== null) window.clearTimeout(nextStage)
-    await waitForVisual(started, 180)
-    panel.set((publishing ? 'Falha no deploy. ' : 'Falha no undeploy. ') + (error?.message || 'Tente novamente.'), true)
-    await new Promise(resolve => window.setTimeout(resolve, 1100))
-    panel.close()
+    screenLoading.hide()
     reportError('Não foi possível alterar a publicação.', error)
-  } finally {
-    if (nextStage !== null) window.clearTimeout(nextStage)
-    setButtonLoading(button, false)
   }
 }
 
@@ -818,6 +898,20 @@ async function handleAvatarUpload(event) {
     toast('Foto atualizada.')
     render()
   } catch (error) { reportError('Não foi possível enviar a foto.', error) } finally { setButtonLoading(button, false) }
+}
+
+async function handleProfileBannerUpload(event) {
+  const file = event.currentTarget.files?.[0]
+  if (!file) return
+  if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) return toast('Use uma imagem JPG, PNG ou WebP de até 5 MB.', 'error')
+  screenLoading.show('Carregando...')
+  try {
+    await uploadPortfolioBanner(currentUser.id, file)
+    profileBannerRevision = String(Date.now())
+    render({ preserveScroll: true })
+    toast('Capa atualizada.')
+  } catch (error) { reportError('Não foi possível atualizar a capa.', error) }
+  finally { screenLoading.hide() }
 }
 
 async function showProject(id) {
@@ -988,8 +1082,8 @@ async function showGithubCallbackResult() {
       return
     }
     await waitForVisual(started, 2500)
-    screenLoading.show('GitHub conectado.')
-    await waitForVisual(started, Math.max(3000, performance.now() - started + 500))
+    screenLoading.show('GitHub conectado!')
+    await waitForVisual(started, Math.max(4000, performance.now() - started + 500))
     screenLoading.hide()
     toast('Conta do GitHub conectada com sucesso.')
     return
@@ -1176,7 +1270,7 @@ function renderWithTransition() {
   const requestedRoute = location.hash.slice(1)
   const route = views[requestedRoute] ? requestedRoute : 'inicio'
   if (route === renderedRoute) return
-  render()
+  screenLoading.navigate(render)
 }
 window.addEventListener('hashchange', renderWithTransition)
 
@@ -1190,6 +1284,7 @@ async function bootstrap() {
   try { state.folderNames = JSON.parse(localStorage.getItem(`devifolio_folder_names_${currentUser.id}`) || '{}'); if (!state.folderNames || typeof state.folderNames !== 'object' || Array.isArray(state.folderNames)) state.folderNames = {} } catch { state.folderNames = {} }
   try { state.folderOrder = JSON.parse(localStorage.getItem(`devifolio_folder_order_${currentUser.id}`) || '[]'); if (!Array.isArray(state.folderOrder)) state.folderOrder = [] } catch { state.folderOrder = [] }
   try { state.hiddenFolders = JSON.parse(localStorage.getItem(`devifolio_hidden_folders_${currentUser.id}`) || '[]'); if (!Array.isArray(state.hiddenFolders)) state.hiddenFolders = [] } catch { state.hiddenFolders = [] }
+  visualPublications = readVisualPublications(localStorage, currentUser.id)
   restorePortfolioFolders(state.folderNames)
   render()
   try {

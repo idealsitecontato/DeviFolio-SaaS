@@ -19,6 +19,12 @@ const brandUrl = '/folio/foliodev-logo.png'
 const placeholderUrl = new URL('./assets/user-placeholder.png', import.meta.url).href
 const esc = value => String(value ?? '').replace(/[&<>'"]/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[character])
 const username = new URLSearchParams(location.search).get('username') || decodeURIComponent(location.pathname.match(/^\/portfolio\/([^/]+)/)?.[1] || '')
+const folderId = new URLSearchParams(location.search).get('folder')
+const folderLabel = new URLSearchParams(location.search).get('name')?.slice(0, 60) || ''
+const builtInFolders = ['principal', 'profissional', 'destaque', 'github']
+const folderBucket = folderId && (/^folder-\d+$/.test(folderId)
+  ? Number(folderId.slice(7)) + 2
+  : builtInFolders.includes(folderId) ? builtInFolders.indexOf(folderId) + 2 : null)
 const imageTypes = new Set(['image/jpeg', 'image/png', 'image/webp'])
 let portfolio = null
 let isOwner = false
@@ -59,7 +65,7 @@ function renderPage() {
   const name = profile.name || profile.username
   const avatar = profile.avatar || placeholderUrl
   const banner = `${portfolioBannerUrl(profile.userId)}${bannerRevision ? `?v=${bannerRevision}` : ''}`
-  document.title = `${name} — FolioDev`
+  document.title = `${folderId ? folderLabel || 'Portfólio secundário' : name} — FolioDev`
   const description=profile.bio || `Projetos de ${name}. Portfólio criado com FolioDev.`
   document.querySelector('meta[name="description"]').content=description
   document.querySelector('meta[property="og:title"]').content=document.title
@@ -196,7 +202,7 @@ async function start() {
       root.innerHTML = '<section class="public-state"><h1>Portfólio indisponível</h1><p>Este portfólio não existe ou ainda não foi publicado.</p><a class="public-button" href="/">Voltar ao FolioDev</a></section>'
       return
     }
-    portfolio = data
+    portfolio = folderId ? { ...data, projects: data.projects.filter(project => folderBucket !== null && Math.floor(project.sortOrder / 100000) === folderBucket) } : data
     isOwner = identity.data?.user?.id === data.profile.userId
     renderPage()
     if (!isOwner) trackPublicEvent(data.profile.userId, 'portfolio_view', null, visitorId())
