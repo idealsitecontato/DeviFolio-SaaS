@@ -6,7 +6,7 @@ html,body{margin:0;min-height:100%;font-family:"DM Sans",Arial,sans-serif;color:
 .not-found-copy{margin-top:10vh}
 .not-found h1{margin:0;font-size:clamp(105px,10vw,160px);font-weight:400;line-height:.94;letter-spacing:-.065em}
 .not-found h2{margin:8px 0 0;font-size:clamp(25px,2.2vw,35px);font-weight:500;line-height:1.2;letter-spacing:-.035em}
-.not-found p{margin:18px 0 0;color:#62676d;font-size:clamp(14px,1.15vw,18px);line-height:1.4}
+.not-found p{margin:18px 0 0;color:#141414;font-size:clamp(14px,1.15vw,18px);line-height:1.4}
 .retry-button{display:inline-flex;align-items:center;justify-content:center;width:235px;min-height:44px;margin-top:27px;padding:8px 20px;border:1px solid #080808;border-radius:var(--radius-md);background:#080808;color:#fff;font-size:13px;font-weight:500;text-decoration:none;transition:background .18s}
 .retry-button:hover{background:#292929}
 .retry-button:active{background:#080808}

@@ -1,4 +1,4 @@
-.auth-body{background:#fff;--text-muted:#334369;--accent:#046eff;--border-strong:#b4c6e4}
+.auth-body{background:var(--color-bg);--text-muted:#141414;--accent:#141414;--border-strong:#D8D8D1}
 .auth-shell{min-height:100dvh;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
 .auth-left{grid-column:1;grid-row:1;display:flex;align-items:center;justify-content:center;padding:48px 24px}
 .auth-form-wrap{width:clamp(340px,28.3vw,520px);max-width:100%;padding:0;transform:translate(7px,4.5px)}
@@ -9,27 +9,27 @@
 .auth-panel form{display:grid;gap:18px}
 .auth-body .auth-field{gap:7px}
 .auth-body .auth-field label{font-size:13px;font-weight:400;line-height:1.3;color:var(--text-muted)}
-.auth-body input:not([type=checkbox]){height:clamp(42px,2.89vw,56px);min-height:42px;padding:9px 16px;border:1px solid var(--border-strong);border-radius:12px;background:#fff;font-size:15px}
-.auth-body input[type=checkbox]{appearance:none;margin:0;width:19px;height:19px;min-width:19px;border:1px solid #7b8ba5;border-radius:4px;display:grid;place-content:center;background:#fff}
+.auth-body input:not([type=checkbox]){height:clamp(42px,2.89vw,56px);min-height:42px;padding:9px 16px;border:1px solid var(--border-strong);border-radius:12px;background:var(--color-bg);font-size:15px}
+.auth-body input[type=checkbox]{appearance:none;margin:0;width:19px;height:19px;min-width:19px;border:1px solid #141414;border-radius:4px;display:grid;place-content:center;background:var(--color-bg)}
 .auth-body input[type=checkbox]:checked{background:#111;border-color:#111}
 .auth-body input[type=checkbox]:checked:after{content:'';width:11px;height:6px;transform:translateY(-1px) rotate(-45deg);border-bottom:2px solid white;border-left:2px solid white}
 .auth-row-between{display:flex;align-items:center;justify-content:space-between;margin-top:-4px;font-size:14px;gap:12px}
 .auth-checkbox{display:flex;align-items:center;gap:10px;color:var(--text-muted);font-size:14px;line-height:1.4}
-.auth-body a:focus-visible,.auth-body button:focus-visible,.auth-body input:focus-visible{outline-color:#075ed0}
-.auth-forgot,.auth-switch a,.auth-terms a{color:#0069ed;text-decoration:underline;text-underline-offset:2px;font-weight:500}
+.auth-body a:focus-visible,.auth-body button:focus-visible,.auth-body input:focus-visible{outline-color:#141414}
+.auth-forgot,.auth-switch a,.auth-terms a{color:#141414;text-decoration:underline;text-underline-offset:2px;font-weight:500}
 .auth-body .button{width:100%;height:clamp(44px,3.03vw,60px);min-height:44px;border-radius:11px;font-size:15px;font-weight:600;padding:8px 16px}
 .auth-body .button-submit{background:#1c1c1c;border-color:#1c1c1c;margin-top:0}
 .auth-divider{display:flex;align-items:center;gap:13px;color:var(--text-muted);font-size:13px;line-height:1.4;margin:16px 0 16px}
-.auth-divider:before,.auth-divider:after{content:'';height:1px;background:#cbd6e9;flex:1}
+.auth-divider:before,.auth-divider:after{content:'';height:1px;background:#D8D8D1;flex:1}
 .auth-providers{display:grid;gap:10px}
-.auth-body .button-google{color:#111;background:white;border:1px solid var(--border-strong)}
+.auth-body .button-google{color:#111;background:var(--color-bg);border:1px solid var(--border-strong)}
 .auth-body .button-github{background:#161616;border-color:#161616;color:white}
 .auth-providers img{width:26px;height:26px;margin-right:10px}
 .auth-body .button:hover{filter:brightness(.94)}
-.auth-body .button-google:hover{background:#f7fbff}
+.auth-body .button-google:hover{background:#D8D8D1}
 .auth-switch{text-align:center;font-size:13px;color:var(--text-muted);margin-top:22px}
 .auth-switch a{margin-left:6px}
-.auth-right{grid-column:2;grid-row:1;background:#046eff;min-height:100%;padding:0;position:relative;color:#fff}
+.auth-right{grid-column:2;grid-row:1;background:#141414;min-height:100%;padding:0;position:relative;color:#fff}
 .auth-story{position:sticky;top:0;padding:clamp(85px,8.35vw,170px) 0 0 4.35vw}
 .auth-story h2{font-size:clamp(32px,3.3vw,64px);font-weight:400;line-height:1.115;letter-spacing:0;text-wrap:nowrap}
 .auth-integrations{display:flex;align-items:center;margin-top:31px;padding-left:10px}
@@ -37,9 +37,9 @@
 .auth-integrations img+img{margin-left:-7px}
 .auth-message{padding:12px;margin-bottom:16px;border-radius:12px;background:var(--danger-bg);color:var(--danger-fg);font-size:13px;border:1px solid currentColor}
 .auth-message.is-success{background:var(--success-bg);color:var(--success-fg)}
-.password-field{position:relative;border:0;background:white;border-radius:12px}
+.password-field{position:relative;border:0;background:var(--color-bg);border-radius:12px}
 .auth-body .password-field input{padding-right:44px}
-.password-toggle{position:absolute;right:3px;top:0;bottom:0;width:38px;background:transparent;border:0;border-radius:10px;color:#7b8ba5;display:grid;place-items:center}
+.password-toggle{position:absolute;right:3px;top:0;bottom:0;width:38px;background:transparent;border:0;border-radius:10px;color:#141414;display:grid;place-items:center}
 .password-toggle svg{width:17px;height:17px}
 .password-strength{font-size:12px;line-height:1.35;color:var(--text-muted)}
 .password-strength:empty{display:none}
@@ -57,35 +57,35 @@
 
 /* Login and signup reference styling; all rules stay inside the auth page. */
 @scope (body.auth-body:is([data-auth-view=login],[data-auth-view=cadastro])) {
-:scope{background:#fff;--text-muted:#6b7280;--border-strong:#e5e7eb;--accent:#1d6bff;color:#0a0a0a}
+:scope{background:var(--color-bg);--text-muted:#141414;--border-strong:#e5e7eb;--accent:#141414;color:#0a0a0a}
 .auth-shell{grid-template-columns:1fr 1fr}
-.auth-left{padding:42px 36px;background:#fff}
+.auth-left{padding:42px 36px;background:var(--color-bg)}
 .auth-form-wrap{width:min(384px,100%);transform:none}
 .auth-brand{margin:0 0 25px;transform:none}
 .auth-logo{width:190px;height:auto;object-fit:contain}
 .auth-panel h1{font-size:30px;font-weight:700;letter-spacing:-.04em;line-height:1.08}
-.auth-sub{font-size:13px;line-height:1.45;margin:4px 0 24px;color:#6b7280;white-space:normal}
+.auth-sub{font-size:13px;line-height:1.45;margin:4px 0 24px;color:#141414;white-space:normal}
 .auth-panel form{gap:17px}
 .auth-body .auth-field{gap:6px}
-.auth-body .auth-field label{font-size:12px;color:#626b79;font-weight:500}
-.auth-body input:not([type=checkbox]){height:43px;min-height:43px;border:1px solid #d9dce2;border-radius:10px;padding:9px 15px;font-size:14px;color:#111;box-shadow:0 1px 2px #11111105}
-.auth-body input::placeholder{color:#9ca3af;opacity:1}
-.auth-body input:focus-visible,.auth-body button:focus-visible,.auth-body a:focus-visible{outline:2px solid #1d6bff;outline-offset:2px}
+.auth-body .auth-field label{font-size:12px;color:#141414;font-weight:500}
+.auth-body input:not([type=checkbox]){height:43px;min-height:43px;border:1px solid #D8D8D1;border-radius:10px;padding:9px 15px;font-size:14px;color:#111;box-shadow:0 1px 2px #11111105}
+.auth-body input::placeholder{color:#D8D8D1;opacity:1}
+.auth-body input:focus-visible,.auth-body button:focus-visible,.auth-body a:focus-visible{outline:2px solid #141414;outline-offset:2px}
 .auth-row-between{font-size:12px;margin-top:-5px}
-.auth-checkbox{font-size:12px;color:#6b7280;gap:9px}
-.auth-body input[type=checkbox]{width:17px;height:17px;min-width:17px;border-color:#a5aab2}
-.auth-forgot,.auth-switch a,.auth-terms a{color:#2878d6;text-decoration:underline;text-underline-offset:2px}
+.auth-checkbox{font-size:12px;color:#141414;gap:9px}
+.auth-body input[type=checkbox]{width:17px;height:17px;min-width:17px;border-color:#D8D8D1}
+.auth-forgot,.auth-switch a,.auth-terms a{color:#141414;text-decoration:underline;text-underline-offset:2px}
 .auth-body .button{height:43px;min-height:43px;border-radius:10px;font-size:13px;font-weight:600;transition:background 150ms,transform 150ms,box-shadow 150ms}
 .auth-body .button:hover:not(:disabled){filter:none;transform:translateY(-1px)}
 .auth-body .button-submit,.auth-body .button-github{background:#111;border-color:#111;color:#fff}
 .auth-body .button-submit:hover:not(:disabled),.auth-body .button-github:hover:not(:disabled){background:#292929;box-shadow:0 5px 14px #0000001a}
-.auth-body .button-google{background:#fff;border:1px solid #d9dce2;color:#111}
+.auth-body .button-google{background:var(--color-bg);border:1px solid #D8D8D1;color:#111}
 .auth-body .button-google:hover:not(:disabled){background:#f9fafb}
-.auth-divider{font-size:12px;color:#7b8492;margin:16px 0}
+.auth-divider{font-size:12px;color:#141414;margin:16px 0}
 .auth-divider:before,.auth-divider:after{background:#e5e7eb}
 .auth-providers{gap:9px}
 .auth-providers img{width:23px;height:23px;margin-right:9px}
-.auth-switch{font-size:12px;margin-top:21px;color:#6b7280}
+.auth-switch{font-size:12px;margin-top:21px;color:#141414}
 .auth-right{background:#000;color:#fff}
 .auth-story{padding:clamp(84px,11.5vh,130px) 30px 0 clamp(54px,4vw,90px)}
 .auth-story h2{font-size:clamp(40px,3.45vw,56px);font-weight:500;line-height:1.08;letter-spacing:-.04em;color:#fff}
@@ -93,7 +93,7 @@
 .auth-integrations-reference{display:flex}
 .auth-integrations-original{display:none}
 .auth-integrations span{width:100px;height:100px;border-radius:50%;display:grid;place-items:center;overflow:hidden}
-.auth-integration-github{background:#fff;z-index:1}
+.auth-integration-github{background:var(--color-bg);z-index:1}
 .auth-integration-github img{width:78px;height:78px;object-fit:contain}
 .auth-integration-k{margin-left:-6px;background:#12a454}
 .auth-integration-k img{width:108px;height:108px;max-width:none;object-fit:cover}

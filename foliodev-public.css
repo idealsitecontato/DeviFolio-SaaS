@@ -267,7 +267,7 @@
 .portfolio-page[data-model="black"] .profile-links a{
   color:var(--text)}
 .portfolio-page[data-model="blue"] .public-hero{
-  border-top:3px solid #2952E3}
+  border-top:3px solid #141414}
 .portfolio-page[data-model="red"] .public-hero{
   border-top:3px solid #B3261E}
 .portfolio-page[data-model="orange"] .public-hero{
@@ -281,7 +281,7 @@
 .portfolio-page[data-model="green"] .public-hero{
   border-top:3px solid #1E7A3E}
 .portfolio-page[data-model="purple"] .public-hero{
-  border-top:3px solid #685091}
+  border-top:3px solid #141414}
 .error-layout{
   display:grid;
   grid-template-columns:1fr 1fr;

@@ -11,9 +11,11 @@ import {
   uploadProjectImage,
 } from './src/lib/user-data.js'
 import { getPortfolioModel } from './src/lib/portfolio-models.js'
+import { mountGooeySpinners, UploadButton } from './src/ui/visual-components.js'
 
 const root = document.getElementById('portfolio-root')
-const brandUrl = new URL('./assets/brand/FolioDev-logo-branca.png', import.meta.url).href
+mountGooeySpinners()
+const brandUrl = '/folio/foliodev-logo.png'
 const placeholderUrl = new URL('./assets/user-placeholder.png', import.meta.url).href
 const esc = value => String(value ?? '').replace(/[&<>'"]/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[character])
 const username = new URLSearchParams(location.search).get('username') || decodeURIComponent(location.pathname.match(/^\/portfolio\/([^/]+)/)?.[1] || '')
@@ -110,7 +112,7 @@ function validateImage(file) {
 
 function editBanner() {
   if (!isOwner) return
-  const dialog = openDialog('Editar banner', `<form class="portfolio-edit-form"><label>Imagem do banner<input type="file" name="banner" accept="image/jpeg,image/png,image/webp" required></label><div class="portfolio-dialog-actions"><button type="button" class="public-button secondary" data-remove-banner>Usar cinza</button><button type="submit" class="public-button">Salvar banner</button></div></form>`)
+  const dialog = openDialog('Editar banner', `<form class="portfolio-edit-form"><label>Imagem do banner<input type="file" name="banner" accept="image/jpeg,image/png,image/webp" required><span class="nuda-browse">${UploadButton('Selecionar banner')}</span></label><div class="portfolio-dialog-actions"><button type="button" class="public-button secondary" data-remove-banner>Usar cinza</button><button type="submit" class="public-button">Salvar banner</button></div></form>`)
   dialog.querySelector('form').onsubmit = async event => {
     event.preventDefault()
     const button = dialog.querySelector('[type="submit"]')
@@ -138,7 +140,7 @@ function editBanner() {
 
 function editAvatar() {
   if (!isOwner) return
-  const dialog = openDialog('Editar foto de perfil', `<form class="portfolio-edit-form"><label>Nova foto<input type="file" name="avatar" accept="image/jpeg,image/png,image/webp" required></label><div class="portfolio-dialog-actions"><button type="submit" class="public-button">Salvar foto</button></div></form>`)
+  const dialog = openDialog('Editar foto de perfil', `<form class="portfolio-edit-form"><label>Nova foto<input type="file" name="avatar" accept="image/jpeg,image/png,image/webp" required><span class="nuda-browse">${UploadButton('Selecionar foto')}</span></label><div class="portfolio-dialog-actions"><button type="submit" class="public-button">Salvar foto</button></div></form>`)
   dialog.querySelector('form').onsubmit = async event => {
     event.preventDefault()
     const button = dialog.querySelector('[type="submit"]')
@@ -159,7 +161,7 @@ function editProject(id) {
   if (!isOwner) return
   const project = portfolio.projects.find(item => item.id === id)
   if (!project) return
-  const dialog = openDialog('Editar projeto', `<form class="portfolio-edit-form"><label>Título<input name="name" required maxlength="100" value="${esc(project.name)}"></label><label>Descrição<textarea name="description" rows="3" maxlength="500">${esc(project.description)}</textarea></label><label>Tecnologias<input name="tech" value="${esc(project.tech)}"></label><label>Link do projeto<input name="link" value="${esc(project.link)}"></label><label>GitHub<input name="github" value="${esc(project.github)}"></label><label>Imagem de capa<input type="file" name="cover" accept="image/jpeg,image/png,image/webp"></label><div class="portfolio-dialog-actions"><button type="submit" class="public-button">Salvar projeto</button></div></form>`)
+  const dialog = openDialog('Editar projeto', `<form class="portfolio-edit-form"><label>Título<input name="name" required maxlength="100" value="${esc(project.name)}"></label><label>Descrição<textarea name="description" rows="3" maxlength="500">${esc(project.description)}</textarea></label><label>Tecnologias<input name="tech" value="${esc(project.tech)}"></label><label>Link do projeto<input name="link" value="${esc(project.link)}"></label><label>GitHub<input name="github" value="${esc(project.github)}"></label><label>Imagem de capa<input type="file" name="cover" accept="image/jpeg,image/png,image/webp"><span class="nuda-browse">${UploadButton('Selecionar imagem')}</span></label><div class="portfolio-dialog-actions"><button type="submit" class="public-button">Salvar projeto</button></div></form>`)
   dialog.querySelector('form').onsubmit = async event => {
     event.preventDefault()
     const form = event.currentTarget

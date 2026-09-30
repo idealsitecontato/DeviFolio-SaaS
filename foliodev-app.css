@@ -1787,7 +1787,7 @@
 .portfolio-folder-paper{
   position:absolute;
   inset:3px 3px 2px;
-  background:white;
+  background:var(--color-bg);
   border-radius:3px}
 .portfolio-folder-front{
   position:absolute;

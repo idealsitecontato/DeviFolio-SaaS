@@ -1,4 +1,5 @@
 import { createScreenLoading } from './screen-loading.js'
+import { mountGooeySpinners } from './src/ui/visual-components.js'
 
 const panels = {
   login: document.getElementById('panel-login'),
@@ -9,6 +10,7 @@ const panels = {
 
 let redirecting = false
 const screenLoading = createScreenLoading({ shell: document.querySelector('.auth-shell'), loading: document.getElementById('auth-loading') })
+mountGooeySpinners()
 let supabasePromise
 const referralUsername = new URLSearchParams(window.location.search).get('ref')?.trim().toLowerCase() || ''
 

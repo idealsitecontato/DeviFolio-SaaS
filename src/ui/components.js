@@ -1,5 +1,5 @@
 export const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[char])
-const brandUrl = new URL('../../assets/brand/FolioDev-logo-branca.png', import.meta.url).href
+const brandUrl = '/folio/foliodev-logo.png'
 export const brandMarkup = () => `<span class="folio-brand"><img src="${brandUrl}" alt="FolioDev" width="1536" height="864"></span>`
 export const statusBadge = status => `<span class="status ${escapeHtml(status)}">${({ published:'Publicado', progress:'Em desenvolvimento', draft:'Rascunho' })[status] || 'Rascunho'}</span>`
 export function projectCardMarkup(project, { actions = '', draggable = false } = {}) {

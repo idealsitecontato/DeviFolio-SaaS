@@ -2,19 +2,21 @@
 
 :root{
   color-scheme:light;
-  --bg:#FAFAF9;
-  --surface:#FFF;
-  --surface-muted:#F4F4F2;
+  --color-bg:#F2F2EA;
+  --color-charcoal:#141414;
+  --bg:var(--color-bg);
+  --surface:var(--color-bg);
+  --surface-muted:#EAEAE3;
   --surface-inset:#EDEDEA;
   --text:#0B0B0C;
   --text-muted:#5C5C60;
   --text-subtle:#8A8A90;
   --border:#E6E6E2;
   --border-strong:#D2D2CD;
-  --action:#0B0B0C;
-  --action-text:#FFF;
-  --accent:#2952E3;
-  --accent-soft:#EAEFFD;
+  --action:var(--color-charcoal);
+  --action-text:#F2F2EA;
+  --accent:var(--color-charcoal);
+  --accent-soft:#E4E4DD;
   --success-bg:#E7F6EC;
   --success-fg:#1E7A3E;
   --warning-bg:#FDF4D9;
@@ -665,7 +667,7 @@ to{
 .document-frame[data-preview-model="green"] .document-toolbar{
   border-left:3px solid #1E7A3E}
 .document-frame[data-preview-model="purple"] .document-toolbar{
-  border-left:3px solid #685091}
+  border-left:3px solid #141414}
 .subtle{
   color:var(--text-muted)}
 @media(max-width:640px){
