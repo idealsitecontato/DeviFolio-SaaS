@@ -1,4 +1,6 @@
 // Demonstração visual do Kaptei, produto nativo da DeviFolio.
+const kapteiBannerUrl = new URL('./assets/kaptei/kaptei-banner-oficial.png', import.meta.url).href
+
 const leads = [
   { id: 1, name: 'Lucas Almeida', email: 'lucas@techsolucoes.com', phone: '(11) 98765-4321', company: 'Tech Soluções', interest: 'Site Institucional', potential: 'Alto', date: '25/09/2026 14:32', message: 'Gostaria de conhecer as opções para um novo site institucional.' },
   { id: 2, name: 'Mariana Costa', email: 'mariana@auroradigital.com', phone: '(11) 91234-5678', company: 'Aurora Digital', interest: 'Identidade Visual', potential: 'Médio', date: '25/09/2026 12:18', message: 'Busco uma identidade visual para a Aurora Digital.' },
@@ -39,6 +41,7 @@ function leadRow(lead) {
 export function kapteiView() {
   visibleLeads = leads
   return `<section class="page-enter kaptei-page" aria-label="Kaptei, produto do FolioDev">
+    <div class="kaptei-banner"><img src="${kapteiBannerUrl}" alt="Kaptei" width="1600" height="192"></div>
     <div class="kaptei-content"><p class="kaptei-demo-note">Demonstração do Kaptei. Os contatos desta tela são exemplos.</p>
       <div class="kaptei-toolbar">
         <div class="kaptei-heading"><h1>Lista de Leads</h1><p>Gerencie e acompanhe seus leads em um só lugar.</p></div>
