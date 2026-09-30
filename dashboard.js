@@ -26,6 +26,7 @@ import { kapteiView, bindKapteiActions } from './kaptei.js'
 import { readVisualPublications, recordVisualPublication } from './src/lib/visual-publications.js'
 
 const githubIconUrl = new URL('./assets/github-icon.webp', import.meta.url).href
+const profilePlaceholderUrl = new URL('./assets/user-placeholder.png', import.meta.url).href
 
 const $ = (selector, root = document) => root.querySelector(selector)
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)]
@@ -123,12 +124,6 @@ const projectsAt = destination => state.projects.filter(project => projectLocati
 const publicPortfolioUrl = () => {
   const username = encodeURIComponent(state.profile.username.trim().toLowerCase())
   return /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? `${location.origin}/portfolio.html?username=${username}` : `${location.origin}/portfolio/${username}`
-}
-const visitorPortfolioUrl = () => {
-  const url = new URL('/portfolio.html', location.origin)
-  url.searchParams.set('username', state.profile.username.trim().toLowerCase())
-  url.searchParams.set('visitor', '1')
-  return url.href
 }
 const secondaryPortfolioUrl = id => {
   if (!state.profile.username.trim()) return ''
@@ -248,23 +243,35 @@ function previewMarkup() {
   return `<div class="public-preview">${profile.avatar ? `<div class="preview-avatar"><img src="${esc(profile.avatar)}" alt="Foto de ${esc(profile.name)}"></div>` : '<div class="preview-avatar preview-avatar-empty"><span data-icon="user"></span></div>'}${profile.name ? `<p class="preview-kicker">PORTFÓLIO</p><h2 data-preview="name">${esc(profile.name)}</h2>` : '<p class="preview-empty-copy">Adicione seu nome para visualizar a prévia.</p>'}${profile.role ? `<h3 data-preview="role">${esc(profile.role)}</h3>` : ''}${profile.bio ? `<p data-preview="bio">${esc(profile.bio)}</p>` : ''}<div class="preview-skills" data-preview="skills">${profile.skills.split(',').filter(Boolean).map(item => `<span>${esc(item.trim())}</span>`).join('')}</div>${publishedProjects.length ? `<div class="preview-project-list">${publishedProjects.slice(0, 3).map(project => `<span>${esc(project.name)}</span>`).join('')}</div>` : '<div class="preview-empty-copy">Nenhum projeto publicado.</div>'}</div>`
 }
 
+function portfolioPreviewField(label, name, value, { multiline = false, attributes = '', placeholder = '' } = {}) {
+  const id = `preview-${name}`
+  const control = multiline
+    ? `<textarea id="${id}" name="${name}" ${attributes} placeholder="${esc(placeholder)}" readonly>${esc(value)}</textarea>`
+    : `<input id="${id}" name="${name}" value="${esc(value)}" ${attributes} placeholder="${esc(placeholder)}" readonly>`
+  return `<div class="field my-portfolio-field my-portfolio-field-${name}"><label for="${id}">${label}</label><div class="inline-edit-field">${control}<button class="icon-button" type="button" data-unlock-field aria-label="Editar ${label.toLowerCase()}"><span data-icon="edit"></span></button></div></div>`
+}
+
+function portfolioPreviewProject(project) {
+  const url = normalizeExternalUrl(project.link)
+  return `<article class="public-project my-portfolio-project"><div class="project-image">${project.image ? `<img src="${esc(project.image)}" alt="Capa de ${esc(project.name)}" loading="lazy" draggable="false">` : `<span>${esc(project.name.slice(0, 2).toUpperCase())}</span>`}</div><div class="project-content"><h3>${esc(project.name)}</h3><p>${esc(project.description || 'Conheça este projeto.')}</p>${project.tech ? `<div class="tag-row">${project.tech.split(',').filter(Boolean).map(item => `<span class="tag mono">${esc(item.trim())}</span>`).join('')}</div>` : ''}<div class="project-actions">${url ? `<a class="public-button" href="${esc(url)}" target="_blank" rel="noopener">Acessar</a>` : `<button class="public-button" type="button" data-preview-project="${project.id}">Acessar</button>`}<button class="public-button secondary" type="button" data-preview-project="${project.id}">Ver</button></div></div></article>`
+}
+
 function portfolioManagerView() {
-  const folders = visiblePortfolioFolders()
-  if (!folders.some(folder => folder.id === selectedFolderId)) selectedFolderId = folders[0]?.id || null
-  const selected = selectedFolderId
-  const projects = selected ? projectsAt(selected) : []
-  const isPublished = Boolean(selected && visualPublications.folders[selected])
-  const link = selected ? secondaryPortfolioUrl(selected) : ''
-  return `<section class="page-enter portfolio-manager-page">${pageHead('Portfólios secundários', 'Sem conexão com GitHub.', '<button class="primary-button" data-new-portfolio><span data-icon="plus"></span>Novo portfólio</button>')}
-    <div class="portfolio-workspace">
-      <div class="portfolio-folders-column"><header class="portfolio-section-head"><h2>Portfólios</h2></header>
-        <div class="portfolio-list">${folders.length ? folders.map(folder => `<article class="portfolio-list-item ${folder.id === selected ? 'is-selected' : ''}" data-folder-id="${folder.id}" data-drag-folder="${folder.id}" data-drop-zone="${folder.id}" draggable="true" tabindex="0" role="button" aria-pressed="${folder.id === selected}" aria-label="Abrir ${esc(folderName(folder.id))}"><span class="portfolio-folder" aria-hidden="true"><span class="portfolio-folder-back"></span><span class="portfolio-folder-paper"></span><span class="portfolio-folder-front"></span></span><div><h2>${esc(folderName(folder.id))}</h2><small class="mono">${projectsAt(folder.id).length} projeto${projectsAt(folder.id).length === 1 ? '' : 's'}</small></div><button class="icon-button portfolio-more" data-portfolio-menu="${folder.id}" aria-label="Ações de ${esc(folderName(folder.id))}" aria-haspopup="dialog">⋯</button></article>`).join('') : '<p class="portfolio-empty-copy">Crie seu primeiro portfólio secundário.</p>'}</div>
-      </div>
-      <div class="portfolio-projects-column">
-        <header class="section-card-head"><div><h2>Projetos</h2><p>Arraste para organizar nas pastas.</p></div><div class="view-actions"><label class="search-field portfolio-search"><span data-icon="search"></span><input id="portfolio-project-search" type="search" placeholder="Buscar projetos..." aria-label="Buscar projetos"></label><button class="icon-button" data-project-layout="grid" aria-label="Visualizar em grade" aria-pressed="${portfolioLayout === 'grid'}"><span data-icon="layout"></span></button><button class="icon-button" data-project-layout="list" aria-label="Visualizar em lista" aria-pressed="${portfolioLayout === 'list'}"><span data-icon="menu"></span></button><button class="secondary-button" data-new-project data-project-destination="${selected || 'loose'}"><span data-icon="plus"></span>Novo projeto</button></div></header>
-        ${selected ? `<div class="secondary-portfolio-detail"><div><strong>${esc(folderName(selected))}</strong><span class="status ${isPublished ? 'published' : 'draft'}">${isPublished ? 'Publicado' : 'Despublicado'}</span></div><div class="secondary-portfolio-link"><span>${esc(link)}</span><button class="icon-button" data-copy="${esc(link)}" aria-label="Copiar link"><span data-icon="copy"></span></button></div><div class="secondary-portfolio-actions"><button class="secondary-button" data-access-folder="${selected}">Acessar</button><button class="secondary-button" data-show-folder-info="${selected}">Ver informações</button><button class="${isPublished ? 'danger-button' : 'primary-button publish-button'}" data-folder-publish="${selected}">${isPublished ? 'Despublicar' : 'Publicar'}</button></div></div>` : ''}
-        <div class="project-grid portfolio-project-grid ${portfolioLayout === 'list' ? 'is-list' : ''}" data-drop-zone="${selected || 'loose'}">${selected ? projectCards(projects) : '<div class="card empty-state portfolio-root-empty"><div class="empty-state-content"><h3>Escolha ou crie um portfólio</h3><p>Seus projetos serão organizados manualmente aqui.</p></div></div>'}</div>
-      </div>
+  const profile = state.profile
+  const model = getPortfolioModel(profile.selectedModel)
+  const banner = currentUser ? `${portfolioBannerUrl(currentUser.id)}${profileBannerRevision ? `?v=${profileBannerRevision}` : ''}` : ''
+  const projects = state.projects.filter(project => project.status === 'published').sort((a, b) => a.sortOrder - b.sortOrder || a.id - b.id)
+  return `<section class="page-enter my-portfolio-page">${pageHead('Meu Portfólio', 'Prévia completa de como os visitantes verão seu portfólio.', '<a class="secondary-button" href="#inicio">← Voltar ao início</a>')}
+    <div class="portfolio-page my-portfolio-preview" data-model="${model.id}" style="--model-image:url('${model.image}');--model-ink:${model.ink}">
+      <div class="portfolio-shell"><form id="my-portfolio-form" class="public-hero has-banner">
+        <div class="my-portfolio-banner"><img class="public-banner-image" src="${esc(banner)}" alt="Banner do portfólio" onerror="this.hidden=true"><input id="profile-banner-file" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="icon-button banner-edit-button" type="button" data-upload-profile-banner aria-label="Editar banner"><span data-icon="edit"></span></button></div>
+        <div class="profile-header"><div class="public-avatar">${profile.avatar ? `<img src="${esc(profile.avatar)}" alt="Foto de ${esc(realName())}" onerror="this.src='${profilePlaceholderUrl}'">` : `<img src="${profilePlaceholderUrl}" alt="Ícone de usuário">`}<input id="avatar-file" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="icon-button avatar-edit-button" type="button" data-upload-avatar aria-label="Editar foto de perfil"><span data-icon="edit"></span></button></div>
+          <div class="profile-copy">${portfolioPreviewField('Nome', 'name', profile.name, { attributes: 'required', placeholder: 'Seu nome' })}${portfolioPreviewField('Nome de usuário', 'username', profile.username, { attributes: 'required pattern="[a-zA-Z0-9._-]+"', placeholder: 'seu.usuario' })}${portfolioPreviewField('Título profissional', 'role', profile.role, { placeholder: 'Sua área de atuação' })}${portfolioPreviewField('Descrição', 'bio', profile.bio, { multiline: true, attributes: 'maxlength="240"', placeholder: 'Conte um pouco sobre você' })}</div>
+          <div class="my-portfolio-extra">${portfolioPreviewField('Habilidades', 'skills', profile.skills, { placeholder: 'Separe por vírgulas' })}<div class="profile-links">${portfolioPreviewField('GitHub', 'github', profile.github, { placeholder: 'github.com/usuario' })}${portfolioPreviewField('LinkedIn', 'linkedin', profile.linkedin, { placeholder: 'linkedin.com/in/usuario' })}${portfolioPreviewField('Meu site', 'website', profile.website, { placeholder: 'https://' })}</div></div>
+          <div class="my-portfolio-save"><button class="primary-button" type="submit"><span data-icon="save"></span>Salvar informações do perfil</button></div>
+        </div>
+      </form><section class="projects-section"><div class="section-heading"><h2>Meus projetos</h2><span>${projects.length} projeto${projects.length === 1 ? '' : 's'}</span></div>${projects.length ? `<div class="public-projects">${projects.map(portfolioPreviewProject).join('')}</div>` : '<div class="empty-projects">Ainda não existem projetos publicados.</div>'}</section></div>
+      <footer class="public-footer"><span>FolioDev</span><span>Trabalho de ${esc(realName())}.</span></footer>
     </div>
   </section>`
 }
@@ -528,11 +535,8 @@ const views = { publicacoes: publicationsView, planos: plansView, 'link-qrcode':
 function render({ preserveScroll = false } = {}) {
   const requestedRoute = location.hash.slice(1)
   const route = views[requestedRoute] ? requestedRoute : 'inicio'
-  if (route === 'portfolio') { window.location.replace(visitorPortfolioUrl()); return }
-  const visitorLink = $('.nav-item[data-route="portfolio"]')
-  if (visitorLink) visitorLink.href = visitorPortfolioUrl()
   renderedRoute = route
-  document.body.classList.toggle('static-page-route', ['inicio', 'analise', 'perfil'].includes(route))
+  document.body.classList.toggle('static-page-route', ['inicio', 'analise', 'perfil', 'portfolio'].includes(route))
   document.body.classList.toggle('home-route', route === 'inicio')
   document.body.classList.toggle('portfolio-route', route === 'portfolio')
   document.body.classList.toggle('github-route', route === 'github')
@@ -569,10 +573,7 @@ function bindActions() {
   $$('[data-preview-model]').forEach(button=>button.onclick=()=>{modal(documentPreview({profile:state.profile,projects:state.projects.filter(p=>p.status==='published'),model:getPortfolioModel(button.dataset.previewModel)})+'<div class="modal-actions"><button class="secondary-button" data-close-modal>Fechar prévia</button></div>');$('.modal').classList.add('model-preview-modal')})
   $$('[data-settings-anchor]').forEach(link=>link.onclick=event=>{event.preventDefault();document.getElementById(link.dataset.settingsAnchor)?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'})})
   $$('[data-unlock-field]').forEach(button=>button.onclick=()=>{const input=button.closest('.field')?.querySelector('input,textarea');if(input){input.readOnly=false;input.focus()}})
-  $$('[data-route-button]').forEach(button => button.onclick = () => {
-    if (button.dataset.routeButton === 'portfolio') window.location.assign(visitorPortfolioUrl())
-    else location.hash = button.dataset.routeButton
-  })
+  $$('[data-route-button]').forEach(button => button.onclick = () => { location.hash = button.dataset.routeButton })
   $('[data-promo-plans]')?.addEventListener('click', event => { event.preventDefault(); location.assign('index.html#planos') })
   $$('[data-copy]').forEach(button => button.onclick = () => copyText(button.dataset.copy))
   $$('[data-open-preview]').forEach(button => button.onclick = () => window.open(publicPortfolioUrl(), '_blank', 'noopener'))
@@ -631,6 +632,8 @@ function bindActions() {
   }
 
   $('#portfolio-form')?.addEventListener('submit', savePortfolioForm)
+  $('#my-portfolio-form')?.addEventListener('submit', savePortfolioForm)
+  $$('[data-preview-project]').forEach(button => button.onclick = () => showPortfolioPreviewProject(Number(button.dataset.previewProject)))
   $('[data-toggle-publish]')?.addEventListener('click', togglePublished)
   $('[data-manage-publication-history]')?.addEventListener('click', () => { publicationHistoryExpanded = !publicationHistoryExpanded; render({ preserveScroll: true }) })
   $$('[data-open-publication-id]').forEach(button => button.onclick = () => showPublicationEvent(button.dataset.openPublicationId))
@@ -911,6 +914,13 @@ async function showProject(id) {
   const githubLink = project.github ? normalizeExternalUrl(project.github.includes('/') && !project.github.includes('.') ? `github.com/${project.github}` : project.github) : ''
   modal(`<div class="project-detail"><div class="project-cover detail-cover">${project.image ? `<img class="project-cover-image" src="${esc(project.image)}" alt="">` : `<span>${esc(project.name.slice(0, 2).toUpperCase())}</span>`}</div>${projectTypeChip(project)}<h2>${esc(project.name)}</h2>${project.description ? `<p>${esc(project.description)}</p>` : ''}<div class="tag-row">${project.tech.split(',').filter(Boolean).map(item => `<span>${esc(item.trim())}</span>`).join('')}</div><div class="modal-actions"><button class="secondary-button" data-close-modal>Fechar</button>${githubLink ? `<a class="secondary-button" href="${esc(githubLink)}" target="_blank" rel="noopener">GitHub</a>` : ''}${projectLink ? `<a class="primary-button" href="${esc(projectLink)}" target="_blank" rel="noopener">Ver projeto <span data-icon="external"></span></a>` : ''}<button class="secondary-button" data-project-menu="${project.id}">Organizar</button><button class="icon-button edit-action" data-edit-project="${project.id}" aria-label="Editar projeto" title="Editar projeto"><span data-icon="edit"></span></button></div></div>`)
   bindProjectGrid($('#modal-root'))
+}
+
+function showPortfolioPreviewProject(id) {
+  const project = state.projects.find(item => item.id === id && item.status === 'published')
+  if (!project) return
+  const projectLink = normalizeExternalUrl(project.link)
+  modal(`<div class="project-detail my-portfolio-project-detail"><div class="project-cover detail-cover">${project.image ? `<img class="project-cover-image" src="${esc(project.image)}" alt="Capa de ${esc(project.name)}">` : `<span>${esc(project.name.slice(0, 2).toUpperCase())}</span>`}</div><h2>${esc(project.name)}</h2><p>${esc(project.description || 'Conheça este projeto.')}</p>${project.tech ? `<div class="tag-row">${project.tech.split(',').filter(Boolean).map(item => `<span>${esc(item.trim())}</span>`).join('')}</div>` : ''}<div class="modal-actions"><button class="secondary-button" type="button" data-close-modal>Fechar</button>${projectLink ? `<a class="primary-button" href="${esc(projectLink)}" target="_blank" rel="noopener">Acessar</a>` : ''}</div></div>`)
 }
 
 function projectModal(id, destination = 'projects') {
