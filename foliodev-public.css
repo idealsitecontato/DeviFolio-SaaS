@@ -405,3 +405,6 @@
 .public-state{
   padding:32px 24px}
 }
+
+/* The dashboard's Meu portfólio link shows the same page visitors receive. */
+body.visitor-view .portfolio-edit-button { display: none !important; }

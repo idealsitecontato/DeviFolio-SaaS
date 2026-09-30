@@ -20,7 +20,7 @@ import QRCode from 'qrcode'
 import { createScreenLoading } from './screen-loading.js'
 import { mountGooeySpinners, UploadButton } from './src/ui/visual-components.js'
 import { portfolioModels, getPortfolioModel } from './src/lib/portfolio-models.js'
-import { portfolioFolders, projectLocation, allowedMove, nextSortOrder, orderedFolders, restorePortfolioFolders, planProjectMove, persistProjectMove } from './src/lib/project-location.js'
+import { portfolioFolders, projectLocation, nextSortOrder, orderedFolders, restorePortfolioFolders, planProjectMove, persistProjectMove } from './src/lib/project-location.js'
 import { bindExplorerDrag } from './src/lib/explorer-drag.js'
 import { kapteiView, bindKapteiActions } from './kaptei.js'
 import { readVisualPublications, recordVisualPublication } from './src/lib/visual-publications.js'
@@ -124,6 +124,12 @@ const publicPortfolioUrl = () => {
   const username = encodeURIComponent(state.profile.username.trim().toLowerCase())
   return /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? `${location.origin}/portfolio.html?username=${username}` : `${location.origin}/portfolio/${username}`
 }
+const visitorPortfolioUrl = () => {
+  const url = new URL('/portfolio.html', location.origin)
+  url.searchParams.set('username', state.profile.username.trim().toLowerCase())
+  url.searchParams.set('visitor', '1')
+  return url.href
+}
 const secondaryPortfolioUrl = id => {
   if (!state.profile.username.trim()) return ''
   const url = new URL(publicPortfolioUrl())
@@ -212,7 +218,7 @@ function homeView() {
     </div>
     <article class="card projects-card home-projects-card"><header class="section-card-head"><h2>Seus projetos</h2><button class="link-button" data-route-button="projetos">Ver todos →</button></header><div class="recent-project-list">${state.projects.length?projectRows():`<div class="home-projects-empty"><span data-icon="folder" aria-hidden="true"></span><h3>Você ainda não possui projetos.</h3><p>Crie seu primeiro projeto para começar.</p><button class="primary-button" data-new-project>Criar primeiro projeto</button></div>`}</div></article>
     <details class="home-support-disclosure"><summary>Atalhos de organização</summary><div class="home-support-grid">
-      <article class="card"><header class="section-card-head"><h2>Sua organização</h2><button class="link-button" data-route-button="portfolio">Abrir portfólios →</button></header><div class="home-folder-links">${visiblePortfolioFolders().map(f=>`<button class="secondary-button" data-folder-id="${f.id}"><span data-icon="folder"></span>${esc(folderName(f.id))}</button>`).join('')}</div></article>
+      <article class="card"><header class="section-card-head"><h2>Meu portfólio</h2><button class="link-button" data-route-button="portfolio">Abrir portfólio →</button></header><p>Veja sua página como seus visitantes a enxergam.</p></article>
       <article class="card"><h2>Próximos passos</h2><ol class="onboarding-list"><li><span class="mono">01</span><div><b>Conectar o GitHub</b><p>${state.githubConnected?'Conta conectada.':'Importe seus repositórios.'}</p><button class="link-button" data-route-button="github">${state.githubConnected?'Gerenciar conexão':'Conectar GitHub'} →</button></div></li><li><span class="mono">02</span><div><b>Escolher seus projetos</b><p>Revise contexto, tecnologias e links.</p><button class="link-button" data-route-button="projetos">Organizar projetos →</button></div></li><li><span class="mono">03</span><div><b>Publicar seu portfólio</b><p>${state.published?'Seu portfólio está publicado.':'Escolha um modelo e prepare sua página.'}</p><button class="link-button" data-route-button="publicacoes">Ver publicação →</button></div></li></ol></article>
     </div></details>
   </section>`
@@ -415,15 +421,13 @@ function portfolioEditorView() {
 }
 
 function githubView() {
-  const content = `<div class="repo-list">${state.repos.map((repository, index) => ({ repository, index })).sort((a, b) => Number(a.repository.private) - Number(b.repository.private)).map(({ repository, index }, position) => `<article class="repo-row" data-repository-index="${index}" ${position >= 1 ? 'hidden' : ''}><label class="repo-select" title="Selecionar ${esc(repository.name)}"><input type="checkbox" value="${index}" aria-label="Selecionar ${esc(repository.name)}"><span class="repo-icon" data-icon="github"></span><span class="repo-copy"><b title="${esc(repository.name)}">${esc(repository.name)}</b><small>@${esc(repository.full_name?.split('/')[0] || state.githubUsername)}</small></span><span class="repo-visibility ${repository.private?'is-private':'is-public'}">${repository.private?'<span data-icon="lock"></span>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c5 5 5 13 0 18-5-5-5-13 0-18z"/></svg>'}${repository.private?'Privado':'Público'}</span></label><button class="icon-button repo-more" data-repo-menu="${index}" aria-label="Ações de ${esc(repository.name)}" aria-haspopup="dialog">⋯</button></article>`).join('')}</div>`
-  const pageCount = state.repos.length
-  const pagination = pageCount > 1 ? `<nav class="repo-pagination" aria-label="Páginas de repositórios"><button class="secondary-button" data-repo-page-change="-1" disabled>Anterior</button><span data-repo-page-status aria-live="polite">Página 1 de ${pageCount}</span><button class="secondary-button" data-repo-page-change="1">Próxima</button></nav>` : ''
+  const content = `<div class="repo-list">${state.repos.map((repository, index) => ({ repository, index })).sort((a, b) => Number(a.repository.private) - Number(b.repository.private)).map(({ repository, index }) => `<article class="repo-row" data-repository-index="${index}"><label class="repo-select" title="Selecionar ${esc(repository.name)}"><input type="checkbox" value="${index}" aria-label="Selecionar ${esc(repository.name)}"><span class="repo-icon" data-icon="github"></span><span class="repo-copy"><b title="${esc(repository.name)}">${esc(repository.name)}</b><small>@${esc(repository.full_name?.split('/')[0] || state.githubUsername)}</small></span><span class="repo-visibility ${repository.private?'is-private':'is-public'}">${repository.private?'<span data-icon="lock"></span>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c5 5 5 13 0 18-5-5-5-13 0-18z"/></svg>'}${repository.private?'Privado':'Público'}</span></label><button class="icon-button repo-more" data-repo-menu="${index}" aria-label="Ações de ${esc(repository.name)}" aria-haspopup="dialog">⋯</button></article>`).join('')}</div>`
   const account = state.githubConnected
     ? `<div class="card connected-account"><span class="connected-github-icon" data-icon="github" aria-hidden="true"></span><div><small>Conta conectada</small><h2>@${esc(state.githubUsername || 'GitHub')}</h2></div><button class="secondary-button" data-sync-repos><span data-icon="refresh"></span>Sincronizar</button></div>`
     : `<div class="card connect-card"><span class="connect-icon" data-icon="github"></span><h2>Conecte seu GitHub</h2><p>Conecte a conta para sincronizar e importar seus repositórios reais.</p><button class="primary-button" data-connect-github><span data-icon="github"></span>Conectar com GitHub</button></div>`
   const status = reposLoading ? 'Carregando repositórios...' : repoLoadFailed ? 'Não foi possível carregar os repositórios.' : `${state.repos.length} repositório${state.repos.length === 1 ? '' : 's'} encontrado${state.repos.length === 1 ? '' : 's'}`
   const message = repoLoadFailed ? '<div class="repo-reference-note"><p>Não conseguimos acessar seus repositórios. Tente novamente ou reconecte sua conta do GitHub.</p><button type="button" data-retry-repos>Tentar novamente</button><button type="button" data-connect-github>Reconectar GitHub</button></div>' : state.githubConnected && reposLoaded && !state.repos.length ? '<p class="repo-empty">Nenhum repositório encontrado nesta conta.</p>' : ''
-  return `<section class="page-enter github-page">${pageHead('GitHub', 'Selecione os repositórios que deseja transformar em projetos.', state.githubConnected ? '<button class="secondary-button" data-disconnect-github>Desconectar</button>' : '')}${account}${state.githubConnected ? `<div class="repo-panel"><div class="section-card-head"><div><h2>Seus repositórios</h2><p>${status}</p></div><button class="primary-button" data-import-selected ${state.repos.length ? '' : 'disabled'}><span data-icon="download"></span>Importar selecionados</button></div>${content}${pagination}${message}</div>` : ''}</section>`
+  return `<section class="page-enter github-page">${pageHead('GitHub', 'Selecione os repositórios que deseja transformar em projetos.', state.githubConnected ? '<button class="secondary-button" data-disconnect-github>Desconectar</button>' : '')}${account}${state.githubConnected ? `<div class="repo-panel"><div class="section-card-head"><div><h2>Seus repositórios</h2><p>${status}</p></div><button class="primary-button" data-import-selected ${state.repos.length ? '' : 'disabled'}><span data-icon="download"></span>Importar selecionados</button></div>${content}${message}</div>` : ''}</section>`
 }
 
 function analyticsView() {
@@ -434,15 +438,16 @@ function analyticsView() {
   const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
   const dailyViews = Array.from({ length: daysInMonth }, (_, index) => monthEvents.filter(event => new Date(event.created_at).getDate() === index + 1).length)
   const maxDailyViews = Math.max(1, ...dailyViews)
+  const axisMax = Math.max(12, Math.ceil(maxDailyViews / 2) * 2)
   const monthLabel = new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(now)
-  const monthlyChart = `<article class="card monthly-chart"><div class="section-card-head"><div><h2>Visualizações — ${esc(monthLabel)}</h2><p>${monthEvents.length} ${monthEvents.length === 1 ? 'visualização' : 'visualizações'} neste mês</p></div></div><div class="month-bars" aria-label="Visualizações por dia">${dailyViews.map((count, index) => `<span title="Dia ${index + 1}: ${count} visualizações"><i style="height:${Math.max(3, Math.round((count / maxDailyViews) * 100))}%;--bar-lightness:${Math.round(40 + (count / maxDailyViews) * 34)}%"></i><small>${index + 1}</small></span>`).join('')}</div></article>`
+  const monthlyChart = `<article class="card monthly-chart"><div class="section-card-head"><div><h2>Visualizações — ${esc(monthLabel)}</h2><p>${monthEvents.length} ${monthEvents.length === 1 ? 'visualização' : 'visualizações'} neste mês</p></div></div><div class="chart-plot"><div class="chart-guides" aria-hidden="true">${Array.from({ length: 7 }, (_, index) => `<span><b>${Math.round(axisMax * (6 - index) / 6)}</b></span>`).join('')}</div><div class="month-bars" aria-label="Visualizações por dia">${dailyViews.map((count, index) => `<span title="Dia ${index + 1}: ${count} visualizações"><i style="height:${Math.max(1, Math.round((count / axisMax) * 100))}%"></i><small>${index + 1}</small></span>`).join('')}</div></div></article>`
   const projectCounts = new Map()
   state.analytics.filter(event => event.project_id && (event.event_type === 'project_view' || event.event_type === 'link_click')).forEach(event => projectCounts.set(Number(event.project_id), (projectCounts.get(Number(event.project_id)) || 0) + 1))
   const ranking = state.projects.map(project => ({ project, count: projectCounts.get(project.id) || 0 })).filter(item => item.count).sort((a, b) => b.count - a.count)
   const max = ranking[0]?.count || 1
-  const metrics = `<div class="analytics-metrics"><article class="card analytic-stat"><span data-icon="eye"></span><small>Visualizações</small><strong>${summary.views}</strong></article><article class="card analytic-stat"><span data-icon="link"></span><small>Cliques em links</small><strong>${summary.clicks}</strong></article><article class="card analytic-stat"><span data-icon="users"></span><small>Visitantes únicos</small><strong>${summary.visitors}</strong></article><article class="card analytic-stat"><span data-icon="trending"></span><small>Taxa de clique</small><strong>${summary.rate}%</strong></article></div>`
-  const details = `<div class="analytics-layout"><article class="card chart-card"><div class="section-card-head"><div><h2>Atividade real</h2><p>Eventos registrados no portfólio público.</p></div><span class="chart-total">${state.analytics.length} total</span></div><div class="event-summary"><div><span>Visualizações</span><strong>${summary.views}</strong></div><div><span>Interações</span><strong>${summary.clicks}</strong></div></div></article><article class="card ranking-card"><div class="section-card-head"><div><h2>Projetos mais acessados</h2><p>Cliques registrados</p></div></div>${ranking.length ? ranking.slice(0, 5).map((item, index) => `<div class="rank-row"><span>${index + 1}</span><div><b>${esc(item.project.name)}</b><small>${item.count} acesso${item.count === 1 ? '' : 's'}</small></div><div class="rank-bar"><i style="width:${Math.round((item.count / max) * 100)}%"></i></div></div>`).join('') : '<div class="compact-empty">Nenhum projeto recebeu acessos ainda.</div>'}</article></div>`
-  return `<section class="page-enter analytics-page">${pageHead('Análise', 'Entenda como as pessoas encontram e exploram seu portfólio.', `<label class="portfolio-select"><span>Selecionar portfólio</span><select aria-label="Selecionar portfólio"><option>${esc(state.profile.name ? `Portfólio — ${state.profile.name}` : 'Portfólio principal')}</option></select></label>`)}${metrics}${monthlyChart}${details}</section>`
+  const metrics = `<aside class="analytics-metrics" aria-label="Indicadores"><article class="card analytic-stat"><span data-icon="eye" aria-hidden="true"></span><small>Visualizações</small><strong>${summary.views}</strong></article><article class="card analytic-stat"><span data-icon="link" aria-hidden="true"></span><small>Cliques em links</small><strong>${summary.clicks}</strong></article><article class="card analytic-stat"><span data-icon="users" aria-hidden="true"></span><small>Visitantes únicos</small><strong>${summary.visitors}</strong></article><article class="card analytic-stat"><span data-icon="trending" aria-hidden="true"></span><small>Taxa de clique</small><strong>${summary.rate}%</strong></article></aside>`
+  const details = `<div class="analytics-layout"><article class="card chart-card"><div class="section-card-head"><div><h2>Atividade real</h2><p>Eventos registrados no portfólio público.</p></div><span class="chart-total">${state.analytics.length} total</span></div><div class="event-summary"><div><span>Visualizações</span><strong>${summary.views}</strong></div><div><span>Interações</span><strong>${summary.clicks}</strong></div></div></article><article class="card ranking-card"><div class="section-card-head"><div><h2>Projetos mais acessados</h2><p>Cliques registrados.</p></div></div>${ranking.length ? ranking.slice(0, 5).map((item, index) => `<div class="rank-row"><span>${index + 1}</span><div><b>${esc(item.project.name)}</b><small>${item.count} acesso${item.count === 1 ? '' : 's'}</small></div><div class="rank-bar"><i style="width:${Math.round((item.count / max) * 100)}%"></i></div></div>`).join('') : '<div class="compact-empty"><span class="ranking-empty-icon" data-icon="folder" aria-hidden="true"></span><p>Nenhum projeto recebeu acessos ainda.</p></div>'}</article></div>`
+  return `<section class="page-enter analytics-page">${pageHead('Análise', 'Entenda como as pessoas encontram e exploram seu portfólio.')}<div class="analytics-overview">${monthlyChart}${metrics}</div>${details}</section>`
 }
 
 function avatarMarkup(className = 'avatar avatar-large') {
@@ -523,6 +528,9 @@ const views = { publicacoes: publicationsView, planos: plansView, 'link-qrcode':
 function render({ preserveScroll = false } = {}) {
   const requestedRoute = location.hash.slice(1)
   const route = views[requestedRoute] ? requestedRoute : 'inicio'
+  if (route === 'portfolio') { window.location.replace(visitorPortfolioUrl()); return }
+  const visitorLink = $('.nav-item[data-route="portfolio"]')
+  if (visitorLink) visitorLink.href = visitorPortfolioUrl()
   renderedRoute = route
   document.body.classList.toggle('static-page-route', ['inicio', 'analise', 'perfil'].includes(route))
   document.body.classList.toggle('home-route', route === 'inicio')
@@ -531,7 +539,7 @@ function render({ preserveScroll = false } = {}) {
   document.body.classList.toggle('projects-route', route === 'projetos')
   document.body.classList.toggle('kaptei-route', route === 'kaptei')
   $('#page-content').innerHTML = views[route]()
-  const routeLabel = { publicacoes:'Publicações', planos:'Planos', 'link-qrcode': 'Seu Link, Seu QR Code', inicio: 'Dashboard', projetos: 'Projetos', portfolio: 'Portfólios secundários', modelos: 'Modelos', 'portfolio-editar': 'Editar portfólio', github: 'GitHub', analise: 'Análise', kaptei: 'Kaptei', perfil: 'Perfil', configuracoes: 'Configurações', indicacao: 'Indicação' }[route]
+  const routeLabel = { publicacoes:'Publicações', planos:'Planos', 'link-qrcode': 'Seu Link, Seu QR Code', inicio: 'Dashboard', projetos: 'Projetos', portfolio: 'Meu portfólio', modelos: 'Modelos', 'portfolio-editar': 'Editar portfólio', github: 'GitHub', analise: 'Análise', kaptei: 'Kaptei', perfil: 'Perfil', configuracoes: 'Configurações', indicacao: 'Indicação' }[route]
   document.title = `${routeLabel} — FolioDev`
   if ($('#breadcrumb-page')) $('#breadcrumb-page').textContent = routeLabel
   if ($('#breadcrumb-section')) $('#breadcrumb-section').textContent = route === 'inicio' ? 'Início' : 'Painel'
@@ -561,7 +569,10 @@ function bindActions() {
   $$('[data-preview-model]').forEach(button=>button.onclick=()=>{modal(documentPreview({profile:state.profile,projects:state.projects.filter(p=>p.status==='published'),model:getPortfolioModel(button.dataset.previewModel)})+'<div class="modal-actions"><button class="secondary-button" data-close-modal>Fechar prévia</button></div>');$('.modal').classList.add('model-preview-modal')})
   $$('[data-settings-anchor]').forEach(link=>link.onclick=event=>{event.preventDefault();document.getElementById(link.dataset.settingsAnchor)?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'})})
   $$('[data-unlock-field]').forEach(button=>button.onclick=()=>{const input=button.closest('.field')?.querySelector('input,textarea');if(input){input.readOnly=false;input.focus()}})
-  $$('[data-route-button]').forEach(button => button.onclick = () => { location.hash = button.dataset.routeButton })
+  $$('[data-route-button]').forEach(button => button.onclick = () => {
+    if (button.dataset.routeButton === 'portfolio') window.location.assign(visitorPortfolioUrl())
+    else location.hash = button.dataset.routeButton
+  })
   $('[data-promo-plans]')?.addEventListener('click', event => { event.preventDefault(); location.assign('index.html#planos') })
   $$('[data-copy]').forEach(button => button.onclick = () => copyText(button.dataset.copy))
   $$('[data-open-preview]').forEach(button => button.onclick = () => window.open(publicPortfolioUrl(), '_blank', 'noopener'))
@@ -636,7 +647,6 @@ function bindActions() {
   $('[data-retry-repos]')?.addEventListener('click', fetchGithubRepos)
   $('[data-import-selected]')?.addEventListener('click', importSelected)
   $$('[data-repo-menu]').forEach(button => button.onclick = () => repositoryMenu(Number(button.dataset.repoMenu)))
-  bindGithubPagination()
   $$('[data-setting]').forEach(button => button.onclick = () => updateSetting(button.dataset.setting))
   $('[data-export]')?.addEventListener('click', exportData)
   $('[data-delete-account]')?.addEventListener('click', confirmAccountDeletion)
@@ -686,26 +696,6 @@ function bindProjectGrid(root = document) {
       if (!event.altKey || !['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) return
       event.preventDefault()
       void nudgeProject(Number(card.dataset.dragProject), ['ArrowLeft', 'ArrowUp'].includes(event.key) ? -1 : 1)
-    }
-  })
-}
-
-// Keep all real rows and their checkboxes mounted so selection survives page changes.
-function bindGithubPagination() {
-  const root = $('.github-page')
-  const controls = root && $('.repo-pagination', root)
-  if (!controls) return
-  const rows = $$('.repo-row', root)
-  const pageCount = rows.length
-  let page = 0
-  $$('[data-repo-page-change]', controls).forEach(button => {
-    button.onclick = () => {
-      page = Math.max(0, Math.min(pageCount - 1, page + Number(button.dataset.repoPageChange)))
-      rows.forEach((row, index) => { row.hidden = index !== page })
-      $('[data-repo-page-status]', controls).textContent = `Página ${page + 1} de ${pageCount}`
-      $('[data-repo-page-change="-1"]', controls).disabled = page === 0
-      $('[data-repo-page-change="1"]', controls).disabled = page === pageCount - 1
-      $('.repo-panel', root).scrollIntoView({ block: 'start', behavior: 'instant' })
     }
   })
 }
@@ -778,7 +768,7 @@ $('#page-content').addEventListener('dragstart', event => { if (document.body.cl
 bindExplorerDrag({
   canMove: (id, destination) => {
     const project = state.projects.find(item => item.id === id)
-    return !organizingProject && project && allowedMove(projectLocation(project), destination)
+    return !organizingProject && destination === 'projects' && project && projectLocation(project) === 'projects'
   },
   moveProject: organizeProject,
   reorderFolders: saveFolderOrder,

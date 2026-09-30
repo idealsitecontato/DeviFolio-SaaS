@@ -21,6 +21,8 @@ const esc = value => String(value ?? '').replace(/[&<>'"]/g, character => ({ '&'
 const username = new URLSearchParams(location.search).get('username') || decodeURIComponent(location.pathname.match(/^\/portfolio\/([^/]+)/)?.[1] || '')
 const folderId = new URLSearchParams(location.search).get('folder')
 const folderLabel = new URLSearchParams(location.search).get('name')?.slice(0, 60) || ''
+const visitorView = new URLSearchParams(location.search).get('visitor') === '1'
+document.body.classList.toggle('visitor-view', visitorView)
 const builtInFolders = ['principal', 'profissional', 'destaque', 'github']
 const folderBucket = folderId && (/^folder-\d+$/.test(folderId)
   ? Number(folderId.slice(7)) + 2

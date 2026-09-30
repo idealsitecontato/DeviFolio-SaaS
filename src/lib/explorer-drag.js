@@ -1,7 +1,7 @@
 // One controller for native desktop drag and touch long-press. Persistence stays
 // with the dashboard's authenticated adapter, not with DOM order or a mock store.
 export function bindExplorerDrag({ canMove, moveProject, reorderFolders, onError, root = document }) {
-  const selector = '[data-drag-project],[data-drag-folder]'
+  const selector = '.projects-page [data-drag-project]'
   let drag = null
   let pending = false
   let touch = null
@@ -11,31 +11,25 @@ export function bindExplorerDrag({ canMove, moveProject, reorderFolders, onError
   const clearTargets = () => root.querySelectorAll('.explorer-drop-target,.explorer-drop-blocked').forEach(el => el.classList.remove('explorer-drop-target', 'explorer-drop-blocked'))
 
   function destination(element) {
-    const nav = element?.closest('#side-nav [data-route]')
-    if (nav) return nav.dataset.route === 'portfolio' ? 'loose' : nav.dataset.route === 'projetos' ? 'projects' : null
-    return element?.closest('[data-drop-zone]')?.dataset.dropZone || null
+    return element?.closest('.projects-page[data-drop-zone="projects"]') ? 'projects' : null
   }
 
-  function start(source, x, y, dataTransfer) {
+  function start(source, dataTransfer) {
     if (pending || drag) return false
     const folder = source.hasAttribute('data-drag-folder')
     const original = [...source.parentElement.children]
-    const ghost = source.cloneNode(true)
-    ghost.removeAttribute('id')
-    for (const attribute of ['data-drag-project', 'data-drag-folder', 'data-folder-id', 'data-drop-zone', 'tabindex']) ghost.removeAttribute(attribute)
-    ghost.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'))
-    ghost.classList.add('explorer-drag-ghost')
-    const rect = source.getBoundingClientRect()
-    ghost.style.width = `${rect.width}px`
+    const ghost = document.createElement('canvas')
+    ghost.width = 1
+    ghost.height = 1
     ghost.style.position = 'fixed'
-    ghost.style.left = '-3000px'
-    ghost.style.top = '0'
-    source.parentElement.append(ghost)
+    ghost.style.left = '-100px'
+    ghost.style.top = '-100px'
+    body.append(ghost)
     drag = { source, ghost, folder, id: folder ? source.dataset.dragFolder : Number(source.dataset.dragProject), parent: source.parentElement, original, target: null, beforeId: null }
     if (dataTransfer) {
       dataTransfer.effectAllowed = 'move'
       dataTransfer.setData('text/plain', `${folder ? 'folder' : 'project'}:${drag.id}`)
-      dataTransfer.setDragImage(ghost, Math.min(rect.width / 2, 90), Math.min(rect.height / 2, 50))
+      dataTransfer.setDragImage(ghost, 0, 0)
     }
     if (source.closest('.portfolio-folder-modal')) {
       drag.previousOverflow = body.style.overflow
@@ -52,18 +46,7 @@ export function bindExplorerDrag({ canMove, moveProject, reorderFolders, onError
     const rect = target.getBoundingClientRect()
     const after = x > rect.x + rect.width / 2
     if ((!after && drag.source.nextElementSibling === target) || (after && target.nextElementSibling === drag.source)) return
-    const positions = new Map([...drag.parent.children].map(el => [el, el.getBoundingClientRect()]))
     drag.parent.insertBefore(drag.source, after ? target.nextElementSibling : target)
-    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      for (const [el, old] of positions) {
-        if (el === drag.source) continue
-        const next = el.getBoundingClientRect()
-        if (old.x !== next.x || old.y !== next.y) {
-          el.getAnimations().forEach(animation => animation.cancel())
-          el.animate([{ transform: `translate(${old.x - next.x}px,${old.y - next.y}px)` }, { transform: 'none' }], { duration: 180, easing: 'ease-out' })
-        }
-      }
-    }
   }
 
   function hover(element, x, y) {
@@ -142,7 +125,7 @@ export function bindExplorerDrag({ canMove, moveProject, reorderFolders, onError
   root.addEventListener('dragstart', event => {
     const source = event.target.closest?.(selector)
     if (!source) return
-    if (event.target.closest('button:not([data-view-project]),a,input,select') || !start(source, event.clientX, event.clientY, event.dataTransfer)) event.preventDefault()
+    if (event.target.closest('button:not([data-view-project]),a,input,select') || !start(source, event.dataTransfer)) event.preventDefault()
   })
   root.addEventListener('dragover', event => {
     if (!drag) return
@@ -167,7 +150,7 @@ export function bindExplorerDrag({ canMove, moveProject, reorderFolders, onError
     if (!source || pending) return
     touch = { source, id: event.pointerId, x: event.clientX, y: event.clientY, active: false }
     touch.timer = setTimeout(() => {
-      if (!touch || !start(source, touch.x, touch.y)) return
+      if (!touch || !start(source)) return
       touch.active = true
       source.setPointerCapture(touch.id)
       drag.ghost.style.left = `${touch.x - 70}px`
