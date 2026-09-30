@@ -1,22 +1,14 @@
 // Demonstração visual do Kaptei, produto nativo da DeviFolio.
-const kapteiBannerUrl = new URL('./assets/kaptei/kaptei-banner-oficial.png', import.meta.url).href
+const kapteiBannerUrl = '/kaptei/kaptei-banner.png'
 
 const leads = [
-  { id: 1, name: 'Lucas Almeida', email: 'lucas@techsolucoes.com', phone: '(11) 98765-4321', company: 'Tech Soluções', interest: 'Site Institucional', potential: 'Alto', date: '25/09/2026 14:32', message: 'Gostaria de conhecer as opções para um novo site institucional.' },
+  { id: 1, name: 'Lucas Almeida', email: 'lucas@techsolucoes.com', phone: '(11) 98765-4321', company: 'Tech Soluções', interest: 'Site institucional', potential: 'Alto', date: '25/09/2026 14:32', message: 'Gostaria de conhecer as opções para um novo site institucional.' },
   { id: 2, name: 'Mariana Costa', email: 'mariana@auroradigital.com', phone: '(11) 91234-5678', company: 'Aurora Digital', interest: 'Identidade Visual', potential: 'Médio', date: '25/09/2026 12:18', message: 'Busco uma identidade visual para a Aurora Digital.' },
   { id: 3, name: 'Gabriel Santos', email: 'gabriel@nextcode.com', phone: '(11) 99876-5432', company: 'NextCode', interest: 'Desenvolvimento Web', potential: 'Alto', date: '25/09/2026 11:03', message: 'Preciso de uma proposta para desenvolvimento web.' },
   { id: 4, name: 'Juliana Ferreira', email: 'juliana@primeconsult.com', phone: '(11) 94456-8901', company: 'Prime Consult', interest: 'Site Institucional', potential: 'Médio', date: '24/09/2026 18:45', message: 'Queremos atualizar a presença digital da empresa.' },
-  { id: 5, name: 'Rafael Lima', email: 'rafael@fluxostudio.com', phone: '(11) 92310-3334', company: 'Fluxo Studio', interest: 'Branding', potential: 'Alto', date: '24/09/2026 16:22', message: 'Estamos planejando uma nova marca para o estúdio.' },
+  { id: 5, name: 'Rafael Lima', email: 'rafael@fluxostudio.com', phone: '(11) 92310-2334', company: 'Fluxo Studio', interest: 'Branding', potential: 'Alto', date: '24/09/2026 16:22', message: 'Estamos planejando uma nova marca para o estúdio.' },
   { id: 6, name: 'Beatriz Oliveira', email: 'beatriz@inovatech.com', phone: '(11) 97865-2210', company: 'InovaTech', interest: 'E-commerce', potential: 'Médio', date: '24/09/2026 14:07', message: 'Gostaria de avaliar uma loja virtual para nossa linha de produtos.' },
-  { id: 7, name: 'Felipe Rodrigues', email: 'felipe@solarweb.com', phone: '(11) 96432-7789', company: 'SolarWeb', interest: 'Site Institucional', potential: 'Baixo', date: '24/09/2026 11:51', message: 'Estou pesquisando preços para um site institucional.' },
-  { id: 8, name: 'Camila Souza', email: 'camila@lumen.com', phone: '(11) 98976-1122', company: 'Lumen', interest: 'Landing Page', potential: 'Alto', date: '23/09/2026 19:33', message: 'Precisamos de uma landing page para uma campanha.' },
-  { id: 9, name: 'Thiago Martins', email: 'thiago@pixelhouse.com', phone: '(11) 97765-4433', company: 'Pixel House', interest: 'Redesign de Site', potential: 'Médio', date: '23/09/2026 16:17', message: 'Quero redesenhar o site atual da Pixel House.' },
-  { id: 10, name: 'Larissa Alves', email: 'larissa@vibra360.com', phone: '(11) 96123-5566', company: 'Vibra360', interest: 'Marketing Digital', potential: 'Alto', date: '23/09/2026 13:02', message: 'Buscamos apoio para nossas ações de marketing digital.' },
-  { id: 11, name: 'Bruno Pereira', email: 'bruno@omega.com', phone: '(11) 95544-6677', company: 'Omega', interest: 'Identidade Visual', potential: 'Médio', date: '23/09/2026 10:48', message: 'Quero conversar sobre a identidade visual da Omega.' },
-  { id: 12, name: 'Fernanda Lima', email: 'fernanda@agrovida.com', phone: '(11) 93011-9988', company: 'AgroVida', interest: 'Site Institucional', potential: 'Baixo', date: '22/09/2026 17:26', message: 'Gostaria de receber informações sobre sites institucionais.' },
-  { id: 13, name: 'Diego Rocha', email: 'diego@novaera.com', phone: '(11) 91234-7765', company: 'Nova Era', interest: 'E-commerce', potential: 'Alto', date: '22/09/2026 14:09', message: 'Precisamos iniciar nosso projeto de e-commerce.' },
-  { id: 14, name: 'Carolina Mendes', email: 'carolina@zenith.com', phone: '(11) 98881-2233', company: 'Zenith', interest: 'Landing Page', potential: 'Médio', date: '22/09/2026 11:37', message: 'Estamos organizando uma campanha e precisamos de uma landing page.' },
-  { id: 15, name: 'Victor Hugo', email: 'victor@blueprint.com', phone: '(11) 94455-6677', company: 'Blueprint', interest: 'Site Institucional', potential: 'Baixo', date: '21/09/2026 20:15', message: 'Gostaria de entender o processo de criação de um site.' },
+  { id: 7, name: 'Felipe Rodrigues', email: 'felipe@solarweb.com', phone: '(11) 96432-7799', company: 'SolarWeb', interest: 'Site institucional', potential: 'Baixo', date: '24/09/2026 11:51', message: 'Estou pesquisando preços para um site institucional.' },
 ]
 
 const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[character])
@@ -41,7 +33,7 @@ function leadRow(lead) {
 export function kapteiView() {
   visibleLeads = leads
   return `<section class="page-enter kaptei-page" aria-label="Kaptei, produto do FolioDev">
-    <div class="kaptei-banner"><img src="${kapteiBannerUrl}" alt="Kaptei" width="1600" height="192"></div>
+    <div class="kaptei-banner"><img src="${kapteiBannerUrl}" alt="Kaptei" width="5120" height="612" fetchpriority="high"></div>
     <div class="kaptei-content"><p class="kaptei-demo-note">Demonstração do Kaptei. Os contatos desta tela são exemplos.</p>
       <div class="kaptei-toolbar">
         <div class="kaptei-heading"><h1>Lista de Leads</h1><p>Gerencie e acompanhe seus leads em um só lugar.</p></div>
