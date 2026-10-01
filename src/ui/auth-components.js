@@ -1,4 +1,6 @@
-export const Logo = () => '<img class="auth-logo" src="/folio/foliodev-logo.png" alt="FolioDev" width="200" height="31">'
+import { folioDevLogo } from './brand.js'
+
+export const Logo = () => `<img class="auth-logo" src="${folioDevLogo}" alt="FolioDev" width="800" height="130">`
 export function AuthInput(id, label, { type = 'text', autocomplete = '', minlength = '', maxlength = '', placeholder = '' } = {}) {
   return `<div class="auth-field"><label for="${id}">${label}</label><input id="${id}" name="${id}" type="${type}" autocomplete="${autocomplete}" ${minlength ? `minlength="${minlength}"` : ''} ${maxlength ? `maxlength="${maxlength}"` : ''} ${placeholder ? `placeholder="${placeholder}"` : ''} required></div>`
 }

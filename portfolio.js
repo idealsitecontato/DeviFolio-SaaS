@@ -2,7 +2,7 @@ import { loadPublicPortfolio, trackPublicEvent } from './src/lib/user-data.js'
 import { getPortfolioModel } from './src/lib/portfolio-models.js'
 
 const root = document.getElementById('portfolio-root')
-const brandUrl = new URL('./assets/devifolio-brand-original.png', import.meta.url).href
+const brandUrl = '/folio/foliodev-logo.png'
 const esc = value => String(value ?? '').replace(/[&<>'"]/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[character])
 const normalizeUrl = value => { const text = String(value || '').trim(); return !text ? '' : /^https?:\/\//i.test(text) ? text : `https://${text}` }
 const username = new URLSearchParams(location.search).get('username') || decodeURIComponent(location.pathname.match(/^\/portfolio\/([^/]+)/)?.[1] || '')
