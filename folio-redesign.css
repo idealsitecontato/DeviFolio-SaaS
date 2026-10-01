@@ -106,6 +106,42 @@ body.auth-body[data-auth-view] .auth-story h2{color:#fff;font-size:clamp(34px,2.
 @media(max-width:1000px){.auth-shell,.auth-body[data-auth-view] .auth-shell{grid-template-columns:1fr}.auth-right,.auth-body[data-auth-view] .auth-right{display:none}.auth-form-wrap,.auth-body[data-auth-view] .auth-form-wrap,.auth-body[data-auth-view=login] .auth-form-wrap,.auth-body[data-auth-view=cadastro] .auth-form-wrap{width:min(472px,100%);transform:none}.auth-body[data-auth-view=login] .auth-brand{transform:none}.auth-left,.auth-body[data-auth-view] .auth-left{padding:38px 24px}}
 @media(max-width:400px){.auth-left,.auth-body[data-auth-view] .auth-left{padding:30px 20px}.auth-form-wrap,.auth-body[data-auth-view] .auth-form-wrap{width:100%}.auth-row-between,.auth-checkbox{font-size:12px}}
 
+/* Login and signup correction: measured against the supplied reference. */
+body.auth-body[data-auth-view] .auth-left{background:#FAF9F4;padding:34px 28px}
+body.auth-body[data-auth-view] .auth-form-wrap{width:min(354px,100%)}
+body.auth-body[data-auth-view] .auth-brand{margin:0 auto 52px}
+body.auth-body[data-auth-view] .auth-logo{width:208px;height:auto}
+body.auth-body[data-auth-view] .auth-panel h1{font-size:26px;font-weight:700;line-height:1.1;letter-spacing:-.04em}
+body.auth-body[data-auth-view] .auth-sub{margin:4px 0 18px;color:#73736F;font-size:11px;line-height:1.45}
+body.auth-body[data-auth-view] .auth-panel form{gap:12px}
+body.auth-body[data-auth-view] .auth-field{gap:6px}
+body.auth-body[data-auth-view] .auth-field label{color:#666661;font-size:11px;font-weight:400}
+body.auth-body[data-auth-view] input:not([type=checkbox]){height:42px;min-height:42px;padding:8px 13px;background:#FFFDFC;border:1px solid #D9D9D2;border-radius:9px;font-size:12px}
+body.auth-body[data-auth-view] .password-field{background:transparent}
+body.auth-body[data-auth-view] .auth-row-between,body.auth-body[data-auth-view] .auth-checkbox{font-size:11px;color:#73736F}
+body.auth-body[data-auth-view] input[type=checkbox]{width:15px;height:15px;min-width:15px;border-radius:3px}
+body.auth-body[data-auth-view] .button{height:42px;min-height:42px;border-radius:8px;font-size:12px}
+body.auth-body[data-auth-view] .button-submit,body.auth-body[data-auth-view] .button-github{background:#151515;border-color:#151515}
+body.auth-body[data-auth-view] .button-google{background:#FFFDFC;border-color:#D9D9D2}
+body.auth-body[data-auth-view] .auth-divider{margin:14px 0;color:#777773;font-size:11px}
+body.auth-body[data-auth-view] .auth-divider::before,body.auth-body[data-auth-view] .auth-divider::after{background:#DEDed8}
+body.auth-body[data-auth-view] .auth-providers{gap:8px}
+body.auth-body[data-auth-view] .auth-providers img{width:19px;height:19px;margin-right:8px}
+body.auth-body[data-auth-view] .button-github img{border-radius:0}
+body.auth-body[data-auth-view] .auth-switch{margin-top:18px;color:#777773;font-size:11px}
+body.auth-body[data-auth-view] .auth-right{background:#2979FF}
+body.auth-body[data-auth-view] .auth-story{padding:clamp(84px,13.3vh,104px) 30px 0 clamp(70px,5.2vw,84px)}
+body.auth-body[data-auth-view] .auth-story h2{color:#fff;font-size:clamp(36px,2.75vw,44px);font-weight:500;line-height:1.1;letter-spacing:-.045em}
+body.auth-body[data-auth-view] .auth-integrations{gap:9px;margin-top:24px;padding:0}
+body.auth-body[data-auth-view] .auth-integrations>img{width:70px;height:70px;margin:0;clip-path:none;object-fit:contain}
+body.auth-body[data-auth-view=cadastro] .auth-brand{margin-bottom:30px}
+body.auth-body[data-auth-view=cadastro] .auth-left{padding-block:24px}
+body.auth-body[data-auth-view=cadastro] form{gap:9px}
+body.auth-body[data-auth-view=cadastro] .auth-sub{margin-bottom:14px}
+body.auth-body[data-auth-view=cadastro] .auth-divider{margin:11px 0}
+body.auth-body[data-auth-view=cadastro] .auth-switch{margin-top:14px}
+@media(max-width:1000px){body.auth-body[data-auth-view] .auth-left{padding:38px 24px}body.auth-body[data-auth-view] .auth-brand{margin-bottom:42px}body.auth-body[data-auth-view=cadastro] .auth-brand{margin-bottom:28px}}
+
 /* Supplied Gooey Spinner, mounted into existing loading states. */
 .nuda-gooey-filter-defs{position:absolute;width:0;height:0;overflow:hidden}
 .nuda-gooey{--gooey-color:var(--color-charcoal);position:relative;display:inline-block;flex:none;width:48px;height:48px;filter:url(#nuda-gooey-filter)}
