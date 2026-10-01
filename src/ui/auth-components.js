@@ -11,7 +11,7 @@ export function SocialButton(provider, signup = false) {
 }
 const social = signup => `<div class="auth-divider">ou continue com</div><div class="auth-providers">${SocialButton('google', signup)}${SocialButton('github', signup)}</div>`
 export function AuthLayout() {
-  return `<aside class="auth-right" aria-label="Seu portfólio de forma descomplicada"><div class="auth-story"><h2>Seu portfólio<br>de forma<br>descomplicada.</h2><div class="auth-integrations" aria-hidden="true"><img class="auth-integration-github" src="/icons/github-octocat-white.svg" alt="" width="70" height="70"><img class="auth-integration-kaptei" src="/brand/kaptei-badge.svg" alt="" width="70" height="70"></div></div></aside>
+  return `<aside class="auth-right" aria-label="Seu portfólio de forma descomplicada"><div class="auth-story"><h2>Seu portfólio<br>de forma<br>descomplicada.</h2><div class="auth-integrations" aria-hidden="true"><img class="auth-integration-github" src="/folio/auth-github-supplied.png" alt="" width="84" height="84"><img class="auth-integration-kaptei" src="/folio/auth-kaptei-supplied.png" alt="" width="84" height="84"></div></div></aside>
   <section class="auth-left"><div class="auth-form-wrap"><a class="auth-brand" href="/" aria-label="FolioDev, início">${Logo()}</a>
   <div class="auth-panel" id="panel-login" aria-labelledby="login-title"><h1 id="login-title">Entrar</h1><p class="auth-sub">Entre com seus dados para acessar sua conta.</p><form id="form-login">
   ${AuthInput('login-email', 'E-mail', { type: 'email', autocomplete: 'email', maxlength: '254', placeholder: 'voce@email.com' })}
