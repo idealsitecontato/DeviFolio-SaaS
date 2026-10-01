@@ -110,7 +110,7 @@ body.auth-body[data-auth-view] .auth-story h2{color:#fff;font-size:clamp(34px,2.
 body.auth-body[data-auth-view] .auth-left{background:#FAF9F4;padding:34px 28px}
 body.auth-body[data-auth-view] .auth-form-wrap{width:min(354px,100%)}
 body.auth-body[data-auth-view] .auth-brand{margin:0 auto 52px}
-body.auth-body[data-auth-view] .auth-logo{width:229px;height:auto}
+body.auth-body[data-auth-view] .auth-logo{width:208px;height:auto}
 body.auth-body[data-auth-view] .auth-panel h1{font-size:26px;font-weight:700;line-height:1.1;letter-spacing:-.04em}
 body.auth-body[data-auth-view] .auth-sub{margin:4px 0 18px;color:#73736F;font-size:11px;line-height:1.45}
 body.auth-body[data-auth-view] .auth-panel form{gap:12px}
@@ -134,6 +134,8 @@ body.auth-body[data-auth-view] .auth-story{padding:clamp(84px,13.3vh,104px) 30px
 body.auth-body[data-auth-view] .auth-story h2{color:#fff;font-size:clamp(36px,2.75vw,44px);font-weight:500;line-height:1.1;letter-spacing:-.045em}
 body.auth-body[data-auth-view] .auth-integrations{gap:9px;margin-top:24px;padding:0}
 body.auth-body[data-auth-view] .auth-integrations>img{width:84px;height:84px;margin:-7px;clip-path:none;object-fit:contain}
+body.auth-body[data-auth-view] .auth-integration-github{width:70px;height:70px;margin:0}
+@media(min-width:1001px){body.auth-body[data-auth-view] .auth-form-wrap{width:354px}}
 body.auth-body[data-auth-view=cadastro] .auth-brand{margin-bottom:30px}
 body.auth-body[data-auth-view=cadastro] .auth-left{padding-block:24px}
 body.auth-body[data-auth-view=cadastro] form{gap:9px}
