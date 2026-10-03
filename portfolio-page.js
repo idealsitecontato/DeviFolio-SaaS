@@ -11,6 +11,7 @@ import {
 import { getPortfolioModel } from './src/lib/portfolio-models.js'
 import { mountGooeySpinners, UploadButton } from './src/ui/visual-components.js'
 import { folioDevLogo } from './src/ui/brand.js'
+import './src/lib/build-version.js'
 
 const root = document.getElementById('portfolio-root')
 mountGooeySpinners()

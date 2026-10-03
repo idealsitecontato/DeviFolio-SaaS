@@ -24,6 +24,7 @@ import { portfolioFolders, projectLocation, nextSortOrder, orderedFolders, resto
 import { bindExplorerDrag } from './src/lib/explorer-drag.js'
 import { kapteiView, bindKapteiActions } from './kaptei.js'
 import { readVisualPublications, recordVisualPublication } from './src/lib/visual-publications.js'
+import './src/lib/build-version.js'
 
 const githubIconUrl = new URL('./assets/github-icon.webp', import.meta.url).href
 const profilePlaceholderUrl = new URL('./assets/user-placeholder.png', import.meta.url).href

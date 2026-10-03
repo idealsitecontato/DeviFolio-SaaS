@@ -1,5 +1,6 @@
 import { createScreenLoading } from './screen-loading.js'
 import { mountGooeySpinners } from './src/ui/visual-components.js'
+import './src/lib/build-version.js'
 
 const panels = {
   login: document.getElementById('panel-login'),
