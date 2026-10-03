@@ -184,16 +184,12 @@ async function downloadReferralQR() {
   } catch (error) { reportError('Não foi possível baixar o QR Code da indicação.', error) }
 }
 
-function projectRows(items = state.projects.slice(0, 5)) {
-  if (!items.length) return `<div class="projects-empty">${emptyState('folder', 'Você ainda não possui projetos.', 'Crie seu primeiro projeto para começar.', '<button class="primary-button" data-new-project>Criar primeiro projeto</button>')}</div>`
-  return items.map(project => {
-    const tags = project.tech.split(',').map(item => item.trim()).filter(Boolean).slice(0, 3)
-    return `<div class="recent-project"><span class="recent-project-image">${project.image ? `<img src="${esc(project.image)}" alt="Imagem do projeto ${esc(project.name)}">` : '<span data-icon="folder"></span>'}</span><div class="recent-project-copy"><strong>${esc(project.name)}</strong><p>${esc(project.description)}</p></div>${tags.length ? `<div class="recent-project-tags">${tags.map(tag => `<span>${esc(tag)}</span>`).join('')}</div>` : '<div class="recent-project-tags" aria-hidden="true"></div>'}${projectTypeChip(project)}<button class="icon-button" data-view-project="${project.id}" aria-label="Visualizar ${esc(project.name)}">Acessar</button></div>`
-  }).join('')
-}
-
 function homeView() {
   const summary=analyticsSummary()
+  const repositoryPreview = state.repos.slice(0, 4).map(repository => `<li><span data-icon="github" aria-hidden="true"></span><span><strong>${esc(repository.name)}</strong><small>${esc(repository.description || repository.full_name || 'Repositório GitHub')}</small></span></li>`).join('')
+  const githubContent = state.githubConnected
+    ? `<div class="home-import-content home-repositories"><span class="home-import-symbol" data-icon="github" aria-hidden="true"></span><h3>Seus repositórios</h3><p>${reposLoading ? 'Carregando repositórios da sua conta...' : repoLoadFailed ? 'Não foi possível carregar seus repositórios agora.' : state.repos.length ? 'Escolha os repositórios reais que deseja importar para o portfólio.' : 'Nenhum repositório encontrado nesta conta.'}</p>${repositoryPreview ? `<ul class="home-repository-list">${repositoryPreview}</ul>` : ''}<button class="primary-button" data-route-button="github"><span data-icon="github"></span>${repoLoadFailed ? 'Tentar novamente' : 'Ver repositórios'}</button></div>`
+    : `<div class="home-import-content"><span class="home-import-symbol" data-icon="github" aria-hidden="true"></span><h3>Conecte seu GitHub e sincronize seus projetos</h3><p>Conecte sua conta para importar e sincronizar seus repositórios automaticamente.</p><button class="primary-button" data-connect-github><span data-icon="github"></span>Conectar GitHub</button></div>`
   return `<section class="page-enter home-page">
     ${pageHead('Olá, '+esc(realName().split(' ')[0])+'.', 'Seu trabalho, organizado para a próxima oportunidade.', '<button class="primary-button" data-new-portfolio><span data-icon="plus"></span>Novo portfólio</button>')}
     <div class="dashboard-metrics">
@@ -205,13 +201,13 @@ function homeView() {
     <div class="home-feature-grid">
       <article class="card home-import-card">
         <header class="section-card-head"><h2>Importe seus repositórios</h2><button class="link-button" data-route-button="github">Ver todos →</button></header>
-        <div class="home-import-content"><span class="home-import-symbol" data-icon="github" aria-hidden="true"></span><h3>Importe seus repositórios de forma automatizada.</h3><p>${state.githubConnected?'Selecione os repositórios da sua conta conectada e transforme seus projetos em itens do seu portfólio.':'Conecte sua conta do GitHub e transforme seus projetos em itens do seu portfólio com um clique.'}</p><button class="primary-button" data-route-button="github"><span data-icon="github"></span>${state.githubConnected?'Ver repositórios':'Conectar GitHub'}</button></div>
+        ${githubContent}
       </article>
       <article class="card link-summary home-share-card"><h2>Seu link do portfólio</h2><p>Compartilhe seu portfólio com recrutadores, clientes e outras pessoas.</p>
         ${state.profile.username?`<div class="dashboard-url"><span>${esc(publicPortfolioUrl())}</span><button class="icon-button" data-copy="${esc(publicPortfolioUrl())}" aria-label="Copiar link"><span data-icon="copy"></span></button></div><div class="home-qr-row"><div class="qr-wrap"><canvas id="portfolio-qr" aria-label="QR Code do seu portfólio"></canvas></div><div class="home-qr-copy"><h3>Seu QR Code</h3><p>Escaneie para acessar seu portfólio diretamente.</p><button class="primary-button" data-download-qr><span data-icon="download"></span>Baixar QR Code</button></div></div>`:'<div class="home-link-pending"><p>Complete seu perfil para gerar o endereço público.</p><button class="secondary-button" data-route-button="perfil">Completar perfil</button></div>'}
       </article>
     </div>
-    <article class="card projects-card home-projects-card"><header class="section-card-head"><h2>Seus projetos</h2><button class="link-button" data-route-button="projetos">Ver todos →</button></header><div class="recent-project-list">${state.projects.length?projectRows():`<div class="home-projects-empty"><span data-icon="folder" aria-hidden="true"></span><h3>Você ainda não possui projetos.</h3><p>Crie seu primeiro projeto para começar.</p><button class="primary-button" data-new-project>Criar primeiro projeto</button></div>`}</div></article>
+    <a class="home-foliodev-banner" href="#planos" aria-label="Conhecer os planos FolioDev"><img src="/reference/07_banner_foliodev.png" width="921" height="97" alt="Assine o FolioDev e tenha acesso ilimitado a ferramentas avançadas." decoding="async"></a>
     <details class="home-support-disclosure"><summary>Atalhos de organização</summary><div class="home-support-grid">
       <article class="card"><header class="section-card-head"><h2>Meu portfólio</h2><button class="link-button" data-route-button="portfolio">Abrir portfólio →</button></header><p>Veja sua página como seus visitantes a enxergam.</p></article>
       <article class="card"><h2>Próximos passos</h2><ol class="onboarding-list"><li><span class="mono">01</span><div><b>Conectar o GitHub</b><p>${state.githubConnected?'Conta conectada.':'Importe seus repositórios.'}</p><button class="link-button" data-route-button="github">${state.githubConnected?'Gerenciar conexão':'Conectar GitHub'} →</button></div></li><li><span class="mono">02</span><div><b>Escolher seus projetos</b><p>Revise contexto, tecnologias e links.</p><button class="link-button" data-route-button="projetos">Organizar projetos →</button></div></li><li><span class="mono">03</span><div><b>Publicar seu portfólio</b><p>${state.published?'Seu portfólio está publicado.':'Escolha um modelo e prepare sua página.'}</p><button class="link-button" data-route-button="publicacoes">Ver publicação →</button></div></li></ol></article>
@@ -258,6 +254,8 @@ function portfolioPreviewProject(project) {
 
 function portfolioManagerView() {
   const profile = state.profile
+  const emptyPortfolioProjects = '<div class="empty-projects folio-empty-projects"><span class="folio-empty-folder" aria-hidden="true">▱</span><h2>Nenhum projeto encontrado</h2><p>Você ainda não desenvolveu nenhum projeto.<br>Crie um novo projeto para começar.</p><button class="primary-button folio-create-project" type="button" data-new-project>+ &nbsp;Criar projeto</button></div>'
+  const profileMetrics = !state.projects.some(project => project.status === 'published') ? `<div class="folio-profile-metrics"><div><strong>0</strong><span>Projetos</span></div><div><strong>${[profile.github, profile.linkedin, profile.website].filter(Boolean).length}</strong><span>Links profissionais</span></div><div><strong>${profile.role ? '1' : '0'}</strong><span>Área de atuação</span></div></div>` : ''
   const model = getPortfolioModel(profile.selectedModel)
   const banner = currentUser ? `${portfolioBannerUrl(currentUser.id)}${profileBannerRevision ? `?v=${profileBannerRevision}` : ''}` : ''
   const projects = state.projects.filter(project => project.status === 'published').sort((a, b) => a.sortOrder - b.sortOrder || a.id - b.id)
@@ -267,10 +265,10 @@ function portfolioManagerView() {
         <div class="my-portfolio-banner"><img class="public-banner-image" src="${esc(banner)}" alt="Banner do portfólio" onerror="this.hidden=true"><input id="profile-banner-file" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="icon-button banner-edit-button" type="button" data-upload-profile-banner aria-label="Editar banner"><span data-icon="edit"></span></button></div>
         <div class="profile-header"><div class="public-avatar">${profile.avatar ? `<img src="${esc(profile.avatar)}" alt="Foto de ${esc(realName())}" onerror="this.src='${profilePlaceholderUrl}'">` : `<img src="${profilePlaceholderUrl}" alt="Ícone de usuário">`}<input id="avatar-file" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="icon-button avatar-edit-button" type="button" data-upload-avatar aria-label="Editar foto de perfil"><span data-icon="edit"></span></button></div>
           <div class="profile-copy">${portfolioPreviewField('Nome', 'name', profile.name, { attributes: 'required', placeholder: 'Seu nome' })}${portfolioPreviewField('Nome de usuário', 'username', profile.username, { attributes: 'required pattern="[a-zA-Z0-9._-]+"', placeholder: 'seu.usuario' })}${portfolioPreviewField('Título profissional', 'role', profile.role, { placeholder: 'Sua área de atuação' })}${portfolioPreviewField('Descrição', 'bio', profile.bio, { multiline: true, attributes: 'maxlength="240"', placeholder: 'Conte um pouco sobre você' })}</div>
-          <div class="my-portfolio-extra">${portfolioPreviewField('Habilidades', 'skills', profile.skills, { placeholder: 'Separe por vírgulas' })}<div class="profile-links">${portfolioPreviewField('GitHub', 'github', profile.github, { placeholder: 'github.com/usuario' })}${portfolioPreviewField('LinkedIn', 'linkedin', profile.linkedin, { placeholder: 'linkedin.com/in/usuario' })}${portfolioPreviewField('Meu site', 'website', profile.website, { placeholder: 'https://' })}</div></div>
+          ${profileMetrics}<div class="my-portfolio-extra">${portfolioPreviewField('Habilidades', 'skills', profile.skills, { placeholder: 'Separe por vírgulas' })}<div class="profile-links">${portfolioPreviewField('GitHub', 'github', profile.github, { placeholder: 'github.com/usuario' })}${portfolioPreviewField('LinkedIn', 'linkedin', profile.linkedin, { placeholder: 'linkedin.com/in/usuario' })}${portfolioPreviewField('Meu site', 'website', profile.website, { placeholder: 'https://' })}</div></div>
           <div class="my-portfolio-save"><button class="primary-button" type="submit"><span data-icon="save"></span>Salvar informações do perfil</button></div>
         </div>
-      </form><section class="projects-section"><div class="section-heading"><h2>Meus projetos</h2><span>${projects.length} projeto${projects.length === 1 ? '' : 's'}</span></div>${projects.length ? `<div class="public-projects">${projects.map(portfolioPreviewProject).join('')}</div>` : '<div class="empty-projects">Ainda não existem projetos publicados.</div>'}</section></div>
+      </form><section class="projects-section"><div class="section-heading"><h2>Meus projetos</h2><span>${projects.length} projeto${projects.length === 1 ? '' : 's'}</span></div>${projects.length ? `<div class="public-projects">${projects.map(portfolioPreviewProject).join('')}</div>` : emptyPortfolioProjects}</section></div>
       <footer class="public-footer"><span>FolioDev</span><span>Trabalho de ${esc(realName())}.</span></footer>
     </div>
   </section>`
@@ -553,7 +551,7 @@ function render({ preserveScroll = false } = {}) {
   bindActions()
   if (route === 'link-qrcode' || route === 'inicio') renderPortfolioQR()
   if (route === 'indicacao') renderReferralQR()
-  if (route === 'github' && !bootstrapping && (state.githubConnected || !githubConnectionChecked) && !reposLoaded && !reposLoading) reposPromise = fetchGithubRepos({ reportFailure: !new URLSearchParams(location.search).has('github') })
+  if ((route === 'github' || route === 'inicio' && state.githubConnected) && !bootstrapping && (state.githubConnected || !githubConnectionChecked) && !reposLoaded && !reposLoading) reposPromise = fetchGithubRepos({ reportFailure: !new URLSearchParams(location.search).has('github') })
   updateUserChrome()
   closeMenu()
   closeUserMenu()

@@ -1,6 +1,3 @@
-import { renderPlanCards } from './plans.js'
-
-document.getElementById('landing-plans-grid').innerHTML = renderPlanCards()
 document.getElementById('copyright-year').textContent = String(new Date().getFullYear())
 const referral = new URLSearchParams(location.search).get('ref')?.trim().toLowerCase() || ''
 if (/^[a-z0-9._-]{1,80}$/.test(referral)) {

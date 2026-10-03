@@ -1,6 +1,6 @@
 import { folioDevLogo } from './brand.js'
 
-export const Logo = () => `<img class="auth-logo" src="${folioDevLogo}" alt="FolioDev" width="800" height="130">`
+export const Logo = () => `<img class="auth-logo" src="${folioDevLogo}" alt="FolioDev" width="821" height="149">`
 export function AuthInput(id, label, { type = 'text', autocomplete = '', minlength = '', maxlength = '', placeholder = '' } = {}) {
   return `<div class="auth-field"><label for="${id}">${label}</label><input id="${id}" name="${id}" type="${type}" autocomplete="${autocomplete}" ${minlength ? `minlength="${minlength}"` : ''} ${maxlength ? `maxlength="${maxlength}"` : ''} ${placeholder ? `placeholder="${placeholder}"` : ''} required></div>`
 }
@@ -11,7 +11,7 @@ export function SocialButton(provider, signup = false) {
 }
 const social = signup => `<div class="auth-divider">ou continue com</div><div class="auth-providers">${SocialButton('google', signup)}${SocialButton('github', signup)}</div>`
 export function AuthLayout() {
-  return `<aside class="auth-right" aria-label="Seu portfólio de forma descomplicada"><div class="auth-story"><h2>Seu portfólio<br>de forma<br>descomplicada.</h2><div class="auth-integrations" aria-hidden="true"><img class="auth-integration-github" src="/folio/auth-github-mark.png" alt="" width="70" height="70"><img class="auth-integration-kaptei" src="/folio/auth-kaptei.png" alt="" width="84" height="84"></div></div></aside>
+  return `<aside class="auth-right" aria-label="Seu portfólio de forma descomplicada"><div class="auth-story"><h2>Seu portfólio<br>de forma<br>descomplicada.</h2><div class="auth-integrations" aria-hidden="true"><img class="auth-integration-github" src="/icons/github-white.svg" alt="" width="70" height="70"><img class="auth-integration-kaptei" src="/folio/auth-kaptei.png" alt="" width="84" height="84"></div></div></aside>
   <section class="auth-left"><div class="auth-form-wrap"><a class="auth-brand" href="/" aria-label="FolioDev, início">${Logo()}</a>
   <div class="auth-panel" id="panel-login" aria-labelledby="login-title"><h1 id="login-title">Entrar</h1><p class="auth-sub">Entre com seus dados para acessar sua conta.</p><form id="form-login">
   ${AuthInput('login-email', 'E-mail', { type: 'email', autocomplete: 'email', maxlength: '254', placeholder: 'voce@email.com' })}
