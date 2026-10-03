@@ -7,7 +7,7 @@ export function AuthInput(id, label, { type = 'text', autocomplete = '', minleng
 export const AuthButton = label => `<button class="button button-submit" type="submit">${label}</button>`
 export function SocialButton(provider, signup = false) {
   const label = `${signup ? 'Continuar' : 'Entrar'} com ${provider === 'google' ? 'Google' : 'GitHub'}`
-  return `<button class="button button-${provider}" type="button" ${provider === 'github' ? `id="github-${signup ? 'cadastro' : 'login'}"` : 'data-google-login'}><img src="${provider === 'github' ? '/folio/07-logo-github.png' : '/icons/google.svg'}" width="${provider === 'github' ? '16' : '22'}" height="${provider === 'github' ? '16' : '22'}" alt="" aria-hidden="true">${label}</button>`
+  return `<button class="button button-${provider}" type="button" ${provider === 'github' ? `id="github-${signup ? 'cadastro' : 'login'}"` : 'data-google-login'}><img src="${provider === 'github' ? '/folio/07-logo-github.png' : '/icons/google.svg'}" width="${provider === 'github' ? '14' : '22'}" height="${provider === 'github' ? '14' : '22'}" alt="" aria-hidden="true">${label}</button>`
 }
 const social = signup => `<div class="auth-divider">ou continue com</div><div class="auth-providers">${SocialButton('google', signup)}${SocialButton('github', signup)}</div>`
 export function AuthLayout() {

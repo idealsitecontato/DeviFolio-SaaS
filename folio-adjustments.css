@@ -8,8 +8,8 @@ body.auth-body[data-auth-view] .auth-story{padding-left:clamp(64px,5vw,90px)}
 body.auth-body[data-auth-view] .auth-story h2{font-size:clamp(38px,2.8vw,47px);font-weight:600;letter-spacing:-.055em}
 body.auth-body[data-auth-view] .auth-integrations{gap:6px;margin-top:24px}
 body.auth-body[data-auth-view] .auth-integrations>img{width:78px;height:78px;margin:0;object-fit:contain}
-body.auth-body[data-auth-view] .auth-integration-github{border-radius:50%;overflow:hidden;background:transparent!important}
-body.auth-body[data-auth-view] .auth-providers .button-github img{width:16px!important;height:16px!important;flex:0 0 16px;object-fit:contain;margin:0}
+body.auth-body[data-auth-view] .auth-integration-github{padding:17px;box-sizing:border-box;border-radius:50%;overflow:hidden;background:transparent!important}
+body.auth-body[data-auth-view] .auth-providers .button-github img{width:14px!important;height:14px!important;flex:0 0 14px;object-fit:contain;margin:0}
 body.auth-body[data-auth-view=cadastro] .auth-brand{margin-bottom:24px}
 @media(max-width:1000px){body.auth-body[data-auth-view] .auth-brand{margin-bottom:34px}}
 
@@ -79,7 +79,22 @@ html body.dashboard-app .kaptei-content{margin:26px 0 0;padding:0}
 @media(max-width:1050px){.dashboard-app .kaptei-filters{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:620px){.dashboard-app .kaptei-filters{grid-template-columns:repeat(2,minmax(0,1fr))}.dashboard-app .kaptei-tabs{gap:0}.dashboard-app .kaptei-tabs button{padding:0 9px;font-size:11px}.dashboard-app .kaptei-content h1{font-size:24px}.dashboard-app .kaptei-lead-card{min-height:0;padding:21px}.dashboard-app .kaptei-lead-card dl{grid-template-columns:1fr}.dashboard-app .kaptei-lead-actions{grid-template-columns:1fr}}
 
-/* The Plus tier uses the original texture. */
+/* Plans follow the supplied 1440px reference: 4 equal columns inside a 1120px canvas. */
+.dashboard-app .plans-page{width:min(100%,1120px)}
+.dashboard-app .plans-page .plans-availability{margin-bottom:0}
+.dashboard-app .plans-page .devi-plan-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.dashboard-app .plans-page .devi-plan-card{min-height:500px;padding:22px 24px 20px;border-radius:16px}
+.dashboard-app .plans-page .devi-plan-head{min-height:64px}
+.dashboard-app .plans-page .devi-plan-head h3{font-size:23px;line-height:1.3}
+.dashboard-app .plans-page .devi-plan-description{min-height:49px;margin-bottom:7px;font-size:14px;line-height:1.4}
+.dashboard-app .plans-page .devi-plan-price{padding:16px 0 18px}
+.dashboard-app .plans-page .devi-plan-price strong{font-size:32px;line-height:1.2;letter-spacing:-.05em}
+.dashboard-app .plans-page .devi-plan-card ul{gap:10px;margin:16px 0 17px}
+.dashboard-app .plans-page .devi-plan-card>button{min-height:42px;height:42px;border-radius:9px;font-size:14px}
+@media(max-width:1200px){.dashboard-app .plans-page .devi-plan-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:640px){.dashboard-app .plans-page .devi-plan-grid{grid-template-columns:1fr}.dashboard-app .plans-page .devi-plan-card{min-height:0}}
+
+/* The Plus tier uses the supplied original texture. */
 .dashboard-app .plans-page .devi-plan-card--plus{background:#103493 url('/reference/08_textura_folio_plus.png') center / cover no-repeat!important;border-color:#16419e!important;color:#fff!important}
 .dashboard-app .plans-page .devi-plan-card--plus :is(h3,p,strong,span,li){color:#fff!important}
 .dashboard-app .plans-page .devi-plan-card--plus .devi-plan-price{border-color:#ffffff80}
