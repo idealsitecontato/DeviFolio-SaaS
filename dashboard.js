@@ -21,9 +21,11 @@ import { createScreenLoading } from './screen-loading.js'
 import { mountGooeySpinners, UploadButton } from './src/ui/visual-components.js'
 import { portfolioModels, getPortfolioModel } from './src/lib/portfolio-models.js'
 import { portfolioFolders, projectLocation, nextSortOrder, orderedFolders, restorePortfolioFolders, planProjectMove, persistProjectMove } from './src/lib/project-location.js'
+import { planGithubImport, importedGithubProject } from './src/lib/github-import.js'
 import { bindExplorerDrag } from './src/lib/explorer-drag.js'
 import { kapteiView, bindKapteiActions } from './kaptei.js'
 import { readVisualPublications, recordVisualPublication } from './src/lib/visual-publications.js'
+import { modelPreviewMarkup } from './src/ui/model-preview.js'
 import './src/lib/build-version.js'
 
 const githubIconUrl = new URL('./assets/github-icon.webp', import.meta.url).href
@@ -119,12 +121,27 @@ const onboardingRequested = new URLSearchParams(location.search).get('onboarding
 const realName = () => state.profile.name.trim() || currentUser?.user_metadata?.full_name || currentUser?.user_metadata?.name || currentUser?.email?.split('@')[0] || 'Você'
 const initials = () => realName().split(/\s+/).filter(Boolean).map(part => part[0]).slice(0, 2).join('').toUpperCase()
 const profileComplete = () => Boolean(state.profile.name.trim() && state.profile.username.trim())
+const repositoryOwner = repository => String(repository.full_name || '').split('/')[0].replace(/[^a-zA-Z0-9-]/g, '')
+const repositoryAvatar = repository => {
+  const owner = repositoryOwner(repository)
+  return `<span class="repo-avatar" aria-hidden="true"><span>${esc((owner || repository.name || 'G')[0].toUpperCase())}</span>${owner ? `<img src="https://github.com/${encodeURIComponent(owner)}.png?size=64" alt="" loading="lazy" onerror="this.hidden=true">` : ''}</span>`
+}
 const folderName = id => state.folderNames[id] || portfolioFolders.find(folder => folder.id === id)?.name || ''
 const visiblePortfolioFolders = () => orderedFolders(state.folderOrder).filter(folder => !state.hiddenFolders.includes(folder.id) && (Object.hasOwn(state.folderNames, folder.id) || state.projects.some(project => projectLocation(project) === folder.id)))
 const projectsAt = destination => state.projects.filter(project => projectLocation(project) === destination).sort((a, b) => a.sortOrder - b.sortOrder || a.id - b.id)
 const publicPortfolioUrl = () => {
   const username = encodeURIComponent(state.profile.username.trim().toLowerCase())
   return /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? `${location.origin}/portfolio.html?username=${username}` : `${location.origin}/portfolio/${username}`
+}
+function openPortfolioPreview() {
+  if (!currentUser) return
+  const snapshot = { profile: { ...state.profile, userId: currentUser.id }, projects: state.projects.filter(project => project.status === 'published') }
+  sessionStorage.setItem(`foliodev_preview_${currentUser.id}`, JSON.stringify(snapshot))
+  const url = new URL('portfolio.html', location.href)
+  url.searchParams.set('username', state.profile.username || currentUser.id)
+  url.searchParams.set('preview', '1')
+  url.searchParams.set('visitor', '1')
+  location.assign(url.href)
 }
 const secondaryPortfolioUrl = id => {
   if (!state.profile.username.trim()) return ''
@@ -187,9 +204,9 @@ async function downloadReferralQR() {
 
 function homeView() {
   const summary=analyticsSummary()
-  const repositoryPreview = state.repos.slice(0, 4).map(repository => `<li><span data-icon="github" aria-hidden="true"></span><span><strong>${esc(repository.name)}</strong><small>${esc(repository.description || repository.full_name || 'Repositório GitHub')}</small></span></li>`).join('')
+  const repositoryPreview = state.repos.slice(0, 4).map(repository => `<li>${repositoryAvatar(repository)}<span><strong>${esc(repository.name)}</strong><small>${esc(repository.full_name || repository.name)}</small></span></li>`).join('')
   const githubContent = state.githubConnected
-    ? `<div class="home-import-content home-repositories"><span class="home-import-symbol" data-icon="github" aria-hidden="true"></span><h3>Seus repositórios</h3><p>${reposLoading ? 'Carregando repositórios da sua conta...' : repoLoadFailed ? 'Não foi possível carregar seus repositórios agora.' : state.repos.length ? 'Escolha os repositórios reais que deseja importar para o portfólio.' : 'Nenhum repositório encontrado nesta conta.'}</p>${repositoryPreview ? `<ul class="home-repository-list">${repositoryPreview}</ul>` : ''}<button class="primary-button" data-route-button="github"><span data-icon="github"></span>${repoLoadFailed ? 'Tentar novamente' : 'Ver repositórios'}</button></div>`
+    ? `<div class="home-import-content home-repositories"><span class="home-import-symbol" data-icon="github" aria-hidden="true"></span><div class="home-import-copy"><h3>Seus repositórios</h3><p>${reposLoading ? 'Buscando repositórios da sua conta...' : repoLoadFailed ? 'Não foi possível carregar seus repositórios.' : state.repos.length ? 'Escolha o que deseja adicionar ao portfólio.' : 'Nenhum repositório encontrado nesta conta.'}</p></div>${reposLoading ? '<div class="repo-skeleton-list" aria-hidden="true"><span></span><span></span><span></span></div>' : repositoryPreview ? `<ul class="home-repository-list">${repositoryPreview}</ul>` : ''}<button class="primary-button" data-route-button="github">${repoLoadFailed ? 'Tentar novamente' : 'Ver repositórios'}</button></div>`
     : `<div class="home-import-content"><span class="home-import-symbol" data-icon="github" aria-hidden="true"></span><h3>Conecte seu GitHub e sincronize seus projetos</h3><p>Conecte sua conta para importar e sincronizar seus repositórios automaticamente.</p><button class="primary-button" data-connect-github><span data-icon="github"></span>Conectar GitHub</button></div>`
   return `<section class="page-enter home-page">
     ${pageHead('Olá, '+esc(realName().split(' ')[0])+'.', 'Seu trabalho, organizado para a próxima oportunidade.', '<button class="primary-button" data-new-portfolio><span data-icon="plus"></span>Novo portfólio</button>')}
@@ -201,24 +218,24 @@ function homeView() {
     </div>
     <div class="home-feature-grid">
       <article class="card home-import-card">
-        <header class="section-card-head"><h2>Importe seus repositórios</h2><button class="link-button" data-route-button="github">Ver todos →</button></header>
+        <header class="section-card-head"><h2>Importe seus repositórios</h2></header>
         ${githubContent}
       </article>
       <article class="card link-summary home-share-card"><h2>Seu link do portfólio</h2><p>Compartilhe seu portfólio com recrutadores, clientes e outras pessoas.</p>
-        ${state.profile.username?`<div class="dashboard-url"><span>${esc(publicPortfolioUrl())}</span><button class="icon-button" data-copy="${esc(publicPortfolioUrl())}" aria-label="Copiar link"><span data-icon="copy"></span></button></div><div class="home-qr-row"><div class="qr-wrap"><canvas id="portfolio-qr" aria-label="QR Code do seu portfólio"></canvas></div><div class="home-qr-copy"><h3>Seu QR Code</h3><p>Escaneie para acessar seu portfólio diretamente.</p><button class="primary-button" data-download-qr><span data-icon="download"></span>Baixar QR Code</button></div></div>`:'<div class="home-link-pending"><p>Complete seu perfil para gerar o endereço público.</p><button class="secondary-button" data-route-button="perfil">Completar perfil</button></div>'}
+        ${state.published && state.profile.username?`<div class="dashboard-url"><span>${esc(publicPortfolioUrl())}</span><button class="icon-button" data-copy="${esc(publicPortfolioUrl())}" aria-label="Copiar link"><span data-icon="copy"></span></button></div><div class="home-qr-row"><div class="qr-wrap"><canvas id="portfolio-qr" aria-label="QR Code do seu portfólio"></canvas></div><div class="home-qr-copy"><h3>Seu QR Code</h3><p>Escaneie para acessar seu portfólio diretamente.</p><button class="primary-button" data-download-qr><span data-icon="download"></span>Baixar QR Code</button></div></div>`:state.profile.username?'<div class="home-link-pending"><span class="status draft">Rascunho</span><p>Seu endereço estará disponível para visitantes após a publicação.</p><button class="primary-button" data-route-button="publicacoes">Publicar portfólio</button></div>':'<div class="home-link-pending"><p>Complete seu perfil para gerar o endereço público.</p><button class="secondary-button" data-route-button="perfil">Completar perfil</button></div>'}
       </article>
     </div>
-    <a class="home-foliodev-banner" href="#planos" aria-label="Conhecer os planos FolioDev"><img src="/reference/07_banner_foliodev.png" width="921" height="97" alt="Assine o FolioDev e tenha acesso ilimitado a ferramentas avançadas." decoding="async"></a>
-    <details class="home-support-disclosure"><summary>Atalhos de organização</summary><div class="home-support-grid">
+    ${localStorage.getItem('foliodev_hide_plus_promo') === 'true' ? '' : '<aside class="home-plus-promo"><div><strong>FolioPlus</strong><span>Conheça os recursos e planos disponíveis.</span></div><a class="secondary-button" href="#planos">Ver planos</a><button class="icon-button" type="button" data-dismiss-promo aria-label="Dispensar oferta"><span data-icon="x"></span></button></aside>'}
+    <section class="home-support-grid" aria-label="Próximos passos">
       <article class="card"><header class="section-card-head"><h2>Meu portfólio</h2><button class="link-button" data-route-button="portfolio">Abrir portfólio →</button></header><p>Veja sua página como seus visitantes a enxergam.</p></article>
       <article class="card"><h2>Próximos passos</h2><ol class="onboarding-list"><li><span class="mono">01</span><div><b>Conectar o GitHub</b><p>${state.githubConnected?'Conta conectada.':'Importe seus repositórios.'}</p><button class="link-button" data-route-button="github">${state.githubConnected?'Gerenciar conexão':'Conectar GitHub'} →</button></div></li><li><span class="mono">02</span><div><b>Escolher seus projetos</b><p>Revise contexto, tecnologias e links.</p><button class="link-button" data-route-button="projetos">Organizar projetos →</button></div></li><li><span class="mono">03</span><div><b>Publicar seu portfólio</b><p>${state.published?'Seu portfólio está publicado.':'Escolha um modelo e prepare sua página.'}</p><button class="link-button" data-route-button="publicacoes">Ver publicação →</button></div></li></ol></article>
-    </div></details>
+    </section>
   </section>`
 }
 
 function linkQrView() {
-  const ready = Boolean(state.profile.username.trim())
-  return `<section class="page-enter link-page">${pageHead('Seu link, Seu QRCode', 'Compartilhe seu portfólio com um link ou QR Code.')}<article class="card share-card">${ready ? `<div class="share-copy"><h2>Seu portfólio, pronto para compartilhar</h2><p>Copie o endereço ou baixe o QR Code para usar onde quiser.</p><div class="dashboard-url"><span data-icon="link"></span><span>${esc(publicPortfolioUrl())}</span><button class="icon-button" data-copy="${esc(publicPortfolioUrl())}" aria-label="Copiar link"><span data-icon="copy"></span></button></div><button class="secondary-button" data-download-qr><span data-icon="download"></span>Baixar QR Code</button></div><div class="qr-wrap"><canvas id="portfolio-qr" width="320" height="320" aria-label="QR Code do portfólio público"></canvas></div>` : emptyState('qr', 'Configure seu link público', 'Complete o perfil para gerar seu link e QR Code.', '<button class="primary-button" data-route-button="portfolio-editar">Configurar portfólio</button>')}</article></section>`
+  const ready = state.published && Boolean(state.profile.username.trim())
+  return `<section class="page-enter link-page">${pageHead('Seu link, Seu QRCode', 'Compartilhe seu portfólio com um link ou QR Code.')}<article class="card share-card">${ready ? `<div class="share-copy"><h2>Seu portfólio, pronto para compartilhar</h2><p>Copie o endereço ou baixe o QR Code para usar onde quiser.</p><div class="dashboard-url"><span data-icon="link"></span><span>${esc(publicPortfolioUrl())}</span><button class="icon-button" data-copy="${esc(publicPortfolioUrl())}" aria-label="Copiar link"><span data-icon="copy"></span></button></div><button class="secondary-button" data-download-qr><span data-icon="download"></span>Baixar QR Code</button></div><div class="qr-wrap"><canvas id="portfolio-qr" width="320" height="320" aria-label="QR Code do portfólio público"></canvas></div>` : state.profile.username ? emptyState('qr', 'Portfólio em rascunho', 'Publique o portfólio para ativar o link e o QR Code.', '<button class="primary-button" data-route-button="publicacoes">Publicar portfólio</button>') : emptyState('qr', 'Configure seu link público', 'Complete o perfil para gerar seu link e QR Code.', '<button class="primary-button" data-route-button="portfolio-editar">Configurar portfólio</button>')}</article></section>`
 }
 
 function projectCards(items) {
@@ -227,7 +244,7 @@ function projectCards(items) {
 }
 
 function projectCard(project) {
-  return `<article class="card project-card reference-project-card explorer-project" draggable="true" data-drag-project="${project.id}" tabindex="0" aria-label="Projeto ${esc(project.name)}"><button class="project-cover" type="button" data-view-project="${project.id}" aria-label="Visualizar ${esc(project.name)}">${project.image ? `<img src="${esc(project.image)}" alt="Capa de ${esc(project.name)}" loading="lazy" width="480" height="270" draggable="false">` : `<span class="project-cover-fallback"><strong>${esc(project.name)}</strong></span>`}</button><div class="project-card-body"><h2>${esc(project.name)}</h2><div class="project-actions"><button class="primary-button" type="button" data-open-project="${project.id}">Acessar</button><button class="secondary-button" type="button" data-view-project="${project.id}">Ver</button><button class="icon-button project-more" type="button" data-project-menu="${project.id}" aria-label="Mais ações para ${esc(project.name)}" aria-haspopup="dialog">⋯</button></div></div></article>`
+  return `<article class="card project-card reference-project-card explorer-project" draggable="true" data-drag-project="${project.id}" tabindex="0" aria-label="Projeto ${esc(project.name)}" aria-description="Use Alt e as setas para mudar a posição" aria-keyshortcuts="Alt+ArrowLeft Alt+ArrowRight Alt+ArrowUp Alt+ArrowDown"><button class="project-cover" type="button" data-view-project="${project.id}" aria-label="Visualizar ${esc(project.name)}">${project.image ? `<img src="${esc(project.image)}" alt="Capa de ${esc(project.name)}" loading="lazy" width="480" height="270" draggable="false">` : `<span class="project-cover-fallback"><strong>${esc(project.name)}</strong></span>`}</button><div class="project-card-body"><h2>${esc(project.name)}</h2><div class="project-actions"><button class="primary-button" type="button" data-open-project="${project.id}">Acessar</button><button class="secondary-button" type="button" data-view-project="${project.id}">Ver</button><button class="icon-button project-more" type="button" data-project-menu="${project.id}" aria-label="Mais ações para ${esc(project.name)}" aria-haspopup="dialog">⋯</button></div></div></article>`
 }
 
 function projectsView() {
@@ -254,7 +271,7 @@ function portfolioManagerView() {
   const username = profile.username ? `@${profile.username.replace(/^@/, '')}` : '@usuario'
   const biography = profile.bio || profile.role || 'Adicione uma biografia para apresentar seu trabalho aos visitantes.'
   return `<section class="page-enter my-portfolio-page">${pageHead('Meu Portfólio', 'Prévia completa de como os visitantes verão seu portfólio.', '<a class="secondary-button" href="#inicio">← Voltar ao início</a>')}
-    <div class="portfolio-page my-portfolio-preview" data-model="${model.id}" style="--model-image:url('${model.image}');--model-ink:${model.ink}">
+    <div class="portfolio-page my-portfolio-preview" data-model="${model.id}" style="--model-ink:${model.ink}">
       <div class="portfolio-shell folio-showcase-shell"><article class="folio-showcase-card">
         <div class="my-portfolio-banner"><img class="public-banner-image" src="${esc(banner)}" alt="Banner do portfólio" onerror="this.hidden=true"><input id="profile-banner-file" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="icon-button banner-edit-button" type="button" data-upload-profile-banner aria-label="Editar banner"><span data-icon="edit"></span></button></div>
         <div class="folio-showcase-profile"><div class="public-avatar">${profile.avatar ? `<img src="${esc(profile.avatar)}" alt="Foto de ${esc(realName())}" onerror="this.src='${profilePlaceholderUrl}'">` : `<img src="${profilePlaceholderUrl}" alt="Ícone de usuário">`}<input id="avatar-file" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="icon-button avatar-edit-button" type="button" data-upload-avatar aria-label="Editar foto de perfil"><span data-icon="edit"></span></button></div>
@@ -369,7 +386,7 @@ function renamePortfolioFolder(id) {
 }
 
 function modelCard(model) {
-return `<article class="card model-card"><button type="button" data-model-swatch="${esc(model.id)}" class="model-swatch ${model.available?'is-available':'is-locked'}" data-preview-model="${model.id}" aria-label="Pré-visualizar ${esc(model.name)}">${model.available?'':'<span class="model-lock" data-icon="lock" aria-hidden="true"></span>'}</button><div class="model-card-footer"><div><h3>${esc(model.name)}</h3><p>${model.available?'Disponível':'Bloqueado'}</p></div><div class="view-actions"><button class="icon-button" data-preview-model="${model.id}" aria-label="Pré-visualizar ${esc(model.name)}"><span data-icon="eye"></span></button><button class="secondary-button" data-apply-model="${model.id}">Aplicar</button></div></div></article>`
+return `<article class="card model-card"><button type="button" data-model-swatch="${esc(model.id)}" class="model-swatch ${model.available?'is-available':'is-locked'}" data-preview-model="${model.id}" aria-label="Pré-visualizar ${esc(model.name)}">${modelPreviewMarkup({ model, profile:state.profile, projects:state.projects })}${model.available?'':'<span class="model-lock" data-icon="lock" aria-hidden="true"></span>'}</button><div class="model-card-footer"><div><h3>${esc(model.name)}</h3><p>${model.available?'Disponível':'Bloqueado'}</p></div><div class="view-actions"><button class="icon-button" data-preview-model="${model.id}" aria-label="Pré-visualizar ${esc(model.name)}"><span data-icon="eye"></span></button><button class="secondary-button" data-apply-model="${model.id}">Aplicar</button></div></div></article>`
 }
 
 function modelsView() {
@@ -426,20 +443,23 @@ function githubView() {
     : `<div class="card connect-card"><span class="connect-icon" data-icon="github"></span><h2>Conecte seu GitHub</h2><p>Conecte a conta para sincronizar e importar seus repositórios reais.</p><button class="primary-button" data-connect-github><span data-icon="github"></span>Conectar com GitHub</button></div>`
   const status = reposLoading ? 'Carregando repositórios...' : repoLoadFailed ? 'Não foi possível carregar os repositórios.' : `${state.repos.length} repositório${state.repos.length === 1 ? '' : 's'} encontrado${state.repos.length === 1 ? '' : 's'}`
   const message = repoLoadFailed ? '<div class="repo-reference-note"><p>Não conseguimos acessar seus repositórios. Tente novamente ou reconecte sua conta do GitHub.</p><button type="button" data-retry-repos>Tentar novamente</button><button type="button" data-connect-github>Reconectar GitHub</button></div>' : state.githubConnected && reposLoaded && !state.repos.length ? '<p class="repo-empty">Nenhum repositório encontrado nesta conta.</p>' : ''
-  return `<section class="page-enter github-page">${pageHead('GitHub', 'Selecione os repositórios que deseja transformar em projetos.', state.githubConnected ? '<button class="secondary-button" data-disconnect-github>Desconectar</button>' : '')}${account}${state.githubConnected ? `<div class="repo-panel"><div class="section-card-head"><div><h2>Seus repositórios</h2><p>${status}</p></div><button class="primary-button" data-import-selected ${state.repos.length ? '' : 'disabled'}><span data-icon="download"></span>Importar selecionados</button></div>${content}${message}</div>` : ''}</section>`
+  return `<section class="page-enter github-page">${pageHead('GitHub', 'Selecione os repositórios que deseja adicionar ao portfólio principal.', state.githubConnected ? '<button class="secondary-button" data-disconnect-github>Desconectar</button>' : '')}${account}${state.githubConnected ? `<div class="repo-panel"><div class="section-card-head"><div><h2>Seus repositórios</h2><p>${status}</p></div><button class="primary-button" data-import-selected ${state.repos.length ? '' : 'disabled'}><span data-icon="plus"></span>Adicionar repositório</button></div>${content}${message}</div>` : ''}</section>`
 }
 
+let analyticsPeriod = 30
 function analyticsView() {
   const summary = analyticsSummary()
   const now = new Date()
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
-  const monthEvents = state.analytics.filter(event => event.event_type === 'portfolio_view' && new Date(event.created_at) >= monthStart)
-  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
-  const dailyViews = Array.from({ length: daysInMonth }, (_, index) => monthEvents.filter(event => new Date(event.created_at).getDate() === index + 1).length)
-  const maxDailyViews = Math.max(1, ...dailyViews)
-  const axisMax = Math.max(12, Math.ceil(maxDailyViews / 2) * 2)
-  const monthLabel = new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(now)
-  const monthlyChart = `<article class="card monthly-chart"><div class="section-card-head"><div><h2>Visualizações — ${esc(monthLabel)}</h2><p>${monthEvents.length} ${monthEvents.length === 1 ? 'visualização' : 'visualizações'} neste mês</p></div></div><div class="chart-plot"><div class="chart-guides" aria-hidden="true">${Array.from({ length: 7 }, (_, index) => `<span><b>${Math.round(axisMax * (6 - index) / 6)}</b></span>`).join('')}</div><div class="month-bars" aria-label="Visualizações por dia">${dailyViews.map((count, index) => `<span title="Dia ${index + 1}: ${count} visualizações"><i style="height:${Math.max(1, Math.round((count / axisMax) * 100))}%"></i><small>${index + 1}</small></span>`).join('')}</div></div></article>`
+  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - analyticsPeriod + 1)
+  const views = state.analytics.filter(event => event.event_type === 'portfolio_view' && new Date(event.created_at) >= start)
+  const dailyViews = Array.from({ length: analyticsPeriod }, (_, index) => {
+    const date = new Date(start.getFullYear(), start.getMonth(), start.getDate() + index)
+    return { date, count: views.filter(event => new Date(event.created_at).toDateString() === date.toDateString()).length }
+  })
+  const axisMax = Math.max(1, Math.ceil(Math.max(...dailyViews.map(item => item.count)) / 5) * 5)
+  const periodControl = `<div class="segmented-control" aria-label="Período das visualizações">${[7, 30, 90].map(days => `<button type="button" data-analysis-period="${days}" aria-pressed="${analyticsPeriod === days}">${days} dias</button>`).join('')}</div>`
+  const bars = `<div class="chart-plot"><div class="chart-guides" aria-hidden="true">${Array.from({ length: 6 }, (_, index) => `<span><b>${Math.round(axisMax * (5 - index) / 5)}</b></span>`).join('')}</div><div class="month-bars" aria-label="Visualizações por dia">${dailyViews.map(({ date, count }, index) => { const label = new Intl.DateTimeFormat('pt-BR', { day:'2-digit', month:'short' }).format(date); return `<span tabindex="0" aria-label="${esc(label)}: ${count} visualizações" data-tooltip="${esc(label)} · ${count} visualizações"><i style="height:${Math.max(1, Math.round((count / axisMax) * 100))}%"></i><small>${analyticsPeriod === 7 || index % Math.ceil(analyticsPeriod / 8) === 0 ? esc(label) : ''}</small></span>` }).join('')}</div></div>`
+  const monthlyChart = `<article class="card monthly-chart"><div class="section-card-head"><div><h2>Visualizações</h2><p>${views.length} ${views.length === 1 ? 'visualização' : 'visualizações'} nos últimos ${analyticsPeriod} dias</p></div>${periodControl}</div>${views.length ? bars : `<div class="chart-empty">${emptyState('chart', 'Ainda não há visualizações neste período.', 'Compartilhe seu portfólio para começar a acompanhar os acessos.', `<button type="button" class="secondary-button" data-route-button="${state.published ? 'link-qrcode' : 'publicacoes'}">${state.published ? 'Compartilhar portfólio' : 'Publicar portfólio'}</button>`)}</div>`}</article>`
   const projectCounts = new Map()
   state.analytics.filter(event => event.project_id && (event.event_type === 'project_view' || event.event_type === 'link_click')).forEach(event => projectCounts.set(Number(event.project_id), (projectCounts.get(Number(event.project_id)) || 0) + 1))
   const ranking = state.projects.map(project => ({ project, count: projectCounts.get(project.id) || 0 })).filter(item => item.count).sort((a, b) => b.count - a.count)
@@ -478,6 +498,14 @@ function settingsView() {
   return `<section class="page-enter compact-panel-page"><div class="card settings-card compact-panel"><div class="settings-card-head"><span data-icon="settings"></span><div><h1>Configurações</h1><p>Preferências, privacidade e integrações.</p></div></div><nav class="settings-tabs" aria-label="Seções de configurações"><a href="#preferencias" data-settings-anchor="preferencias">Preferências</a><a href="#privacidade" data-settings-anchor="privacidade">Privacidade</a><a href="#conta" data-settings-anchor="conta">Conta</a></nav><div class="panel-section" id="preferencias"><h2>Preferências</h2>${switchRow('mail', 'Avisos por e-mail', 'Receba atualizações importantes sobre seu portfólio.', 'email', state.settings.email)}${switchRow('bell', 'Novidades do produto', 'Acompanhe melhorias e novos recursos da plataforma.', 'product', state.settings.product)}${switchRow('panel', 'Modo compacto', 'Reduza o espaçamento das listas e painéis.', 'compact', state.settings.compact)}</div><div class="panel-section" id="privacidade"><h2>Privacidade</h2>${switchRow('shield', 'Perfil público', 'Permita que visitantes acessem seu portfólio publicado.', 'publicProfile', state.settings.publicProfile)}</div><div class="panel-section" id="conta"><h2>Conta</h2><div class="setting-row"><div><b>Exportar dados</b><small>Baixe uma cópia das informações da conta.</small></div><button class="secondary-button" data-export>Exportar</button></div><div class="setting-row danger-row"><div><b>Excluir conta</b><small>Essa ação não poderá ser desfeita.</small></div><button class="danger-button" data-delete-account>Excluir conta</button></div></div></div></section>`
 }
 
+function settingsWithAppearanceView() {
+  const theme = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light'
+  const appearance = `<div class="panel-section appearance-section" id="aparencia"><h2>Aparência</h2><div class="setting-row"><div><b>Tema da interface</b><small>Escolha como o painel aparece neste navegador.</small></div><div class="segmented-control theme-control" role="group" aria-label="Tema da interface"><button type="button" data-interface-theme="light" aria-pressed="${theme === 'light'}">Claro</button><button type="button" data-interface-theme="dark" aria-pressed="${theme === 'dark'}">Escuro</button></div></div></div>`
+  return settingsView()
+    .replace('<a href="#privacidade" data-settings-anchor="privacidade">', '<a href="#aparencia" data-settings-anchor="aparencia">Aparência</a><a href="#privacidade" data-settings-anchor="privacidade">')
+    .replace('<div class="panel-section" id="privacidade">', appearance + '<div class="panel-section" id="privacidade">')
+}
+
 function referralView() {
   const code = state.profile.username.trim().toLowerCase()
   const link = code ? `${location.origin}/?ref=${encodeURIComponent(code)}` : ''
@@ -498,7 +526,7 @@ function referralView() {
 function publicationsView() {
   const entries = publicationHistoryExpanded ? visualPublications.events : visualPublications.events.slice(0, 5)
   return `<section class="page-enter publications-page">${pageHead('Publicações', 'O estado atual do seu portfólio público.')}
-    <article class="card publication-panel"><div class="publication-heading"><h2>Portfólio de ${esc(realName())}</h2>${statusBadge(state.published ? 'published' : 'draft')}</div><div class="commit-timeline"><div><b>${state.published ? 'Disponível para visitantes' : 'Ainda não publicado'}</b><p>${state.published ? 'Sua página está no ar. Revise o conteúdo antes de compartilhar.' : 'Revise seu conteúdo antes de publicar.'}</p></div></div>${state.profile.username ? `<div class="url-field"><span>${esc(publicPortfolioUrl())}</span><button class="icon-button" data-copy="${esc(publicPortfolioUrl())}" aria-label="Copiar endereço"><span data-icon="copy"></span></button></div>` : ''}<div class="publication-actions"><button class="${state.published ? 'danger-button' : 'primary-button publish-button'}" data-toggle-publish>${state.published ? 'Despublicar' : 'Publicar'}</button><button class="secondary-button" data-route-button="portfolio-editar"><span data-icon="edit"></span>Editar conteúdo</button>${state.published ? '<button class="secondary-button" data-open-preview>Abrir portfólio</button>' : ''}</div><p class="workspace-note">Esta tela mostra a publicação atual do seu portfólio.</p></article>
+    <article class="card publication-panel"><div class="publication-heading"><h2>Portfólio de ${esc(realName())}</h2>${statusBadge(state.published ? 'published' : 'draft')}</div><div class="commit-timeline"><div><b>${state.published ? 'Disponível para visitantes' : 'Ainda não publicado'}</b><p>${state.published ? 'Sua página está no ar. Revise o conteúdo antes de compartilhar.' : 'Revise seu conteúdo antes de publicar.'}</p></div></div>${state.published && state.profile.username ? `<div class="url-field"><span>${esc(publicPortfolioUrl())}</span><button class="icon-button" data-copy="${esc(publicPortfolioUrl())}" aria-label="Copiar endereço"><span data-icon="copy"></span></button></div>` : ''}<div class="publication-actions"><button class="${state.published ? 'danger-button' : 'primary-button publish-button'}" data-toggle-publish>${state.published ? 'Despublicar' : 'Publicar'}</button><button class="secondary-button" data-route-button="portfolio-editar"><span data-icon="edit"></span>Editar conteúdo</button>${state.published ? '<button class="secondary-button" data-open-preview>Abrir portfólio</button>' : ''}</div><p class="workspace-note">Esta tela mostra a publicação atual do seu portfólio.</p></article>
     <article class="card publication-history"><div class="section-card-head"><div><h2>Histórico de publicações</h2><p>Todas as versões do seu portfólio publicadas.</p></div><button class="secondary-button" data-manage-publication-history><span data-icon="refresh"></span>Gerenciar histórico</button></div>
       <div class="publication-table-wrap"><table class="publication-table"><thead><tr><th>Portfólio</th><th>Data</th><th>Horário</th><th>Status</th><th>Ações</th></tr></thead><tbody>${entries.length ? entries.map(event => { const date = new Date(event.createdAt); return `<tr><td>${esc(event.name)}</td><td>${date.toLocaleDateString('pt-BR')}</td><td>${date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</td><td><span class="status ${event.action === 'published' ? 'published' : 'draft'}">${event.action === 'published' ? 'Publicado' : 'Despublicado'}</span></td><td><button class="secondary-button" data-open-publication-id="${esc(event.id)}" ${event.snapshot ? '' : 'disabled'}>Abrir</button><button class="icon-button" data-publication-menu="${esc(event.id)}" aria-label="Ações do registro">⋮</button></td></tr>` }).join('') : '<tr><td colspan="5" class="publication-empty">Nenhuma publicação registrada ainda.</td></tr>'}</tbody></table></div>
     </article>
@@ -520,9 +548,9 @@ function publicationEventMenu(id) {
   $('[data-copy]', $('#modal-root'))?.addEventListener('click', button => copyText(button.currentTarget.dataset.copy))
 }
 
-function plansView(){return `<section class="page-enter plans-page">${pageHead('Planos','Compare os recursos disponíveis para seu portfólio.')}<p class="plans-availability">As assinaturas pagas estão em breve. Continue editando e publicando seu portfólio.</p><div class="devi-plan-grid">${renderPlanCards({internal:true})}</div></section>`}
+function plansView(){return `<section class="page-enter plans-page">${pageHead('Planos','Compare os recursos disponíveis para seu portfólio.')}<p class="plans-availability">As assinaturas pagas estão em breve. Continue editando e publicando seu portfólio.</p><div class="devi-plan-grid">${renderPlanCards({internal:true})}</div><form class="card coupon-panel" id="coupon-form"><div><h2>Tem um cupom?</h2><p>A validação e o pagamento serão ativados com os planos.</p></div><label for="coupon-code">Código do cupom</label><div class="coupon-entry"><input id="coupon-code" name="coupon" autocomplete="off" placeholder="Digite o código"><button class="secondary-button" type="submit">Aplicar</button><button class="ghost-button" type="reset">Remover</button></div><p id="coupon-feedback" role="status" aria-live="polite">Nenhum desconto aplicado.</p></form></section>`}
 
-const views = { publicacoes: publicationsView, planos: plansView, 'link-qrcode': linkQrView, inicio: homeView, projetos: projectsView, portfolio: portfolioManagerView, modelos: modelsView, 'portfolio-editar': portfolioEditorView, github: githubView, analise: analyticsView, kaptei: kapteiView, perfil: profileView, configuracoes: settingsView, indicacao: referralView }
+const views = { publicacoes: publicationsView, planos: plansView, 'link-qrcode': linkQrView, inicio: homeView, projetos: projectsView, portfolio: portfolioManagerView, modelos: modelsView, 'portfolio-editar': portfolioEditorView, github: githubView, analise: analyticsView, kaptei: kapteiView, perfil: profileView, configuracoes: settingsWithAppearanceView, indicacao: referralView }
 
 function render({ preserveScroll = false } = {}) {
   const requestedRoute = location.hash.slice(1)
@@ -535,7 +563,7 @@ function render({ preserveScroll = false } = {}) {
   document.body.classList.toggle('projects-route', route === 'projetos')
   document.body.classList.toggle('kaptei-route', route === 'kaptei')
   $('#page-content').innerHTML = views[route]()
-  const routeLabel = { publicacoes:'Publicações', planos:'Planos', 'link-qrcode': 'Seu Link, Seu QR Code', inicio: 'Dashboard', projetos: 'Projetos', portfolio: 'Meu portfólio', modelos: 'Modelos', 'portfolio-editar': 'Editar portfólio', github: 'GitHub', analise: 'Análise', kaptei: 'Kaptei', perfil: 'Perfil', configuracoes: 'Configurações', indicacao: 'Indicação' }[route]
+  const routeLabel = { publicacoes:'Publicações', planos:'Planos', 'link-qrcode': 'Seu Link, Seu QR Code', inicio: 'Início', projetos: 'Projetos', portfolio: 'Meu portfólio', modelos: 'Modelos', 'portfolio-editar': 'Editar portfólio', github: 'GitHub', analise: 'Análise', kaptei: 'Kaptei', perfil: 'Perfil', configuracoes: 'Configurações', indicacao: 'Indicação' }[route]
   document.title = `${routeLabel} — FolioDev`
   if ($('#breadcrumb-page')) $('#breadcrumb-page').textContent = routeLabel
   if ($('#breadcrumb-section')) $('#breadcrumb-section').textContent = route === 'inicio' ? 'Início' : 'Painel'
@@ -561,14 +589,24 @@ function updateUserChrome() {
 }
 
 function bindActions() {
+  $$('[data-interface-theme]').forEach(button => button.onclick = () => {
+    const theme = button.dataset.interfaceTheme === 'dark' ? 'dark' : 'light'
+    document.documentElement.dataset.theme = theme
+    try { localStorage.setItem('foliodev_interface_theme', theme) } catch { toast('A preferência de tema não pôde ser salva neste navegador.', 'error') }
+    $$('[data-interface-theme]').forEach(option => option.setAttribute('aria-pressed', String(option === button)))
+  })
+  $$('[data-analysis-period]').forEach(button => button.onclick = () => { analyticsPeriod = Number(button.dataset.analysisPeriod); render({ preserveScroll:true }) })
+  $('#coupon-form')?.addEventListener('submit', event => { event.preventDefault(); const code = $('#coupon-code').value.trim(); const feedback = $('#coupon-feedback'); feedback.classList.add('error'); feedback.textContent = code ? 'Não é possível validar cupons agora. Nenhum desconto foi aplicado.' : 'Digite um cupom antes de aplicar.' })
+  $('#coupon-form')?.addEventListener('reset', () => { const feedback = $('#coupon-feedback'); feedback.classList.remove('error'); feedback.textContent = 'Nenhum desconto aplicado.' })
   $$('[data-project-layout]').forEach(button=>button.onclick=()=>{portfolioLayout=button.dataset.projectLayout;const grid=$('.portfolio-project-grid');grid?.classList.toggle('is-list',portfolioLayout==='list');$$('[data-project-layout]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)))})
-  $$('[data-preview-model]').forEach(button=>button.onclick=()=>{modal(documentPreview({profile:state.profile,projects:state.projects.filter(p=>p.status==='published'),model:getPortfolioModel(button.dataset.previewModel)})+'<div class="modal-actions"><button class="secondary-button" data-close-modal>Fechar prévia</button></div>');$('.modal').classList.add('model-preview-modal')})
+  $$('[data-preview-model]').forEach(button=>button.onclick=()=>{modal(modelPreviewMarkup({profile:state.profile,projects:state.projects,model:getPortfolioModel(button.dataset.previewModel)})+'<div class="modal-actions"><button class="secondary-button" data-close-modal>Fechar prévia</button></div>');$('.modal').classList.add('model-preview-modal')})
   $$('[data-settings-anchor]').forEach(link=>link.onclick=event=>{event.preventDefault();document.getElementById(link.dataset.settingsAnchor)?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'})})
   $$('[data-unlock-field]').forEach(button=>button.onclick=()=>{const input=button.closest('.field')?.querySelector('input,textarea');if(input){input.readOnly=false;input.focus()}})
   $$('[data-route-button]').forEach(button => button.onclick = () => { location.hash = button.dataset.routeButton })
+  $('[data-dismiss-promo]')?.addEventListener('click', () => { localStorage.setItem('foliodev_hide_plus_promo', 'true'); $('.home-plus-promo')?.remove() })
   $('[data-promo-plans]')?.addEventListener('click', event => { event.preventDefault(); location.assign('index.html#planos') })
   $$('[data-copy]').forEach(button => button.onclick = () => copyText(button.dataset.copy))
-  $$('[data-open-preview]').forEach(button => button.onclick = () => window.open(publicPortfolioUrl(), '_blank', 'noopener'))
+  $$('[data-open-preview]').forEach(button => button.onclick = openPortfolioPreview)
   $$('[data-edit-portfolio]').forEach(button => button.onclick = () => { location.hash = 'portfolio-editar' })
   $$('[data-portfolio-menu]').forEach(button => button.onclick = () => portfolioActions(button.dataset.portfolioMenu))
   $$('[data-show-folder-info]').forEach(button => button.onclick = () => showPortfolioFolderInfo(button.dataset.showFolderInfo))
@@ -603,9 +641,10 @@ function bindActions() {
     const query = folderSearch.value.trim().toLocaleLowerCase('pt-BR')
     const items = selectedFolderId ? projectsAt(selectedFolderId).filter(project => `${project.name} ${project.description} ${project.tech}`.toLocaleLowerCase('pt-BR').includes(query)) : []
     const grid = $('.portfolio-project-grid')
-    grid.innerHTML = items.length || !query ? projectCards(items) : '<div class="projects-empty">Nenhum projeto encontrado.</div>'
+    grid.innerHTML = items.length || !query ? projectCards(items) : '<div class="projects-empty"><p>Nenhum projeto encontrado para esta busca.</p><button class="secondary-button" type="button" data-clear-portfolio-search>Limpar busca</button></div>'
     hydrateIcons(grid)
     bindProjectGrid(grid)
+    $('[data-clear-portfolio-search]', grid)?.addEventListener('click', () => { folderSearch.value = ''; folderSearch.dispatchEvent(new Event('input')); folderSearch.focus() })
   }
 
   const search = $('#project-search'), filter = $('#type-filter'), sort = $('#project-sort')
@@ -615,9 +654,12 @@ function bindActions() {
       const items = projectsAt('projects').filter(project => `${project.name} ${project.description} ${project.tech}`.toLowerCase().includes(query) && (selection === 'all' || selection === `status:${project.status}` || selection === `type:${projectVisualType(project)}`))
       if (sort.value === 'name') items.sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'))
       if (sort.value === 'type') items.sort((a, b) => projectVisualType(a).localeCompare(projectVisualType(b), 'pt-BR'))
-      $('#project-grid').innerHTML = projectCards(items)
+      $('#project-grid').innerHTML = items.length || (!query && selection === 'all')
+        ? projectCards(items)
+        : '<div class="card projects-empty"><p>Nenhum projeto encontrado com estes filtros.</p><button class="secondary-button" type="button" data-clear-project-filters>Limpar filtros</button></div>'
       hydrateIcons($('#project-grid'))
       bindProjectGrid()
+      $('[data-clear-project-filters]')?.addEventListener('click', () => { search.value = ''; filter.value = 'all'; update(); search.focus() })
       $('[data-new-project]', $('#project-grid'))?.addEventListener('click', () => projectModal())
     }
     search.oninput = update; filter.onchange = update; sort.onchange = update
@@ -767,7 +809,7 @@ bindExplorerDrag({
   },
   moveProject: organizeProject,
   reorderFolders: saveFolderOrder,
-  onError: error => reportError('Não foi possível salvar a organização.', error),
+  onError: error => { render({ preserveScroll: true }); reportError('Não foi possível salvar a organização. A ordem anterior foi restaurada.', error) },
 })
 
 async function savePortfolioForm(event) {
@@ -784,10 +826,6 @@ async function savePortfolioForm(event) {
   } catch (error) { reportError('Não foi possível salvar o portfólio.', error) } finally { setButtonLoading(button, false) }
 }
 
-const waitForVisual = (started, targetMs) => new Promise(resolve => {
-  window.setTimeout(resolve, Math.max(0, targetMs - (performance.now() - started)))
-})
-
 async function togglePublished() {
   if (!state.published && !profileComplete()) return toast('Adicione seu nome e username antes de publicar.', 'error')
   if (state.published) {
@@ -799,15 +837,10 @@ async function togglePublished() {
 }
 
 async function runPortfolioPublication(publishing) {
-  const started = performance.now()
   closeModal({ immediate: true })
   screenLoading.show(publishing ? 'Publicando portfólio...' : 'Despublicando portfólio...')
   try {
     await saveProfile(currentUser.id, state.profile, publishing)
-    if (publishing) {
-      await waitForVisual(started, 1350)
-      screenLoading.show('Enviando projetos...')
-    }
     state.published = publishing
     try {
       visualPublications = recordVisualPublication(localStorage, currentUser.id, visualPublications, {
@@ -817,19 +850,12 @@ async function runPortfolioPublication(publishing) {
         snapshot: publishing ? { profile: { ...state.profile }, projects: state.projects.filter(project => project.status === 'published').map(project => ({ ...project })) } : null,
       })
     } catch (storageError) { console.warn('[Devifolio] Histórico visual não salvo.', storageError) }
-    if (publishing) {
-      await waitForVisual(started, 2900)
-      screenLoading.show('Portfólio publicado!')
-      await waitForVisual(started, 4000)
-    } else {
-      await waitForVisual(started, 750)
-    }
     render({ preserveScroll: true })
     screenLoading.hide()
     toast(publishing ? 'Portfólio publicado.' : 'Portfólio despublicado.')
   } catch (error) {
     screenLoading.hide()
-    reportError('Não foi possível alterar a publicação.', error)
+    reportError(publishing ? 'Não foi possível publicar. Tente novamente.' : 'Não foi possível despublicar. Tente novamente.', error)
   }
 }
 
@@ -889,7 +915,7 @@ async function handleProfileBannerUpload(event) {
   const file = event.currentTarget.files?.[0]
   if (!file) return
   if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) return toast('Use uma imagem JPG, PNG ou WebP de até 5 MB.', 'error')
-  screenLoading.show('Carregando...')
+  screenLoading.show('Enviando capa do portfólio...')
   try {
     await uploadPortfolioBanner(currentUser.id, file)
     profileBannerRevision = String(Date.now())
@@ -976,45 +1002,34 @@ function confirmDelete(id) {
 
 async function connectGithub(event) {
   const button = event.currentTarget
-  const started = performance.now()
-  setButtonLoading(button, true, 'Conectando...')
+  setButtonLoading(button, true, 'Conectando ao GitHub...')
   screenLoading.show('Conectando GitHub...')
   try {
     const data = await authenticatedApi('/api/github/connect', { method: 'POST' })
     if (!data.authorizationUrl) throw new Error('A autorização do GitHub não retornou um endereço válido.')
     location.assign(data.authorizationUrl)
   } catch (error) {
-    await waitForVisual(started, 180)
-    screenLoading.show('Não foi possível conectar.')
-    await waitForVisual(started, 900)
     screenLoading.hide()
-    reportError('Não foi possível conectar o GitHub.', error)
+    reportError('Falha ao conectar o GitHub. Tente novamente.', error)
     setButtonLoading(button, false)
   }
 }
 
 async function disconnectGithub() {
-  const started = performance.now()
   screenLoading.show('Desconectando GitHub...')
   try {
     await authenticatedApi('/api/github/connection', { method: 'DELETE' })
-    await waitForVisual(started, 700)
     state.githubConnected = false
     state.githubUsername = ''
     state.repos = []
     reposLoaded = false
     reposPromise = null
-    screenLoading.show('GitHub desconectado.')
-    await waitForVisual(started, Math.max(1000, performance.now() - started + 300))
     render()
     screenLoading.hide()
     toast('Conta do GitHub desconectada.')
   } catch (error) {
-    await waitForVisual(started, 180)
-    screenLoading.show('Não foi possível desconectar.')
-    await new Promise(resolve => window.setTimeout(resolve, 900))
     screenLoading.hide()
-    reportError('Não foi possível desconectar o GitHub.', error)
+    reportError('Não foi possível desconectar o GitHub. Tente novamente.', error)
   }
 }
 
@@ -1054,35 +1069,23 @@ async function showGithubCallbackResult() {
   const params = new URLSearchParams(location.search)
   const status = params.get('github')
   if (!status) return
-  const started = performance.now()
-  screenLoading.show('Conectando GitHub...')
+  screenLoading.show('Confirmando conexão com o GitHub...')
   history.replaceState(null, '', location.pathname + (location.hash || '#github'))
 
   if (status === 'connected') {
     const repositories = reposPromise || (reposLoaded && state.githubConnected && !repoLoadFailed ? Promise.resolve(true) : fetchGithubRepos({ reportFailure: false }))
-    await waitForVisual(started, 800)
-    screenLoading.show('Procurando projetos...')
-    await waitForVisual(started, 1600)
-    screenLoading.show('Extraindo projetos...')
+    screenLoading.show('Buscando repositórios do GitHub...')
     const repositoriesReady = await repositories
-    await waitForVisual(started, 2100)
     if (!repositoriesReady) {
-      screenLoading.show('Não foi possível extrair projetos.')
-      await new Promise(resolve => window.setTimeout(resolve, 900))
       screenLoading.hide()
-      toast('GitHub conectado, mas não foi possível carregar os projetos.', 'error')
+      toast('GitHub conectado. Não foi possível carregar os repositórios; tente novamente.', 'error')
       return
     }
-    await waitForVisual(started, 2500)
-    screenLoading.show('GitHub conectado!')
-    await waitForVisual(started, Math.max(4000, performance.now() - started + 500))
     screenLoading.hide()
     toast('Conta do GitHub conectada com sucesso.')
     return
   }
 
-  screenLoading.show('Não foi possível conectar.')
-  await waitForVisual(started, 900)
   screenLoading.hide()
   if (status === 'access_denied') toast('A autorização do GitHub foi cancelada.', 'error')
   else if (status === 'invalid_state') toast('A autorização expirou. Tente conectar novamente.', 'error')
@@ -1090,19 +1093,43 @@ async function showGithubCallbackResult() {
 }
 
 async function importSelected(event) {
+  if (!state.githubConnected) return toast('Conecte o GitHub antes de adicionar repositórios.', 'error')
   const selected = $$('.repo-row input:checked').map(input => state.repos[Number(input.value)]).filter(Boolean)
   if (!selected.length) return toast('Selecione ao menos um repositório.', 'error')
   const button = event.currentTarget
-  setButtonLoading(button, true, 'Importando...')
+  const oldFeedback = $('.repo-import-feedback')
+  oldFeedback?.remove()
+  setButtonLoading(button, true, 'Adicionando repositório...')
+  let added = 0
   try {
-    for (const repository of selected) {
-      if (state.projects.some(project => project.github === repository.full_name)) continue
-      const project = { id: Date.now() + state.projects.length, sortOrder: nextSortOrder(state.projects, 'projects'), name: repository.name, description: repository.description || '', tech: repository.language || '', link: repository.homepage || '', github: repository.full_name, image: '', status: 'draft' }
-      const saved = await saveProject(currentUser.id, project, 0)
-      state.projects.unshift(saved)
+    const response = await authenticatedApi('/api/github/repos')
+    const plan = planGithubImport(selected, Array.isArray(response.repositories) ? response.repositories : [], state.projects)
+    if (!plan.repositories.length) {
+      const reason = plan.removed ? 'O repositório selecionado não está mais disponível no GitHub. Sincronize a lista e tente novamente.' : 'Este repositório já está no seu portfólio.'
+      toast(reason, 'error')
+      return
     }
-    toast(`${selected.length} repositório${selected.length === 1 ? '' : 's'} importado${selected.length === 1 ? '' : 's'}.`); render()
-  } catch (error) { reportError('Não foi possível importar os projetos.', error); setButtonLoading(button, false) }
+    for (const repository of plan.repositories) {
+      let id = Date.now() + state.projects.length
+      while (state.projects.some(project => project.id === id)) id++
+      const saved = await saveProject(currentUser.id, importedGithubProject(repository, state.projects, id))
+      state.projects.push(saved)
+      added++
+    }
+    location.hash = 'portfolio'
+    render()
+    toast(added === 1 ? 'Repositório adicionado.' : `${added} repositórios adicionados.`)
+    if (plan.removed || plan.duplicates) toast(`${plan.duplicates} já adicionado(s); ${plan.removed} indisponível(is) no GitHub.`, 'error')
+  } catch (error) {
+    const expired = /sessão expir/i.test(error.message || '')
+    const message = expired ? 'Sua sessão expirou. Entre novamente para adicionar o repositório.' : added ? `${added} repositório(s) adicionado(s). Os demais não puderam ser salvos. Tente novamente.` : 'Não foi possível adicionar. Verifique a conexão e tente novamente.'
+    reportError(message, error)
+    const feedback = document.createElement('p')
+    feedback.className = 'repo-import-feedback'
+    feedback.setAttribute('role', 'alert')
+    feedback.textContent = message
+    button.closest('.section-card-head')?.after(feedback)
+  } finally { setButtonLoading(button, false) }
 }
 
 async function updateSetting(key) {
@@ -1262,7 +1289,7 @@ function renderWithTransition() {
   const requestedRoute = location.hash.slice(1)
   const route = views[requestedRoute] ? requestedRoute : 'inicio'
   if (route === renderedRoute) return
-  screenLoading.navigate(render)
+  render()
 }
 window.addEventListener('hashchange', renderWithTransition)
 
@@ -1322,7 +1349,6 @@ async function bootstrap() {
     entrance.ready()
     return
   }
-  document.documentElement.dataset.theme = 'light'
   hydrateIcons()
   setSidebarCollapsed(localStorage.getItem('devifolio_sidebar_collapsed') === 'true')
   if (onboardingRequested && !new URLSearchParams(location.search).has('github')) history.replaceState(null, '', `${location.pathname}${location.hash || '#inicio'}`)
@@ -1332,11 +1358,11 @@ async function bootstrap() {
   else entrance.ready()
 }
 
-supabase.auth.onAuthStateChange((event, session) => { if (event === 'SIGNED_OUT' || (!session && event !== 'INITIAL_SESSION')) { screenLoading.show(); closeModal({ immediate: true }); location.replace('cadastro.html#login') } })
+supabase.auth.onAuthStateChange((event, session) => { if (event === 'SIGNED_OUT' || (!session && event !== 'INITIAL_SESSION')) { screenLoading.show('Saindo da conta...'); closeModal({ immediate: true }); location.replace('cadastro.html#login') } })
 $$('[data-logout]').forEach(link => link.addEventListener('click', async event => { event.preventDefault(); await supabase.auth.signOut(); location.replace('cadastro.html#login') }))
 
 bootstrap()
 
 window.addEventListener('offline',()=>{if(document.querySelector('.offline-notice'))return;const notice=document.createElement('div');notice.className='offline-notice';notice.setAttribute('role','status');notice.textContent='Você está sem conexão. Aguarde a conexão retornar antes de salvar alterações.';document.querySelector('.main-content').prepend(notice)});window.addEventListener('online',()=>document.querySelector('.offline-notice')?.remove())
 
-document.addEventListener('keydown',event=>{if(!document.querySelector('#sidebar.open')||window.innerWidth>820)return;if(event.key==='Escape'){event.preventDefault();closeMenu();$('#menu-toggle').focus()}else if(event.key==='Tab'){const controls=$$('#sidebar a[href],#sidebar button:not([disabled])').filter(el=>el.getClientRects().length),first=controls[0],last=controls.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}}});document.querySelectorAll('[data-tooltip]').forEach(el=>el.title=el.dataset.tooltip)
+document.addEventListener('keydown',event=>{if(!document.querySelector('#sidebar.open')||window.innerWidth>820)return;if(event.key==='Escape'){event.preventDefault();closeMenu();$('#menu-toggle').focus()}else if(event.key==='Tab'){const controls=$$('#sidebar a[href],#sidebar button:not([disabled])').filter(el=>el.getClientRects().length),first=controls[0],last=controls.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}}})

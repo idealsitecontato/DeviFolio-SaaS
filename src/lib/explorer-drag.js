@@ -46,7 +46,16 @@ export function bindExplorerDrag({ canMove, moveProject, reorderFolders, onError
     const rect = target.getBoundingClientRect()
     const after = x > rect.x + rect.width / 2
     if ((!after && drag.source.nextElementSibling === target) || (after && target.nextElementSibling === drag.source)) return
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const previous = reduced ? null : new Map([...drag.parent.children].filter(item => item !== drag.source).map(item => [item, item.getBoundingClientRect()]))
     drag.parent.insertBefore(drag.source, after ? target.nextElementSibling : target)
+    if (previous) {
+      for (const [item, before] of previous) {
+        const current = item.getBoundingClientRect()
+        const dx = before.left - current.left, dy = before.top - current.top
+        if (dx || dy) item.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'translate(0, 0)' }], { duration: 160, easing: 'cubic-bezier(.2,.7,.2,1)' })
+      }
+    }
   }
 
   function hover(element, x, y) {
@@ -95,10 +104,10 @@ export function bindExplorerDrag({ canMove, moveProject, reorderFolders, onError
     return valid
   }
 
-  function cleanup() {
+  function cleanup(restore = true) {
     if (!drag) return
     clearTargets()
-    drag.original.forEach(el => { if (el.parentElement === drag.parent) drag.parent.append(el) })
+    if (restore) drag.original.forEach(el => { if (el.parentElement === drag.parent) drag.parent.append(el) })
     drag.source.classList.remove('explorer-drag-source')
     drag.ghost.remove()
     if (drag.shell && query('.portfolio-folder-modal')) drag.shell.inert = true
@@ -112,8 +121,10 @@ export function bindExplorerDrag({ canMove, moveProject, reorderFolders, onError
     if (!drag) return
     const item = drag
     const order = item.folder ? [...item.parent.querySelectorAll('[data-drag-folder]')].map(el => el.dataset.dragFolder) : null
-    cleanup()
+    cleanup(!item.target)
     if (!item.target) return
+    item.source.classList.add('explorer-drop-settle')
+    window.setTimeout(() => item.source.classList.remove('explorer-drop-settle'), 180)
     pending = true
     try {
       if (item.folder) await reorderFolders(order)

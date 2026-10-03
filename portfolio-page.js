@@ -10,18 +10,17 @@ import {
 } from './src/lib/user-data.js'
 import { getPortfolioModel } from './src/lib/portfolio-models.js'
 import { mountGooeySpinners, UploadButton } from './src/ui/visual-components.js'
-import { folioDevLogo } from './src/ui/brand.js'
 import './src/lib/build-version.js'
 
 const root = document.getElementById('portfolio-root')
 mountGooeySpinners()
-const brandUrl = folioDevLogo
 const placeholderUrl = new URL('./assets/user-placeholder.png', import.meta.url).href
 const esc = value => String(value ?? '').replace(/[&<>'"]/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[character])
 const username = new URLSearchParams(location.search).get('username') || decodeURIComponent(location.pathname.match(/^\/portfolio\/([^/]+)/)?.[1] || '')
 const folderId = new URLSearchParams(location.search).get('folder')
 const folderLabel = new URLSearchParams(location.search).get('name')?.slice(0, 60) || ''
 const visitorView = new URLSearchParams(location.search).get('visitor') === '1'
+const previewMode = new URLSearchParams(location.search).get('preview') === '1'
 document.body.classList.toggle('visitor-view', visitorView)
 const builtInFolders = ['principal', 'profissional', 'destaque', 'github']
 const folderBucket = folderId && (/^folder-\d+$/.test(folderId)
@@ -74,7 +73,7 @@ function renderPage() {
   document.querySelector('meta[property="og:title"]').content=document.title
   document.querySelector('meta[property="og:description"]').content=description
   if(profile.avatar)document.querySelector('meta[property="og:image"]').content=profile.avatar
-  root.innerHTML = `<article class="portfolio-page" data-model="${model.id}" style="--model-image:url('${model.image}');--model-ink:${model.ink}"><header class="public-nav"><a href="${isOwner ? '/dashboard.html#inicio' : '/'}" aria-label="${isOwner ? 'Voltar ao início do painel' : 'Voltar ao FolioDev'}">${isOwner ? '← Voltar ao início' : '← FolioDev'}</a><a href="/cadastro.html#cadastro" class="nav-action">Criar meu portfólio</a></header><div class="portfolio-shell"><section class="public-hero"><img class="public-banner-image" src="${esc(banner)}" alt="" aria-hidden="true">${isOwner ? '<button class="portfolio-edit-button banner-edit-button" type="button" data-edit-banner aria-label="Editar banner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4z"/></svg></button>' : ''}<div class="profile-header"><div class="public-avatar"><img src="${esc(avatar)}" alt="${profile.avatar ? `Foto de ${esc(name)}` : 'Ícone de usuário'}" width="112" height="112">${isOwner ? '<button class="portfolio-edit-button avatar-edit-button" type="button" data-edit-avatar aria-label="Editar foto de perfil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4z"/></svg></button>' : ''}</div><div class="profile-copy"><h1>${esc(name)}</h1><p class="folio-username">@${esc(profile.username)}</p>${profile.role ? `<h2>${esc(profile.role)}</h2>` : ''}${profile.bio ? `<p class="bio">${esc(profile.bio)}</p>` : ''}<nav class="profile-links">${profileLink('GitHub', profile.github)}${profileLink('LinkedIn', profile.linkedin)}${profileLink('Meu site', profile.website)}</nav></div>${profileMetrics}</div></section><section class="projects-section"><div class="section-heading"><h2>Meus projetos</h2><span>${projects.length} projeto${projects.length === 1 ? '' : 's'}</span></div>${projects.length ? `<div class="public-projects">${projects.map(project => projectCard(project, profile.userId)).join('')}</div>` : emptyProject}</section></div><footer class="public-footer"><a href="/" aria-label="Criado com FolioDev"><span class="folio-brand"><img src="${brandUrl}" alt="FolioDev" width="821" height="149"></span></a><span>Trabalho de ${esc(name)}.</span></footer></article>`
+  root.innerHTML = `${visitorView ? '<div class="portfolio-preview-bar"><a href="/dashboard.html#portfolio" aria-label="Voltar ao painel">← Voltar ao painel</a><span>Prévia do portfólio</span></div>' : ''}<article class="portfolio-page" data-model="${model.id}" style="--model-ink:${model.ink}"><header class="public-nav"><a href="${isOwner ? '/dashboard.html#inicio' : '/'}" aria-label="${isOwner ? 'Voltar ao início do painel' : 'Voltar ao FolioDev'}">${isOwner ? '← Voltar ao início' : '← FolioDev'}</a><a href="/cadastro.html#cadastro" class="nav-action">Criar meu portfólio</a></header><div class="portfolio-shell"><section class="public-hero"><img class="public-banner-image" src="${esc(banner)}" alt="" aria-hidden="true">${isOwner ? '<button class="portfolio-edit-button banner-edit-button" type="button" data-edit-banner aria-label="Editar banner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4z"/></svg></button>' : ''}<div class="profile-header"><div class="public-avatar"><img src="${esc(avatar)}" alt="${profile.avatar ? `Foto de ${esc(name)}` : 'Ícone de usuário'}" width="112" height="112">${isOwner ? '<button class="portfolio-edit-button avatar-edit-button" type="button" data-edit-avatar aria-label="Editar foto de perfil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4z"/></svg></button>' : ''}</div><div class="profile-copy"><h1>${esc(name)}</h1><p class="folio-username">@${esc(profile.username)}</p>${profile.role ? `<h2>${esc(profile.role)}</h2>` : ''}${profile.bio ? `<p class="bio">${esc(profile.bio)}</p>` : ''}<nav class="profile-links">${profileLink('GitHub', profile.github)}${profileLink('LinkedIn', profile.linkedin)}${profileLink('Meu site', profile.website)}</nav></div>${profileMetrics}</div></section><section class="projects-section"><div class="section-heading"><h2>Meus projetos</h2><span>${projects.length} projeto${projects.length === 1 ? '' : 's'}</span></div>${projects.length ? `<div class="public-projects">${projects.map(project => projectCard(project, profile.userId)).join('')}</div>` : emptyProject}</section></div><footer class="public-footer"><span>Trabalho de ${esc(name)}.</span></footer></article>`
 
   const bannerImage = root.querySelector('.public-banner-image')
   bannerImage.addEventListener('load', () => root.querySelector('.public-hero')?.classList.add('has-banner'))
@@ -176,6 +175,18 @@ function showProjectDetails(id) {
 
 async function start() {
   try {
+    if (previewMode) {
+      const { data: identity } = await supabase.auth.getUser()
+      const ownerId = identity.user?.id
+      const saved = ownerId ? sessionStorage.getItem(`foliodev_preview_${ownerId}`) : null
+      if (!saved) throw new Error('Prévia indisponível. Abra novamente pelo painel.')
+      const snapshot = JSON.parse(saved)
+      if (snapshot.profile?.userId !== ownerId || !Array.isArray(snapshot.projects)) throw new Error('Prévia inválida. Abra novamente pelo painel.')
+      portfolio = snapshot
+      isOwner = true
+      renderPage()
+      return
+    }
     const [data, identity] = await Promise.all([loadPublicPortfolio(username), supabase.auth.getUser().catch(() => ({ data: { user: null } }))])
     if (!data) {
       root.innerHTML = '<section class="public-state"><h1>Portfólio indisponível</h1><p>Este portfólio não existe ou ainda não foi publicado.</p><a class="public-button" href="/">Voltar ao FolioDev</a></section>'
@@ -192,3 +203,4 @@ async function start() {
 }
 
 start()
+if (visitorView) document.addEventListener('keydown', event => { if (event.key === 'Escape') location.assign('/dashboard.html#portfolio') })

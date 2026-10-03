@@ -1,9 +1,10 @@
 // The ZIP's images are kept byte-for-byte in assets/models, in archive order.
 // Its entries are color backgrounds, so the named models use the matching colors.
 export const portfolioModels = [
-  { id: 'black', name: 'Modelo Preto', description: 'Elegante, com contraste marcante.', image: new URL('../../assets/models/model-10.png', import.meta.url).href, available: true, ink: '#ffffff', muted: '#d2d2d2' },
-  { id: 'white', name: 'Modelo Branco', description: 'Claro, versátil e minimalista.', image: new URL('../../assets/models/model-06.png', import.meta.url).href, available: true, ink: '#17191b', muted: '#51565b' },
-  { id: 'blue', name: 'Modelo Azul', description: 'Expressivo e profissional.', image: new URL('../../assets/models/model-02.png', import.meta.url).href, available: true, ink: '#ffffff', muted: '#dce6ff' },
+  { id: 'cream', name: 'Modelo 01 · Editorial', description: 'Fundo #F2F2EA, estrutura editorial.', available: true, ink: '#111111', muted: '#555555' },
+  { id: 'black', name: 'Modelo 02 · Escuro', description: 'Fundo #111111 e apresentação central.', available: true, ink: '#ffffff', muted: '#d2d2d2' },
+  { id: 'blue', name: 'Modelo 03 · Azul', description: 'Azul sóbrio e projetos em blocos.', available: true, ink: '#ffffff', muted: '#dce6ff' },
+  { id: 'white', name: 'Modelo 04 · Minimalista', description: 'Fundo branco e leitura direta.', available: true, ink: '#17191b', muted: '#51565b' },
   { id: 'red', name: 'Modelo Vermelho', description: 'Uma presença visual intensa.', image: new URL('../../assets/models/model-01.png', import.meta.url).href, available: false, ink: '#ffffff', muted: '#ffe0dc' },
   { id: 'orange', name: 'Modelo Laranja', description: 'Cor e energia na medida certa.', image: new URL('../../assets/models/model-03.png', import.meta.url).href, available: false, ink: '#17191b', muted: '#342820' },
   { id: 'pink', name: 'Modelo Rosa', description: 'Uma identidade vibrante.', image: new URL('../../assets/models/model-04.png', import.meta.url).href, available: false, ink: '#ffffff', muted: '#ffe1eb' },
@@ -13,4 +14,4 @@ export const portfolioModels = [
   { id: 'purple', name: 'Modelo Roxo', description: 'Criativo com profundidade.', image: new URL('../../assets/models/model-09.png', import.meta.url).href, available: false, ink: '#ffffff', muted: '#e6d9ff' },
 ]
 
-export const getPortfolioModel = id => portfolioModels.find(model => model.id === id) || portfolioModels[1]
+export const getPortfolioModel = id => portfolioModels.find(model => model.id === id) || portfolioModels.find(model => model.id === 'white')
