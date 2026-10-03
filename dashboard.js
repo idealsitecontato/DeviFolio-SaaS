@@ -239,14 +239,6 @@ function previewMarkup() {
   return `<div class="public-preview">${profile.avatar ? `<div class="preview-avatar"><img src="${esc(profile.avatar)}" alt="Foto de ${esc(profile.name)}"></div>` : '<div class="preview-avatar preview-avatar-empty"><span data-icon="user"></span></div>'}${profile.name ? `<p class="preview-kicker">PORTFÓLIO</p><h2 data-preview="name">${esc(profile.name)}</h2>` : '<p class="preview-empty-copy">Adicione seu nome para visualizar a prévia.</p>'}${profile.role ? `<h3 data-preview="role">${esc(profile.role)}</h3>` : ''}${profile.bio ? `<p data-preview="bio">${esc(profile.bio)}</p>` : ''}<div class="preview-skills" data-preview="skills">${profile.skills.split(',').filter(Boolean).map(item => `<span>${esc(item.trim())}</span>`).join('')}</div>${publishedProjects.length ? `<div class="preview-project-list">${publishedProjects.slice(0, 3).map(project => `<span>${esc(project.name)}</span>`).join('')}</div>` : '<div class="preview-empty-copy">Nenhum projeto publicado.</div>'}</div>`
 }
 
-function portfolioPreviewField(label, name, value, { multiline = false, attributes = '', placeholder = '' } = {}) {
-  const id = `preview-${name}`
-  const control = multiline
-    ? `<textarea id="${id}" name="${name}" ${attributes} placeholder="${esc(placeholder)}" readonly>${esc(value)}</textarea>`
-    : `<input id="${id}" name="${name}" value="${esc(value)}" ${attributes} placeholder="${esc(placeholder)}" readonly>`
-  return `<div class="field my-portfolio-field my-portfolio-field-${name}"><label for="${id}">${label}</label><div class="inline-edit-field">${control}<button class="icon-button" type="button" data-unlock-field aria-label="Editar ${label.toLowerCase()}"><span data-icon="edit"></span></button></div></div>`
-}
-
 function portfolioPreviewProject(project) {
   const url = normalizeExternalUrl(project.link)
   return `<article class="public-project my-portfolio-project"><div class="project-image">${project.image ? `<img src="${esc(project.image)}" alt="Capa de ${esc(project.name)}" loading="lazy" draggable="false">` : `<span>${esc(project.name.slice(0, 2).toUpperCase())}</span>`}</div><div class="project-content"><h3>${esc(project.name)}</h3><p>${esc(project.description || 'Conheça este projeto.')}</p>${project.tech ? `<div class="tag-row">${project.tech.split(',').filter(Boolean).map(item => `<span class="tag mono">${esc(item.trim())}</span>`).join('')}</div>` : ''}<div class="project-actions">${url ? `<a class="public-button" href="${esc(url)}" target="_blank" rel="noopener">Acessar</a>` : `<button class="public-button" type="button" data-preview-project="${project.id}">Acessar</button>`}<button class="public-button secondary" type="button" data-preview-project="${project.id}">Ver</button></div></div></article>`
@@ -255,21 +247,22 @@ function portfolioPreviewProject(project) {
 function portfolioManagerView() {
   const profile = state.profile
   const emptyPortfolioProjects = '<div class="empty-projects folio-empty-projects"><span class="folio-empty-folder" aria-hidden="true">▱</span><h2>Nenhum projeto encontrado</h2><p>Você ainda não desenvolveu nenhum projeto.<br>Crie um novo projeto para começar.</p><button class="primary-button folio-create-project" type="button" data-new-project>+ &nbsp;Criar projeto</button></div>'
-  const profileMetrics = !state.projects.some(project => project.status === 'published') ? `<div class="folio-profile-metrics"><div><strong>0</strong><span>Projetos</span></div><div><strong>${[profile.github, profile.linkedin, profile.website].filter(Boolean).length}</strong><span>Links profissionais</span></div><div><strong>${profile.role ? '1' : '0'}</strong><span>Área de atuação</span></div></div>` : ''
   const model = getPortfolioModel(profile.selectedModel)
   const banner = currentUser ? `${portfolioBannerUrl(currentUser.id)}${profileBannerRevision ? `?v=${profileBannerRevision}` : ''}` : ''
   const projects = state.projects.filter(project => project.status === 'published').sort((a, b) => a.sortOrder - b.sortOrder || a.id - b.id)
+  const username = profile.username ? `@${profile.username.replace(/^@/, '')}` : '@usuario'
+  const biography = profile.bio || profile.role || 'Adicione uma biografia para apresentar seu trabalho aos visitantes.'
   return `<section class="page-enter my-portfolio-page">${pageHead('Meu Portfólio', 'Prévia completa de como os visitantes verão seu portfólio.', '<a class="secondary-button" href="#inicio">← Voltar ao início</a>')}
     <div class="portfolio-page my-portfolio-preview" data-model="${model.id}" style="--model-image:url('${model.image}');--model-ink:${model.ink}">
-      <div class="portfolio-shell"><form id="my-portfolio-form" class="public-hero has-banner">
+      <div class="portfolio-shell folio-showcase-shell"><article class="folio-showcase-card">
         <div class="my-portfolio-banner"><img class="public-banner-image" src="${esc(banner)}" alt="Banner do portfólio" onerror="this.hidden=true"><input id="profile-banner-file" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="icon-button banner-edit-button" type="button" data-upload-profile-banner aria-label="Editar banner"><span data-icon="edit"></span></button></div>
-        <div class="profile-header"><div class="public-avatar">${profile.avatar ? `<img src="${esc(profile.avatar)}" alt="Foto de ${esc(realName())}" onerror="this.src='${profilePlaceholderUrl}'">` : `<img src="${profilePlaceholderUrl}" alt="Ícone de usuário">`}<input id="avatar-file" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="icon-button avatar-edit-button" type="button" data-upload-avatar aria-label="Editar foto de perfil"><span data-icon="edit"></span></button></div>
-          <div class="profile-copy">${portfolioPreviewField('Nome', 'name', profile.name, { attributes: 'required', placeholder: 'Seu nome' })}${portfolioPreviewField('Nome de usuário', 'username', profile.username, { attributes: 'required pattern="[a-zA-Z0-9._-]+"', placeholder: 'seu.usuario' })}${portfolioPreviewField('Título profissional', 'role', profile.role, { placeholder: 'Sua área de atuação' })}${portfolioPreviewField('Descrição', 'bio', profile.bio, { multiline: true, attributes: 'maxlength="240"', placeholder: 'Conte um pouco sobre você' })}</div>
-          ${profileMetrics}<div class="my-portfolio-extra">${portfolioPreviewField('Habilidades', 'skills', profile.skills, { placeholder: 'Separe por vírgulas' })}<div class="profile-links">${portfolioPreviewField('GitHub', 'github', profile.github, { placeholder: 'github.com/usuario' })}${portfolioPreviewField('LinkedIn', 'linkedin', profile.linkedin, { placeholder: 'linkedin.com/in/usuario' })}${portfolioPreviewField('Meu site', 'website', profile.website, { placeholder: 'https://' })}</div></div>
-          <div class="my-portfolio-save"><button class="primary-button" type="submit"><span data-icon="save"></span>Salvar informações do perfil</button></div>
+        <div class="folio-showcase-profile"><div class="public-avatar">${profile.avatar ? `<img src="${esc(profile.avatar)}" alt="Foto de ${esc(realName())}" onerror="this.src='${profilePlaceholderUrl}'">` : `<img src="${profilePlaceholderUrl}" alt="Ícone de usuário">`}<input id="avatar-file" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="icon-button avatar-edit-button" type="button" data-upload-avatar aria-label="Editar foto de perfil"><span data-icon="edit"></span></button></div>
+          <div class="folio-showcase-copy"><h2>${esc(realName())}</h2><p class="folio-username">${esc(username)}</p><p class="folio-biography">${esc(biography)}</p></div>
+          <div class="folio-profile-metrics" aria-label="Estatísticas do portfólio"><div><strong>${projects.length}</strong><span>Projetos</span></div><div><strong>—</strong><span>Clientes atendidos</span></div><div><strong>—</strong><span>No mercado</span></div></div>
         </div>
-      </form><section class="projects-section"><div class="section-heading"><h2>Meus projetos</h2><span>${projects.length} projeto${projects.length === 1 ? '' : 's'}</span></div>${projects.length ? `<div class="public-projects">${projects.map(portfolioPreviewProject).join('')}</div>` : emptyPortfolioProjects}</section></div>
-      <footer class="public-footer"><span>FolioDev</span><span>Trabalho de ${esc(realName())}.</span></footer>
+        <div class="folio-profile-divider" aria-hidden="true"></div>
+        <section class="projects-section folio-showcase-projects">${projects.length ? `<div class="section-heading"><h2>Meus projetos</h2><span>${projects.length} projeto${projects.length === 1 ? '' : 's'}</span></div><div class="public-projects">${projects.map(portfolioPreviewProject).join('')}</div>` : emptyPortfolioProjects}</section>
+      </article></div>
     </div>
   </section>`
 }
