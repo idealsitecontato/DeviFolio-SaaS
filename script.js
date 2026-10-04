@@ -33,6 +33,20 @@ const observer = new IntersectionObserver(entries => {
   }
 }, { rootMargin: '-15% 0px -60% 0px' })
 navLinks.forEach(link => { const section = document.querySelector(link.hash); if (section) observer.observe(section) })
+if (window.IntersectionObserver && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  const reveals = [...document.querySelectorAll('.ecosystem-landing .reveal')]
+  const revealObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return
+      entry.target.classList.add('is-visible')
+      revealObserver.unobserve(entry.target)
+    })
+  }, { threshold: 0.12 })
+  reveals.forEach(element => {
+    element.classList.add('reveal-ready')
+    revealObserver.observe(element)
+  })
+}
 window.addEventListener('offline', () => {
   if (document.querySelector('.offline-notice')) return
   const notice = document.createElement('div')

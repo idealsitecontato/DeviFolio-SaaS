@@ -11,7 +11,7 @@ export function createScreenLoading({ shell = null, loading = null } = {}) {
     timer = null
   }
 
-  function show(label = 'Carregando...') {
+  function show(label = 'Abrindo seu painel...') {
     if (!loading) return
     const text = loading.querySelector('p')
     if (text) text.textContent = label
@@ -38,14 +38,7 @@ export function createScreenLoading({ shell = null, loading = null } = {}) {
 
   function navigate(render) {
     resetPage()
-    const current = sequence
-    show()
-    timer = window.setTimeout(() => {
-      if (current !== sequence) return
-      render()
-      hide()
-      timer = null
-    }, ROUTE_MS)
+    render()
   }
 
   function leaveDashboard(navigateAway) {
@@ -66,11 +59,13 @@ export function createScreenLoading({ shell = null, loading = null } = {}) {
 
   function exitAuth(navigateAway, { duration = 1000 } = {}) {
     resetPage()
-    const current = sequence
-    show()
-    timer = window.setTimeout(() => {
-      if (current === sequence) navigateAway()
-    }, duration)
+    show('Abrindo seu painel...')
+    if (duration > 0) {
+      const current = sequence
+      timer = window.setTimeout(() => {
+        if (current === sequence) navigateAway()
+      }, duration)
+    } else navigateAway()
   }
 
   function modalOpener() {

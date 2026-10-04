@@ -22,6 +22,7 @@ const username = new URLSearchParams(location.search).get('username') || decodeU
 const folderId = new URLSearchParams(location.search).get('folder')
 const folderLabel = new URLSearchParams(location.search).get('name')?.slice(0, 60) || ''
 const visitorView = new URLSearchParams(location.search).get('visitor') === '1'
+const previewMode = new URLSearchParams(location.search).get('preview') === '1'
 document.body.classList.toggle('visitor-view', visitorView)
 const builtInFolders = ['principal', 'profissional', 'destaque', 'github']
 const folderBucket = folderId && (/^folder-\d+$/.test(folderId)
@@ -193,6 +194,18 @@ function showProjectDetails(id) {
 
 async function start() {
   try {
+    if (previewMode) {
+      const { data: identity } = await supabase.auth.getUser()
+      const ownerId = identity.user?.id
+      const saved = ownerId ? sessionStorage.getItem(`foliodev_preview_${ownerId}`) : null
+      if (!saved) throw new Error('Prévia indisponível. Abra novamente pelo painel.')
+      const snapshot = JSON.parse(saved)
+      if (snapshot.profile?.userId !== ownerId || !Array.isArray(snapshot.projects)) throw new Error('Prévia inválida. Abra novamente pelo painel.')
+      portfolio = snapshot
+      isOwner = true
+      renderPage()
+      return
+    }
     const [data, identity] = await Promise.all([loadPublicPortfolio(username), supabase.auth.getUser().catch(() => ({ data: { user: null } }))])
     if (!data) {
       root.innerHTML = '<section class="public-state"><h1>Portfólio indisponível</h1><p>Este portfólio não existe ou ainda não foi publicado.</p><a class="public-button" href="/">Voltar ao FolioDev</a></section>'
@@ -209,3 +222,4 @@ async function start() {
 }
 
 start()
+if (visitorView) document.addEventListener('keydown', event => { if (event.key === 'Escape') location.assign('/dashboard.html#portfolio') })

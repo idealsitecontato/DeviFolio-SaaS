@@ -37,3 +37,17 @@ html body.dashboard-app .analytics-overview{display:grid;grid-template-columns:m
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}.visual-chart-column i{animation:none!important}*{transition-duration:.01ms!important;animation-duration:.01ms!important}}
 .dashboard-app .danger-button{background:#050505!important;border-color:#050505!important;color:#fff!important;box-shadow:none!important;border-radius:9px!important}
 .dashboard-app .danger-button:hover{background:#303030!important;border-color:#303030!important}
+.dashboard-app .home-repositories{display:grid;grid-template-columns:42px minmax(0,1fr);align-items:start;gap:10px 14px;text-align:left}
+.dashboard-app .home-repositories .home-import-symbol{width:42px;height:42px;margin:0}
+.dashboard-app .home-repositories .home-import-copy{min-width:0}
+.dashboard-app .home-repositories h3{margin:0;font-size:18px}
+.dashboard-app .home-repositories p{margin:4px 0 0;font-size:13px}
+.dashboard-app .home-repositories :is(.home-repository-list,.repo-skeleton-list,.primary-button){grid-column:1/-1}
+.dashboard-app .repo-avatar{position:relative;display:grid;place-items:center;flex:none;width:28px;height:28px;overflow:hidden;border-radius:50%;background:#eceef0;color:#111;font-size:12px;font-weight:700}
+.dashboard-app .repo-avatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.dashboard-app .repo-skeleton-list{display:grid;gap:8px;width:100%;margin-top:10px}
+.dashboard-app .repo-skeleton-list span{height:32px;border-radius:7px;background:#eceef0;animation:fd-repo-pulse 1.2s ease-in-out infinite alternate}
+.dashboard-app .repo-skeleton-list span:last-child{width:72%}
+.dashboard-app .repo-import-feedback{margin:8px 0 0;padding:9px 12px;border:1px solid #cbd0d6;border-radius:8px;background:#f5f6f7;color:#4a4a4a;font-size:13px}
+@keyframes fd-repo-pulse{to{opacity:.45}}
+@media(prefers-reduced-motion:reduce){.dashboard-app .repo-skeleton-list span{animation:none}}
