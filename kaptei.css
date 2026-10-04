@@ -3,10 +3,10 @@ html:has(body.dashboard-app.kaptei-route)::-webkit-scrollbar { display: none; }
 
 /* Kaptei uses the same dashboard shell and only changes its own route. */
 html body.dashboard-app.kaptei-route {
-  --kaptei-page-bg: #f7f6f1;
-  --kaptei-sidebar-bg: #f5f4ef;
-  --kaptei-surface: #fffffb;
-  --kaptei-border: #e5e6e1;
+  --kaptei-page-bg: var(--bg);
+  --kaptei-sidebar-bg: var(--surface-muted);
+  --kaptei-surface: var(--surface);
+  --kaptei-border: var(--border);
   --kaptei-text: #171a18;
   --kaptei-muted: #5e625f;
 }
@@ -18,7 +18,7 @@ html body.dashboard-app.kaptei-route {
   html body.dashboard-app.kaptei-route .sidebar {
     padding: 18px 12px 32px;
     background: var(--kaptei-sidebar-bg) !important;
-    border-right-color: #e7e6df;
+    border-right-color: var(--border);
   }
   html body.dashboard-app.kaptei-route .sidebar .brand-crop {
     height: 27px;
@@ -32,7 +32,7 @@ html body.dashboard-app.kaptei-route {
     min-height: 50px;
     padding: 7px 8px;
     margin-bottom: 17px;
-    background: #f0f0eb !important;
+    background: var(--surface-muted) !important;
   }
   html body.dashboard-app.kaptei-route .side-nav {
     gap: 0;
@@ -70,7 +70,7 @@ html body.dashboard-app .kaptei-nav-mark img {
   object-fit: contain;
 }
 html body.dashboard-app.kaptei-route .nav-item[data-route="kaptei"].active {
-  background: #ebebe5 !important;
+  background: var(--surface-inset) !important;
   color: #202522;
   font-weight: 600;
 }
@@ -91,7 +91,7 @@ html body.dashboard-app.kaptei-route .desktop-topbar {
   display: flex;
   height: 42px;
   padding: 0 29px;
-  border-bottom: 1px solid #e8e8e2 !important;
+  border-bottom: 1px solid var(--border) !important;
   background: var(--kaptei-page-bg) !important;
   color: #666b67;
   font-size: 11px;
@@ -188,7 +188,7 @@ html body.dashboard-app .kaptei-search {
   margin: 0;
   border: 1px solid var(--kaptei-border) !important;
   border-radius: 7px !important;
-  background: #fafaf7 !important;
+  background: var(--surface) !important;
   box-shadow: none !important;
   color: #333a35 !important;
   font-family: inherit;
@@ -202,7 +202,7 @@ html body.dashboard-app .kaptei-controls .kaptei-download {
 }
 html body.dashboard-app .kaptei-controls .kaptei-download:hover,
 html body.dashboard-app .kaptei-controls select:hover {
-  background: #f0f1ed !important;
+  background: var(--surface-muted) !important;
 }
 html body.dashboard-app .kaptei-search {
   display: flex;
@@ -256,7 +256,7 @@ html body.dashboard-app .kaptei-controls select {
 html body.dashboard-app .kaptei-table-wrap {
   width: 100%;
   overflow-x: auto;
-  border: 1px solid #e6e7e2;
+  border: 1px solid var(--border);
   border-radius: 11px;
   background: var(--kaptei-surface);
   box-shadow: none;
@@ -274,7 +274,7 @@ html body.dashboard-app .kaptei-table th,
 html body.dashboard-app .kaptei-table td {
   height: 46px;
   padding: 5px 8px;
-  border-bottom: 1px solid #e8e9e4;
+  border-bottom: 1px solid var(--border);
   overflow: hidden;
   text-align: left;
   text-overflow: ellipsis;
@@ -283,7 +283,7 @@ html body.dashboard-app .kaptei-table td {
 }
 html body.dashboard-app .kaptei-table thead th {
   height: 43px;
-  background: #f5f6f3;
+  background: var(--surface-muted);
   color: #3d443e;
   font-weight: 600;
 }
@@ -291,7 +291,7 @@ html body.dashboard-app .kaptei-table tbody tr:last-child td {
   border-bottom: 0;
 }
 html body.dashboard-app .kaptei-table tbody tr:hover {
-  background: #f6f7f3;
+  background: var(--surface-muted);
 }
 html body.dashboard-app .kaptei-table th:nth-child(1) { width: 4.5%; }
 html body.dashboard-app .kaptei-table th:nth-child(2) { width: 10.5%; }
@@ -349,9 +349,9 @@ html body.dashboard-app .kaptei-actions-cell button {
   height: 27px;
   margin: 0 5px 0 0;
   padding: 0 9px;
-  border: 1px solid #e4e7e2 !important;
+  border: 1px solid var(--border) !important;
   border-radius: 6px !important;
-  background: #fdfdfa !important;
+  background: var(--surface) !important;
   box-shadow: none !important;
   color: #485049 !important;
   font: inherit;
@@ -360,7 +360,7 @@ html body.dashboard-app .kaptei-actions-cell button {
   cursor: pointer;
 }
 html body.dashboard-app .kaptei-actions-cell button:hover {
-  background: #f2f3ef !important;
+  background: var(--surface-muted) !important;
 }
 html body.dashboard-app .kaptei-empty {
   margin: 18px 0;
@@ -404,7 +404,7 @@ html body.dashboard-app .kaptei-detail dd { margin: 0; overflow-wrap: anywhere; 
     justify-content: initial;
     gap: 0;
     padding: 5px 8px;
-    border-bottom: 1px solid #e8e9e4;
+    border-bottom: 1px solid var(--border);
     white-space: nowrap;
     overflow-wrap: normal;
   }

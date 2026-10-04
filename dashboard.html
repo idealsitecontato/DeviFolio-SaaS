@@ -1,7 +1,6 @@
 <!doctype html>
-<html lang="pt-BR" data-theme="light">
+<html lang="pt-BR">
 <head>
-  <script>try { document.documentElement.dataset.theme = localStorage.getItem('foliodev_interface_theme') === 'dark' ? 'dark' : 'light' } catch { document.documentElement.dataset.theme = 'light' }</script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Gerencie seus projetos, portfólio e resultados no FolioDev.">
@@ -21,16 +20,18 @@
   <link rel="stylesheet" href="/kaptei.css">
   <link rel="stylesheet" href="/dashboard-master.css">
   <link rel="stylesheet" href="/folio-adjustments.css">
-<link rel="stylesheet" href="/redesign-app.css">
+  <link rel="stylesheet" href="/redesign-app.css">
+  <link rel="stylesheet" href="/dashboard-theme.css">
 </head>
 <body class="dashboard-app">
+<script>try { document.body.dataset.theme = localStorage.getItem('foliodev_interface_theme') === 'dark' ? 'dark' : 'light' } catch { document.body.dataset.theme = 'light' }</script>
 <a class="skip-link" href="#page-content">Ir para o conteúdo</a>
   <div class="app-shell">
     <aside class="sidebar" id="sidebar" aria-label="Menu principal">
       <div class="sidebar-resize-handle" id="sidebar-resize-handle" role="separator" aria-label="Redimensionar menu lateral" aria-orientation="vertical" aria-valuemin="180" aria-valuemax="320" aria-valuenow="190" tabindex="0">
 </div>
       <a class="brand-crop" href="#inicio" aria-label="FolioDev, início">
-<span class="folio-brand"><img src="/brand/foliodev-logo.svg" alt="FolioDev" width="1086" height="162"></span>
+<span class="folio-brand"><img src="/brand/foliodev-logo.png" alt="FolioDev" width="1086" height="162"></span>
 <img class="folio-brand-compact" src="/brand/foliodev-mark.svg" alt="" width="512" height="512">
 </a>
       <button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Recolher menu" aria-expanded="true" data-tooltip="Recolher menu">
@@ -129,7 +130,7 @@
 </span>
 </button>
       <a class="brand-crop brand-mobile" href="#inicio" aria-label="FolioDev">
-<span class="folio-brand"><img src="/brand/foliodev-logo.svg" alt="FolioDev" width="1086" height="162"></span>
+<span class="folio-brand"><img src="/brand/foliodev-logo.png" alt="FolioDev" width="1086" height="162"></span>
 </a>
       <button class="avatar avatar-small" type="button" data-route-button="perfil" aria-label="Abrir perfil">
 </button>

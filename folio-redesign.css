@@ -185,7 +185,7 @@ button.is-loading .nuda-gooey__rot span{width:10px;height:10px;margin:-5px}
 .dashboard-app :is(.card,.modal,.form-card,.settings-card,.pricing-card,.repo-panel,.connected-account,.empty-state,.portfolio-list-item,.project-card,.plan-card),.dashboard-app :is(input,textarea,select,.search-field,.input-prefix,.url-field,.dashboard-url){background:var(--color-bg)!important}
 .dashboard-app :is(.primary-button,.dashboard-action,.deploy-button){background:var(--color-charcoal)!important;border-color:var(--color-charcoal)!important;color:var(--color-bg)!important}
 .dashboard-app :is(.secondary-button,.icon-button,.link-button){border-color:var(--color-line)}
-.dashboard-app :is(.nav-item.active,.nav-item:hover,.user-mini,.user-menu,.menu-popover){background:#E6E6DF!important}
+.dashboard-app :is(.nav-item.active,.nav-item:hover,.user-mini,.user-menu,.menu-popover){background:var(--surface-muted)!important}
 .dashboard-app .plans-page :is(.devi-plan-card--avancado,.devi-plan-card--plus){background:var(--color-charcoal)!important;color:var(--color-bg)!important}
 .dashboard-app .plans-page :is(.devi-plan-card--avancado,.devi-plan-card--plus) :is(h3,strong,span,li,p){color:var(--color-bg)!important}
 .dashboard-app .project-cover-tone-0,.dashboard-app .project-cover-tone-3{background:var(--color-charcoal)!important}

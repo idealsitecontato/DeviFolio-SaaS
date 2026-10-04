@@ -118,11 +118,6 @@ const onboardingRequested = new URLSearchParams(location.search).get('onboarding
 const realName = () => state.profile.name.trim() || currentUser?.user_metadata?.full_name || currentUser?.user_metadata?.name || currentUser?.email?.split('@')[0] || 'Você'
 const initials = () => realName().split(/\s+/).filter(Boolean).map(part => part[0]).slice(0, 2).join('').toUpperCase()
 const profileComplete = () => Boolean(state.profile.name.trim() && state.profile.username.trim())
-const repositoryOwner = repository => String(repository.full_name || '').split('/')[0].replace(/[^a-zA-Z0-9-]/g, '')
-const repositoryAvatar = repository => {
-  const owner = repositoryOwner(repository)
-  return `<span class="repo-avatar" aria-hidden="true"><span>${esc((owner || repository.name || 'G')[0].toUpperCase())}</span>${owner ? `<img src="https://github.com/${encodeURIComponent(owner)}.png?size=64" alt="" loading="lazy" onerror="this.hidden=true">` : ''}</span>`
-}
 const folderName = id => state.folderNames[id] || portfolioFolders.find(folder => folder.id === id)?.name || ''
 const visiblePortfolioFolders = () => orderedFolders(state.folderOrder).filter(folder => !state.hiddenFolders.includes(folder.id) && (Object.hasOwn(state.folderNames, folder.id) || state.projects.some(project => projectLocation(project) === folder.id)))
 const projectsAt = destination => state.projects.filter(project => projectLocation(project) === destination).sort((a, b) => a.sortOrder - b.sortOrder || a.id - b.id)
@@ -211,9 +206,9 @@ function analyticsChart({ compact = false } = {}) {
 
 function homeView() {
   const summary=analyticsSummary()
-  const repositoryPreview = state.repos.slice(0, 4).map(repository => `<li>${repositoryAvatar(repository)}<span><strong>${esc(repository.name)}</strong><small>${esc(repository.full_name || repository.name)}</small></span></li>`).join('')
+  const repositoryPreview = state.repos.slice(0, 4).map(repository => `<li><button type="button" data-route-button="github"><span data-icon="github" aria-hidden="true"></span><span class="home-repo-copy"><strong>${esc(repository.full_name || repository.name)}</strong><small>${esc(repository.description || 'Repositório GitHub')}</small></span><span class="home-repo-visibility">${repository.private ? 'Privado' : 'Público'}</span><span data-icon="chevron" aria-hidden="true"></span></button></li>`).join('')
   const githubContent = state.githubConnected
-    ? `<div class="home-import-content home-repositories"><span class="home-import-symbol" data-icon="github" aria-hidden="true"></span><div class="home-import-copy"><h3>Seus repositórios</h3><p>${reposLoading ? 'Buscando repositórios da sua conta...' : repoLoadFailed ? 'Não foi possível carregar seus repositórios.' : state.repos.length ? 'Escolha o que deseja adicionar ao portfólio.' : 'Nenhum repositório encontrado nesta conta.'}</p></div>${reposLoading ? '<div class="repo-skeleton-list" aria-hidden="true"><span></span><span></span><span></span></div>' : repositoryPreview ? `<ul class="home-repository-list">${repositoryPreview}</ul>` : ''}<button class="primary-button" data-route-button="github">${repoLoadFailed ? 'Tentar novamente' : 'Ver repositórios'}</button></div>`
+    ? `<div class="home-import-content home-repositories">${reposLoading ? '<p>Buscando repositórios...</p>' : repoLoadFailed ? '<p>Não foi possível carregar os repositórios.</p><button class="secondary-button" data-retry-repos>Tentar novamente</button>' : repositoryPreview ? `<ul class="home-repository-list">${repositoryPreview}<li><button type="button" data-route-button="github" class="home-repo-all"><span data-icon="github" aria-hidden="true"></span><strong>Ver todos os repositórios</strong><span data-icon="chevron" aria-hidden="true"></span></button></li></ul>` : '<p>Nenhum repositório encontrado nesta conta.</p>'}</div>`
     : `<div class="home-import-content"><span class="home-import-symbol" data-icon="github" aria-hidden="true"></span><h3>Conecte seu GitHub e sincronize seus projetos</h3><p>Conecte sua conta para importar e sincronizar seus repositórios automaticamente.</p><button class="primary-button" data-connect-github><span data-icon="github"></span>Conectar GitHub</button></div>`
   return `<section class="page-enter home-page">
     ${pageHead('Olá, '+esc(realName().split(' ')[0])+'.', 'Seu trabalho, organizado para a próxima oportunidade.', '<button class="primary-button" data-new-portfolio><span data-icon="plus"></span>Novo portfólio</button>')}
@@ -225,7 +220,7 @@ function homeView() {
     </div>
     <div class="home-feature-grid">
       <article class="card home-import-card">
-        <header class="section-card-head"><h2>Importe seus repositórios</h2></header>
+        <header class="section-card-head"><h2>Seus repositórios</h2>${state.githubConnected ? '<button class="secondary-button home-disconnect" type="button" data-disconnect-github>Desconectar</button>' : ''}</header>
         ${githubContent}
       </article>
       <article class="card link-summary home-share-card"><h2>Seu link do portfólio</h2><p>Compartilhe seu portfólio com recrutadores, clientes e outras pessoas.</p>
@@ -445,7 +440,8 @@ function switchRow(icon, title, description, key, on) {
 }
 
 function settingsView() {
-  return `<section class="page-enter compact-panel-page"><div class="card settings-card compact-panel"><div class="settings-card-head"><span data-icon="settings"></span><div><h1>Configurações</h1><p>Preferências, privacidade e integrações.</p></div></div><nav class="settings-tabs" aria-label="Seções de configurações"><a href="#preferencias" data-settings-anchor="preferencias">Preferências</a><a href="#privacidade" data-settings-anchor="privacidade">Privacidade</a><a href="#conta" data-settings-anchor="conta">Conta</a></nav><div class="panel-section" id="preferencias"><h2>Preferências</h2>${switchRow('mail', 'Avisos por e-mail', 'Receba atualizações importantes sobre seu portfólio.', 'email', state.settings.email)}${switchRow('bell', 'Novidades do produto', 'Acompanhe melhorias e novos recursos da plataforma.', 'product', state.settings.product)}${switchRow('panel', 'Modo compacto', 'Reduza o espaçamento das listas e painéis.', 'compact', state.settings.compact)}</div><div class="panel-section" id="privacidade"><h2>Privacidade</h2>${switchRow('shield', 'Perfil público', 'Permita que visitantes acessem seu portfólio publicado.', 'publicProfile', state.settings.publicProfile)}</div><div class="panel-section" id="conta"><h2>Conta</h2><div class="setting-row"><div><b>Exportar dados</b><small>Baixe uma cópia das informações da conta.</small></div><button class="secondary-button" data-export>Exportar</button></div><div class="setting-row danger-row"><div><b>Excluir conta</b><small>Essa ação não poderá ser desfeita.</small></div><button class="danger-button" data-delete-account>Excluir conta</button></div></div></div></section>`
+  const dark = document.body.dataset.theme === 'dark'
+  return `<section class="page-enter compact-panel-page"><div class="card settings-card compact-panel"><div class="settings-card-head"><span data-icon="settings"></span><div><h1>Configurações</h1><p>Preferências, privacidade e integrações.</p></div></div><nav class="settings-tabs" aria-label="Seções de configurações"><a href="#preferencias" data-settings-anchor="preferencias">Preferências</a><a href="#privacidade" data-settings-anchor="privacidade">Privacidade</a><a href="#conta" data-settings-anchor="conta">Conta</a></nav><div class="panel-section" id="preferencias"><h2>Preferências</h2><div class="setting-row"><span class="circle-icon" data-icon="palette"></span><div><b>Aparência</b><small>Escolha o tema da área interna.</small></div><div class="theme-options" role="group" aria-label="Tema da área interna"><button type="button" data-interface-theme="light" aria-pressed="${!dark}">Claro</button><button type="button" data-interface-theme="dark" aria-pressed="${dark}">Escuro</button></div></div>${switchRow('mail', 'Avisos por e-mail', 'Receba atualizações importantes sobre seu portfólio.', 'email', state.settings.email)}${switchRow('bell', 'Novidades do produto', 'Acompanhe melhorias e novos recursos da plataforma.', 'product', state.settings.product)}${switchRow('panel', 'Modo compacto', 'Reduza o espaçamento das listas e painéis.', 'compact', state.settings.compact)}</div><div class="panel-section" id="privacidade"><h2>Privacidade</h2>${switchRow('shield', 'Perfil público', 'Permita que visitantes acessem seu portfólio publicado.', 'publicProfile', state.settings.publicProfile)}</div><div class="panel-section" id="conta"><h2>Conta</h2><div class="setting-row"><div><b>Exportar dados</b><small>Baixe uma cópia das informações da conta.</small></div><button class="secondary-button" data-export>Exportar</button></div><div class="setting-row danger-row"><div><b>Excluir conta</b><small>Essa ação não poderá ser desfeita.</small></div><button class="danger-button" data-delete-account>Excluir conta</button></div></div></div></section>`
 }
 
 function publicationsView() {
@@ -473,7 +469,7 @@ function publicationEventMenu(id) {
   $('[data-copy]', $('#modal-root'))?.addEventListener('click', button => copyText(button.currentTarget.dataset.copy))
 }
 
-function plansView(){return `<section class="page-enter plans-page">${pageHead('Planos','Compare os recursos disponíveis para seu portfólio.')}<p class="plans-availability">As assinaturas pagas estão em breve. Continue editando e publicando seu portfólio.</p><div class="devi-plan-grid">${renderPlanCards({internal:true})}</div><article class="card coupon-card"><h2>Tem um cupom?</h2><p>A validação e o pagamento serão ativados com os planos.</p><label for="coupon-code">Código do cupom</label><div><input id="coupon-code" placeholder="Digite o código" disabled><button class="primary-button" disabled>Aplicar</button><button class="secondary-button" disabled>Remover</button></div><small>Nenhum desconto aplicado.</small></article></section>`}
+function plansView(){return `<section class="page-enter plans-page">${pageHead('Planos','Compare os recursos disponíveis para seu portfólio.')}<p class="plans-availability">As assinaturas pagas estão em breve. Continue editando e publicando seu portfólio.</p><div class="devi-plan-grid">${renderPlanCards({internal:true})}</div><article class="card coupon-card"><h2>Tem um cupom?</h2><p>A validação e o pagamento serão ativados com os planos.</p><form id="coupon-form"><label for="coupon-code">Código do cupom</label><div><input id="coupon-code" placeholder="Digite o código"><button class="primary-button" type="submit">Aplicar</button><button class="secondary-button" type="reset">Remover</button></div><small id="coupon-feedback" role="status">Nenhum desconto aplicado.</small></form></article></section>`}
 
 const views = { publicacoes: publicationsView, planos: plansView, 'link-qrcode': linkQrView, inicio: homeView, projetos: projectsView, portfolio: portfolioManagerView, 'portfolio-editar': portfolioEditorView, github: githubView, analise: analyticsView, kaptei: () => kapteiView(state.leads, state.leadsAvailable), perfil: profileView, configuracoes: settingsView }
 
@@ -516,13 +512,14 @@ function updateUserChrome() {
 function bindActions() {
   $$('[data-interface-theme]').forEach(button => button.onclick = () => {
     const theme = button.dataset.interfaceTheme === 'dark' ? 'dark' : 'light'
-    document.documentElement.dataset.theme = theme
+    document.body.dataset.theme = theme
     try { localStorage.setItem('foliodev_interface_theme', theme) } catch { toast('A preferência de tema não pôde ser salva neste navegador.', 'error') }
     $$('[data-interface-theme]').forEach(option => option.setAttribute('aria-pressed', String(option === button)))
   })
   $$('[data-analysis-period]').forEach(button => button.onclick = () => { analyticsPeriod = Number(button.dataset.analysisPeriod); render({ preserveScroll:true }) })
   $('#coupon-form')?.addEventListener('submit', event => { event.preventDefault(); const code = $('#coupon-code').value.trim(); const feedback = $('#coupon-feedback'); feedback.classList.add('error'); feedback.textContent = code ? 'Não é possível validar cupons agora. Nenhum desconto foi aplicado.' : 'Digite um cupom antes de aplicar.' })
   $('#coupon-form')?.addEventListener('reset', () => { const feedback = $('#coupon-feedback'); feedback.classList.remove('error'); feedback.textContent = 'Nenhum desconto aplicado.' })
+  $$('[data-plan-coming-soon]').forEach(button => button.onclick = () => toast('As assinaturas estarão disponíveis em breve.'))
   $$('[data-project-layout]').forEach(button=>button.onclick=()=>{portfolioLayout=button.dataset.projectLayout;const grid=$('.portfolio-project-grid');grid?.classList.toggle('is-list',portfolioLayout==='list');$$('[data-project-layout]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)))})
   $$('[data-settings-anchor]').forEach(link=>link.onclick=event=>{event.preventDefault();document.getElementById(link.dataset.settingsAnchor)?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'})})
   $$('[data-unlock-field]').forEach(button=>button.onclick=()=>{const input=button.closest('.field')?.querySelector('input,textarea');if(input){input.readOnly=false;input.focus()}})
@@ -760,8 +757,17 @@ async function togglePublished() {
 async function runPortfolioPublication(publishing) {
   closeModal({ immediate: true })
   screenLoading.show(publishing ? 'Publicando portfólio...' : 'Despublicando portfólio...')
+  let timeoutId
   try {
-    await saveProfile(currentUser.id, state.profile, publishing)
+    await Promise.all([
+      Promise.race([
+        saveProfile(currentUser.id, state.profile, publishing),
+        new Promise((_, reject) => {
+          timeoutId = window.setTimeout(() => reject(new Error('A publicação demorou demais. Atualize a página para conferir o estado antes de tentar novamente.')), 30000)
+        }),
+      ]),
+      publishing ? new Promise(resolve => window.setTimeout(resolve, 4000)) : Promise.resolve(),
+    ])
     state.published = publishing
     try {
       visualPublications = recordVisualPublication(localStorage, currentUser.id, visualPublications, {
@@ -772,11 +778,16 @@ async function runPortfolioPublication(publishing) {
       })
     } catch (storageError) { console.warn('[Devifolio] Histórico visual não salvo.', storageError) }
     render({ preserveScroll: true })
-    screenLoading.hide()
+    if (publishing) {
+      screenLoading.success('Portfólio publicado.')
+      await new Promise(resolve => window.setTimeout(resolve, 500))
+    }
     toast(publishing ? 'Portfólio publicado.' : 'Portfólio despublicado.')
   } catch (error) {
+    reportError(error.message?.includes('demorou demais') ? error.message : publishing ? 'Não foi possível publicar. Tente novamente.' : 'Não foi possível despublicar. Tente novamente.', error)
+  } finally {
+    window.clearTimeout(timeoutId)
     screenLoading.hide()
-    reportError(publishing ? 'Não foi possível publicar. Tente novamente.' : 'Não foi possível despublicar. Tente novamente.', error)
   }
 }
 
@@ -1144,7 +1155,7 @@ function sidebarWidthLimits() { return { min: 180, max: Math.max(180, Math.min(3
 function setExpandedSidebarWidth(width, persist = false) {
   const { min, max } = sidebarWidthLimits()
   const next = Math.min(max, Math.max(min, Math.round(width)))
-  document.documentElement.style.setProperty('--sidebar-expanded-width', `${next}px`)
+  $('.app-shell').style.setProperty('--sidebar-expanded-width', `${next}px`)
   sidebarResizeHandle?.setAttribute('aria-valuemax', String(max))
   sidebarResizeHandle?.setAttribute('aria-valuenow', String(next))
   if (persist) { try { localStorage.setItem(sidebarWidthKey, String(next)) } catch { /* armazenamento indisponível */ } }

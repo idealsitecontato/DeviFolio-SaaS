@@ -101,7 +101,7 @@ function goToDashboard(onboarding = false) {
   if (redirecting) return
   redirecting = true
   const destination = 'dashboard.html' + (onboarding ? '?onboarding=1' : '') + '#inicio'
-  screenLoading.exitAuth(() => window.location.replace(destination), { duration: onboarding ? 3000 : 1000 })
+  screenLoading.exitAuth(() => window.location.replace(destination), { duration: 4000 })
 }
 
 document.querySelectorAll('[data-switch]').forEach(control => {

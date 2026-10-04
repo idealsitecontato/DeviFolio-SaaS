@@ -1,0 +1,250 @@
+/* Tokens belong to the dashboard body; public and authentication pages stay untouched. */
+body.dashboard-app {
+  color-scheme: light;
+  --bg: #f2f3f5;
+  --surface: #ffffff;
+  --surface-muted: #f5f6f7;
+  --surface-inset: #eceef0;
+  --border: #dde1e5;
+  --border-strong: #c8cdd2;
+  --text: #111111;
+  --text-muted: #4a4f55;
+  --text-subtle: #666c72;
+  --action: #050505;
+  --action-text: #ffffff;
+  --color-bg: var(--bg);
+  --color-charcoal: var(--text);
+  --color-line: var(--border);
+  --fd-bg: var(--bg);
+  --fd-card: var(--surface);
+  --fd-ink: var(--text);
+  --fd-charcoal: var(--text-muted);
+  --fd-muted: var(--text-muted);
+  --fd-line: var(--border);
+  --master-soft: var(--surface-muted);
+  --master-line: var(--border);
+  --master-ink: var(--text);
+  --master-muted: var(--text-muted);
+  --kaptei-page-bg: var(--bg);
+  --kaptei-sidebar-bg: var(--surface);
+  --kaptei-surface: var(--surface);
+}
+
+body.dashboard-app[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #111316;
+  --surface: #1c1f23;
+  --surface-muted: #252a30;
+  --surface-inset: #292e34;
+  --border: #343940;
+  --border-strong: #505760;
+  --text: #f5f6f7;
+  --text-muted: #c0c5ca;
+  --text-subtle: #a0a7af;
+  --action: #f5f6f7;
+  --action-text: #111316;
+  --visual-repo: var(--surface-muted);
+  --visual-plan-charcoal: var(--surface-muted);
+}
+body.dashboard-app.home-route { --bg: #f2f3f5; }
+body.dashboard-app[data-theme="dark"].home-route { --bg: #111316; }
+
+/* The final visual stylesheet had fixed light values that defeated earlier tokens. */
+html body.dashboard-app,
+html body.dashboard-app .main-content,
+html body.dashboard-app .page-content {
+  background: var(--bg) !important;
+  color: var(--text) !important;
+}
+html body.dashboard-app .sidebar,
+html body.dashboard-app.kaptei-route .sidebar,
+body.dashboard-app .desktop-topbar,
+body.dashboard-app .mobile-topbar {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+html body.dashboard-app .card,
+html body.dashboard-app .devi-plan-card,
+html body.dashboard-app .repo-panel,
+html body.dashboard-app .dashboard-metrics,
+html body.dashboard-app .dashboard-metrics > button {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+body.dashboard-app .page-head h1,
+body.dashboard-app .dashboard-metrics strong,
+body.dashboard-app .home-share-card .dashboard-url > span {
+  color: var(--text) !important;
+}
+body.dashboard-app .page-head p,
+body.dashboard-app .card p,
+body.dashboard-app .card small,
+body.dashboard-app .setting-row small {
+  color: var(--text-muted);
+}
+html body.dashboard-app[data-theme="dark"] .page-head p { color: var(--text-muted) !important; }
+body.dashboard-app .nav-item,
+body.dashboard-app .link-button,
+body.dashboard-app .desktop-topbar,
+body.dashboard-app .settings-tabs a {
+  color: var(--text-muted) !important;
+}
+body.dashboard-app .nav-item:hover,
+body.dashboard-app .nav-item.active,
+body.dashboard-app .user-mini {
+  background: var(--surface-muted) !important;
+  color: var(--text) !important;
+}
+body.dashboard-app .primary-button,
+body.dashboard-app .publish-button,
+body.dashboard-app .danger-button {
+  background: var(--action) !important;
+  border-color: var(--action) !important;
+  color: var(--action-text) !important;
+}
+body.dashboard-app .secondary-button,
+body.dashboard-app .icon-button {
+  background: var(--surface) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+body.dashboard-app :is(input:not([type="checkbox"]), textarea, select) {
+  background: var(--surface) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+body.dashboard-app :is(input, textarea)::placeholder { color: var(--text-subtle); }
+body.dashboard-app :is(.dashboard-url, .url-field, .search-field, .visual-chart-period, .repo-row, .publication-table th, .profile-input-prefix, .setting-row) {
+  background: var(--surface-muted) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+body.dashboard-app .screen-loading { background: var(--bg) !important; color: var(--text); }
+body.dashboard-app .screen-loading[aria-hidden="true"] { display: none !important; pointer-events: none !important; }
+body.dashboard-app .screen-loading.is-success .spinner { display: none; }
+body.dashboard-app .screen-loading.is-success::after {
+  content: "✓";
+  grid-row: 1;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--action);
+  color: var(--action-text);
+  font-size: 28px;
+}
+body.dashboard-app .page-enter { animation: none !important; opacity: 1; translate: none; }
+body.dashboard-app .sidebar,
+body.dashboard-app .main-content {
+  transition: width 280ms cubic-bezier(.4, 0, .2, 1), margin-left 280ms cubic-bezier(.4, 0, .2, 1);
+}
+body.dashboard-app .sidebar-resize-handle { width: 6px; right: -3px; touch-action: none; }
+body.dashboard-app .sidebar-toggle { z-index: 2; }
+body.dashboard-app .folio-brand img,
+body.dashboard-app .folio-brand-compact { filter: none; }
+body.dashboard-app[data-theme="dark"] .folio-brand img,
+body.dashboard-app[data-theme="dark"] .folio-brand-compact { filter: brightness(0) invert(1); }
+body.dashboard-app .home-repository-list .github-icon img { filter: brightness(0); }
+body.dashboard-app[data-theme="dark"] .home-repository-list .github-icon img,
+html body.dashboard-app[data-theme="dark"] .nav-item[data-route="github"] .github-icon img { filter: brightness(0) invert(1); }
+html body.dashboard-app[data-theme="dark"] .user-mini,
+html body.dashboard-app[data-theme="dark"] .user-menu { background: var(--surface-muted) !important; color: var(--text) !important; }
+
+/* Connected repositories are a compact, actionable list. */
+body.dashboard-app .home-import-card .section-card-head { align-items: center; }
+body.dashboard-app .home-disconnect { min-height: 30px; padding: 5px 10px; font-size: 11px; }
+body.dashboard-app .home-repositories {
+  display: block;
+  width: 100%;
+  padding: 8px 0 0 !important;
+  text-align: left;
+}
+body.dashboard-app .home-repository-list {
+  width: 100%;
+  max-height: none;
+  margin: 0;
+  overflow: visible;
+}
+body.dashboard-app .home-repository-list li { display: block; padding: 0; border: 0; }
+body.dashboard-app .home-repository-list li + li { margin-top: 5px; }
+body.dashboard-app .home-repository-list button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 39px;
+  padding: 7px 9px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-muted);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+body.dashboard-app .home-repository-list button:hover { border-color: var(--border-strong); }
+body.dashboard-app .home-repository-list button > [data-icon] { flex: none; width: 18px; height: 18px; }
+body.dashboard-app .home-repository-list button > [data-icon]:last-child { width: 14px; height: 14px; margin-left: auto; }
+body.dashboard-app .home-repo-copy { flex: 1; min-width: 0; }
+body.dashboard-app .home-repo-copy strong,
+body.dashboard-app .home-repo-copy small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+body.dashboard-app .home-repo-copy strong { font-size: 11px; }
+body.dashboard-app .home-repo-copy small { color: var(--text-subtle); font-size: 10px; }
+body.dashboard-app .home-repo-visibility { flex: none; color: var(--text-muted); font-size: 10px; }
+body.dashboard-app .home-repository-list .home-repo-all { background: var(--surface-inset); }
+
+/* The QR canvas stays inside its own padded square at every card width. */
+body.dashboard-app .home-share-card { min-width: 0; }
+body.dashboard-app .home-qr-row { display: grid; grid-template-columns: 118px minmax(0, 1fr); align-items: center; gap: 14px; }
+body.dashboard-app .home-qr-row .qr-wrap {
+  display: grid;
+  place-items: center;
+  width: 118px !important;
+  height: 118px !important;
+  padding: 10px !important;
+  overflow: hidden;
+  background: #ffffff !important;
+  border: 1px solid var(--border);
+}
+body.dashboard-app .home-qr-row canvas { display: block; width: 96px !important; height: 96px !important; max-width: 100%; }
+body.dashboard-app .home-qr-copy { min-width: 0; }
+body.dashboard-app .home-qr-copy .primary-button { max-width: 100%; min-width: 0; white-space: normal; }
+
+body.dashboard-app .theme-options { display: flex; gap: 4px; padding: 3px; border: 1px solid var(--border); border-radius: 9px; background: var(--surface-muted); }
+body.dashboard-app .coupon-card #coupon-form > div { display: flex; align-items: center; gap: 9px; }
+body.dashboard-app .theme-options button { min-height: 34px; padding: 5px 12px; border: 0; border-radius: 6px; background: transparent; color: var(--text-muted); cursor: pointer; }
+body.dashboard-app .theme-options button[aria-pressed="true"] { background: var(--action); color: var(--action-text); }
+
+/* Dark theme covers legacy hardcoded surfaces across internal routes and dialogs. */
+html body.dashboard-app[data-theme="dark"] :is(.modal, .user-menu, .connected-account, .profile-showcase, .profile-cover, .profile-edit-card, .my-portfolio-preview .folio-showcase-shell, .folio-showcase-projects, .publication-table-wrap, .kaptei-filter-group, .kaptei-capture-table, .kaptei-context-empty, .visual-chart-period button.active, .home-link-pending, .repo-reference-note) {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+html body.dashboard-app[data-theme="dark"] :is(.profile-input-prefix, .profile-cover > button, .profile-identity .avatar-edit-button, .my-portfolio-banner .banner-edit-button, .folio-empty-projects, .repo-import-feedback, .kaptei-table th, .leads-table th, .leads-filters input, .leads-filters select),
+html body.dashboard-app[data-theme="dark"] .profile-cover::after {
+  background: var(--surface-muted) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+body.dashboard-app[data-theme="dark"] :is(.modal, .settings-card, .profile-showcase, .repo-panel, .leads-page, .kaptei-page) :is(h1, h2, h3, h4, b, strong, label, td, th, p, small, span) { color: inherit; }
+body.dashboard-app[data-theme="dark"] :is(.visual-chart-head p, .visual-chart-grid span, .visual-chart-column small, .profile-edit-card p, .profile-edit-card small, .leads-header p, .leads-section-head p, .leads-stats span, .leads-filters label, .leads-empty p, .home-qr-copy p) { color: var(--text-muted) !important; }
+body.dashboard-app[data-theme="dark"] .modal-backdrop { background: rgb(0 0 0 / 72%); }
+body.dashboard-app[data-theme="dark"] .status { border-color: var(--border); }
+body.dashboard-app[data-theme="dark"] .repo-visibility { color: var(--text-muted); }
+body.dashboard-app[data-theme="dark"] .visual-chart-period button { color: var(--text-muted); }
+body.dashboard-app[data-theme="dark"] .visual-chart-period button.active { color: var(--text); }
+body.dashboard-app[data-theme="dark"] .visual-chart-column i { background: linear-gradient(180deg, #eceff2, #a5abb2); }
+body.dashboard-app[data-theme="dark"] .home-share-card .dashboard-url { background: var(--surface-muted) !important; }
+@media (max-width: 640px) {
+  body.dashboard-app .home-qr-row { grid-template-columns: 104px minmax(0, 1fr); gap: 10px; }
+  body.dashboard-app .home-qr-row .qr-wrap { width: 104px !important; height: 104px !important; padding: 7px !important; }
+  body.dashboard-app .home-qr-row canvas { width: 88px !important; height: 88px !important; }
+  body.dashboard-app .theme-options { margin-left: auto; }
+  body.dashboard-app .coupon-card #coupon-form > div { flex-wrap: wrap; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.dashboard-app .sidebar, body.dashboard-app .main-content { transition: none; }
+}

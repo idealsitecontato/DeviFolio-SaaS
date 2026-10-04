@@ -11,6 +11,6 @@ export function renderPlanCards({ internal = false } = {}) {
     <p class="devi-plan-description">${plan.description}</p>
     <div class="devi-plan-price"><strong>R$ ${plan.price}</strong><span>por mês</span></div>
     <ul>${plan.benefits.map(benefit => `<li><span aria-hidden="true">•</span>${benefit}</li>`).join('')}</ul>
-    ${internal ? '<button type="button" disabled aria-label="Assinaturas em breve">Em breve</button>' : '<a href="cadastro.html#cadastro">Criar conta <span aria-hidden="true">↗</span></a>'}
+    ${internal ? '<button type="button" data-plan-coming-soon>Em breve</button>' : '<a href="cadastro.html#cadastro">Criar conta <span aria-hidden="true">↗</span></a>'}
   </article>`).join('')
 }

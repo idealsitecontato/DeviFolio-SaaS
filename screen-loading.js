@@ -15,10 +15,18 @@ export function createScreenLoading({ shell = null, loading = null } = {}) {
     if (!loading) return
     const text = loading.querySelector('p')
     if (text) text.textContent = label
+    loading.classList.remove('is-success')
     loading.hidden = false
     loading.setAttribute('aria-hidden', 'false')
     document.body.classList.add('is-screen-loading')
     if (shell) shell.inert = true
+  }
+
+  function success(label) {
+    if (!loading) return
+    const text = loading.querySelector('p')
+    if (text) text.textContent = label
+    loading.classList.add('is-success')
   }
 
   function hide() {
@@ -57,12 +65,16 @@ export function createScreenLoading({ shell = null, loading = null } = {}) {
     return { ready: hide, abort: clearTimer }
   }
 
-  function exitAuth(navigateAway, { duration = 1000 } = {}) {
+  function exitAuth(navigateAway, { duration = 4000 } = {}) {
     resetPage()
-    show('Abrindo seu painel...')
+    show('Organizando sua conta...')
     if (duration > 0) {
       const current = sequence
+      const messageTimer = window.setTimeout(() => {
+        if (current === sequence && loading?.querySelector('p')) loading.querySelector('p').textContent = 'Preparando seu painel...'
+      }, Math.min(2000, duration / 2))
       timer = window.setTimeout(() => {
+        window.clearTimeout(messageTimer)
         if (current === sequence) navigateAway()
       }, duration)
     } else navigateAway()
@@ -114,5 +126,5 @@ export function createScreenLoading({ shell = null, loading = null } = {}) {
     if (restoreFocus && record.opener?.isConnected) record.opener.focus()
   }
 
-  return { show, hide, navigate, leaveDashboard, resetPage, enterDashboard, exitAuth, modalOpener, openModal, closeModal, resetEntry: hide }
+  return { show, success, hide, navigate, leaveDashboard, resetPage, enterDashboard, exitAuth, modalOpener, openModal, closeModal, resetEntry: hide }
 }
