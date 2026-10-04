@@ -22,7 +22,7 @@ export default async function handler(req, res) {
 
     if (isLogin) {
       res.setHeader('Set-Cookie', clearLoginStateCookies())
-      if (req.query?.error) return res.redirect(302, authPageUrl(req.query.error, loginState.referral))
+      if (req.query?.error) return res.redirect(302, authPageUrl(req.query.error))
       if (!code || loginState.expiresAt < Date.now()) throw Object.assign(new Error('Estado OAuth inválido ou expirado.'), { statusCode: 400 })
       const token = await exchangeGithubCode(code)
       const githubUser = await githubApi('/user', token)
@@ -32,7 +32,7 @@ export default async function handler(req, res) {
         ...clearLoginStateCookies(),
         secureCookieHeader(LOGIN_SESSION_COOKIE, encodeURIComponent(sessionCookie), '/api/auth/github/session', 120, 'Strict'),
       ])
-      return res.redirect(302, authPageUrl('complete', loginState.referral))
+      return res.redirect(302, authPageUrl('complete'))
     }
 
     res.setHeader('Set-Cookie', oauthCookieHeader('', 0))
@@ -64,9 +64,8 @@ function clearLoginStateCookies() {
   ]
 }
 
-function authPageUrl(status, referral = '') {
+function authPageUrl(status) {
   const origin = new URL(githubConfig().callbackUrl).origin
   const query = new URLSearchParams({ github_login: status })
-  if (referral) query.set('ref', referral)
   return `${origin}/cadastro.html?${query}#login`
 }

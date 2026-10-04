@@ -1,12 +1,12 @@
 import { folioDevLogo } from './brand.js'
 
-export const Logo = () => `<img class="auth-logo" src="${folioDevLogo}" alt="FolioDev" width="821" height="149">`
+export const Logo = () => `<img class="auth-logo" src="${folioDevLogo}" alt="FolioDev" width="1086" height="162">`
 export function AuthInput(id, label, { type = 'text', autocomplete = '', minlength = '', maxlength = '', placeholder = '' } = {}) {
   return `<div class="auth-field"><label for="${id}">${label}</label><input id="${id}" name="${id}" type="${type}" autocomplete="${autocomplete}" ${minlength ? `minlength="${minlength}"` : ''} ${maxlength ? `maxlength="${maxlength}"` : ''} ${placeholder ? `placeholder="${placeholder}"` : ''} required></div>`
 }
 export const AuthButton = label => `<button class="button button-submit" type="submit">${label}</button>`
 export function SocialButton(provider, signup = false) {
-  const label = `${signup ? 'Continuar' : 'Entrar'} com ${provider === 'google' ? 'Google' : 'GitHub'}`
+  const label = `${signup ? 'Cadastrar' : 'Entrar'} com ${provider === 'google' ? 'Google' : 'GitHub'}`
   return `<button class="button button-${provider}" type="button" ${provider === 'github' ? `id="github-${signup ? 'cadastro' : 'login'}"` : 'data-google-login'}><img src="${provider === 'github' ? '/folio/07-logo-github.png' : '/icons/google.svg'}" width="${provider === 'github' ? '14' : '22'}" height="${provider === 'github' ? '14' : '22'}" alt="" aria-hidden="true">${label}</button>`
 }
 const social = signup => `<div class="auth-divider">ou continue com</div><div class="auth-providers">${SocialButton('google', signup)}${SocialButton('github', signup)}</div>`

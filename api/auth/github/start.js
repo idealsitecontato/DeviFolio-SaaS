@@ -8,8 +8,7 @@ export default async function handler(req, res) {
   try {
     const config = githubConfig()
     const nonce = crypto.randomBytes(24).toString('base64url')
-    const referral = String(req.query?.ref || '').trim().toLowerCase().slice(0, 80)
-    const stateCookie = createLoginStateCookie({ nonce, referral, expiresAt: Date.now() + 10 * 60 * 1000 })
+    const stateCookie = createLoginStateCookie({ nonce, expiresAt: Date.now() + 10 * 60 * 1000 })
     const authorizationUrl = new URL('https://github.com/login/oauth/authorize')
     authorizationUrl.search = new URLSearchParams({ client_id: config.clientId, redirect_uri: config.callbackUrl, state: nonce, scope: 'read:user user:email', prompt: 'select_account' }).toString()
     res.setHeader('Cache-Control', 'no-store')

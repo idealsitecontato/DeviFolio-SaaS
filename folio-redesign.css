@@ -94,12 +94,12 @@ body{background:var(--color-bg)}
 .auth-body[data-auth-view=cadastro] form{gap:11px}
 .auth-body[data-auth-view=cadastro] input:not([type=checkbox]){height:49px;min-height:49px}
 .auth-body .auth-left{background:#FAF9F4}
-.auth-body .auth-right{background:#2979FF;color:#fff}
+.auth-body .auth-right{background:#4a4a4a;color:#fff}
 .auth-body .auth-story h2{color:#fff}
 .auth-body .auth-integrations>img{width:88px;height:88px;object-fit:contain}
 .auth-body .password-toggle:focus-visible{outline:2px solid #111;outline-offset:2px}
 body.auth-body[data-auth-view] .auth-left{background:#FAF9F4}
-body.auth-body[data-auth-view] .auth-right{background:#2979FF;color:#fff}
+body.auth-body[data-auth-view] .auth-right{background:#4a4a4a;color:#fff}
 body.auth-body[data-auth-view] .auth-form-wrap{width:min(360px,100%);transform:none}
 body.auth-body[data-auth-view] .auth-brand{margin:0 auto 25px;transform:none}
 body.auth-body[data-auth-view] .auth-story h2{color:#fff;font-size:clamp(34px,2.5vw,44px);font-weight:500;line-height:1.1;letter-spacing:-.04em}
@@ -129,7 +129,7 @@ body.auth-body[data-auth-view] .auth-providers{gap:8px}
 body.auth-body[data-auth-view] .auth-providers img{width:19px;height:19px;margin-right:8px}
 body.auth-body[data-auth-view] .button-github img{border-radius:0}
 body.auth-body[data-auth-view] .auth-switch{margin-top:18px;color:#777773;font-size:11px}
-body.auth-body[data-auth-view] .auth-right{background:#2979FF}
+body.auth-body[data-auth-view] .auth-right{background:#4a4a4a}
 body.auth-body[data-auth-view] .auth-story{padding:clamp(84px,13.3vh,104px) 30px 0 clamp(70px,5.2vw,84px)}
 body.auth-body[data-auth-view] .auth-story h2{color:#fff;font-size:clamp(36px,2.75vw,44px);font-weight:500;line-height:1.1;letter-spacing:-.045em}
 body.auth-body[data-auth-view] .auth-integrations{gap:9px;margin-top:24px;padding:0}
@@ -180,7 +180,7 @@ button.is-loading .nuda-gooey__rot span{width:10px;height:10px;margin:-5px}
 .portfolio-edit-form label:has(input[type=file]):focus-within .nuda-browse{outline:2px solid var(--color-charcoal);outline-offset:2px}
 
 /* Cream surfaces and charcoal actions across the current application. */
-.dashboard-app{--bg:var(--color-bg);--surface:var(--color-bg);--bg-app:var(--color-bg);--bg-card:var(--color-bg);--bg-input:var(--color-bg);--accent:var(--color-charcoal);--visual-plan-blue:var(--color-charcoal)}
+.dashboard-app{--bg:var(--color-bg);--surface:var(--color-bg);--bg-app:var(--color-bg);--bg-card:var(--color-bg);--bg-input:var(--color-bg);--accent:var(--color-charcoal)}
 .dashboard-app,.dashboard-app .app-shell,.dashboard-app .main-content,.dashboard-app .sidebar,.dashboard-app .mobile-topbar,.dashboard-app .desktop-topbar,.dashboard-app .page-content{background:var(--color-bg)!important}
 .dashboard-app :is(.card,.modal,.form-card,.settings-card,.pricing-card,.repo-panel,.connected-account,.empty-state,.portfolio-list-item,.project-card,.plan-card),.dashboard-app :is(input,textarea,select,.search-field,.input-prefix,.url-field,.dashboard-url){background:var(--color-bg)!important}
 .dashboard-app :is(.primary-button,.dashboard-action,.deploy-button){background:var(--color-charcoal)!important;border-color:var(--color-charcoal)!important;color:var(--color-bg)!important}

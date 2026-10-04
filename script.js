@@ -1,14 +1,8 @@
 import './src/lib/build-version.js'
+import { renderPlanCards } from './plans.js'
 
 document.getElementById('copyright-year').textContent = String(new Date().getFullYear())
-const referral = new URLSearchParams(location.search).get('ref')?.trim().toLowerCase() || ''
-if (/^[a-z0-9._-]{1,80}$/.test(referral)) {
-  document.querySelectorAll('a[href^="cadastro.html"]').forEach(link => {
-    const url = new URL(link.getAttribute('href'), location.href)
-    url.searchParams.set('ref', referral)
-    link.href = url.toString()
-  })
-}
+document.getElementById('landing-plans-grid').innerHTML = renderPlanCards()
 const menuToggle = document.querySelector('.menu-toggle')
 const mobileMenu = document.getElementById('mobile-menu')
 function closeMenu() {
@@ -47,3 +41,26 @@ window.addEventListener('offline', () => {
   document.getElementById('site-header').append(notice)
 })
 window.addEventListener('online', () => document.querySelector('.offline-notice')?.remove())
+
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)')
+const revealObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting) return
+    entry.target.classList.add('is-visible')
+    revealObserver.unobserve(entry.target)
+  })
+}, { threshold: 0.12 })
+document.querySelectorAll('.reveal').forEach(element => revealObserver.observe(element))
+
+const mockup = document.querySelector('.landing-mockup')
+if (mockup && !reducedMotion.matches) {
+  let scheduled = false
+  window.addEventListener('scroll', () => {
+    if (scheduled) return
+    scheduled = true
+    requestAnimationFrame(() => {
+      mockup.style.setProperty('--mock-parallax', `${Math.min(28, window.scrollY * 0.04)}px`)
+      scheduled = false
+    })
+  }, { passive: true })
+}

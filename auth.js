@@ -13,7 +13,6 @@ let redirecting = false
 const screenLoading = createScreenLoading({ shell: document.querySelector('.auth-shell'), loading: document.getElementById('auth-loading') })
 mountGooeySpinners()
 let supabasePromise
-const referralUsername = new URLSearchParams(window.location.search).get('ref')?.trim().toLowerCase() || ''
 
 function getSupabase() {
   if (!supabasePromise) {
@@ -187,10 +186,6 @@ document.getElementById('form-cadastro').addEventListener('submit', async event 
     if (data.session) {
       const { error } = await supabase.auth.setSession(data.session)
       if (error) return reportAuthError('Falha ao iniciar a sessão', error)
-      if (referralUsername) {
-        const { registerReferral } = await import('./src/lib/user-data.js')
-        await registerReferral(referralUsername)
-      }
       return goToDashboard(true)
     }
     showMessage('Conta criada. Confirme seu e-mail para entrar.', 'success')
@@ -215,8 +210,7 @@ document.querySelectorAll('#github-login, #github-cadastro').forEach(button => {
     } catch (error) { reportAuthError('Falha ao preparar a sessão', error); return }
     button.disabled = true
     sessionStorage.setItem('devifolio_auth_intent', currentAuthView())
-    const query = referralUsername ? `?ref=${encodeURIComponent(referralUsername)}` : ''
-    window.location.assign(`/api/auth/github/start${query}`)
+    window.location.assign('/api/auth/github/start')
   })
 })
 
@@ -301,10 +295,6 @@ async function completeGithubLogin() {
     const supabase = await getSupabase()
     const { error } = await supabase.auth.setSession({ access_token: payload.access_token, refresh_token: payload.refresh_token })
     if (error) throw error
-    if (referralUsername) {
-      const { registerReferral } = await import('./src/lib/user-data.js')
-      await registerReferral(referralUsername)
-    }
     const fromSignup = sessionStorage.getItem('devifolio_auth_intent') === 'cadastro'
     sessionStorage.removeItem('devifolio_auth_intent')
     goToDashboard(fromSignup)

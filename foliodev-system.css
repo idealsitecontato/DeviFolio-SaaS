@@ -170,7 +170,7 @@ button:disabled,[aria-disabled="true"]{
   background:var(--surface-muted)}
 .danger-button:hover{
   border-color:var(--danger-fg)}
-.icon-button,.portfolio-edit-button,.model-drawer-close{
+.icon-button, .portfolio-edit-button{
   display:inline-grid;
   place-items:center;
   flex:none;
@@ -292,7 +292,7 @@ input[type="checkbox"],input[type="radio"]{
 .status.draft,.badge{
   color:var(--warning-fg);
   background:var(--warning-bg)}
-.avatar,.public-avatar,.preview-avatar,.model-preview-avatar{
+.avatar, .public-avatar, .preview-avatar{
   display:inline-grid;
   place-items:center;
   flex:none;
@@ -542,13 +542,6 @@ dialog::backdrop{
   height:44px}
 .document-compact .document-person h3{
   font-size:18px}
-.document-frame[data-preview-model="black"] .document-content{
-  background:#171719;
-  color:#fff}
-.document-frame[data-preview-model="black"] .document-person p,.document-frame[data-preview-model="black"] .document-project p{
-  color:#bbb}
-.document-frame[data-preview-model="blue"] .document-toolbar{
-  border-left:3px solid var(--accent)}
 .eyebrow{
   display:none}
 .offline-notice{
@@ -650,24 +643,6 @@ to{
   padding:5px}
 .switch.on i{
   translate:16px 0}
-.document-frame[data-preview-model="black"] .document-toolbar{
-  color:var(--text-muted)}
-.document-frame[data-preview-model="black"] .document-project{
-  border-color:#45454a}
-.document-frame[data-preview-model="red"] .document-toolbar{
-  border-left:3px solid #B3261E}
-.document-frame[data-preview-model="orange"] .document-toolbar{
-  border-left:3px solid #A24E12}
-.document-frame[data-preview-model="pink"] .document-toolbar{
-  border-left:3px solid #A13F70}
-.document-frame[data-preview-model="lime"] .document-toolbar{
-  border-left:3px solid #627B21}
-.document-frame[data-preview-model="yellow"] .document-toolbar{
-  border-left:3px solid #8A6410}
-.document-frame[data-preview-model="green"] .document-toolbar{
-  border-left:3px solid #1E7A3E}
-.document-frame[data-preview-model="purple"] .document-toolbar{
-  border-left:3px solid #141414}
 .subtle{
   color:var(--text-muted)}
 @media(max-width:640px){

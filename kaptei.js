@@ -1,79 +1,82 @@
-const kapteiBannerUrl = '/kaptei/kaptei-banner.png'
-let activeTab = 'captados'
-
-const leads = [
-  { id: 1, name: 'Lucas Almeida', email: 'lucas@techsolucoes.com', phone: '(11) 98765-4321', company: 'Tech Soluções', interest: 'Site institucional', potential: 'Alto', date: '25/09/2026 14:32', message: 'Gostaria de conhecer as opções para um novo site institucional.' },
-  { id: 2, name: 'Mariana Costa', email: 'mariana@auroradigital.com', phone: '(11) 91234-5678', company: 'Aurora Digital', interest: 'Identidade Visual', potential: 'Médio', date: '25/09/2026 12:18', message: 'Busco uma identidade visual para a Aurora Digital.' },
-  { id: 3, name: 'Gabriel Santos', email: 'gabriel@nextcode.com', phone: '(11) 99876-5432', company: 'NextCode', interest: 'Desenvolvimento Web', potential: 'Alto', date: '25/09/2026 11:03', message: 'Preciso de uma proposta para desenvolvimento web.' },
-  { id: 4, name: 'Juliana Ferreira', email: 'juliana@primeconsult.com', phone: '(11) 94456-8901', company: 'Prime Consult', interest: 'Site Institucional', potential: 'Médio', date: '24/09/2026 18:45', message: 'Queremos atualizar a presença digital da empresa.' },
-  { id: 5, name: 'Rafael Lima', email: 'rafael@fluxostudio.com', phone: '(11) 92310-2334', company: 'Fluxo Studio', interest: 'Branding', potential: 'Alto', date: '24/09/2026 16:22', message: 'Estamos planejando uma nova marca para o estúdio.' },
-  { id: 6, name: 'Beatriz Oliveira', email: 'beatriz@inovatech.com', phone: '(11) 97865-2210', company: 'InovaTech', interest: 'E-commerce', potential: 'Médio', date: '24/09/2026 14:07', message: 'Gostaria de avaliar uma loja virtual para nossa linha de produtos.' },
-]
-
 const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[character])
 
-const filterGroups = [
-  { title: 'Nichos', name: 'nicho', options: ['Tecnologia / Software', 'E-commerce', 'Marketing Digital', 'Design', 'Educação', 'Saúde', 'Outros'] },
-  { title: 'Quantidade de leads', name: 'quantidade', options: ['1 - 10', '11 - 25', '26 - 50', '51 - 100', '101 - 200', '201+'] },
-  { title: 'Região', name: 'regiao', options: ['Nordeste', 'Sudeste', 'Sul', 'Centro-Oeste', 'Norte'] },
-  { title: 'Potencial', name: 'potencial', options: ['Alto', 'Médio', 'Baixo'] },
-  { title: 'Possui site', name: 'site', options: ['Com site', 'Sem site'] },
-]
-
-function filterGroup(group) {
-  return `<fieldset class="kaptei-filter-group"><legend>${group.title}</legend><select aria-label="Filtrar ${group.title.toLowerCase()}"><option>Todos${group.name === 'nicho' ? ' os nichos' : group.name === 'potencial' ? ' os potenciais' : ''}</option>${group.options.map(option => `<option>${option}</option>`).join('')}</select><div class="kaptei-filter-options">${group.options.map(option => `<label><input type="checkbox" name="${group.name}" value="${option}"><span>${option}</span></label>`).join('')}</div></fieldset>`
+const localDay = value => {
+  const date = new Date(value)
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate())
 }
 
-function leadCard(lead) {
-  return `<article class="kaptei-lead-card">
-    <div class="kaptei-lead-card-head"><div><span>Lead captado</span><h2>${escapeHtml(lead.name)}</h2><p>${escapeHtml(lead.company)}</p></div><span class="kaptei-potential ${lead.potential.toLowerCase()}">${lead.potential}</span></div>
-    <dl><div><dt>E-mail</dt><dd>${escapeHtml(lead.email)}</dd></div><div><dt>Telefone</dt><dd>${escapeHtml(lead.phone)}</dd></div><div><dt>Interesse</dt><dd>${escapeHtml(lead.interest)}</dd></div><div><dt>Recebido em</dt><dd>${lead.date}</dd></div></dl>
-    <div class="kaptei-lead-actions"><button type="button" data-kaptei-info="${lead.id}">Informações</button><button type="button" data-kaptei-contact="${lead.id}">Entrar em contato</button></div>
-  </article>`
+function leadRows(leads) {
+  return leads.map(lead => {
+    const phone = String(lead.phone || '').replace(/[^0-9+]/g, '')
+    const contact = phone ? `tel:${phone}` : `mailto:${encodeURIComponent(lead.email)}`
+    const potential = ['Alto', 'Médio', 'Baixo'].includes(lead.potential) ? lead.potential : 'Médio'
+    return `<tr data-lead-row data-search="${escapeHtml(`${lead.name} ${lead.email}`.toLowerCase())}" data-status="${escapeHtml(lead.status || 'Novo')}" data-date="${escapeHtml(lead.created_at)}"><td><input type="checkbox" data-lead-select value="${lead.id}" aria-label="Selecionar ${escapeHtml(lead.name)}"></td><td>${escapeHtml(lead.name)}</td><td><a href="mailto:${escapeHtml(lead.email)}">${escapeHtml(lead.email)}</a></td><td>${escapeHtml(lead.phone || '—')}</td><td><span class="lead-potential ${potential === 'Alto' ? 'high' : potential === 'Baixo' ? 'low' : 'medium'}">${potential}</span></td><td><a class="lead-call" href="${escapeHtml(contact)}">Chamar</a></td></tr>`
+  }).join('')
 }
 
-export function kapteiView() {
-  return `<section class="page-enter kaptei-page" aria-label="Kaptei">
-    <div class="kaptei-banner"><img src="${kapteiBannerUrl}" alt="Kaptei" width="5120" height="612"></div>
-    <div class="kaptei-content">
-      <div class="kaptei-tabs" role="tablist" aria-label="Contexto dos leads">
-        <button id="kaptei-tab-portfolio" type="button" role="tab" data-kaptei-tab="portfolio" aria-selected="${activeTab === 'portfolio'}" aria-controls="kaptei-panel-portfolio" class="${activeTab === 'portfolio' ? 'is-active' : ''}"><span data-icon="users" aria-hidden="true"></span> Leads do seu Portfólio</button>
-        <button id="kaptei-tab-captados" type="button" role="tab" data-kaptei-tab="captados" aria-selected="${activeTab === 'captados'}" aria-controls="kaptei-panel-captados" class="${activeTab === 'captados' ? 'is-active' : ''}"><span data-icon="user" aria-hidden="true"></span> Leads Captados</button>
-      </div>
-      <div id="kaptei-panel-portfolio" role="tabpanel" aria-labelledby="kaptei-tab-portfolio" ${activeTab === 'portfolio' ? '' : 'hidden'}>
-        <h1>Leads do seu Portfólio</h1><div class="kaptei-context-empty"><span aria-hidden="true">✉</span><h2>Nenhum lead do portfólio por enquanto</h2><p>Quando houver contatos associados ao seu portfólio, eles aparecerão aqui.</p></div>
-      </div>
-      <div id="kaptei-panel-captados" role="tabpanel" aria-labelledby="kaptei-tab-captados" ${activeTab === 'captados' ? '' : 'hidden'}>
-        <h1>Leads Captados</h1>
-        <div class="kaptei-capture-area"><div class="kaptei-filters">${filterGroups.map(filterGroup).join('')}</div>
-          <button class="kaptei-generate" type="button" id="kaptei-generate">✣ &nbsp;Gerar Leads</button>
-          <div class="kaptei-capture-cards">${leads.map(leadCard).join('')}</div>
-        </div>
-      </div>
-    </div>
+export function kapteiView(leads = [], available = true) {
+  const today = localDay(new Date())
+  const last7 = new Date(today); last7.setDate(last7.getDate() - 6)
+  const last30 = new Date(today); last30.setDate(last30.getDate() - 29)
+  const stats = [
+    ['Total de leads', leads.length],
+    ['Hoje', leads.filter(lead => localDay(lead.created_at).getTime() === today.getTime()).length],
+    ['Últimos 7 dias', leads.filter(lead => localDay(lead.created_at) >= last7).length],
+    ['Últimos 30 dias', leads.filter(lead => localDay(lead.created_at) >= last30).length],
+  ]
+  return `<section class="page-enter leads-page" aria-label="Leads do portfólio">
+    <header class="leads-header"><h1>Leads</h1><p>Acompanhe contatos do portfólio e oportunidades da Kaptei em um só lugar.</p></header>
+    <div class="leads-tab">Leads do seu portfólio</div>
+    <div class="leads-stats">${stats.map(([label, value]) => `<article class="card"><span>${label}</span><strong>${available && leads.length ? value : '—'}</strong></article>`).join('')}</div>
+    <div class="leads-section-head"><div><h2>Leads do seu portfólio</h2><p>Organize os contatos recebidos e acompanhe cada oportunidade.</p></div>${leads.length ? '<button class="primary-button" type="button" data-download-leads>↓ &nbsp;Baixar lista</button>' : ''}</div>
+    <div class="leads-filters"><label>Buscar lead<input type="search" id="lead-search" placeholder="Nome ou e-mail"></label><label>Status<select id="lead-status"><option value="all">Todos</option><option>Novo</option><option>Em contato</option><option>Concluído</option></select></label><label>Período<select id="lead-period"><option value="all">Qualquer período</option><option value="today">Hoje</option><option value="7">Últimos 7 dias</option><option value="30">Últimos 30 dias</option></select></label></div>
+    <div class="card leads-table-wrap"><table class="leads-table"><thead><tr><th><input type="checkbox" id="lead-select-all" aria-label="Selecionar todos os leads visíveis"></th><th>Nome</th><th>E-mail</th><th>Contato</th><th>Potencial</th><th>Ações</th></tr></thead><tbody>${leadRows(leads)}</tbody></table><div class="leads-empty" ${leads.length ? 'hidden' : ''}><span aria-hidden="true">♙</span><h3>${available ? 'Nenhum lead encontrado' : 'Leads indisponíveis'}</h3><p>${available ? 'Verifique seu portfólio. Quando houver novos contatos, eles aparecerão aqui.' : 'Aplique a migração de leads do banco para receber contatos.'}</p></div><p class="leads-no-results" hidden>Nenhum lead corresponde aos filtros.</p></div>
   </section>`
 }
 
-export function bindKapteiActions({ modal, toast }) {
-  const root = document.querySelector('.kaptei-page')
+function csvCell(value) {
+  const text = String(value ?? '').replace(/^([=+\-@])/, "'$1")
+  return `"${text.replace(/"/g, '""')}"`
+}
+
+export function bindKapteiActions({ toast }) {
+  const root = document.querySelector('.leads-page')
   if (!root) return
-  root.querySelectorAll('[data-kaptei-tab]').forEach(tab => tab.addEventListener('click', () => {
-    activeTab = tab.dataset.kapteiTab
-    root.querySelectorAll('[data-kaptei-tab]').forEach(item => {
-      const active = item === tab
-      item.classList.toggle('is-active', active)
-      item.setAttribute('aria-selected', String(active))
+  const rows = [...root.querySelectorAll('[data-lead-row]')]
+  const search = root.querySelector('#lead-search')
+  const status = root.querySelector('#lead-status')
+  const period = root.querySelector('#lead-period')
+  const selectAll = root.querySelector('#lead-select-all')
+  const update = () => {
+    const query = search.value.trim().toLowerCase()
+    const threshold = new Date()
+    if (period.value === 'today') threshold.setHours(0, 0, 0, 0)
+    else if (period.value !== 'all') { threshold.setHours(0, 0, 0, 0); threshold.setDate(threshold.getDate() - Number(period.value) + 1) }
+    rows.forEach(row => {
+      const visible = row.dataset.search.includes(query) && (status.value === 'all' || row.dataset.status === status.value) && (period.value === 'all' || new Date(row.dataset.date) >= threshold)
+      row.hidden = !visible
+      if (!visible) row.querySelector('[data-lead-select]').checked = false
     })
-    root.querySelector('#kaptei-panel-portfolio').hidden = activeTab !== 'portfolio'
-    root.querySelector('#kaptei-panel-captados').hidden = activeTab !== 'captados'
-  }))
-  root.querySelector('#kaptei-generate')?.addEventListener('click', () => toast('Em breve...'))
-  root.querySelector('.kaptei-capture-cards')?.addEventListener('click', event => {
-    const info = event.target.closest('[data-kaptei-info]')
-    const contact = event.target.closest('[data-kaptei-contact]')
-    const lead = leads.find(item => item.id === Number(info?.dataset.kapteiInfo || contact?.dataset.kapteiContact))
-    if (!lead) return
-    if (info) modal(`<div class="kaptei-detail"><h2>${escapeHtml(lead.name)}</h2><p>${escapeHtml(lead.company)} · ${escapeHtml(lead.interest)}</p><dl><div><dt>E-mail</dt><dd>${escapeHtml(lead.email)}</dd></div><div><dt>Telefone</dt><dd>${escapeHtml(lead.phone)}</dd></div><div><dt>Potencial</dt><dd>${lead.potential}</dd></div><div><dt>Recebido em</dt><dd>${lead.date}</dd></div><div><dt>Mensagem</dt><dd>${escapeHtml(lead.message)}</dd></div></dl><button class="secondary-button" type="button" data-close-modal>Fechar</button></div>`)
-    if (contact) modal(`<div class="kaptei-detail"><h2>Entrar em contato</h2><p>${escapeHtml(lead.name)}</p><dl><div><dt>E-mail</dt><dd>${escapeHtml(lead.email)}</dd></div><div><dt>Telefone</dt><dd>${escapeHtml(lead.phone)}</dd></div></dl><button class="secondary-button" type="button" data-close-modal>Fechar</button></div>`)
+    root.querySelector('.leads-no-results').hidden = !rows.length || rows.some(row => !row.hidden)
+    selectAll.checked = false
+  }
+  search.addEventListener('input', update)
+  status.addEventListener('change', update)
+  period.addEventListener('change', update)
+  selectAll.addEventListener('change', () => rows.filter(row => !row.hidden).forEach(row => { row.querySelector('[data-lead-select]').checked = selectAll.checked }))
+  root.querySelector('[data-download-leads]')?.addEventListener('click', () => {
+    const selected = rows.filter(row => row.querySelector('[data-lead-select]').checked)
+    const target = selected.length ? selected : rows.filter(row => !row.hidden)
+    if (!target.length) return toast('Nenhum lead para baixar.')
+    const lines = [['Nome', 'E-mail', 'Contato', 'Potencial', 'Status', 'Recebido em'].map(csvCell).join(',')]
+    target.forEach(row => {
+      const cells = row.querySelectorAll('td')
+      lines.push([cells[1].textContent, cells[2].textContent, cells[3].textContent, cells[4].textContent, row.dataset.status, new Date(row.dataset.date).toLocaleString('pt-BR')].map(csvCell).join(','))
+    })
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(new Blob(['\uFEFF', lines.join('\r\n')], { type: 'text/csv;charset=utf-8' }))
+    link.download = 'foliodev-leads.csv'
+    link.click()
+    setTimeout(() => URL.revokeObjectURL(link.href), 1000)
   })
 }

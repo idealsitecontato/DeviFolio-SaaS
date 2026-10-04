@@ -48,10 +48,6 @@ html body.dashboard-app.kaptei-route {
     width: 16px;
     height: 16px;
   }
-  html body.dashboard-app.kaptei-route .sidebar-referral {
-    padding: 13px 8px;
-    font-size: 11px;
-  }
   html body.dashboard-app.kaptei-route .side-nav-utility {
     padding-top: 5px;
   }
@@ -337,7 +333,7 @@ html body.dashboard-app .kaptei-potential.médio {
 }
 html body.dashboard-app .kaptei-potential.baixo {
   background: transparent !important;
-  color: #5b82ad;
+  color: #4a4a4a;
 }
 html body.dashboard-app .kaptei-potential i {
   display: none;
@@ -372,12 +368,12 @@ html body.dashboard-app .kaptei-empty {
   text-align: center;
 }
 html body.dashboard-app .kaptei-empty[hidden] { display: none; }
-html body.dashboard-app .kaptei-detail { color: #17202b; }
+html body.dashboard-app .kaptei-detail { color: #1f1f1f; }
 html body.dashboard-app .kaptei-detail h2 { margin: 0 0 5px; font-size: 22px; }
-html body.dashboard-app .kaptei-detail p { margin: 0 0 20px; color: #596672; }
+html body.dashboard-app .kaptei-detail p { margin: 0 0 20px; color: #4a4a4a; }
 html body.dashboard-app .kaptei-detail dl { display: grid; gap: 12px; margin: 0 0 22px; }
 html body.dashboard-app .kaptei-detail dl div { display: grid; gap: 3px; }
-html body.dashboard-app .kaptei-detail dt { color: #6b7480; font-size: 12px; }
+html body.dashboard-app .kaptei-detail dt { color: #4a4a4a; font-size: 12px; }
 html body.dashboard-app .kaptei-detail dd { margin: 0; overflow-wrap: anywhere; }
 
 @media (max-width: 1100px) {

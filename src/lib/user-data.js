@@ -14,7 +14,6 @@ const mapProfile = row => row ? {
   website: row.website || '',
   avatar: row.avatar_url || '',
   published: Boolean(row.published),
-  selectedModel: row.selected_model || 'white',
   userId: row.user_id,
 } : null
 
@@ -43,11 +42,11 @@ export async function loadWorkspace(userId) {
     supabase.from('projects').select('*').eq('user_id', userId).order('sort_order'),
     supabase.from('user_settings').select('*').eq('user_id', userId).maybeSingle(),
     supabase.from('analytics_events').select('event_type,project_id,visitor_id,occurred_at').eq('user_id', userId).order('occurred_at', { ascending: true }),
-    supabase.from('referrals').select('id,referred_email,status,created_at').eq('user_id', userId).order('created_at', { ascending: false }),
+    supabase.from('portfolio_leads').select('id,name,email,phone,message,potential,status,created_at').eq('user_id', userId).order('created_at', { ascending: false }),
     supabase.from('github_connections').select('github_user_id,github_username,avatar_url,connected_at').eq('user_id', userId).maybeSingle(),
   ])
 
-  const [profileResult, projectsResult, settingsResult, analyticsResult, referralsResult, githubResult] = results
+  const [profileResult, projectsResult, settingsResult, analyticsResult, leadsResult, githubResult] = results
   if (!coreWorkspaceAvailable([profileResult, projectsResult])) return { available: false }
   return {
     available: true,
@@ -56,7 +55,8 @@ export async function loadWorkspace(userId) {
     settings: settingsResult.error ? null : settingsResult.data,
     settingsAvailable: !settingsResult.error,
     analytics: analyticsResult.error ? [] : (analyticsResult.data || []).map(event => ({ ...event, created_at: event.occurred_at })),
-    referrals: referralsResult.error ? [] : referralsResult.data || [],
+    leads: leadsResult.error ? [] : leadsResult.data || [],
+    leadsAvailable: !leadsResult.error,
     githubConnection: githubResult.error ? null : githubResult.data,
   }
 }
@@ -77,14 +77,6 @@ export async function saveProfile(userId, profile, published) {
     published: Boolean(published),
     updated_at: new Date().toISOString(),
   }, { onConflict: 'user_id' })
-  if (error) throw error
-}
-
-export async function savePortfolioModel(userId, modelId) {
-  const { error } = await supabase.from('profiles').update({
-    selected_model: modelId,
-    updated_at: new Date().toISOString(),
-  }).eq('user_id', userId)
   if (error) throw error
 }
 
@@ -201,7 +193,7 @@ export async function loadPublicPortfolio(username) {
   if (!normalized) return null
   let { data: profileRow, error: profileError } = await supabase
     .from('profiles')
-    .select('user_id,name,username,role,bio,skills,linkedin,github,website,avatar_url,published,selected_model')
+    .select('user_id,name,username,role,bio,skills,linkedin,github,website,avatar_url,published')
     .eq('username', normalized)
     .eq('published', true)
     .maybeSingle()
@@ -234,13 +226,18 @@ export async function trackPublicEvent(userId, eventType, projectId = null, visi
   if (error) console.warn('[Devifolio] Métrica não registrada', error)
 }
 
-export async function deleteCurrentAccount() {
-  const { error } = await supabase.rpc('delete_my_account')
+export async function submitPortfolioLead(userId, lead) {
+  const { error } = await supabase.from('portfolio_leads').insert({
+    user_id: userId,
+    name: lead.name.trim(),
+    email: lead.email.trim(),
+    phone: lead.phone.trim(),
+    message: lead.message.trim(),
+  })
   if (error) throw error
 }
 
-export async function registerReferral(username) {
-  if (!username) return
-  const { error } = await supabase.rpc('register_referral', { inviter_username: username })
-  if (error) console.warn('[Devifolio] Indicação não registrada', error)
+export async function deleteCurrentAccount() {
+  const { error } = await supabase.rpc('delete_my_account')
+  if (error) throw error
 }

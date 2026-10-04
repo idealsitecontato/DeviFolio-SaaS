@@ -259,29 +259,6 @@
   display:block;
   margin-top:16px;
   font-family:var(--font-mono)}
-.portfolio-page[data-model="black"] .profile-header{
-  background:#171719;
-  color:white}
-.portfolio-page[data-model="black"] .profile-copy h2,.portfolio-page[data-model="black"] .profile-copy .bio{
-  color:#C6C6CA}
-.portfolio-page[data-model="black"] .profile-links a{
-  color:var(--text)}
-.portfolio-page[data-model="blue"] .public-hero{
-  border-top:3px solid #141414}
-.portfolio-page[data-model="red"] .public-hero{
-  border-top:3px solid #B3261E}
-.portfolio-page[data-model="orange"] .public-hero{
-  border-top:3px solid #A24E12}
-.portfolio-page[data-model="pink"] .public-hero{
-  border-top:3px solid #A13F70}
-.portfolio-page[data-model="lime"] .public-hero{
-  border-top:3px solid #627B21}
-.portfolio-page[data-model="yellow"] .public-hero{
-  border-top:3px solid #8A6410}
-.portfolio-page[data-model="green"] .public-hero{
-  border-top:3px solid #1E7A3E}
-.portfolio-page[data-model="purple"] .public-hero{
-  border-top:3px solid #141414}
 .error-layout{
   display:grid;
   grid-template-columns:1fr 1fr;

@@ -3,7 +3,7 @@ body.auth-body[data-auth-view] .auth-brand{width:210px;height:auto;margin-bottom
 body.auth-body[data-auth-view] .auth-logo{position:static;width:210px!important;height:auto!important;max-width:100%;object-fit:contain}
 @media(min-width:1001px){body.auth-body[data-auth-view=login] .auth-form-wrap{transform:translate(18px,-48px)}body.auth-body[data-auth-view=cadastro] .auth-form-wrap{width:400px;transform:translate(38px,-18px)}}
 body.auth-body[data-auth-view] .auth-left{background:#faf9f4}
-body.auth-body[data-auth-view] .auth-right{background:#2776f6}
+body.auth-body[data-auth-view] .auth-right{background:#4a4a4a}
 body.auth-body[data-auth-view] .auth-story{padding-left:clamp(64px,5vw,90px)}
 body.auth-body[data-auth-view] .auth-story h2{font-size:clamp(38px,2.8vw,47px);font-weight:600;letter-spacing:-.055em}
 body.auth-body[data-auth-view] .auth-integrations{gap:6px;margin-top:24px}
@@ -14,7 +14,7 @@ body.auth-body[data-auth-view=cadastro] .auth-brand{margin-bottom:24px}
 @media(max-width:1000px){body.auth-body[data-auth-view] .auth-brand{margin-bottom:34px}}
 
 /* Dashboard banner and real GitHub state. */
-.dashboard-app .home-foliodev-banner{display:block;width:100%;margin-top:var(--visual-gap,14px);border-radius:18px;overflow:hidden;background:#111820}
+.dashboard-app .home-foliodev-banner{display:block;width:100%;margin-top:var(--visual-gap,14px);border-radius:18px;overflow:hidden;background:#171717}
 .dashboard-app .home-foliodev-banner img{display:block;width:100%;height:auto;aspect-ratio:921/97;object-fit:cover}
 .dashboard-app .home-repositories{padding-top:8px}
 .dashboard-app .home-repositories .home-import-symbol{width:42px;height:42px}
@@ -43,15 +43,15 @@ html body.dashboard-app .kaptei-content{margin:26px 0 0;padding:0}
 .dashboard-app .kaptei-capture-area{padding:0 0 24px}
 .dashboard-app .kaptei-filters{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px}
 .dashboard-app .kaptei-filter-group{min-width:0;min-height:180px;padding:12px 11px;border:1px solid #e4e9e8;border-radius:7px;background:#fafcfc;box-shadow:0 3px 12px #17271807}
-.dashboard-app .kaptei-filter-group legend{padding:0 2px;color:#344055;font-size:11px;font-weight:700}
-.dashboard-app .kaptei-filter-group select{display:block;width:100%;height:29px;margin:4px 0 9px;padding:0 7px;border:1px solid #e1e8eb!important;border-radius:5px;background:#fff!important;color:#526178;font-size:10px}
+.dashboard-app .kaptei-filter-group legend{padding:0 2px;color:#3f3f3f;font-size:11px;font-weight:700}
+.dashboard-app .kaptei-filter-group select{display:block;width:100%;height:29px;margin:4px 0 9px;padding:0 7px;border:1px solid #e1e8eb!important;border-radius:5px;background:#fff!important;color:#4a4a4a;font-size:10px}
 .dashboard-app .kaptei-filter-options{display:grid;gap:4px;max-height:123px;overflow:auto}
-.dashboard-app .kaptei-filter-options label{display:flex;align-items:center;gap:6px;min-width:0;color:#59677d;font-size:10px;line-height:1.3}
+.dashboard-app .kaptei-filter-options label{display:flex;align-items:center;gap:6px;min-width:0;color:#4a4a4a;font-size:10px;line-height:1.3}
 .dashboard-app .kaptei-filter-options input{width:12px;height:12px;margin:0;accent-color:#1eb55c;flex:none}
-.dashboard-app .kaptei-generate{display:inline-flex;align-items:center;justify-content:center;min-height:34px;margin:16px 0 12px;padding:0 17px;border:0;border-radius:5px;background:#10161e;color:white;font:600 11px "Google Sans",Arial,sans-serif;cursor:pointer}
-.dashboard-app .kaptei-generate:hover{background:#303a44}
+.dashboard-app .kaptei-generate{display:inline-flex;align-items:center;justify-content:center;min-height:34px;margin:16px 0 12px;padding:0 17px;border:0;border-radius:5px;background:#151515;color:white;font:600 11px "Google Sans",Arial,sans-serif;cursor:pointer}
+.dashboard-app .kaptei-generate:hover{background:#393939}
 .dashboard-app .kaptei-capture-table{overflow-x:auto;border:1px solid #e1e7e6;border-radius:7px;background:#fbfdfc}
-.dashboard-app .kaptei-capture-table table{width:100%;min-width:900px;border-collapse:collapse;font-size:10px;color:#5c6880}
+.dashboard-app .kaptei-capture-table table{width:100%;min-width:900px;border-collapse:collapse;font-size:10px;color:#4a4a4a}
 .dashboard-app .kaptei-capture-table th{height:37px;padding:6px 9px;text-align:left;font-weight:600;border-bottom:1px solid #e2e8e8}
 .dashboard-app .kaptei-capture-table p{padding:27px 15px;margin:0;text-align:center;font-size:12px;color:#69746f}
 .dashboard-app .kaptei-capture-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr));gap:22px;width:100%}
@@ -95,10 +95,10 @@ html body.dashboard-app .kaptei-content{margin:26px 0 0;padding:0}
 @media(max-width:640px){.dashboard-app .plans-page .devi-plan-grid{grid-template-columns:1fr}.dashboard-app .plans-page .devi-plan-card{min-height:0}}
 
 /* The Plus tier uses the supplied original texture. */
-.dashboard-app .plans-page .devi-plan-card--plus{background:#103493 url('/reference/08_textura_folio_plus.png') center / cover no-repeat!important;border-color:#16419e!important;color:#fff!important}
+.dashboard-app .plans-page .devi-plan-card--plus{background:#4a4a4a url('/reference/08_textura_folio_plus.png') center / cover no-repeat!important;border-color:#4a4a4a!important;color:#fff!important}
 .dashboard-app .plans-page .devi-plan-card--plus :is(h3,p,strong,span,li){color:#fff!important}
 .dashboard-app .plans-page .devi-plan-card--plus .devi-plan-price{border-color:#ffffff80}
-.dashboard-app .plans-page .devi-plan-card--plus>button:disabled{background:#fff!important;color:#0e1626!important;border-color:#e7eaf0!important}
+.dashboard-app .plans-page .devi-plan-card--plus>button:disabled{background:#fff!important;color:#151515!important;border-color:#e7eaf0!important}
 
 /* Public and editable portfolio when no projects exist. */
 .portfolio-page:has(.folio-empty-projects) .portfolio-shell{padding:20px 22px 24px;border-radius:20px;background:#fff;box-shadow:0 12px 48px #293a4d0d}
@@ -110,23 +110,23 @@ html body.dashboard-app .kaptei-content{margin:26px 0 0;padding:0}
 .portfolio-page:has(.folio-empty-projects) .public-avatar>img{object-fit:cover}
 .portfolio-page:has(.folio-empty-projects) .profile-copy{max-width:none;width:100%;grid-column:1}
 .portfolio-page:has(.folio-empty-projects) .profile-copy h1{font-size:clamp(30px,3vw,40px);margin:0 0 2px}
-.portfolio-page:has(.folio-empty-projects) .folio-username{font-size:17px;color:#61718a;margin:0 0 11px}
-.portfolio-page:has(.folio-empty-projects) .profile-copy .bio{max-width:530px;margin:8px 0;color:#61718a;font-size:16px;line-height:1.4}
-.portfolio-page:has(.folio-empty-projects) .profile-copy h2{margin:7px 0;color:#61718a}
+.portfolio-page:has(.folio-empty-projects) .folio-username{font-size:17px;color:#4a4a4a;margin:0 0 11px}
+.portfolio-page:has(.folio-empty-projects) .profile-copy .bio{max-width:530px;margin:8px 0;color:#4a4a4a;font-size:16px;line-height:1.4}
+.portfolio-page:has(.folio-empty-projects) .profile-copy h2{margin:7px 0;color:#4a4a4a}
 .portfolio-page:has(.folio-empty-projects) .profile-links{justify-content:flex-start;margin-top:12px}
 .portfolio-page:has(.folio-empty-projects) .folio-profile-metrics{display:grid;grid-template-columns:repeat(3,1fr);grid-column:2;align-self:center}
 .folio-profile-metrics>div{display:flex;flex-direction:column;justify-content:center;min-height:96px;padding:0 20px;border-left:1px solid #dde2e8}
-.folio-profile-metrics strong{font-size:28px;color:#0e1520;line-height:1.1}
-.folio-profile-metrics span{margin-top:5px;color:#61718a;font-size:13px}
+.folio-profile-metrics strong{font-size:28px;color:#141414;line-height:1.1}
+.folio-profile-metrics span{margin-top:5px;color:#4a4a4a;font-size:13px}
 .portfolio-page:has(.folio-empty-projects) .projects-section{padding:24px 0 0;border-top:1px solid #e1e5e8}
 .portfolio-page:has(.folio-empty-projects) .projects-section>.section-heading{display:none}
 .folio-empty-projects{min-height:340px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:34px 16px!important;border:1px solid #e1e6eb!important;border-radius:15px!important;background:#f9fafb!important;text-align:center}
 .folio-empty-folder{position:relative;display:block;width:96px;height:65px;margin:10px 0 4px;border:3px solid #aeb8c5;border-radius:8px;background:#eef1f4;color:transparent;font-size:0;transform:rotate(5deg)}
 .folio-empty-folder:before{content:"";position:absolute;left:-3px;top:-18px;width:45px;height:18px;border:3px solid #aeb8c5;border-bottom:0;border-radius:7px 8px 0 0;background:#d6dce4}
 .folio-empty-folder:after{content:"";position:absolute;inset:14px -3px -3px;border:3px solid #aeb8c5;border-radius:7px;background:#f7f8fa}
-.folio-empty-projects h2{margin:14px 0 4px;color:#0c1520;font-size:27px;letter-spacing:-.03em}
-.folio-empty-projects p{margin:0 0 20px;color:#61718a;font-size:16px;line-height:1.35}
-.folio-create-project{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 24px;border-radius:10px;background:#101318!important;color:#fff!important;text-decoration:none;font-size:15px;font-weight:600}
+.folio-empty-projects h2{margin:14px 0 4px;color:#141414;font-size:27px;letter-spacing:-.03em}
+.folio-empty-projects p{margin:0 0 20px;color:#4a4a4a;font-size:16px;line-height:1.35}
+.folio-create-project{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 24px;border-radius:10px;background:#131313!important;color:#fff!important;text-decoration:none;font-size:15px;font-weight:600}
 .dashboard-app .my-portfolio-preview:has(.folio-empty-projects) .profile-header{padding-top:64px;grid-template-columns:minmax(0,1fr) minmax(250px,.9fr)}
 .dashboard-app .my-portfolio-preview:has(.folio-empty-projects) .profile-copy{justify-items:start}
 .dashboard-app .my-portfolio-preview:has(.folio-empty-projects) .my-portfolio-field .inline-edit-field{justify-content:flex-start}
@@ -141,27 +141,27 @@ html body.dashboard-app .kaptei-content{margin:26px 0 0;padding:0}
 .dashboard-app .my-portfolio-page{width:min(100%,1120px);margin:0 auto}
 .dashboard-app .my-portfolio-page>.page-head{align-items:center;margin-bottom:28px}
 .dashboard-app .my-portfolio-page>.page-head .secondary-button{min-height:42px;padding:0 18px;border:1px solid #d6d7d2;background:transparent;color:#171a18;box-shadow:none}
-.dashboard-app .my-portfolio-preview{width:100%;margin:0;background:transparent!important;color:#10151c}
+.dashboard-app .my-portfolio-preview{width:100%;margin:0;background:transparent!important;color:#141414}
 .dashboard-app .my-portfolio-preview .folio-showcase-shell{width:100%;padding:18px 20px 22px!important;border:0;border-radius:21px;background:#fff!important;box-shadow:0 18px 55px #2632410d}
 .dashboard-app .folio-showcase-card{width:100%}
 .dashboard-app .folio-showcase-card .my-portfolio-banner{position:relative;width:100%;height:176px;overflow:hidden;border-radius:15px;background:linear-gradient(135deg,#a9afb8,#bcc1c8)}
 .dashboard-app .folio-showcase-card .public-banner-image{display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit}
-.dashboard-app .folio-showcase-card .banner-edit-button{position:absolute;top:15px;right:15px;display:grid;place-items:center;width:46px;height:46px;border:0;border-radius:50%!important;background:#fff!important;color:#16202b!important;box-shadow:0 4px 16px #1b273323}
+.dashboard-app .folio-showcase-card .banner-edit-button{position:absolute;top:15px;right:15px;display:grid;place-items:center;width:46px;height:46px;border:0;border-radius:50%!important;background:#fff!important;color:#1f1f1f!important;box-shadow:0 4px 16px #1b273323}
 .dashboard-app .folio-showcase-card .banner-edit-button svg{width:20px;height:20px}
 .dashboard-app .folio-showcase-profile{position:relative;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(390px,.95fr);gap:36px;align-items:center;min-height:190px;padding:66px 32px 22px}
 .dashboard-app .folio-showcase-profile .public-avatar{position:absolute;z-index:2;top:-91px;left:32px;width:142px;height:142px;overflow:visible;border:6px solid #fff;border-radius:50%;background:#dfe3e7;box-shadow:0 3px 12px #28354518}
 .dashboard-app .folio-showcase-profile .public-avatar>img{display:block;width:100%;height:100%;border-radius:50%;object-fit:cover}
-.dashboard-app .folio-showcase-profile .avatar-edit-button{position:absolute;right:-7px;bottom:-3px;display:grid;place-items:center;width:41px;height:41px;border:0;border-radius:50%!important;background:#fff!important;color:#15202b!important;box-shadow:0 4px 14px #1b27332e}
+.dashboard-app .folio-showcase-profile .avatar-edit-button{position:absolute;right:-7px;bottom:-3px;display:grid;place-items:center;width:41px;height:41px;border:0;border-radius:50%!important;background:#fff!important;color:#1e1e1e!important;box-shadow:0 4px 14px #1b27332e}
 .dashboard-app .folio-showcase-profile .avatar-edit-button svg{width:18px;height:18px}
 .dashboard-app .folio-showcase-copy{min-width:0}
-.dashboard-app .folio-showcase-copy h2{margin:0 0 2px;color:#0a111a;font-size:31px;line-height:1.08;letter-spacing:-.04em}
-.dashboard-app .folio-showcase-copy .folio-username{margin:0 0 8px;color:#61718a;font-size:15px;line-height:1.3}
-.dashboard-app .folio-showcase-copy .folio-biography{max-width:530px;margin:0;color:#4f5e74;font-size:15px;line-height:1.42}
+.dashboard-app .folio-showcase-copy h2{margin:0 0 2px;color:#101010;font-size:31px;line-height:1.08;letter-spacing:-.04em}
+.dashboard-app .folio-showcase-copy .folio-username{margin:0 0 8px;color:#4a4a4a;font-size:15px;line-height:1.3}
+.dashboard-app .folio-showcase-copy .folio-biography{max-width:530px;margin:0;color:#4a4a4a;font-size:15px;line-height:1.42}
 .dashboard-app .folio-showcase-profile .folio-profile-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-self:center}
 .dashboard-app .folio-showcase-profile .folio-profile-metrics>div{display:flex;flex-direction:column;justify-content:center;min-height:83px;padding:0 24px;border-left:1px solid #dfe3e8}
 .dashboard-app .folio-showcase-profile .folio-profile-metrics>div:first-child{border-left:0}
-.dashboard-app .folio-showcase-profile .folio-profile-metrics strong{color:#0a111a;font-size:27px;line-height:1.05;white-space:nowrap}
-.dashboard-app .folio-showcase-profile .folio-profile-metrics span{margin-top:5px;color:#61718a;font-size:13px;line-height:1.2}
+.dashboard-app .folio-showcase-profile .folio-profile-metrics strong{color:#101010;font-size:27px;line-height:1.05;white-space:nowrap}
+.dashboard-app .folio-showcase-profile .folio-profile-metrics span{margin-top:5px;color:#4a4a4a;font-size:13px;line-height:1.2}
 .dashboard-app .folio-profile-divider{height:1px;margin:0;background:#e1e5e9}
 .dashboard-app .folio-showcase-projects{padding:20px 0 0!important;border:0!important}
 .dashboard-app .folio-showcase-projects .section-heading{margin:0 0 18px}
@@ -172,7 +172,7 @@ html body.dashboard-app .kaptei-content{margin:26px 0 0;padding:0}
 .dashboard-app .folio-showcase-projects .folio-empty-folder:after{inset:11px -3px -3px}
 .dashboard-app .folio-showcase-projects .folio-empty-projects h2{margin:13px 0 4px;font-size:22px}
 .dashboard-app .folio-showcase-projects .folio-empty-projects p{margin:0 0 16px;font-size:14px}
-.dashboard-app .folio-showcase-projects .folio-create-project{min-height:45px;padding:0 24px;border-radius:8px!important;background:#101318!important;color:#fff!important}
+.dashboard-app .folio-showcase-projects .folio-create-project{min-height:45px;padding:0 24px;border-radius:8px!important;background:#131313!important;color:#fff!important}
 @media(max-width:980px){.dashboard-app .folio-showcase-profile{grid-template-columns:1fr;gap:20px;padding-top:66px}.dashboard-app .folio-showcase-profile .folio-profile-metrics{width:100%;max-width:560px}.dashboard-app .folio-showcase-profile .folio-profile-metrics>div:first-child{border-left:0}}
 @media(max-width:700px){.dashboard-app .my-portfolio-page>.page-head{align-items:flex-start}.dashboard-app .my-portfolio-page>.page-head .secondary-button{margin-top:4px}.dashboard-app .my-portfolio-preview .folio-showcase-shell{padding:10px!important;border-radius:15px}.dashboard-app .folio-showcase-card .my-portfolio-banner{height:145px;border-radius:11px}.dashboard-app .folio-showcase-profile{padding:62px 16px 18px}.dashboard-app .folio-showcase-profile .public-avatar{top:-72px;left:17px;width:116px;height:116px}.dashboard-app .folio-showcase-copy h2{font-size:27px}.dashboard-app .folio-showcase-profile .folio-profile-metrics>div{min-height:72px;padding:0 13px}.dashboard-app .folio-showcase-profile .folio-profile-metrics strong{font-size:22px}.dashboard-app .folio-showcase-profile .folio-profile-metrics span{font-size:11px}.dashboard-app .folio-showcase-projects .folio-empty-projects{min-height:270px}}
 @media(max-width:480px){.dashboard-app .my-portfolio-page>.page-head{display:grid;gap:14px}.dashboard-app .my-portfolio-page>.page-head .secondary-button{width:max-content}.dashboard-app .folio-showcase-card .my-portfolio-banner{height:122px}.dashboard-app .folio-showcase-card .banner-edit-button{width:40px;height:40px}.dashboard-app .folio-showcase-profile{padding:56px 12px 16px}.dashboard-app .folio-showcase-profile .public-avatar{top:-62px;left:12px;width:100px;height:100px;border-width:5px}.dashboard-app .folio-showcase-profile .avatar-edit-button{width:36px;height:36px}.dashboard-app .folio-showcase-copy .folio-biography{font-size:13px}.dashboard-app .folio-showcase-profile .folio-profile-metrics{grid-template-columns:1fr}.dashboard-app .folio-showcase-profile .folio-profile-metrics>div{display:grid;grid-template-columns:70px 1fr;align-items:center;min-height:50px;border-left:0;border-top:1px solid #e3e6ea}.dashboard-app .folio-showcase-profile .folio-profile-metrics>div:first-child{border-top:0}.dashboard-app .folio-showcase-profile .folio-profile-metrics span{margin:0}.dashboard-app .folio-showcase-projects .folio-empty-projects h2{font-size:20px}}

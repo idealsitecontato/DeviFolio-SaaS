@@ -8,7 +8,6 @@ import {
   removeProject,
   removeProjectImage,
   saveProfile,
-  savePortfolioModel,
   saveProject,
   saveSettings,
   uploadAvatar,
@@ -19,7 +18,6 @@ import {
 import QRCode from 'qrcode'
 import { createScreenLoading } from './screen-loading.js'
 import { mountGooeySpinners, UploadButton } from './src/ui/visual-components.js'
-import { portfolioModels, getPortfolioModel } from './src/lib/portfolio-models.js'
 import { portfolioFolders, projectLocation, nextSortOrder, orderedFolders, restorePortfolioFolders, planProjectMove, persistProjectMove } from './src/lib/project-location.js'
 import { bindExplorerDrag } from './src/lib/explorer-drag.js'
 import { kapteiView, bindKapteiActions } from './kaptei.js'
@@ -95,9 +93,9 @@ function hydrateIcons(root = document) {
   })
 }
 
-const blankProfile = { name: '', username: '', email: '', role: '', bio: '', skills: '', linkedin: '', github: '', website: '', avatar: '', selectedModel: 'white' }
+const blankProfile = { name: '', username: '', email: '', role: '', bio: '', skills: '', linkedin: '', github: '', website: '', avatar: '' }
 const blankSettings = { email: true, product: true, publicProfile: true, compact: false }
-const state = { projects: [], folderNames: {}, folderOrder: [], hiddenFolders: [], profile: { ...blankProfile }, published: false, githubConnected: false, githubUsername: '', repos: [], analytics: [], referrals: [], settings: { ...blankSettings } }
+const state = { projects: [], folderNames: {}, folderOrder: [], hiddenFolders: [], profile: { ...blankProfile }, published: false, githubConnected: false, githubUsername: '', repos: [], analytics: [], leads: [], leadsAvailable: true, settings: { ...blankSettings } }
 let visualPublications = { folders: {}, events: [] }
 let selectedFolderId = null
 let portfolioLayout = 'grid'
@@ -165,24 +163,34 @@ async function renderPortfolioQR() {
   }
 }
 
-async function renderReferralQR() {
-  const canvas = $('#referral-qr')
-  if (!canvas || !state.profile.username.trim()) return
-  try {
-    await QRCode.toCanvas(canvas, `${location.origin}/?ref=${encodeURIComponent(state.profile.username.trim().toLowerCase())}`, { width: 176, margin: 2, color: { dark: '#000000', light: '#ffffff' } })
-  } catch (error) { reportError('Não foi possível gerar o QR Code da indicação.', error) }
-}
+let analyticsPeriod = 7
 
-async function downloadReferralQR() {
-  if (!state.profile.username.trim()) return
-  try {
-    const url = `${location.origin}/?ref=${encodeURIComponent(state.profile.username.trim().toLowerCase())}`
-    const dataUrl = await QRCode.toDataURL(url, { width: 1024, margin: 2, color: { dark: '#000000', light: '#ffffff' } })
-    const anchor = document.createElement('a')
-    anchor.href = dataUrl
-    anchor.download = 'devifolio-indicacao-qr.png'
-    anchor.click()
-  } catch (error) { reportError('Não foi possível baixar o QR Code da indicação.', error) }
+function analyticsChart({ compact = false } = {}) {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const days = Array.from({ length: analyticsPeriod }, (_, index) => {
+    const date = new Date(today)
+    date.setDate(today.getDate() - analyticsPeriod + index + 1)
+    return date
+  })
+  const viewsByDate = new Map()
+  state.analytics.filter(event => event.event_type === 'portfolio_view').forEach(event => {
+    const date = new Date(event.created_at)
+    if (Number.isNaN(date.getTime())) return
+    const key = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime()
+    viewsByDate.set(key, (viewsByDate.get(key) || 0) + 1)
+  })
+  const counts = days.map(date => viewsByDate.get(date.getTime()) || 0)
+  const max = Math.max(4, ...counts)
+  const total = counts.reduce((sum, count) => sum + count, 0)
+  const buttons = [7, 30, 90].map(period => `<button type="button" data-analytics-period="${period}" aria-pressed="${period === analyticsPeriod}" class="${period === analyticsPeriod ? 'active' : ''}">${period} dias</button>`).join('')
+  const bars = days.map((date, index) => {
+    const count = counts[index]
+    const label = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'short' }).format(date)
+    const showLabel = analyticsPeriod === 7 || index % Math.ceil(analyticsPeriod / 7) === 0 || index === days.length - 1
+    return `<span class="visual-chart-column" title="${label}: ${count} visualizações"><i style="height:${count ? Math.max(3, count / max * 100) : 0}%"></i><small>${showLabel ? label : ''}</small></span>`
+  }).join('')
+  return `<article class="card visual-chart ${compact ? 'visual-chart-compact' : ''}"><div class="visual-chart-head"><div><h2>Visualizações</h2><p>${total} ${total === 1 ? 'visualização' : 'visualizações'} nos últimos ${analyticsPeriod} dias</p></div><div class="visual-chart-period" role="group" aria-label="Período do gráfico">${buttons}</div></div><div class="visual-chart-plot" role="img" aria-label="Gráfico de visualizações reais nos últimos ${analyticsPeriod} dias"><div class="visual-chart-grid" aria-hidden="true"><span>${max}</span><span>${Math.round(max / 2)}</span><span>0</span></div><div class="visual-chart-bars">${bars}</div></div>${compact ? '<button class="link-button" type="button" data-route-button="portfolio">Abrir portfólio →</button>' : ''}</article>`
 }
 
 function homeView() {
@@ -208,11 +216,9 @@ function homeView() {
         ${state.profile.username?`<div class="dashboard-url"><span>${esc(publicPortfolioUrl())}</span><button class="icon-button" data-copy="${esc(publicPortfolioUrl())}" aria-label="Copiar link"><span data-icon="copy"></span></button></div><div class="home-qr-row"><div class="qr-wrap"><canvas id="portfolio-qr" aria-label="QR Code do seu portfólio"></canvas></div><div class="home-qr-copy"><h3>Seu QR Code</h3><p>Escaneie para acessar seu portfólio diretamente.</p><button class="primary-button" data-download-qr><span data-icon="download"></span>Baixar QR Code</button></div></div>`:'<div class="home-link-pending"><p>Complete seu perfil para gerar o endereço público.</p><button class="secondary-button" data-route-button="perfil">Completar perfil</button></div>'}
       </article>
     </div>
-    <a class="home-foliodev-banner" href="#planos" aria-label="Conhecer os planos FolioDev"><img src="/reference/07_banner_foliodev.png" width="921" height="97" alt="Assine o FolioDev e tenha acesso ilimitado a ferramentas avançadas." decoding="async"></a>
-    <details class="home-support-disclosure"><summary>Atalhos de organização</summary><div class="home-support-grid">
-      <article class="card"><header class="section-card-head"><h2>Meu portfólio</h2><button class="link-button" data-route-button="portfolio">Abrir portfólio →</button></header><p>Veja sua página como seus visitantes a enxergam.</p></article>
-      <article class="card"><h2>Próximos passos</h2><ol class="onboarding-list"><li><span class="mono">01</span><div><b>Conectar o GitHub</b><p>${state.githubConnected?'Conta conectada.':'Importe seus repositórios.'}</p><button class="link-button" data-route-button="github">${state.githubConnected?'Gerenciar conexão':'Conectar GitHub'} →</button></div></li><li><span class="mono">02</span><div><b>Escolher seus projetos</b><p>Revise contexto, tecnologias e links.</p><button class="link-button" data-route-button="projetos">Organizar projetos →</button></div></li><li><span class="mono">03</span><div><b>Publicar seu portfólio</b><p>${state.published?'Seu portfólio está publicado.':'Escolha um modelo e prepare sua página.'}</p><button class="link-button" data-route-button="publicacoes">Ver publicação →</button></div></li></ol></article>
-    </div></details>
+    <div class="home-bottom-grid">${analyticsChart({ compact: true })}
+      <article class="card home-next-card"><h2>Próximos passos</h2><ol class="onboarding-list"><li><span class="mono">01</span><div><b>Conectar o GitHub</b><p>${state.githubConnected ? 'Conta conectada.' : 'Importe seus repositórios.'}</p><button class="link-button" data-route-button="github">${state.githubConnected ? 'Gerenciar conexão' : 'Conectar GitHub'} →</button></div></li><li><span class="mono">02</span><div><b>Escolher seus projetos</b><p>Revise contexto, tecnologias e links.</p><button class="link-button" data-route-button="projetos">Organizar projetos →</button></div></li><li><span class="mono">03</span><div><b>Publicar seu portfólio</b><p>${state.published ? 'Seu portfólio está publicado.' : 'Prepare sua página com o template padrão.'}</p><button class="link-button" data-route-button="publicacoes">Ver publicação →</button></div></li></ol></article>
+    </div>
   </section>`
 }
 
@@ -248,13 +254,12 @@ function portfolioPreviewProject(project) {
 function portfolioManagerView() {
   const profile = state.profile
   const emptyPortfolioProjects = '<div class="empty-projects folio-empty-projects"><span class="folio-empty-folder" aria-hidden="true">▱</span><h2>Nenhum projeto encontrado</h2><p>Você ainda não desenvolveu nenhum projeto.<br>Crie um novo projeto para começar.</p><button class="primary-button folio-create-project" type="button" data-new-project>+ &nbsp;Criar projeto</button></div>'
-  const model = getPortfolioModel(profile.selectedModel)
   const banner = currentUser ? `${portfolioBannerUrl(currentUser.id)}${profileBannerRevision ? `?v=${profileBannerRevision}` : ''}` : ''
   const projects = state.projects.filter(project => project.status === 'published').sort((a, b) => a.sortOrder - b.sortOrder || a.id - b.id)
   const username = profile.username ? `@${profile.username.replace(/^@/, '')}` : '@usuario'
   const biography = profile.bio || profile.role || 'Adicione uma biografia para apresentar seu trabalho aos visitantes.'
   return `<section class="page-enter my-portfolio-page">${pageHead('Meu Portfólio', 'Prévia completa de como os visitantes verão seu portfólio.', '<a class="secondary-button" href="#inicio">← Voltar ao início</a>')}
-    <div class="portfolio-page my-portfolio-preview" data-model="${model.id}" style="--model-image:url('${model.image}');--model-ink:${model.ink}">
+    <div class="portfolio-page my-portfolio-preview">
       <div class="portfolio-shell folio-showcase-shell"><article class="folio-showcase-card">
         <div class="my-portfolio-banner"><img class="public-banner-image" src="${esc(banner)}" alt="Banner do portfólio" onerror="this.hidden=true"><input id="profile-banner-file" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="icon-button banner-edit-button" type="button" data-upload-profile-banner aria-label="Editar banner"><span data-icon="edit"></span></button></div>
         <div class="folio-showcase-profile"><div class="public-avatar">${profile.avatar ? `<img src="${esc(profile.avatar)}" alt="Foto de ${esc(realName())}" onerror="this.src='${profilePlaceholderUrl}'">` : `<img src="${profilePlaceholderUrl}" alt="Ícone de usuário">`}<input id="avatar-file" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="icon-button avatar-edit-button" type="button" data-upload-avatar aria-label="Editar foto de perfil"><span data-icon="edit"></span></button></div>
@@ -368,50 +373,6 @@ function renamePortfolioFolder(id) {
   }
 }
 
-function modelCard(model) {
-return `<article class="card model-card"><button type="button" data-model-swatch="${esc(model.id)}" class="model-swatch ${model.available?'is-available':'is-locked'}" data-preview-model="${model.id}" aria-label="Pré-visualizar ${esc(model.name)}">${model.available?'':'<span class="model-lock" data-icon="lock" aria-hidden="true"></span>'}</button><div class="model-card-footer"><div><h3>${esc(model.name)}</h3><p>${model.available?'Disponível':'Bloqueado'}</p></div><div class="view-actions"><button class="icon-button" data-preview-model="${model.id}" aria-label="Pré-visualizar ${esc(model.name)}"><span data-icon="eye"></span></button><button class="secondary-button" data-apply-model="${model.id}">Aplicar</button></div></div></article>`
-}
-
-function modelsView() {
-  return `<section class="page-enter models-page">${pageHead('Modelos', 'Escolha um modelo para personalizar a aparência do seu portfólio.')}<div class="models-grid">${portfolioModels.map(modelCard).join('')}</div></section>`
-}
-
-
-function showUpgradeModel(model) {
-  location.assign('index.html#planos')
-}
-
-function showPortfolioSelector(model) {
-  const name = state.profile.name.trim() ? `Portfólio — ${state.profile.name.trim()}` : 'Portfólio Pessoal'
-  const drawer = document.createElement('dialog')
-  drawer.className = 'model-drawer'
-  drawer.setAttribute('aria-label', 'Portfólios')
-  drawer.innerHTML = `<div class="model-drawer-head"><h2>Portfólios</h2><button type="button" class="model-drawer-close" aria-label="Fechar" data-close-drawer>×</button></div><div class="model-drawer-list"><div class="model-drawer-row"><span class="model-drawer-folder" data-icon="folder"></span><div><strong>${esc(name)}</strong><p>Meu portfólio principal</p></div><button type="button" data-select-portfolio>Aplicar</button></div></div>`
-  document.body.append(drawer)
-  hydrateIcons(drawer)
-  drawer.addEventListener('close', () => drawer.remove(), { once: true })
-  drawer.querySelector('[data-close-drawer]').onclick = () => drawer.close()
-  drawer.querySelector('[data-select-portfolio]').onclick = async () => {
-    drawer.close()
-    if (!model.available) { showUpgradeModel(model); return }
-    screenLoading.show('Aplicando modelo...')
-    try {
-      await savePortfolioModel(currentUser.id, model.id)
-      state.profile.selectedModel = model.id
-      render({ preserveScroll: true })
-      toast('Modelo aplicado ao portfólio.')
-    } catch (error) { reportError('Não foi possível aplicar o modelo.', error) }
-    finally { screenLoading.hide() }
-  }
-  drawer.showModal()
-}
-
-function applyModel(id) {
-  const model = portfolioModels.find(item => item.id === id)
-  if (!model) return
-  showPortfolioSelector(model)
-}
-
 function portfolioEditorView() {
   const profile = state.profile
   const ready = state.published && profileComplete()
@@ -431,43 +392,36 @@ function githubView() {
 
 function analyticsView() {
   const summary = analyticsSummary()
-  const now = new Date()
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
-  const monthEvents = state.analytics.filter(event => event.event_type === 'portfolio_view' && new Date(event.created_at) >= monthStart)
-  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
-  const dailyViews = Array.from({ length: daysInMonth }, (_, index) => monthEvents.filter(event => new Date(event.created_at).getDate() === index + 1).length)
-  const maxDailyViews = Math.max(1, ...dailyViews)
-  const axisMax = Math.max(12, Math.ceil(maxDailyViews / 2) * 2)
-  const monthLabel = new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(now)
-  const monthlyChart = `<article class="card monthly-chart"><div class="section-card-head"><div><h2>Visualizações — ${esc(monthLabel)}</h2><p>${monthEvents.length} ${monthEvents.length === 1 ? 'visualização' : 'visualizações'} neste mês</p></div></div><div class="chart-plot"><div class="chart-guides" aria-hidden="true">${Array.from({ length: 7 }, (_, index) => `<span><b>${Math.round(axisMax * (6 - index) / 6)}</b></span>`).join('')}</div><div class="month-bars" aria-label="Visualizações por dia">${dailyViews.map((count, index) => `<span title="Dia ${index + 1}: ${count} visualizações"><i style="height:${Math.max(1, Math.round((count / axisMax) * 100))}%"></i><small>${index + 1}</small></span>`).join('')}</div></div></article>`
   const projectCounts = new Map()
   state.analytics.filter(event => event.project_id && (event.event_type === 'project_view' || event.event_type === 'link_click')).forEach(event => projectCounts.set(Number(event.project_id), (projectCounts.get(Number(event.project_id)) || 0) + 1))
   const ranking = state.projects.map(project => ({ project, count: projectCounts.get(project.id) || 0 })).filter(item => item.count).sort((a, b) => b.count - a.count)
   const max = ranking[0]?.count || 1
   const metrics = `<aside class="analytics-metrics" aria-label="Indicadores"><article class="card analytic-stat"><span data-icon="eye" aria-hidden="true"></span><small>Visualizações</small><strong>${summary.views}</strong></article><article class="card analytic-stat"><span data-icon="link" aria-hidden="true"></span><small>Cliques em links</small><strong>${summary.clicks}</strong></article><article class="card analytic-stat"><span data-icon="users" aria-hidden="true"></span><small>Visitantes únicos</small><strong>${summary.visitors}</strong></article><article class="card analytic-stat"><span data-icon="trending" aria-hidden="true"></span><small>Taxa de clique</small><strong>${summary.rate}%</strong></article></aside>`
   const details = `<div class="analytics-layout"><article class="card chart-card"><div class="section-card-head"><div><h2>Atividade real</h2><p>Eventos registrados no portfólio público.</p></div><span class="chart-total">${state.analytics.length} total</span></div><div class="event-summary"><div><span>Visualizações</span><strong>${summary.views}</strong></div><div><span>Interações</span><strong>${summary.clicks}</strong></div></div></article><article class="card ranking-card"><div class="section-card-head"><div><h2>Projetos mais acessados</h2><p>Cliques registrados.</p></div></div>${ranking.length ? ranking.slice(0, 5).map((item, index) => `<div class="rank-row"><span>${index + 1}</span><div><b>${esc(item.project.name)}</b><small>${item.count} acesso${item.count === 1 ? '' : 's'}</small></div><div class="rank-bar"><i style="width:${Math.round((item.count / max) * 100)}%"></i></div></div>`).join('') : '<div class="compact-empty"><span class="ranking-empty-icon" data-icon="folder" aria-hidden="true"></span><p>Nenhum projeto recebeu acessos ainda.</p></div>'}</article></div>`
-  return `<section class="page-enter analytics-page">${pageHead('Análise', 'Entenda como as pessoas encontram e exploram seu portfólio.')}<div class="analytics-overview">${monthlyChart}${metrics}</div>${details}</section>`
+  return `<section class="page-enter analytics-page">${pageHead('Análise', 'Entenda como as pessoas encontram e exploram seu portfólio.')}<div class="analytics-overview">${analyticsChart()}${metrics}</div>${details}</section>`
 }
 
 function avatarMarkup(className = 'avatar avatar-large') {
   return state.profile.avatar ? `<span class="${className}"><img src="${esc(state.profile.avatar)}" alt="Foto de ${esc(realName())}"></span>` : `<span class="${className}">${esc(initials())}</span>`
 }
 
-function profileField(label,name,value,{type='text',attributes='',full=false}={}) {
-  return `<div class="field ${full?'full':''}"><label for="profile-${name}">${label}</label><div class="inline-edit-field"><input id="profile-${name}" name="${name}" type="${type}" value="${esc(value)}" ${attributes} ${String(value??'').trim()?'readonly':''}><button type="button" class="icon-button" data-unlock-field aria-label="Editar ${label.toLowerCase()}"><span data-icon="edit"></span></button></div></div>`
+function profileEditCard(label, help, name, value, type = 'text', extra = '') {
+  return `<form class="card profile-edit-card" data-profile-form><div><h2>${label}</h2><p>${help}</p></div><div class="profile-edit-control">${extra}<input name="${name}" type="${type}" value="${esc(value)}" required ${name === 'username' ? 'pattern="[a-zA-Z0-9._-]+" maxlength="48"' : ''} ${name === 'name' ? 'maxlength="32"' : ''}><button class="primary-button" type="submit">Salvar</button></div><small>${name === 'name' ? 'Use até 32 caracteres.' : name === 'username' ? 'Use até 48 caracteres. Apenas letras, números, hífens e underscores.' : 'Este é o e-mail associado à sua conta.'}</small></form>`
 }
+
 function profileView() {
   const profile = state.profile
   const banner = currentUser ? `${portfolioBannerUrl(currentUser.id)}${profileBannerRevision ? `?v=${profileBannerRevision}` : ''}` : ''
   const portfolioCount = visiblePortfolioFolders().length + 1
-  const modelCount = portfolioModels.filter(model => model.available).length
-  return `<section class="page-enter profile-page"><form class="card profile-showcase" id="profile-form">
+  return `<section class="page-enter profile-page"><div class="card profile-showcase">
     <div class="profile-cover"><img src="${esc(banner)}" alt="" aria-hidden="true" onerror="this.hidden=true"><input id="profile-banner-file" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="icon-button" type="button" data-upload-profile-banner aria-label="Alterar capa"><span data-icon="edit"></span></button></div>
-    <div class="profile-identity"><div class="profile-avatar-edit">${avatarMarkup()}<input id="avatar-file" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="icon-button avatar-edit-button" type="button" data-upload-avatar aria-label="Alterar foto de perfil"><span data-icon="edit"></span></button></div><h1>${esc(realName())}</h1><p>${esc(profile.email)}</p></div>
-    <div class="profile-stat-row"><div><strong>${portfolioCount}</strong><span>Portfólios</span></div><div><strong>${state.projects.length}</strong><span>Projetos</span></div><div><strong>${modelCount}</strong><span>Modelos</span></div><div><span>Usuário</span><strong class="profile-username">@${esc(profile.username || 'conta')}</strong></div></div>
-    <div class="profile-edit-fields">${profileField('Nome','name',profile.name,{attributes:'required',full:true})}${profileField('Nome de usuário','username',profile.username,{attributes:'required pattern="[a-zA-Z0-9._-]+"',full:true})}${profileField('E-mail','email',profile.email,{type:'email',attributes:'required',full:true})}</div>
-    <div class="form-footer"><button class="primary-button" type="submit">Salvar Perfil</button></div>
-  </form></section>`
+    <div class="profile-identity"><div class="profile-avatar-edit">${avatarMarkup()}<input id="avatar-file" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="icon-button avatar-edit-button" type="button" data-upload-avatar aria-label="Alterar foto de perfil"><span data-icon="edit"></span></button></div><h1>${esc(realName())}</h1></div>
+    <div class="profile-stat-row"><div><strong>${portfolioCount}</strong><span>Portfólios</span></div><div><strong>${state.projects.length}</strong><span>Projetos</span></div><div><span>Usuário</span><strong class="profile-username">@${esc(profile.username || 'conta')}</strong></div></div>
+    <div class="profile-cards"><div class="card profile-edit-card profile-avatar-card"><div><h2>Avatar</h2><p>Esta é sua foto de perfil. Faça upload de uma imagem personalizada.</p><small>Um avatar é opcional, mas recomendado.</small></div><div class="profile-avatar-action">${avatarMarkup('avatar avatar-card-image')}<button type="button" class="primary-button" data-upload-avatar>Salvar</button></div></div>
+    ${profileEditCard('Nome de exibição', 'Digite seu nome completo ou um nome de exibição.', 'name', profile.name)}
+    ${profileEditCard('Nome de usuário', 'Este será o seu nome de usuário dentro da plataforma FolioDev.', 'username', profile.username, 'text', '<span class="profile-input-prefix">folio.dev/</span>')}
+    ${profileEditCard('E-mail', 'Este é o e-mail associado à sua conta.', 'email', profile.email, 'email')}
+    </div></div></section>`
 }
 
 function switchRow(icon, title, description, key, on) {
@@ -477,23 +431,6 @@ function switchRow(icon, title, description, key, on) {
 function settingsView() {
   return `<section class="page-enter compact-panel-page"><div class="card settings-card compact-panel"><div class="settings-card-head"><span data-icon="settings"></span><div><h1>Configurações</h1><p>Preferências, privacidade e integrações.</p></div></div><nav class="settings-tabs" aria-label="Seções de configurações"><a href="#preferencias" data-settings-anchor="preferencias">Preferências</a><a href="#privacidade" data-settings-anchor="privacidade">Privacidade</a><a href="#conta" data-settings-anchor="conta">Conta</a></nav><div class="panel-section" id="preferencias"><h2>Preferências</h2>${switchRow('mail', 'Avisos por e-mail', 'Receba atualizações importantes sobre seu portfólio.', 'email', state.settings.email)}${switchRow('bell', 'Novidades do produto', 'Acompanhe melhorias e novos recursos da plataforma.', 'product', state.settings.product)}${switchRow('panel', 'Modo compacto', 'Reduza o espaçamento das listas e painéis.', 'compact', state.settings.compact)}</div><div class="panel-section" id="privacidade"><h2>Privacidade</h2>${switchRow('shield', 'Perfil público', 'Permita que visitantes acessem seu portfólio publicado.', 'publicProfile', state.settings.publicProfile)}</div><div class="panel-section" id="conta"><h2>Conta</h2><div class="setting-row"><div><b>Exportar dados</b><small>Baixe uma cópia das informações da conta.</small></div><button class="secondary-button" data-export>Exportar</button></div><div class="setting-row danger-row"><div><b>Excluir conta</b><small>Essa ação não poderá ser desfeita.</small></div><button class="danger-button" data-delete-account>Excluir conta</button></div></div></div></section>`
 }
-
-function referralView() {
-  const code = state.profile.username.trim().toLowerCase()
-  const link = code ? `${location.origin}/?ref=${encodeURIComponent(code)}` : ''
-  const active = state.referrals.filter(item => item.status === 'active').length
-  return `<section class="page-enter referral-page">${pageHead('Indique o FolioDev', 'Indique para um desenvolvedor e receba 1 mês grátis de Folio Plus.')}
-    <div class="referral-layout">
-      <article class="card referral-primary">
-        <h2>Seu link de indicação</h2><p>Compartilhe com quem ainda não tem conta. Seus convites aparecerão no histórico após o cadastro.</p>
-        ${link ? `<div class="url-field referral-link"><span>${esc(link)}</span></div><div class="referral-actions"><button class="primary-button" data-copy="${esc(link)}"><span data-icon="copy"></span>Copiar link</button><button class="secondary-button" data-share-referral data-share-url="${esc(link)}"><span data-icon="share"></span>Compartilhar</button></div><div class="referral-qr"><canvas id="referral-qr" width="176" height="176" aria-label="QR Code do link de indicação"></canvas><button class="secondary-button" data-download-referral-qr><span data-icon="download"></span>Baixar QR Code</button></div>` : `<div class="dashboard-link-empty"><p>Complete seu perfil para criar o link de indicação.</p><button class="secondary-button" data-route-button="perfil">Completar perfil</button></div>`}
-      </article>
-      <div class="referral-side"><article class="card referral-benefit"><span class="eyebrow">FOLIO PLUS</span><strong>1 mês grátis</strong><p>por indicação válida</p></article><article class="card referral-totals"><div><small>Indicações registradas</small><strong>${state.referrals.length}</strong></div><div><small>Cadastros concluídos</small><strong>${active}</strong></div><p>Acompanhe os convites feitos pelo seu link.</p></article></div>
-    </div>
-    <article class="card history-card"><div class="section-card-head"><div><h2>Histórico de indicações</h2><p>Cadastros associados ao seu link.</p></div></div>${state.referrals.length ? state.referrals.map(item => `<div class="history-row"><span class="avatar avatar-small">${esc(item.referred_email.slice(0, 1).toUpperCase())}</span><div><b>${esc(item.referred_email)}</b><small>${new Date(item.created_at).toLocaleDateString('pt-BR')}</small></div><span class="status ${item.status === 'active' ? 'published' : 'progress'}">${item.status === 'active' ? 'Ativa' : 'Pendente'}</span></div>`).join('') : `<div class="projects-empty">${emptyState('users', 'Nenhuma indicação registrada.', 'Compartilhe seu link para começar.')}</div>`}</article>
-  </section>`
-}
-
 
 function publicationsView() {
   const entries = publicationHistoryExpanded ? visualPublications.events : visualPublications.events.slice(0, 5)
@@ -520,13 +457,14 @@ function publicationEventMenu(id) {
   $('[data-copy]', $('#modal-root'))?.addEventListener('click', button => copyText(button.currentTarget.dataset.copy))
 }
 
-function plansView(){return `<section class="page-enter plans-page">${pageHead('Planos','Compare os recursos disponíveis para seu portfólio.')}<p class="plans-availability">As assinaturas pagas estão em breve. Continue editando e publicando seu portfólio.</p><div class="devi-plan-grid">${renderPlanCards({internal:true})}</div></section>`}
+function plansView(){return `<section class="page-enter plans-page">${pageHead('Planos','Compare os recursos disponíveis para seu portfólio.')}<p class="plans-availability">As assinaturas pagas estão em breve. Continue editando e publicando seu portfólio.</p><div class="devi-plan-grid">${renderPlanCards({internal:true})}</div><article class="card coupon-card"><h2>Tem um cupom?</h2><p>A validação e o pagamento serão ativados com os planos.</p><label for="coupon-code">Código do cupom</label><div><input id="coupon-code" placeholder="Digite o código" disabled><button class="primary-button" disabled>Aplicar</button><button class="secondary-button" disabled>Remover</button></div><small>Nenhum desconto aplicado.</small></article></section>`}
 
-const views = { publicacoes: publicationsView, planos: plansView, 'link-qrcode': linkQrView, inicio: homeView, projetos: projectsView, portfolio: portfolioManagerView, modelos: modelsView, 'portfolio-editar': portfolioEditorView, github: githubView, analise: analyticsView, kaptei: kapteiView, perfil: profileView, configuracoes: settingsView, indicacao: referralView }
+const views = { publicacoes: publicationsView, planos: plansView, 'link-qrcode': linkQrView, inicio: homeView, projetos: projectsView, portfolio: portfolioManagerView, 'portfolio-editar': portfolioEditorView, github: githubView, analise: analyticsView, kaptei: () => kapteiView(state.leads, state.leadsAvailable), perfil: profileView, configuracoes: settingsView }
 
 function render({ preserveScroll = false } = {}) {
   const requestedRoute = location.hash.slice(1)
   const route = views[requestedRoute] ? requestedRoute : 'inicio'
+  if (requestedRoute && !views[requestedRoute]) history.replaceState(null, '', `${location.pathname}${location.search}#inicio`)
   renderedRoute = route
   document.body.classList.toggle('static-page-route', ['inicio', 'analise', 'perfil', 'portfolio'].includes(route))
   document.body.classList.toggle('home-route', route === 'inicio')
@@ -535,7 +473,7 @@ function render({ preserveScroll = false } = {}) {
   document.body.classList.toggle('projects-route', route === 'projetos')
   document.body.classList.toggle('kaptei-route', route === 'kaptei')
   $('#page-content').innerHTML = views[route]()
-  const routeLabel = { publicacoes:'Publicações', planos:'Planos', 'link-qrcode': 'Seu Link, Seu QR Code', inicio: 'Dashboard', projetos: 'Projetos', portfolio: 'Meu portfólio', modelos: 'Modelos', 'portfolio-editar': 'Editar portfólio', github: 'GitHub', analise: 'Análise', kaptei: 'Kaptei', perfil: 'Perfil', configuracoes: 'Configurações', indicacao: 'Indicação' }[route]
+  const routeLabel = { publicacoes:'Publicações', planos:'Planos', 'link-qrcode': 'Seu Link, Seu QR Code', inicio: 'Dashboard', projetos: 'Projetos', portfolio: 'Meu portfólio', 'portfolio-editar': 'Editar portfólio', github: 'GitHub', analise: 'Análise', kaptei: 'Kaptei', perfil: 'Perfil', configuracoes: 'Configurações' }[route]
   document.title = `${routeLabel} — FolioDev`
   if ($('#breadcrumb-page')) $('#breadcrumb-page').textContent = routeLabel
   if ($('#breadcrumb-section')) $('#breadcrumb-section').textContent = route === 'inicio' ? 'Início' : 'Painel'
@@ -544,7 +482,6 @@ function render({ preserveScroll = false } = {}) {
   if (document.body.classList.contains('static-page-route')) $$('img,a', $('#page-content')).forEach(element => { element.draggable = false })
   bindActions()
   if (route === 'link-qrcode' || route === 'inicio') renderPortfolioQR()
-  if (route === 'indicacao') renderReferralQR()
   if ((route === 'github' || route === 'inicio' && state.githubConnected) && !bootstrapping && (state.githubConnected || !githubConnectionChecked) && !reposLoaded && !reposLoading) reposPromise = fetchGithubRepos({ reportFailure: !new URLSearchParams(location.search).has('github') })
   updateUserChrome()
   closeMenu()
@@ -562,10 +499,10 @@ function updateUserChrome() {
 
 function bindActions() {
   $$('[data-project-layout]').forEach(button=>button.onclick=()=>{portfolioLayout=button.dataset.projectLayout;const grid=$('.portfolio-project-grid');grid?.classList.toggle('is-list',portfolioLayout==='list');$$('[data-project-layout]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)))})
-  $$('[data-preview-model]').forEach(button=>button.onclick=()=>{modal(documentPreview({profile:state.profile,projects:state.projects.filter(p=>p.status==='published'),model:getPortfolioModel(button.dataset.previewModel)})+'<div class="modal-actions"><button class="secondary-button" data-close-modal>Fechar prévia</button></div>');$('.modal').classList.add('model-preview-modal')})
   $$('[data-settings-anchor]').forEach(link=>link.onclick=event=>{event.preventDefault();document.getElementById(link.dataset.settingsAnchor)?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'})})
   $$('[data-unlock-field]').forEach(button=>button.onclick=()=>{const input=button.closest('.field')?.querySelector('input,textarea');if(input){input.readOnly=false;input.focus()}})
   $$('[data-route-button]').forEach(button => button.onclick = () => { location.hash = button.dataset.routeButton })
+  $$('[data-analytics-period]').forEach(button => button.onclick = () => { analyticsPeriod = Number(button.dataset.analyticsPeriod); render({ preserveScroll: true }) })
   $('[data-promo-plans]')?.addEventListener('click', event => { event.preventDefault(); location.assign('index.html#planos') })
   $$('[data-copy]').forEach(button => button.onclick = () => copyText(button.dataset.copy))
   $$('[data-open-preview]').forEach(button => button.onclick = () => window.open(publicPortfolioUrl(), '_blank', 'noopener'))
@@ -590,10 +527,8 @@ function bindActions() {
     }
   })
   $$('[data-new-portfolio]').forEach(button => button.onclick = createPortfolioFolder)
-  $$('[data-apply-model]').forEach(button => button.onclick = () => applyModel(button.dataset.applyModel))
   $$('[data-share-portfolio]').forEach(button => button.onclick = sharePortfolio)
   $$('[data-download-qr]').forEach(button => button.onclick = downloadPortfolioQR)
-  $('[data-download-referral-qr]')?.addEventListener('click', downloadReferralQR)
   $$('[data-new-project]').forEach(button => button.onclick = () => projectModal(null, button.dataset.projectDestination || (location.hash === '#portfolio' ? 'loose' : 'projects')))
   bindProjectGrid()
   bindKapteiActions({ modal, toast })
@@ -630,9 +565,9 @@ function bindActions() {
   $('[data-manage-publication-history]')?.addEventListener('click', () => { publicationHistoryExpanded = !publicationHistoryExpanded; render({ preserveScroll: true }) })
   $$('[data-open-publication-id]').forEach(button => button.onclick = () => showPublicationEvent(button.dataset.openPublicationId))
   $$('[data-publication-menu]').forEach(button => button.onclick = () => publicationEventMenu(button.dataset.publicationMenu))
-  $('#profile-form')?.addEventListener('submit', saveProfileForm)
+  $$('[data-profile-form]').forEach(form => form.addEventListener('submit', saveProfileForm))
   $('#password-form')?.addEventListener('submit', changePassword)
-  $('[data-upload-avatar]')?.addEventListener('click', () => $('#avatar-file')?.click())
+  $$('[data-upload-avatar]').forEach(button => button.addEventListener('click', () => $('#avatar-file')?.click()))
   $('#avatar-file')?.addEventListener('change', handleAvatarUpload)
   $('[data-upload-profile-banner]')?.addEventListener('click', () => $('#profile-banner-file')?.click())
   $('#profile-banner-file')?.addEventListener('change', handleProfileBannerUpload)
@@ -645,7 +580,6 @@ function bindActions() {
   $$('[data-setting]').forEach(button => button.onclick = () => updateSetting(button.dataset.setting))
   $('[data-export]')?.addEventListener('click', exportData)
   $('[data-delete-account]')?.addEventListener('click', confirmAccountDeletion)
-  $('[data-share-referral]')?.addEventListener('click', shareReferral)
 }
 
 async function downloadPortfolioQR() {
@@ -838,17 +772,17 @@ async function saveProfileForm(event) {
   const form = event.currentTarget
   const button = form.querySelector('[type="submit"]')
   const changes = Object.fromEntries(new FormData(form))
-  changes.username = changes.username.trim().toLowerCase()
+  if (changes.username) changes.username = changes.username.trim().toLowerCase()
   setButtonLoading(button, true, 'Salvando...')
   try {
-    const authChanges = { data: { full_name: changes.name } }
-    if (changes.email !== currentUser.email) authChanges.email = changes.email
-    const { error } = await supabase.auth.updateUser(authChanges)
-    if (error) throw error
+    const authChanges = {}
+    if (changes.name !== undefined) authChanges.data = { full_name: changes.name }
+    if (changes.email && changes.email !== currentUser.email) authChanges.email = changes.email
+    if (Object.keys(authChanges).length) { const { error } = await supabase.auth.updateUser(authChanges); if (error) throw error }
     const next = { ...state.profile, ...changes }
     await saveProfile(currentUser.id, next, state.published)
     Object.assign(state.profile, next)
-    currentUser.email = changes.email
+    if (changes.email) currentUser.email = changes.email
     toast('Perfil atualizado.')
     render()
   } catch (error) { reportError(error?.code === '23505' ? 'Este username já está em uso.' : 'Não foi possível atualizar o perfil.', error) } finally { setButtonLoading(button, false) }
@@ -1112,7 +1046,7 @@ async function updateSetting(key) {
 
 
 function exportData() {
-  const payload = JSON.stringify({ profile: state.profile, published: state.published, projects: state.projects, settings: state.settings, analytics: state.analytics, referrals: state.referrals }, null, 2)
+  const payload = JSON.stringify({ profile: state.profile, published: state.published, projects: state.projects, settings: state.settings, analytics: state.analytics }, null, 2)
   const url = URL.createObjectURL(new Blob([payload], { type: 'application/json' }))
   const anchor = document.createElement('a'); anchor.href = url; anchor.download = `devifolio-${state.profile.username || 'dados'}.json`; anchor.click(); URL.revokeObjectURL(url)
   toast('Dados exportados.')
@@ -1124,14 +1058,6 @@ function confirmAccountDeletion() {
     setButtonLoading(event.currentTarget, true, 'Excluindo...')
     try { await deleteCurrentAccount(); await supabase.auth.signOut(); location.replace('index.html') } catch (error) { reportError('Não foi possível excluir a conta.', error); setButtonLoading(event.currentTarget, false) }
   }
-}
-
-async function shareReferral(event) {
-  const url = event.currentTarget.dataset.shareUrl
-  try {
-    if (navigator.share) await navigator.share({ title: 'Devifolio', text: 'Crie seu portfólio profissional.', url })
-    else await copyText(url)
-  } catch (error) { if (error.name !== 'AbortError') reportError('Não foi possível compartilhar.', error) }
 }
 
 async function sharePortfolio() {
@@ -1261,6 +1187,7 @@ function renderWithTransition() {
   if (bootstrapping) { render(); return }
   const requestedRoute = location.hash.slice(1)
   const route = views[requestedRoute] ? requestedRoute : 'inicio'
+  if (requestedRoute && !views[requestedRoute]) history.replaceState(null, '', `${location.pathname}${location.search}#inicio`)
   if (route === renderedRoute) return
   screenLoading.navigate(render)
 }
@@ -1308,7 +1235,8 @@ async function bootstrap() {
     state.projects = workspace.projects || []
     restorePortfolioFolders(state.folderNames, state.projects)
     state.analytics = workspace.analytics || []
-    state.referrals = workspace.referrals || []
+    state.leads = workspace.leads || []
+    state.leadsAvailable = workspace.leadsAvailable
     state.githubConnected = Boolean(workspace.githubConnection)
     state.githubUsername = workspace.githubConnection?.github_username || ''
     if (workspace.settings) Object.assign(state.settings, { email: workspace.settings.email_notifications, product: workspace.settings.product_notifications, publicProfile: workspace.settings.public_profile, compact: workspace.settings.compact_mode })
