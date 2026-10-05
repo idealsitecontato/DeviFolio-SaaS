@@ -11,14 +11,20 @@ body.dashboard-app[data-theme="dark"] .sidebar-collapsed .brand-crop .folio-bran
 body.dashboard-app[data-theme="dark"] .sidebar-collapsed .brand-crop .folio-brand-compact.theme-logo-dark { display: block !important; }
 html body.dashboard-app .sidebar,
 html body.dashboard-app.kaptei-route .sidebar { overflow: visible; }
-html body.dashboard-app .sidebar-account-row { position: relative; margin-bottom: 24px; }
-html body.dashboard-app .sidebar-account-row .user-mini { width: 100%; margin-bottom: 0; padding-right: 18px; }
-html body.dashboard-app .sidebar-toggle,
-html body.dashboard-app.kaptei-route .sidebar-toggle { position: absolute !important; top: 50% !important; right: -26px !important; transform: translateY(-50%); z-index: 65 !important; display: grid !important; place-items: center; width: 36px; height: 36px; padding: 7px; border: 1px solid var(--border) !important; border-radius: 8px; background: var(--surface) !important; color: var(--text) !important; box-shadow: 0 2px 8px #0002; }
-html body.dashboard-app .sidebar-toggle:hover { background: var(--surface-muted) !important; }
+html body.dashboard-app .sidebar-header { display: flex; align-items: center; gap: 6px; height: 36px; min-width: 0; margin: -6px 0 24px; }
+html body.dashboard-app .sidebar-header .brand-crop,
+html body.dashboard-app.kaptei-route .sidebar-header .brand-crop { flex: 1; min-width: 0; width: auto !important; height: auto !important; margin: 0 !important; }
+html body.dashboard-app .sidebar-account-row { margin-bottom: 24px; }
+html body.dashboard-app .sidebar-account-row .user-mini { width: 100%; margin-bottom: 0; }
+html body.dashboard-app .sidebar-header .sidebar-toggle,
+html body.dashboard-app.kaptei-route .sidebar-header .sidebar-toggle { position: static !important; top: auto !important; right: auto !important; transform: none !important; z-index: 65 !important; display: grid !important; place-items: center; flex: none; width: 36px !important; height: 36px !important; margin: 0 !important; padding: 7px; border: 0 !important; border-radius: 8px; background: transparent !important; color: var(--text) !important; box-shadow: none !important; cursor: pointer; }
+html body.dashboard-app .sidebar-header .sidebar-toggle:hover { background: var(--surface-muted) !important; }
+html body.dashboard-app .sidebar-header .sidebar-toggle:focus-visible { outline: 2px solid var(--text-muted) !important; outline-offset: 2px; }
 html body.dashboard-app .sidebar-toggle svg,
 html body.dashboard-app .mobile-topbar #menu-toggle svg { width: 21px; height: 21px; stroke-width: 1.65; }
-html body.dashboard-app .sidebar-collapsed .sidebar-account-row .sidebar-toggle { right: -38px !important; }
+html body.dashboard-app .sidebar-collapsed .sidebar-header { gap: 0; }
+html body.dashboard-app .sidebar-collapsed .sidebar-header .brand-crop { flex: 0 0 20px; width: 20px !important; height: 20px !important; }
+html body.dashboard-app .sidebar-collapsed .sidebar-header .folio-brand-compact { width: 20px !important; height: 20px !important; }
 html body.dashboard-app .sidebar-resize-handle { z-index: 50; }
 html body.dashboard-app[data-theme="dark"] .sidebar,
 html body.dashboard-app[data-theme="dark"].kaptei-route .sidebar { background: #171a1e !important; border-right: 1px solid #343a42 !important; color: #f5f6f7 !important; }
@@ -30,7 +36,8 @@ html body.dashboard-app[data-theme="dark"] .sidebar .user-mini,
 html body.dashboard-app[data-theme="dark"] .sidebar .user-menu { background: #252a30 !important; color: #f5f6f7 !important; border-color: #40474f !important; }
 html body.dashboard-app[data-theme="dark"] .sidebar .user-mini small,
 html body.dashboard-app[data-theme="dark"] .sidebar .user-menu button { color: #d0d6dc !important; }
-html body.dashboard-app[data-theme="dark"] .sidebar-toggle { background: #252a30 !important; border-color: #4b535d !important; color: #fff !important; }
+html body.dashboard-app[data-theme="dark"] .sidebar-header .sidebar-toggle { background: transparent !important; color: var(--text) !important; }
+html body.dashboard-app[data-theme="dark"] .sidebar-header .sidebar-toggle:hover { background: rgb(255 255 255 / 9%) !important; }
 html body.dashboard-app[data-theme="dark"] .mobile-topbar { background: #171a1e !important; color: #fff !important; border-color: #343a42 !important; }
 html body.dashboard-app[data-theme="dark"] .mobile-topbar .icon-button { background: #252a30 !important; border-color: #4b535d !important; color: #fff !important; }
 html body.dashboard-app[data-theme="dark"].kaptei-route .desktop-topbar { color: var(--text-muted) !important; }
@@ -93,8 +100,15 @@ html body.dashboard-app[data-theme="dark"] .leads-page .leads-table th { backgro
 html body.dashboard-app[data-theme="dark"] .leads-page .leads-table td a:not(.lead-call) { color: var(--text) !important; }
 html body.dashboard-app[data-theme="dark"] .leads-page .leads-filters :is(input, select) { background: var(--surface-muted) !important; color: var(--text) !important; border-color: var(--border) !important; }
 @media (max-width: 820px) {
-  html body.dashboard-app .sidebar-toggle,
-  html body.dashboard-app.kaptei-route .sidebar-toggle { display: none !important; }
+  html body.dashboard-app .sidebar-header .sidebar-toggle,
+  html body.dashboard-app.kaptei-route .sidebar-header .sidebar-toggle { display: grid !important; }
+  html body.dashboard-app .sidebar-collapsed .sidebar-header { gap: 6px; }
+  html body.dashboard-app .sidebar-collapsed .sidebar-header .brand-crop { flex: 1; width: auto !important; height: auto !important; }
+  html body.dashboard-app .sidebar-collapsed .sidebar-header .brand-crop .folio-brand { display: block !important; }
+  html body.dashboard-app .sidebar-collapsed .sidebar-header .folio-brand-compact { display: none !important; }
+  html body.dashboard-app .mobile-topbar #menu-toggle { width: 36px; height: 36px; border: 0 !important; background: transparent !important; color: var(--text) !important; box-shadow: none !important; }
+  html body.dashboard-app .mobile-topbar #menu-toggle:hover { background: var(--surface-muted) !important; }
+  html body.dashboard-app .mobile-topbar #menu-toggle:focus-visible { outline: 2px solid var(--text-muted); outline-offset: 2px; }
   html body.dashboard-app .leads-header { align-items: flex-start; flex-direction: column; gap: 4px; }
   html body.dashboard-app .leads-brand { width: 235px; height: 72px; }
 }

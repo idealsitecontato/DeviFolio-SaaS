@@ -1171,6 +1171,7 @@ function closeMenu() {
     }
   }
   $('#menu-toggle')?.setAttribute('aria-expanded', 'false')
+  $('#menu-toggle')?.setAttribute('aria-label', 'Expandir menu')
 }
 function setSidebarCollapsed(collapsed) {
   $('.app-shell')?.classList.toggle('sidebar-collapsed', collapsed)
@@ -1234,9 +1235,9 @@ sidebarResizeHandle?.addEventListener('keydown', event => {
 window.addEventListener('resize', syncSidebarResizeHandle)
 syncSidebarResizeHandle()
 
-$('#menu-toggle').onclick = () => { if (drawerCloseTimer) { clearTimeout(drawerCloseTimer); drawerCloseTimer = null }; $('#sidebar-overlay').classList.remove('is-closing'); const open = $('#sidebar').classList.toggle('open'); $('#sidebar-overlay').classList.toggle('show', open); $('#menu-toggle').setAttribute('aria-expanded', String(open));$('.main-content').inert=open;if(open){$('#sidebar').setAttribute('role','dialog');$('#sidebar').setAttribute('aria-modal','true');$('#sidebar .nav-item.active')?.focus()}else{$('#sidebar').removeAttribute('role');$('#sidebar').removeAttribute('aria-modal')} }
+$('#menu-toggle').onclick = () => { if (drawerCloseTimer) { clearTimeout(drawerCloseTimer); drawerCloseTimer = null }; $('#sidebar-overlay').classList.remove('is-closing'); const open = $('#sidebar').classList.toggle('open'); $('#sidebar-overlay').classList.toggle('show', open); $('#menu-toggle').setAttribute('aria-expanded', String(open)); $('#menu-toggle').setAttribute('aria-label', open ? 'Recolher menu' : 'Expandir menu'); $('#sidebar-toggle').setAttribute('aria-label', 'Recolher menu'); $('.main-content').inert=open;if(open){$('#sidebar').setAttribute('role','dialog');$('#sidebar').setAttribute('aria-modal','true');$('#sidebar .nav-item.active')?.focus()}else{$('#sidebar').removeAttribute('role');$('#sidebar').removeAttribute('aria-modal')} }
 $('#sidebar-overlay').onclick = closeMenu
-$('#sidebar-toggle').onclick = () => setSidebarCollapsed(!$('.app-shell')?.classList.contains('sidebar-collapsed'))
+$('#sidebar-toggle').onclick = () => window.innerWidth <= 820 ? closeMenu() : setSidebarCollapsed(!$('.app-shell')?.classList.contains('sidebar-collapsed'))
 $('#user-menu-toggle').onclick = event => {
   event.stopPropagation()
   const menu = $('#user-menu')
