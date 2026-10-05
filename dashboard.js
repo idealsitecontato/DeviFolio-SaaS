@@ -60,7 +60,7 @@ const icons = {
   panel: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M14 9l-3 3 3 3"/>',
   settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06a1.7 1.7 0 0 0-1.88-.34A1.7 1.7 0 0 0 14 20.92V21h-4v-.08A1.7 1.7 0 0 0 8.95 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15 1.7 1.7 0 0 0 3 14v-4a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.34-1.88l2.83-2.83A1.7 1.7 0 0 0 9 4.6 1.7 1.7 0 0 0 10 3.08V3h4v.08A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.88-.34l2.83 2.83A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 1.52 1H21v4a1.7 1.7 0 0 0-1.6 1z"/>',
   logout: '<path d="M10 17l5-5-5-5M15 12H3"/><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>',
-  chevron: '<path d="m9 18 6-6-6-6"/>', menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+  chevron: '<path d="m9 18 6-6-6-6"/>', menu: '<path d="M4 7h16M4 12h16M4 17h16"/>', 'sidebar-toggle': '<rect x="2.5" y="3.5" width="19" height="17" rx="2.5"/><path d="M8.5 3.5v17"/>',
   crown: '<path d="m3 7 4 4 5-7 5 7 4-4-2 12H5z"/>',
   eye: '<path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
   link: '<path d="M10 13a5 5 0 0 0 7.07.07l2-2A5 5 0 0 0 12 4l-1.15 1.15"/><path d="M14 11a5 5 0 0 0-7.07-.07l-2 2A5 5 0 0 0 12 20l1.15-1.15"/>',
@@ -423,10 +423,8 @@ function profileEditCard(label, help, name, value, type = 'text', extra = '') {
 
 function profileView() {
   const profile = state.profile
-  const banner = currentUser ? `${portfolioBannerUrl(currentUser.id)}${profileBannerRevision ? `?v=${profileBannerRevision}` : ''}` : ''
   const portfolioCount = visiblePortfolioFolders().length + 1
   return `<section class="page-enter profile-page"><div class="card profile-showcase">
-    <div class="profile-cover"><img src="${esc(banner)}" alt="" aria-hidden="true" onerror="this.hidden=true"><input id="profile-banner-file" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="icon-button" type="button" data-upload-profile-banner aria-label="Alterar capa"><span data-icon="edit"></span></button></div>
     <div class="profile-identity"><div class="profile-avatar-edit">${avatarMarkup()}<input id="avatar-file" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="icon-button avatar-edit-button" type="button" data-upload-avatar aria-label="Alterar foto de perfil"><span data-icon="edit"></span></button></div><h1>${esc(realName())}</h1></div>
     <div class="profile-stat-row"><div><strong>${portfolioCount}</strong><span>Portfólios</span></div><div><strong>${state.projects.length}</strong><span>Projetos</span></div><div><span>Usuário</span><strong class="profile-username">@${esc(profile.username || 'conta')}</strong></div></div>
     <div class="profile-cards"><div class="card profile-edit-card profile-avatar-card"><div><h2>Avatar</h2><p>Esta é sua foto de perfil. Faça upload de uma imagem personalizada.</p><small>Um avatar é opcional, mas recomendado.</small></div><div class="profile-avatar-action">${avatarMarkup('avatar avatar-card-image')}<button type="button" class="primary-button" data-upload-avatar>Salvar</button></div></div>
@@ -442,7 +440,7 @@ function switchRow(icon, title, description, key, on) {
 
 function settingsView() {
   const dark = document.body.dataset.theme === 'dark'
-  return `<section class="page-enter compact-panel-page"><div class="card settings-card compact-panel"><div class="settings-card-head"><span data-icon="settings"></span><div><h1>Configurações</h1><p>Preferências, privacidade e integrações.</p></div></div><nav class="settings-tabs" aria-label="Seções de configurações"><a href="#preferencias" data-settings-anchor="preferencias">Preferências</a><a href="#privacidade" data-settings-anchor="privacidade">Privacidade</a><a href="#conta" data-settings-anchor="conta">Conta</a></nav><div class="panel-section" id="preferencias"><h2>Preferências</h2><div class="setting-row"><span class="circle-icon" data-icon="palette"></span><div><b>Aparência</b><small>Escolha o tema da área interna.</small></div><div class="theme-options" role="group" aria-label="Tema da área interna"><button type="button" data-interface-theme="light" aria-pressed="${!dark}">Claro</button><button type="button" data-interface-theme="dark" aria-pressed="${dark}">Escuro</button></div></div>${switchRow('mail', 'Avisos por e-mail', 'Receba atualizações importantes sobre seu portfólio.', 'email', state.settings.email)}${switchRow('bell', 'Novidades do produto', 'Acompanhe melhorias e novos recursos da plataforma.', 'product', state.settings.product)}${switchRow('panel', 'Modo compacto', 'Reduza o espaçamento das listas e painéis.', 'compact', state.settings.compact)}</div><div class="panel-section" id="privacidade"><h2>Privacidade</h2>${switchRow('shield', 'Perfil público', 'Permita que visitantes acessem seu portfólio publicado.', 'publicProfile', state.settings.publicProfile)}</div><div class="panel-section" id="conta"><h2>Conta</h2><div class="setting-row"><div><b>Exportar dados</b><small>Baixe uma cópia das informações da conta.</small></div><button class="secondary-button" data-export>Exportar</button></div><div class="setting-row danger-row"><div><b>Excluir conta</b><small>Essa ação não poderá ser desfeita.</small></div><button class="danger-button" data-delete-account>Excluir conta</button></div></div></div></section>`
+  return `<section class="page-enter compact-panel-page"><div class="card settings-card compact-panel"><div class="settings-card-head"><span data-icon="settings"></span><div><h1>Configurações</h1><p>Preferências, privacidade e integrações.</p></div></div><nav class="settings-tabs" aria-label="Seções de configurações"><a href="#preferencias" data-settings-anchor="preferencias">Preferências</a><a href="#privacidade" data-settings-anchor="privacidade">Privacidade</a><a href="#conta" data-settings-anchor="conta">Conta</a></nav><div class="panel-section" id="preferencias"><h2>Preferências</h2><div class="setting-row"><span class="circle-icon" data-icon="palette"></span><div><b>Aparência</b><small>Escolha o tema da área interna.</small></div><div class="theme-options" role="group" aria-label="Tema da área interna"><button type="button" data-interface-theme="light" aria-pressed="${!dark}">Claro</button><button type="button" data-interface-theme="dark" aria-pressed="${dark}">Escuro</button></div></div>${switchRow('palette', 'Modo escuro', 'Alterna entre o tema claro e o escuro.', 'theme', dark)}${switchRow('mail', 'Avisos por e-mail', 'Receba atualizações importantes sobre seu portfólio.', 'email', state.settings.email)}${switchRow('bell', 'Novidades do produto', 'Acompanhe melhorias e novos recursos da plataforma.', 'product', state.settings.product)}${switchRow('panel', 'Modo compacto', 'Reduza o espaçamento das listas e painéis.', 'compact', state.settings.compact)}</div><div class="panel-section" id="privacidade"><h2>Privacidade</h2>${switchRow('shield', 'Perfil público', 'Permita que visitantes acessem seu portfólio publicado.', 'publicProfile', state.settings.publicProfile)}</div><div class="panel-section" id="conta"><h2>Conta</h2><div class="setting-row"><div><b>Exportar dados</b><small>Baixe uma cópia das informações da conta.</small></div><button class="secondary-button" data-export>Exportar</button></div><div class="setting-row danger-row"><div><b>Excluir conta</b><small>Essa ação não poderá ser desfeita.</small></div><button class="danger-button" data-delete-account>Excluir conta</button></div></div></div></section>`
 }
 
 function publicationsView() {
@@ -514,15 +512,20 @@ function updateUserChrome() {
   hydrateIcons(user || document)
 }
 
+function setInterfaceTheme(theme) {
+  const dark = theme === 'dark'
+  document.body.dataset.theme = dark ? 'dark' : 'light'
+  document.documentElement.style.colorScheme = document.body.dataset.theme
+  document.querySelector('meta[name="theme-color"]').content = dark ? '#111316' : '#f2f3f5'
+  try { localStorage.setItem('foliodev_interface_theme', document.body.dataset.theme) } catch { toast('A preferência de tema não pôde ser salva neste navegador.', 'error') }
+  $$('[data-interface-theme]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.interfaceTheme === document.body.dataset.theme)))
+  const themeSwitch = $('[data-setting="theme"]')
+  themeSwitch?.classList.toggle('on', dark)
+  themeSwitch?.setAttribute('aria-pressed', String(dark))
+}
+
 function bindActions() {
-  $$('[data-interface-theme]').forEach(button => button.onclick = () => {
-    const theme = button.dataset.interfaceTheme === 'dark' ? 'dark' : 'light'
-    document.body.dataset.theme = theme
-    document.documentElement.style.colorScheme = theme
-    document.querySelector('meta[name="theme-color"]').content = theme === 'dark' ? '#111316' : '#f2f3f5'
-    try { localStorage.setItem('foliodev_interface_theme', theme) } catch { toast('A preferência de tema não pôde ser salva neste navegador.', 'error') }
-    $$('[data-interface-theme]').forEach(option => option.setAttribute('aria-pressed', String(option === button)))
-  })
+  $$('[data-interface-theme]').forEach(button => button.onclick = () => setInterfaceTheme(button.dataset.interfaceTheme))
   $$('[data-analysis-period]').forEach(button => button.onclick = () => { analyticsPeriod = Number(button.dataset.analysisPeriod); render({ preserveScroll:true }) })
   $('#coupon-form')?.addEventListener('submit', event => { event.preventDefault(); const code = $('#coupon-code').value.trim(); const feedback = $('#coupon-feedback'); feedback.classList.add('error'); feedback.textContent = code ? 'Não é possível validar cupons agora. Nenhum desconto foi aplicado.' : 'Digite um cupom antes de aplicar.' })
   $('#coupon-form')?.addEventListener('reset', () => { const feedback = $('#coupon-feedback'); feedback.classList.remove('error'); feedback.textContent = 'Nenhum desconto aplicado.' })
@@ -610,7 +613,7 @@ function bindActions() {
   $('[data-retry-repos]')?.addEventListener('click', fetchGithubRepos)
   $('[data-import-selected]')?.addEventListener('click', importSelected)
   $$('[data-repo-menu]').forEach(button => button.onclick = () => repositoryMenu(Number(button.dataset.repoMenu)))
-  $$('[data-setting]').forEach(button => button.onclick = () => updateSetting(button.dataset.setting))
+  $$('[data-setting]').forEach(button => button.onclick = () => button.dataset.setting === 'theme' ? setInterfaceTheme(document.body.dataset.theme === 'dark' ? 'light' : 'dark') : updateSetting(button.dataset.setting))
   $('[data-export]')?.addEventListener('click', exportData)
   $('[data-delete-account]')?.addEventListener('click', confirmAccountDeletion)
 }

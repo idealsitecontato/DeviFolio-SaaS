@@ -25,7 +25,7 @@ export function kapteiView(leads = [], available = true) {
     ['Últimos 30 dias', leads.filter(lead => localDay(lead.created_at) >= last30).length],
   ]
   return `<section class="page-enter leads-page" aria-label="Leads do portfólio">
-    <header class="leads-header"><h1>Leads</h1><p>Acompanhe contatos do portfólio e oportunidades da Kaptei em um só lugar.</p></header>
+    <header class="leads-header"><div><h1>Leads</h1><p>Acompanhe contatos do portfólio e oportunidades da Kaptei em um só lugar.</p></div><div class="leads-brand"><img class="theme-logo-light" src="/brand/kaptei-logo-light.png" alt="Kaptei" width="3464" height="1949"><img class="theme-logo-dark" src="/brand/kaptei-logo-dark.png" alt="" width="3464" height="1949"></div></header>
     <div class="leads-tab">Leads do seu portfólio</div>
     <div class="leads-stats">${stats.map(([label, value]) => `<article class="card"><span>${label}</span><strong>${available && leads.length ? value : '—'}</strong></article>`).join('')}</div>
     <div class="leads-section-head"><div><h2>Leads do seu portfólio</h2><p>Organize os contatos recebidos e acompanhe cada oportunidade.</p></div>${leads.length ? '<button class="primary-button" type="button" data-download-leads>↓ &nbsp;Baixar lista</button>' : ''}</div>

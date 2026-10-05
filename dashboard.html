@@ -41,10 +41,7 @@
 <img class="folio-brand-compact theme-logo-light" src="/brand/webfolio-icon-black.png" alt="" width="1260" height="1134">
 <img class="folio-brand-compact theme-logo-dark" src="/brand/webfolio-icon-white.png" alt="" width="1260" height="1134">
 </a>
-      <button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Recolher menu" aria-expanded="true" data-tooltip="Recolher menu">
-<span data-icon="menu">
-</span>
-</button>
+      <div class="sidebar-account-row">
       <button class="user-mini" id="user-menu-toggle" type="button" aria-expanded="false" aria-controls="user-menu" data-tooltip="Conta">
         <span class="avatar">
 </span>
@@ -56,6 +53,8 @@
 <span data-icon="chevron">
 </span>
       </button>
+      <button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Recolher menu" aria-expanded="true" data-tooltip="Recolher menu"><span data-icon="sidebar-toggle"></span></button>
+      </div>
       <div class="user-menu" id="user-menu" hidden>
         <button type="button" data-route-button="perfil">
 <span data-icon="profile">
@@ -138,7 +137,7 @@
 
     <div class="mobile-topbar">
       <button class="icon-button" id="menu-toggle" aria-label="Abrir menu" aria-expanded="false">
-<span data-icon="menu">
+<span data-icon="sidebar-toggle">
 </span>
 </button>
       <a class="brand-crop brand-mobile" href="#inicio" aria-label="WebFolio">
