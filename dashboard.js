@@ -30,6 +30,7 @@ const profilePlaceholderUrl = new URL('./assets/user-placeholder.png', import.me
 
 const $ = (selector, root = document) => root.querySelector(selector)
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)]
+const motionDuration = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : parseFloat(getComputedStyle(document.body).getPropertyValue('--motion-fast')) || 180
 const screenLoading = createScreenLoading({ shell: document.querySelector('.app-shell'), loading: document.querySelector('#app-loading') })
 mountGooeySpinners()
 let renderedRoute = null
@@ -1102,9 +1103,11 @@ async function copyText(text) {
 }
 
 
+let modalCloseTimer = null
 function modal(content, { creationPanel = false, dismissible = true, folderWindow = false } = {}) {
   const root = $('#modal-root')
   const opener = screenLoading.modalOpener() || document.activeElement
+  if (modalCloseTimer) { clearTimeout(modalCloseTimer); modalCloseTimer = null }
   screenLoading.closeModal({ immediate: true, restoreFocus: false })
   root.innerHTML = `<div class="modal-backdrop${creationPanel ? ' creation-backdrop' : ''}${folderWindow ? ' portfolio-folder-modal-backdrop' : ''}"><div class="modal${creationPanel ? ' creation-panel' : ''}${folderWindow ? ' portfolio-folder-modal' : ''}" role="dialog" aria-modal="true">${content}</div></div>`
   const backdrop = root.querySelector('.modal-backdrop')
@@ -1116,14 +1119,36 @@ function modal(content, { creationPanel = false, dismissible = true, folderWindo
 }
 
 function closeModal(options = {}) {
-  screenLoading.closeModal(options)
+  const backdrop = $('#modal-root .modal-backdrop')
+  if (!backdrop || options.immediate || !motionDuration()) {
+    if (modalCloseTimer) { clearTimeout(modalCloseTimer); modalCloseTimer = null }
+    screenLoading.closeModal(options)
+  } else if (!backdrop.classList.contains('is-closing')) {
+    backdrop.classList.add('is-closing')
+    modalCloseTimer = window.setTimeout(() => {
+      modalCloseTimer = null
+      screenLoading.closeModal({ restoreFocus: options.restoreFocus !== false })
+    }, motionDuration())
+  }
   $$('[data-folder-id].is-open').forEach(folder => folder.classList.remove('is-open'))
 }
 
 function setButtonLoading(button, loading, label = '') { if (!button) return; button.classList.toggle('is-loading',loading); if (loading) { button.dataset.original = button.innerHTML; button.dataset.originalWidth=button.style.width; button.style.width=button.getBoundingClientRect().width+'px'; button.disabled = true; button.textContent = label } else { button.disabled = false; button.style.width=button.dataset.originalWidth||''; if (button.dataset.original) button.innerHTML = button.dataset.original; hydrateIcons(button) } }
 function reportError(message, error) { console.error(`[Devifolio] ${message}`, error); toast(message, 'error') }
 function toast(message, type = 'success') { const element = document.createElement('div'); element.className = `toast ${type}`; element.innerHTML = `<span data-icon="${type === 'error' ? 'x' : 'check'}"></span>${esc(message)}`; $('#toast-stack').append(element); hydrateIcons(element); setTimeout(() => element.remove(), 4200) }
-function closeUserMenu() { $('#user-menu')?.setAttribute('hidden', ''); $('#user-menu-toggle')?.setAttribute('aria-expanded', 'false') }
+let userMenuCloseTimer = null
+function closeUserMenu({ immediate = false } = {}) {
+  const menu = $('#user-menu')
+  $('#user-menu-toggle')?.setAttribute('aria-expanded', 'false')
+  if (!menu || menu.hasAttribute('hidden') || menu.classList.contains('is-closing')) return
+  if (immediate || !motionDuration()) { menu.setAttribute('hidden', ''); return }
+  menu.classList.add('is-closing')
+  userMenuCloseTimer = window.setTimeout(() => {
+    menu.setAttribute('hidden', '')
+    menu.classList.remove('is-closing')
+    userMenuCloseTimer = null
+  }, motionDuration())
+}
 let drawerCloseTimer = null
 function closeMenu() {
   $('#sidebar')?.classList.remove('open')
@@ -1205,7 +1230,16 @@ syncSidebarResizeHandle()
 $('#menu-toggle').onclick = () => { if (drawerCloseTimer) { clearTimeout(drawerCloseTimer); drawerCloseTimer = null }; $('#sidebar-overlay').classList.remove('is-closing'); const open = $('#sidebar').classList.toggle('open'); $('#sidebar-overlay').classList.toggle('show', open); $('#menu-toggle').setAttribute('aria-expanded', String(open));$('.main-content').inert=open;if(open){$('#sidebar').setAttribute('role','dialog');$('#sidebar').setAttribute('aria-modal','true');$('#sidebar .nav-item.active')?.focus()}else{$('#sidebar').removeAttribute('role');$('#sidebar').removeAttribute('aria-modal')} }
 $('#sidebar-overlay').onclick = closeMenu
 $('#sidebar-toggle').onclick = () => setSidebarCollapsed(!$('.app-shell')?.classList.contains('sidebar-collapsed'))
-$('#user-menu-toggle').onclick = event => { event.stopPropagation(); const menu = $('#user-menu'), open = menu.hasAttribute('hidden'); menu.toggleAttribute('hidden', !open); $('#user-menu-toggle').setAttribute('aria-expanded', String(open)) }
+$('#user-menu-toggle').onclick = event => {
+  event.stopPropagation()
+  const menu = $('#user-menu')
+  const open = menu.hasAttribute('hidden') || menu.classList.contains('is-closing')
+  if (userMenuCloseTimer) { clearTimeout(userMenuCloseTimer); userMenuCloseTimer = null }
+  menu.classList.remove('is-closing')
+  if (open) menu.removeAttribute('hidden')
+  else closeUserMenu()
+  $('#user-menu-toggle').setAttribute('aria-expanded', String(open))
+}
 document.addEventListener('click', event => { if (!event.target.closest('#user-menu') && !event.target.closest('#user-menu-toggle')) closeUserMenu() })
 function renderWithTransition() {
   closeModal({ immediate: true })

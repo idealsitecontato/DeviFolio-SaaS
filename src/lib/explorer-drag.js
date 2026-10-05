@@ -8,6 +8,13 @@ export function bindExplorerDrag({ canMove, moveProject, reorderFolders, onError
   let suppressClickUntil = 0
   const body = root.body
   const query = value => root.querySelector(value)
+  const motion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : parseFloat(getComputedStyle(body).getPropertyValue('--motion-fast')) || 180
+  const easing = () => getComputedStyle(body).getPropertyValue('--ease').trim() || 'ease-out'
+  const status = document.createElement('div')
+  status.className = 'explorer-drag-status'
+  status.setAttribute('role', 'status')
+  status.setAttribute('aria-live', 'polite')
+  body.append(status)
   const clearTargets = () => root.querySelectorAll('.explorer-drop-target,.explorer-drop-blocked').forEach(el => el.classList.remove('explorer-drop-target', 'explorer-drop-blocked'))
 
   function destination(element) {
@@ -46,14 +53,14 @@ export function bindExplorerDrag({ canMove, moveProject, reorderFolders, onError
     const rect = target.getBoundingClientRect()
     const after = x > rect.x + rect.width / 2
     if ((!after && drag.source.nextElementSibling === target) || (after && target.nextElementSibling === drag.source)) return
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const previous = reduced ? null : new Map([...drag.parent.children].filter(item => item !== drag.source).map(item => [item, item.getBoundingClientRect()]))
+    const duration = motion()
+    const previous = duration ? new Map([...drag.parent.children].filter(item => item !== drag.source).map(item => [item, item.getBoundingClientRect()])) : null
     drag.parent.insertBefore(drag.source, after ? target.nextElementSibling : target)
     if (previous) {
       for (const [item, before] of previous) {
         const current = item.getBoundingClientRect()
         const dx = before.left - current.left, dy = before.top - current.top
-        if (dx || dy) item.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'translate(0, 0)' }], { duration: 160, easing: 'cubic-bezier(.2,.7,.2,1)' })
+        if (dx || dy) item.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'translate(0, 0)' }], { duration, easing: easing() })
       }
     }
   }
@@ -109,6 +116,7 @@ export function bindExplorerDrag({ canMove, moveProject, reorderFolders, onError
     clearTargets()
     if (restore) drag.original.forEach(el => { if (el.parentElement === drag.parent) drag.parent.append(el) })
     drag.source.classList.remove('explorer-drag-source')
+    drag.source.removeAttribute('aria-grabbed')
     drag.ghost.remove()
     if (drag.shell && query('.portfolio-folder-modal')) drag.shell.inert = true
     if (drag.previousOverflow !== undefined) body.style.overflow = drag.previousOverflow
@@ -124,7 +132,7 @@ export function bindExplorerDrag({ canMove, moveProject, reorderFolders, onError
     cleanup(!item.target)
     if (!item.target) return
     item.source.classList.add('explorer-drop-settle')
-    window.setTimeout(() => item.source.classList.remove('explorer-drop-settle'), 180)
+    window.setTimeout(() => item.source.classList.remove('explorer-drop-settle'), motion())
     pending = true
     try {
       if (item.folder) await reorderFolders(order)
@@ -153,7 +161,48 @@ export function bindExplorerDrag({ canMove, moveProject, reorderFolders, onError
   root.addEventListener('click', event => {
     if (Date.now() < suppressClickUntil) { event.preventDefault(); event.stopImmediatePropagation() }
   }, true)
-  root.addEventListener('keydown', event => { if (event.key === 'Escape' && drag) { event.preventDefault(); cleanup() } }, true)
+  root.addEventListener('keydown', event => {
+    const source = event.target.closest?.(selector)
+    if (drag?.keyboard && event.key === 'Escape') {
+      event.preventDefault()
+      status.textContent = 'Reordenação cancelada.'
+      cleanup()
+      return
+    }
+    if (!source || event.target !== source) {
+      if (event.key === 'Escape' && drag) { event.preventDefault(); cleanup() }
+      return
+    }
+    if (!drag && event.key === ' ' && canMove(Number(source.dataset.dragProject), 'projects')) {
+      event.preventDefault()
+      if (start(source)) {
+        drag.keyboard = true
+        drag.target = 'projects'
+        source.setAttribute('aria-grabbed', 'true')
+        status.textContent = `${source.getAttribute('aria-label')}. Use as setas para mover, Espaço para soltar ou Escape para cancelar.`
+      }
+      return
+    }
+    if (!drag?.keyboard || drag.source !== source) return
+    if (event.key === ' ' || event.key === 'Enter') {
+      event.preventDefault()
+      const id = drag.id
+      status.textContent = `${source.getAttribute('aria-label')} solto.`
+      void drop().then(() => query(`.projects-page [data-drag-project="${id}"]`)?.focus())
+      return
+    }
+    if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) return
+    event.preventDefault()
+    const backward = event.key === 'ArrowLeft' || event.key === 'ArrowUp'
+    const neighbor = backward ? source.previousElementSibling : source.nextElementSibling
+    if (!neighbor?.hasAttribute('data-drag-project')) return
+    const rect = neighbor.getBoundingClientRect()
+    arrange(neighbor, backward ? rect.left : rect.right)
+    const next = source.nextElementSibling
+    drag.beforeId = next?.hasAttribute('data-drag-project') ? Number(next.dataset.dragProject) : null
+    const position = [...drag.parent.querySelectorAll('[data-drag-project]')].indexOf(source) + 1
+    status.textContent = `${source.getAttribute('aria-label')}, posição ${position}.`
+  }, true)
 
   root.addEventListener('pointerdown', event => {
     if (event.pointerType !== 'touch' || event.target.closest('button:not([data-view-project]),a,input,select')) return

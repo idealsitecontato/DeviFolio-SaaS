@@ -48,6 +48,14 @@ body.dashboard-app[data-theme="dark"] {
   --visual-repo: var(--surface-muted);
   --visual-plan-charcoal: var(--surface-muted);
 }
+body.dashboard-app {
+  --motion-fast: 180ms;
+  --motion: 200ms;
+  --motion-normal: 220ms;
+  --ease: cubic-bezier(.2, 0, 0, 1);
+  --motion-enter-distance: 8px;
+  --motion-lift-distance: 2px;
+}
 body.dashboard-app { scrollbar-color: var(--border-strong) var(--bg); }
 body.dashboard-app ::selection { background: var(--border-strong); color: var(--text); }
 body.dashboard-app :is(input, textarea):-webkit-autofill {
@@ -311,6 +319,80 @@ html body.dashboard-app[data-theme="dark"] .profile-avatar-action .avatar {
   color: var(--text) !important;
 }
 html body.dashboard-app .profile-stat-row span { color: var(--text-muted); }
+
+/* Motion only: static colors, spacing and typography are unchanged. */
+body.dashboard-app :is(.primary-button, .secondary-button, .danger-button, .icon-button, .user-mini, .project-cover):active:not(:disabled) {
+  transform: scale(.98);
+}
+body.dashboard-app .projects-page .explorer-project {
+  cursor: grab;
+  transition: transform var(--motion-fast) var(--ease), opacity var(--motion-fast) var(--ease) !important;
+}
+html body.dashboard-app .projects-page .explorer-project:not(.explorer-drag-source):hover {
+  transform: translateY(calc(-1 * var(--motion-lift-distance))) !important;
+}
+html body.dashboard-app .projects-page .explorer-project.explorer-drag-source {
+  cursor: grabbing;
+  transform: scale(1.01) !important;
+  opacity: .82;
+}
+body.dashboard-app .projects-page.explorer-drop-target .project-grid {
+  outline: 1px solid var(--border-strong);
+  outline-offset: 4px;
+}
+.explorer-drag-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+html body.dashboard-app .projects-page .explorer-project.explorer-drop-settle {
+  animation: dashboard-drop-settle var(--motion-fast) var(--ease) both !important;
+}
+@keyframes dashboard-drop-settle {
+  from { transform: scale(.99); opacity: .88; }
+  to { transform: scale(1); opacity: 1; }
+}
+body.dashboard-app .user-menu:not([hidden]) {
+  animation: dashboard-menu-in var(--motion-fast) var(--ease) both;
+}
+body.dashboard-app .user-menu.is-closing {
+  animation: dashboard-menu-out var(--motion-fast) var(--ease) both;
+  pointer-events: none;
+}
+@keyframes dashboard-menu-in {
+  from { transform: translateY(calc(-1 * var(--motion-enter-distance))); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+@keyframes dashboard-menu-out {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(calc(-1 * var(--motion-enter-distance))); opacity: 0; }
+}
+body.dashboard-app .modal-backdrop {
+  animation: dashboard-backdrop-in var(--motion-normal) var(--ease) both;
+}
+body.dashboard-app .modal-backdrop .modal {
+  animation: dashboard-dialog-in var(--motion-normal) var(--ease) both;
+}
+body.dashboard-app .modal-backdrop.is-closing {
+  animation: dashboard-backdrop-out var(--motion-fast) var(--ease) both;
+  pointer-events: none;
+}
+body.dashboard-app .modal-backdrop.is-closing .modal {
+  animation: dashboard-dialog-out var(--motion-fast) var(--ease) both;
+}
+@keyframes dashboard-backdrop-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes dashboard-backdrop-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes dashboard-dialog-in {
+  from { transform: translateY(var(--motion-enter-distance)); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+@keyframes dashboard-dialog-out {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(var(--motion-enter-distance)); opacity: 0; }
+}
 @media (max-width: 640px) {
   body.dashboard-app .home-qr-row { grid-template-columns: 104px minmax(0, 1fr); gap: 10px; }
   body.dashboard-app .home-qr-row .qr-wrap { width: 104px !important; height: 104px !important; padding: 7px !important; }
@@ -320,4 +402,9 @@ html body.dashboard-app .profile-stat-row span { color: var(--text-muted); }
 }
 @media (prefers-reduced-motion: reduce) {
   body.dashboard-app .sidebar, body.dashboard-app .main-content { transition: none; }
+  body.dashboard-app .projects-page .explorer-project { transition: none !important; }
+  body.dashboard-app :is(.primary-button, .secondary-button, .danger-button, .icon-button, .user-mini, .project-cover):active:not(:disabled),
+  html body.dashboard-app .projects-page .explorer-project:not(.explorer-drag-source):hover,
+  html body.dashboard-app .projects-page .explorer-project.explorer-drag-source { transform: none !important; }
+  body.dashboard-app :is(.user-menu, .modal-backdrop, .modal, .explorer-drop-settle) { animation: none !important; }
 }
