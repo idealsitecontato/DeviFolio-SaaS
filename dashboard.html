@@ -24,7 +24,12 @@
   <link rel="stylesheet" href="/dashboard-theme.css">
 </head>
 <body class="dashboard-app">
-<script>try { document.body.dataset.theme = localStorage.getItem('foliodev_interface_theme') === 'dark' ? 'dark' : 'light' } catch { document.body.dataset.theme = 'light' }</script>
+<script>
+  try { document.body.dataset.theme = localStorage.getItem('foliodev_interface_theme') === 'dark' ? 'dark' : 'light' }
+  catch { document.body.dataset.theme = 'light' }
+  document.documentElement.style.colorScheme = document.body.dataset.theme
+  document.querySelector('meta[name="theme-color"]').content = document.body.dataset.theme === 'dark' ? '#111316' : '#f2f3f5'
+</script>
 <a class="skip-link" href="#page-content">Ir para o conteúdo</a>
   <div class="app-shell">
     <aside class="sidebar" id="sidebar" aria-label="Menu principal">

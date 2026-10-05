@@ -513,6 +513,8 @@ function bindActions() {
   $$('[data-interface-theme]').forEach(button => button.onclick = () => {
     const theme = button.dataset.interfaceTheme === 'dark' ? 'dark' : 'light'
     document.body.dataset.theme = theme
+    document.documentElement.style.colorScheme = theme
+    document.querySelector('meta[name="theme-color"]').content = theme === 'dark' ? '#111316' : '#f2f3f5'
     try { localStorage.setItem('foliodev_interface_theme', theme) } catch { toast('A preferência de tema não pôde ser salva neste navegador.', 'error') }
     $$('[data-interface-theme]').forEach(option => option.setAttribute('aria-pressed', String(option === button)))
   })
