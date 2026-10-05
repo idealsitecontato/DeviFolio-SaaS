@@ -1,6 +1,6 @@
-# Ajuste visual do frontend FolioDev
+# Ajuste visual do frontend WebFolio
 
-Especificação: `prompt-codex-ajuste-frontend-foliodev.md`, as cinco capturas anexadas e `FolioDev_logos(2).zip`, fornecidos em 29/09/2026. Branch de entrega: `ajuste-visual-frontend`. Base: `a123fcf`.
+Especificação: `prompt-codex-ajuste-frontend-foliodev.md`, as cinco capturas anexadas e `WebFolio_logos(2).zip`, fornecidos em 29/09/2026. Branch de entrega: `ajuste-visual-frontend`. Base: `a123fcf`.
 
 ## Reabertura da revisão — versão publicada e sessão real
 
@@ -125,7 +125,7 @@ Verificado: comparação em 1672 × 941 px; grade em x=244/y=170,8 px, previews 
 ## Checklist de aceite — somente verificações realizadas
 
 - [x] Logos extraídas do ZIP, com os mesmos bytes e proporção preservada; nenhuma logo antiga nas páginas ativas.
-- [x] Nome FolioDev, GitHub preto na sidebar e Modelos imediatamente acima de Perfil.
+- [x] Nome WebFolio, GitHub preto na sidebar e Modelos imediatamente acima de Perfil.
 - [x] Estrutura e medidas das cinco telas comparadas às capturas; diferenças justificadas abaixo.
 - [x] Planos com altura, alinhamentos e aparência das cores comparados à referência, mantendo “Em breve”.
 - [x] Cards GitHub carvão, ícone branco e visibilidade real derivada dos dados verificados no renderer.
@@ -142,7 +142,7 @@ Verificado: comparação em 1672 × 941 px; grade em x=244/y=170,8 px, previews 
 
 ## Diferenças e suposições de entrega
 
-1. A logo oficial do ZIP tem um símbolo F diferente daquele das capturas; foi usada a versão `FolioDev-logo-branca.png` nas superfícies claras, sem redesenhar ou recolorir.
+1. A logo oficial do ZIP tem um símbolo F diferente daquele das capturas; foi usada a versão `WebFolio-logo-branca.png` nas superfícies claras, sem redesenhar ou recolorir.
 2. O catálogo atual tem 10 modelos e outra paleta/ordem; a referência tem 15. A disponibilidade real prevalece sobre o texto “Disponível” mostrado em cards com cadeado na captura.
 3. Nome da seção e posição de Modelos seguem as instruções expressas do MD. Dados pessoais, nomes de pastas, quantidades, URLs e repositórios dependem da conta real e não foram copiados das capturas.
 4. Atalhos funcionais extras do Início e o controle GitHub das pastas foram preservados; sua presença difere das capturas.

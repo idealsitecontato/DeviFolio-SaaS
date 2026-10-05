@@ -1,18 +1,18 @@
 import { folioDevLogo } from './brand.js'
 
-export const Logo = () => `<img class="auth-logo" src="${folioDevLogo}" alt="FolioDev" width="1086" height="162">`
+export const Logo = () => `<img class="auth-logo" src="${folioDevLogo}" alt="WebFolio" width="3189" height="573">`
 export function AuthInput(id, label, { type = 'text', autocomplete = '', minlength = '', maxlength = '', placeholder = '' } = {}) {
   return `<div class="auth-field"><label for="${id}">${label}</label><input id="${id}" name="${id}" type="${type}" autocomplete="${autocomplete}" ${minlength ? `minlength="${minlength}"` : ''} ${maxlength ? `maxlength="${maxlength}"` : ''} ${placeholder ? `placeholder="${placeholder}"` : ''} required></div>`
 }
 export const AuthButton = label => `<button class="button button-submit" type="submit">${label}</button>`
 export function SocialButton(provider, signup = false) {
   const label = `${signup ? 'Cadastrar' : 'Entrar'} com ${provider === 'google' ? 'Google' : 'GitHub'}`
-  return `<button class="button button-${provider}" type="button" ${provider === 'github' ? `id="github-${signup ? 'cadastro' : 'login'}"` : 'data-google-login'}><img src="${provider === 'github' ? '/folio/07-logo-github.png' : '/icons/google.svg'}" width="${provider === 'github' ? '14' : '22'}" height="${provider === 'github' ? '14' : '22'}" alt="" aria-hidden="true">${label}</button>`
+  return `<button class="button button-${provider}" type="button" ${provider === 'github' ? `id="github-${signup ? 'cadastro' : 'login'}"` : 'data-google-login'}><img src="${provider === 'github' ? '/icons/github-white.svg' : '/icons/google.svg'}" width="${provider === 'github' ? '22' : '22'}" height="${provider === 'github' ? '22' : '22'}" alt="" aria-hidden="true">${label}</button>`
 }
-const social = signup => `<div class="auth-divider">ou continue com</div><div class="auth-providers">${SocialButton('google', signup)}${SocialButton('github', signup)}</div>`
+const social = signup => `<div class="auth-divider">Ou continue com</div><div class="auth-providers">${SocialButton('google', signup)}${SocialButton('github', signup)}</div>`
 export function AuthLayout() {
-  return `<aside class="auth-right" aria-label="Seu portfólio de forma descomplicada"><div class="auth-story"><h2>Seu portfólio<br>de forma<br>descomplicada.</h2><div class="auth-integrations" aria-hidden="true"><img class="auth-integration-github" src="/icons/github-white.svg" alt="" width="70" height="70"><img class="auth-integration-kaptei" src="/folio/auth-kaptei.png" alt="" width="84" height="84"></div></div></aside>
-  <section class="auth-left"><div class="auth-form-wrap"><a class="auth-brand" href="/" aria-label="FolioDev, início">${Logo()}</a>
+  return `<aside class="auth-right" aria-label="Seus projetos em um só lugar"><div class="auth-story"><h2>Seus projetos<br>em um só lugar.</h2><div class="auth-integrations" aria-label="GitHub e Kirvano"><span class="auth-integration-github"><img src="/icons/github.svg" alt="GitHub" width="72" height="72"></span><span class="auth-integration-k" aria-label="Kirvano">K</span></div></div></aside>
+  <section class="auth-left"><div class="auth-form-wrap"><a class="auth-brand" href="/" aria-label="WebFolio, início">${Logo()}</a>
   <div class="auth-panel" id="panel-login" aria-labelledby="login-title"><h1 id="login-title">Entrar</h1><p class="auth-sub">Entre com seus dados para acessar sua conta.</p><form id="form-login">
   ${AuthInput('login-email', 'E-mail', { type: 'email', autocomplete: 'email', maxlength: '254', placeholder: 'voce@email.com' })}
   ${AuthInput('login-senha', 'Senha', { type: 'password', autocomplete: 'current-password', placeholder: '••••••••' })}

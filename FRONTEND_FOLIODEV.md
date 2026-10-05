@@ -1,4 +1,4 @@
-# FolioDev — reconstrução do frontend
+# WebFolio — reconstrução do frontend
 
 Especificação: `foliodev-prompt-frontend.md`. Direção: Editorial Mono, “o portfólio como documento”. Implementação em 28/09/2026.
 
@@ -56,7 +56,7 @@ As avaliações foram reduzidas de aproximadamente 8 MB para 12 KB no total. Os 
 - [x] Rotas autenticadas continuam protegidas — verificado sem sessão em nove rotas.
 - [ ] GitHub conecta, lista e vincula repositórios como antes — contratos preservados, teste autenticado pendente.
 - [ ] Criar, editar, mover (drag and drop), publicar e despublicar continuam funcionando — testes de organização passam; validação real de persistência pendente.
-- [x] Marca “FolioDev” e logo oficial consistentes nas telas, títulos e metadados revisados.
+- [x] Marca “WebFolio” e logo oficial consistentes nas telas, títulos e metadados revisados.
 - [x] Nenhum identificador técnico foi renomeado por engano.
 - [ ] Todas as telas têm estados de loading, vazio, erro e sucesso — interfaces implementadas; respostas reais de sucesso/erro autenticadas não verificadas.
 - [x] Sem gradientes decorativos, glow, blobs ou glassmorphism nos novos estilos. O fade lateral do carrossel segue a exceção da especificação.

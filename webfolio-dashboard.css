@@ -1,0 +1,55 @@
+/* Final theme layer for the WebFolio dashboard and empty Models route. */
+body.dashboard-app .folio-brand { aspect-ratio: 3189 / 573 !important; }
+body.dashboard-app .folio-brand img { filter: none !important; width: 100% !important; height: auto !important; }
+body.dashboard-app .theme-logo-dark { display: none !important; }
+body.dashboard-app[data-theme="dark"] .theme-logo-light { display: none !important; }
+body.dashboard-app[data-theme="dark"] .theme-logo-dark { display: block !important; }
+body.dashboard-app .sidebar .folio-brand-compact { display: none !important; width: 38px !important; height: 38px !important; object-fit: contain; filter: none !important; }
+body.dashboard-app .sidebar-collapsed .brand-crop { overflow: visible !important; }
+body.dashboard-app .sidebar-collapsed .brand-crop .folio-brand-compact.theme-logo-light { display: block !important; }
+body.dashboard-app[data-theme="dark"] .sidebar-collapsed .brand-crop .folio-brand-compact.theme-logo-light { display: none !important; }
+body.dashboard-app[data-theme="dark"] .sidebar-collapsed .brand-crop .folio-brand-compact.theme-logo-dark { display: block !important; }
+html body.dashboard-app .sidebar,
+html body.dashboard-app.kaptei-route .sidebar { overflow: visible; }
+html body.dashboard-app .sidebar-toggle,
+html body.dashboard-app.kaptei-route .sidebar-toggle { position: absolute !important; top: 82px !important; right: -16px !important; z-index: 65 !important; display: grid !important; place-items: center; width: 32px; height: 32px; border: 1px solid var(--border) !important; border-radius: 50%; background: var(--surface) !important; color: var(--text) !important; box-shadow: 0 2px 8px #0002; }
+html body.dashboard-app .sidebar-toggle:hover { background: var(--surface-muted) !important; }
+html body.dashboard-app .sidebar-resize-handle { z-index: 50; }
+html body.dashboard-app[data-theme="dark"] .sidebar,
+html body.dashboard-app[data-theme="dark"].kaptei-route .sidebar { background: #171a1e !important; border-right: 1px solid #343a42 !important; color: #f5f6f7 !important; }
+html body.dashboard-app[data-theme="dark"] .sidebar .nav-item { color: #e4e8ec !important; }
+html body.dashboard-app[data-theme="dark"] .sidebar .nav-item:hover,
+html body.dashboard-app[data-theme="dark"] .sidebar .nav-item.active { background: #2b3138 !important; color: #fff !important; }
+html body.dashboard-app[data-theme="dark"] .sidebar .nav-item.active::before { background: #78aaff !important; }
+html body.dashboard-app[data-theme="dark"] .sidebar .user-mini,
+html body.dashboard-app[data-theme="dark"] .sidebar .user-menu { background: #252a30 !important; color: #f5f6f7 !important; border-color: #40474f !important; }
+html body.dashboard-app[data-theme="dark"] .sidebar .user-mini small,
+html body.dashboard-app[data-theme="dark"] .sidebar .user-menu button { color: #d0d6dc !important; }
+html body.dashboard-app[data-theme="dark"] .sidebar-toggle { background: #252a30 !important; border-color: #4b535d !important; color: #fff !important; }
+html body.dashboard-app[data-theme="dark"] .mobile-topbar { background: #171a1e !important; color: #fff !important; border-color: #343a42 !important; }
+html body.dashboard-app[data-theme="dark"] .mobile-topbar .icon-button { background: #252a30 !important; border-color: #4b535d !important; color: #fff !important; }
+body.dashboard-app .models-page .page-head h1 { display: flex; align-items: center; gap: 10px; }
+body.dashboard-app .models-page .page-head h1::before { content: "✎"; font-size: .75em; font-weight: 400; }
+body.dashboard-app .models-empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: min(52vh, 480px); margin-top: 26px; padding: 32px; border: 1px dashed var(--border-strong); border-radius: 18px; background: var(--surface); color: var(--text); text-align: center; }
+body.dashboard-app .models-empty-state [data-icon] { display: grid; place-items: center; width: 62px; height: 62px; margin-bottom: 18px; border-radius: 18px; background: var(--surface-muted); color: var(--text); }
+body.dashboard-app .models-empty-state svg { width: 30px; height: 30px; }
+body.dashboard-app .models-empty-state h2 { margin: 0; font-size: clamp(25px, 3vw, 35px); letter-spacing: -.04em; }
+body.dashboard-app .models-empty-state p { max-width: 440px; margin: 10px 0 0; color: var(--text-muted); }
+html body.dashboard-app .plans-page .devi-plan-card--plus,
+html body.dashboard-app[data-theme="dark"] .plans-page .devi-plan-card--plus { background: #171b22 !important; color: #fff !important; border: 2px solid #3979db !important; box-shadow: 0 12px 32px #1b4b8c29 !important; opacity: 1 !important; }
+html body.dashboard-app .plans-page .devi-plan-card--plus :is(h3, strong, li, .devi-plan-price span),
+html body.dashboard-app[data-theme="dark"] .plans-page .devi-plan-card--plus :is(h3, strong, li, .devi-plan-price span) { color: #fff !important; opacity: 1 !important; }
+html body.dashboard-app .plans-page .devi-plan-card--plus .devi-plan-description,
+html body.dashboard-app[data-theme="dark"] .plans-page .devi-plan-card--plus .devi-plan-description { color: #d7e0ed !important; opacity: 1 !important; }
+html body.dashboard-app .plans-page .devi-plan-card--plus > button,
+html body.dashboard-app .plans-page .devi-plan-card--plus > button:disabled { background: #fff !important; color: #11151b !important; border-color: #fff !important; opacity: 1 !important; }
+html body.dashboard-app[data-theme="dark"] .plans-page .devi-plan-card:not(.devi-plan-card--plus) { background: var(--surface) !important; color: var(--text) !important; border-color: var(--border) !important; opacity: 1 !important; }
+html body.dashboard-app[data-theme="dark"] .plans-page .devi-plan-card:not(.devi-plan-card--plus) :is(h3, strong, li) { color: var(--text) !important; }
+html body.dashboard-app[data-theme="dark"] .plans-page .devi-plan-card:not(.devi-plan-card--plus) .devi-plan-description { color: var(--text-muted) !important; }
+html body.dashboard-app[data-theme="dark"] .home-repository-list .github-icon img,
+html body.dashboard-app[data-theme="dark"] .github-page .repo-icon img { filter: brightness(0) invert(1) !important; }
+html body.dashboard-app .home-repository-list .github-icon img { filter: brightness(0); }
+@media (max-width: 700px) {
+  html body.dashboard-app .sidebar-toggle { top: 70px !important; right: 12px !important; }
+  body.dashboard-app .models-empty-state { min-height: 42vh; padding: 26px 18px; }
+}

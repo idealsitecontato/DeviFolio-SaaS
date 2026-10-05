@@ -29,7 +29,7 @@ function showPanel(name, updateHash = false) {
     panel.hidden = !active
   })
   document.body.dataset.authView = selected
-  document.title = `${({login:'Entrar',cadastro:'Criar conta',recuperar:'Recuperar acesso',redefinir:'Nova senha'})[selected]} — FolioDev`
+  document.title = `${({login:'Entrar',cadastro:'Criar conta',recuperar:'Recuperar acesso',redefinir:'Nova senha'})[selected]} — WebFolio`
   clearMessage()
   if (updateHash) history.replaceState(null, '', `#${selected}`)
   if (updateHash) panels[selected].querySelector('h1')?.focus({ preventScroll: true })

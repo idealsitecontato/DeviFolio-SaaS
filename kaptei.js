@@ -75,7 +75,7 @@ export function bindKapteiActions({ toast }) {
     })
     const link = document.createElement('a')
     link.href = URL.createObjectURL(new Blob(['\uFEFF', lines.join('\r\n')], { type: 'text/csv;charset=utf-8' }))
-    link.download = 'foliodev-leads.csv'
+    link.download = 'webfolio-leads.csv'
     link.click()
     setTimeout(() => URL.revokeObjectURL(link.href), 1000)
   })

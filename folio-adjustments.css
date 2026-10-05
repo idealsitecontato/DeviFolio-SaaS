@@ -1,4 +1,4 @@
-/* FolioDev references: scoped final presentation adjustments. */
+/* WebFolio references: scoped final presentation adjustments. */
 body.auth-body[data-auth-view] .auth-brand{width:210px;height:auto;margin-bottom:44px;overflow:visible}
 body.auth-body[data-auth-view] .auth-logo{position:static;width:210px!important;height:auto!important;max-width:100%;object-fit:contain}
 @media(min-width:1001px){body.auth-body[data-auth-view=login] .auth-form-wrap{transform:translate(18px,-48px)}body.auth-body[data-auth-view=cadastro] .auth-form-wrap{width:400px;transform:translate(38px,-18px)}}

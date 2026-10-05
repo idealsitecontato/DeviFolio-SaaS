@@ -1,0 +1,49 @@
+/* Light, two-column WebFolio authentication screens. */
+html:has(body.auth-body),
+body.auth-body,
+body.auth-body[data-auth-view] { background: #f8f9fa !important; color: #111319 !important; color-scheme: light; }
+body.auth-body .auth-shell { display: grid; grid-template-columns: 1fr 1fr; min-height: 100svh; }
+body.auth-body .auth-left { grid-column: 1; grid-row: 1; display: flex; align-items: center; justify-content: center; padding: 44px 32px; background: #fafbfc !important; }
+body.auth-body .auth-form-wrap,
+body.auth-body[data-auth-view] .auth-form-wrap { width: min(430px, 100%); transform: none; }
+body.auth-body .auth-brand,
+body.auth-body[data-auth-view] .auth-brand { width: max-content; margin: 0 auto 38px !important; transform: none; }
+body.auth-body .auth-logo { width: 244px !important; height: auto !important; object-fit: contain; }
+body.auth-body .auth-panel h1 { color: #111319; font-size: 32px; font-weight: 700; line-height: 1.1; }
+body.auth-body .auth-sub { color: #747d8d; font-size: 14px; white-space: normal; }
+body.auth-body .auth-field label { color: #67717f; font-size: 13px; }
+body.auth-body input:not([type=checkbox]) { background: #fff !important; border: 1px solid #d5dbe3 !important; border-radius: 9px; color: #111319; }
+body.auth-body input::placeholder { color: #a2aab5; opacity: 1; }
+body.auth-body .auth-row-between, body.auth-body .auth-checkbox, body.auth-body .auth-switch, body.auth-body .auth-divider { color: #687383; }
+body.auth-body .auth-forgot, body.auth-body .auth-switch a, body.auth-body .auth-terms a { color: #555f6d; text-decoration: underline; }
+body.auth-body .button-submit { background: #17191d !important; border-color: #17191d !important; color: #fff !important; }
+body.auth-body .button-google { background: #fff !important; border: 1px solid #d5dbe3 !important; color: #111319 !important; }
+body.auth-body .button-github { background: #2f73f2 !important; border-color: #2f73f2 !important; color: #fff !important; }
+body.auth-body .button-github:hover:not(:disabled) { background: #1d62e0 !important; }
+body.auth-body .button-github img { filter: none; }
+body.auth-body .auth-right { grid-column: 2; grid-row: 1; min-height: 100%; background: linear-gradient(180deg, #fafbfc 0%, #fff 53%, #cdd0d2 75%, #202124 100%) !important; color: #111319 !important; border-left: 1px solid #d7dadd; }
+body.auth-body .auth-story { position: sticky; top: 0; padding: clamp(85px, 10vh, 150px) 6vw 0; }
+body.auth-body .auth-story h2 { color: #0a0b0e !important; font-size: clamp(43px, 3.9vw, 72px); font-weight: 700; line-height: 1.02; letter-spacing: -.055em; text-wrap: wrap; }
+body.auth-body .auth-integrations { display: flex; align-items: center; gap: 14px; padding: 0; margin-top: 32px; }
+body.auth-body .auth-integrations span { display: grid; place-items: center; flex: none; width: 80px; height: 80px; border-radius: 50%; overflow: hidden; }
+body.auth-body[data-auth-view] .auth-integrations .auth-integration-github { box-sizing: border-box; padding: 0; margin: 0; background: #050505 !important; }
+body.auth-body[data-auth-view] .auth-integrations .auth-integration-github img { display: block; width: 58px; height: 58px; margin: 0; clip-path: none; object-fit: contain; filter: brightness(0) invert(1); }
+body.auth-body .auth-integration-k { background: #20bd62; color: #fff; font-size: 55px; font-weight: 800; font-style: italic; line-height: 1; }
+body.auth-body .password-toggle { color: #606b79; }
+body.auth-body .auth-message { color: #7a2121; }
+body.auth-body .auth-message.is-success { color: #126444; }
+body.auth-body[data-auth-view=cadastro] .auth-brand { margin-bottom: 20px !important; }
+body.auth-body[data-auth-view=cadastro] .auth-left { padding-block: 24px; }
+body.auth-body :is(a, button, input):focus-visible { outline: 2px solid #2f73f2 !important; outline-offset: 2px; }
+@media (max-width: 1000px) {
+  body.auth-body .auth-shell { grid-template-columns: 1fr; }
+  body.auth-body .auth-right { display: none; }
+  body.auth-body .auth-left { min-height: 100svh; padding: 36px 24px; }
+  body.auth-body .auth-form-wrap { width: min(430px, 100%); }
+}
+@media (max-width: 420px) {
+  body.auth-body .auth-left { padding: 26px 20px; }
+  body.auth-body .auth-brand { margin-bottom: 24px !important; }
+  body.auth-body .auth-logo { width: 205px !important; }
+  body.auth-body .auth-panel h1 { font-size: 28px; }
+}

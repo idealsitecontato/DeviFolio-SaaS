@@ -1,4 +1,4 @@
-/* The official FolioDev assets and the supplied animation styles live here. */
+/* The official WebFolio assets and the supplied animation styles live here. */
 :root{--color-line:#CBCBC4;--gooey-color:var(--color-charcoal)}
 html{background:var(--color-bg)}
 body{background:var(--color-bg)}
@@ -11,7 +11,7 @@ body{background:var(--color-bg)}
 .dashboard-app .sidebar .folio-brand,.dashboard-app .mobile-topbar .folio-brand{width:var(--brand-width,146px);height:auto}
 .dashboard-app .sidebar-collapsed .folio-brand{width:38px;height:35px;overflow:hidden}
 .dashboard-app .sidebar-collapsed .folio-brand img{position:static;left:auto;top:auto;width:38px;height:35px;max-width:none;object-fit:cover;object-position:left}
-.site-footer .footer-grid img[src*="foliodev-logo"],.public-footer .folio-brand{background:var(--color-bg);border-radius:5px}
+.site-footer .footer-grid img[src*="webfolio-logo"],.public-footer .folio-brand{background:var(--color-bg);border-radius:5px}
 .folio-brand-compact{object-fit:contain!important}
 
 /* Landing reference: independent full-screen hero with its own dashboard fade. */
