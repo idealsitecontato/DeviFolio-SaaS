@@ -13,6 +13,7 @@ create table if not exists public.profiles (
   github text not null default '',
   website text not null default '',
   avatar_url text not null default '',
+  selected_model text not null default 'white',
   published boolean not null default false,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -59,6 +60,8 @@ create table if not exists public.analytics_events (
 create index if not exists analytics_events_user_id_idx on public.analytics_events(user_id);
 
 alter table public.profiles add column if not exists avatar_url text not null default '';
+alter table public.profiles add column if not exists selected_model text not null default 'white';
+alter table public.profiles drop constraint if exists profiles_selected_model_check;
 alter table public.projects add column if not exists image_url text;
 alter table public.analytics_events add column if not exists visitor_id text;
 

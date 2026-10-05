@@ -1,4 +1,5 @@
 import { documentPreview, statusBadge, emptyMarkup } from './src/ui/components.js'
+import { portfolioModels, templateModels, getPortfolioModel, modelPreviewUrl } from './src/lib/portfolio-models.js'
 import { renderPlanCards } from './plans.js'
 import { supabase } from './src/lib/supabase.js'
 import {
@@ -8,6 +9,7 @@ import {
   removeProject,
   removeProjectImage,
   saveProfile,
+  savePortfolioModel,
   saveProject,
   saveSettings,
   uploadAvatar,
@@ -95,7 +97,7 @@ function hydrateIcons(root = document) {
   })
 }
 
-const blankProfile = { name: '', username: '', email: '', role: '', bio: '', skills: '', linkedin: '', github: '', website: '', avatar: '' }
+const blankProfile = { name: '', username: '', email: '', role: '', bio: '', skills: '', linkedin: '', github: '', website: '', avatar: '', selectedModel: 'white' }
 const blankSettings = { email: true, product: true, publicProfile: true, compact: false }
 const state = { projects: [], folderNames: {}, folderOrder: [], hiddenFolders: [], profile: { ...blankProfile }, published: false, githubConnected: false, githubUsername: '', repos: [], analytics: [], leads: [], leadsAvailable: true, settings: { ...blankSettings } }
 let visualPublications = { folders: {}, events: [] }
@@ -103,6 +105,9 @@ let selectedFolderId = null
 let portfolioLayout = 'grid'
 let profileBannerRevision = ''
 let publicationHistoryExpanded = false
+let modelQuery = ''
+let modelCategory = 'Todos'
+let modelPage = 1
 const projectVisualType = project => /(?:^|[\s/_-])landing(?:[\s/_-]|$)/i.test(`${project.name} ${project.description || ''} ${project.link || ''}`) ? 'landing' : 'site'
 const projectTypeChip = project => {
   const type = projectVisualType(project)
@@ -271,7 +276,7 @@ function portfolioManagerView() {
   const username = profile.username ? `@${profile.username.replace(/^@/, '')}` : '@usuario'
   const biography = profile.bio || profile.role || 'Adicione uma biografia para apresentar seu trabalho aos visitantes.'
   return `<section class="page-enter my-portfolio-page">${pageHead('Meu Portfólio', 'Prévia completa de como os visitantes verão seu portfólio.', '<a class="secondary-button" href="#inicio">← Voltar ao início</a>')}
-    <div class="portfolio-page my-portfolio-preview">
+    <div class="portfolio-page my-portfolio-preview" style="--portfolio-model-accent:${esc(getPortfolioModel(profile.selectedModel).accent || '#333333')}">
       <div class="portfolio-shell folio-showcase-shell"><article class="folio-showcase-card">
         <div class="my-portfolio-banner"><img class="public-banner-image" src="${esc(banner)}" alt="Banner do portfólio" onerror="this.hidden=true"><input id="profile-banner-file" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="icon-button banner-edit-button" type="button" data-upload-profile-banner aria-label="Editar banner"><span data-icon="edit"></span></button></div>
         <div class="folio-showcase-profile"><div class="public-avatar">${profile.avatar ? `<img src="${esc(profile.avatar)}" alt="Foto de ${esc(realName())}" onerror="this.src='${profilePlaceholderUrl}'">` : `<img src="${profilePlaceholderUrl}" alt="Ícone de usuário">`}<input id="avatar-file" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="icon-button avatar-edit-button" type="button" data-upload-avatar aria-label="Editar foto de perfil"><span data-icon="edit"></span></button></div>
@@ -470,9 +475,76 @@ function publicationEventMenu(id) {
   $('[data-copy]', $('#modal-root'))?.addEventListener('click', button => copyText(button.currentTarget.dataset.copy))
 }
 
+const modelCategories = ['Todos', ...new Set(portfolioModels.map(model => model.category || 'Portfólio'))]
+const catalogModels = [...templateModels, ...portfolioModels.filter(model => !templateModels.includes(model))]
+const modelPageSize = 12
+
+function filteredModels() {
+  const query = modelQuery.trim().toLocaleLowerCase('pt-BR')
+  return catalogModels.filter(model => {
+    if (modelCategory !== 'Todos' && (model.category || 'Portfólio') !== modelCategory) return false
+    return !query || [model.name, model.description, model.category || 'Portfólio', ...(model.tags || [])].join(' ').toLocaleLowerCase('pt-BR').includes(query)
+  })
+}
+
+function modelCard(model) {
+  const current = state.profile.selectedModel === model.id
+  const category = model.category || 'Portfólio'
+  return `<article class="card model-card${current ? ' is-current' : ''}"><button class="model-image" type="button" data-preview-model="${esc(model.id)}" aria-label="Pré-visualizar ${esc(model.name)}"><img src="${esc(model.image)}" alt="Prévia do modelo ${esc(model.name)}" width="640" height="360" loading="lazy"></button><div class="model-card-content"><span class="model-category">${esc(category)}</span><h2>${esc(model.name)}</h2><p>${esc(model.description)}</p><div class="model-card-actions"><button class="secondary-button" type="button" data-preview-model="${esc(model.id)}">Prévia</button><button class="primary-button" type="button" ${current ? 'disabled aria-current="true"' : model.available ? `data-apply-model="${esc(model.id)}"` : `data-upgrade-model="${esc(model.id)}"`}>${current ? 'Aplicado' : model.available ? 'Aplicar' : 'Indisponível'}</button></div></div></article>`
+}
+
+function modelsResults() {
+  const filtered = filteredModels()
+  const totalPages = Math.max(1, Math.ceil(filtered.length / modelPageSize))
+  modelPage = Math.min(modelPage, totalPages)
+  const items = filtered.slice((modelPage - 1) * modelPageSize, modelPage * modelPageSize)
+  const controls = totalPages > 1 ? `<nav class="models-pages" aria-label="Páginas de modelos"><button class="secondary-button" data-model-page="${modelPage - 1}" ${modelPage === 1 ? 'disabled' : ''}>Anterior</button><span>Página ${modelPage} de ${totalPages}</span><button class="secondary-button" data-model-page="${modelPage + 1}" ${modelPage === totalPages ? 'disabled' : ''}>Próxima</button></nav>` : ''
+  return `<p class="models-count" role="status">${filtered.length} modelo${filtered.length === 1 ? '' : 's'} encontrado${filtered.length === 1 ? '' : 's'} · ${templateModels.length} novos</p>${items.length ? `<div class="models-grid">${items.map(modelCard).join('')}</div>${controls}` : '<div class="card models-empty">Nenhum modelo corresponde à busca.</div>'}`
+}
+
+function modelsView() {
+  return `<section class="page-enter models-page">${pageHead('Modelos', 'Explore sites completos. Ao aplicar um modelo, suas cores aparecem no portfólio público.')}<div class="models-toolbar"><label class="search-field"><span data-icon="search"></span><input id="model-search" type="search" value="${esc(modelQuery)}" placeholder="Buscar modelos..." aria-label="Buscar modelos"></label><label class="model-filter-label">Categoria<select id="model-category" aria-label="Filtrar modelos por categoria">${modelCategories.map(category => `<option value="${esc(category)}" ${category === modelCategory ? 'selected' : ''}>${esc(category)}</option>`).join('')}</select></label></div><div id="models-results">${modelsResults()}</div></section>`
+}
+
+function bindModelResults() {
+  $$('[data-preview-model]', $('#models-results')).forEach(button => button.onclick = () => {
+    const model = getPortfolioModel(button.dataset.previewModel)
+    const url = modelPreviewUrl(model)
+    if (url) window.open(url, '_blank', 'noopener')
+    else modal(`<div class="modal-head"><h2>${esc(model.name)}</h2><button class="icon-button" type="button" data-close-modal aria-label="Fechar"><span data-icon="x"></span></button></div><img class="legacy-model-image" src="${esc(model.image)}" alt="Cor do ${esc(model.name)}">${documentPreview({ profile: state.profile, projects: state.projects.filter(project => project.status === 'published') })}<div class="modal-actions"><button class="secondary-button" type="button" data-close-modal>Fechar</button></div>`)
+  })
+  $$('[data-apply-model]', $('#models-results')).forEach(button => button.onclick = () => {
+    const model = getPortfolioModel(button.dataset.applyModel)
+    modal(`<div class="modal-head"><h2>Aplicar ${esc(model.name)}</h2><button class="icon-button" type="button" data-close-modal aria-label="Fechar"><span data-icon="x"></span></button></div><p>As cores do modelo serão aplicadas ao seu portfólio público. A prévia mostra o site completo.</p><div class="modal-actions"><button class="secondary-button" type="button" data-close-modal>Cancelar</button><button class="primary-button" type="button" data-confirm-model="${esc(model.id)}">Aplicar modelo</button></div>`)
+    $('[data-confirm-model]', $('#modal-root')).onclick = async event => {
+      const confirm = event.currentTarget
+      setButtonLoading(confirm, true, 'Aplicando...')
+      try {
+        await savePortfolioModel(currentUser.id, model.id)
+        state.profile.selectedModel = model.id
+        closeModal()
+        updateModelsResults()
+        toast('Modelo aplicado ao portfólio.')
+      } catch (error) {
+        reportError(error?.code === '42703' || error?.code === 'PGRST204' ? 'A migração de Modelos precisa ser aplicada no banco.' : 'Não foi possível aplicar o modelo.', error)
+      } finally { if (confirm.isConnected) setButtonLoading(confirm, false) }
+    }
+  })
+  $$('[data-upgrade-model]', $('#models-results')).forEach(button => button.onclick = () => { location.hash = 'planos' })
+  $$('[data-model-page]', $('#models-results')).forEach(button => button.onclick = () => { modelPage = Number(button.dataset.modelPage); updateModelsResults(); $('#models-results')?.scrollIntoView({ block: 'start', behavior: motionDuration() ? 'smooth' : 'instant' }) })
+}
+
+function updateModelsResults() {
+  const root = $('#models-results')
+  if (!root) return
+  root.innerHTML = modelsResults()
+  hydrateIcons(root)
+  bindModelResults()
+}
+
 function plansView(){return `<section class="page-enter plans-page">${pageHead('Planos','Compare os recursos disponíveis para seu portfólio.')}<p class="plans-availability">As assinaturas pagas estão em breve. Continue editando e publicando seu portfólio.</p><div class="devi-plan-grid">${renderPlanCards({internal:true})}</div><article class="card coupon-card"><h2>Tem um cupom?</h2><p>A validação e o pagamento serão ativados com os planos.</p><form id="coupon-form"><label for="coupon-code">Código do cupom</label><div><input id="coupon-code" placeholder="Digite o código"><button class="primary-button" type="submit">Aplicar</button><button class="secondary-button" type="reset">Remover</button></div><small id="coupon-feedback" role="status">Nenhum desconto aplicado.</small></form></article></section>`}
 
-const views = { publicacoes: publicationsView, planos: plansView, 'link-qrcode': linkQrView, inicio: homeView, projetos: projectsView, portfolio: portfolioManagerView, 'portfolio-editar': portfolioEditorView, github: githubView, analise: analyticsView, kaptei: () => kapteiView(state.leads, state.leadsAvailable), perfil: profileView, configuracoes: settingsView }
+const views = { publicacoes: publicationsView, planos: plansView, 'link-qrcode': linkQrView, inicio: homeView, projetos: projectsView, portfolio: portfolioManagerView, modelos: modelsView, 'portfolio-editar': portfolioEditorView, github: githubView, analise: analyticsView, kaptei: () => kapteiView(state.leads, state.leadsAvailable), perfil: profileView, configuracoes: settingsView }
 
 function render({ preserveScroll = false } = {}) {
   const requestedRoute = location.hash.slice(1)
@@ -486,7 +558,7 @@ function render({ preserveScroll = false } = {}) {
   document.body.classList.toggle('projects-route', route === 'projetos')
   document.body.classList.toggle('kaptei-route', route === 'kaptei')
   $('#page-content').innerHTML = views[route]()
-  const routeLabel = { publicacoes:'Publicações', planos:'Planos', 'link-qrcode': 'Seu Link, Seu QR Code', inicio: 'Dashboard', projetos: 'Projetos', portfolio: 'Meu portfólio', 'portfolio-editar': 'Editar portfólio', github: 'GitHub', analise: 'Análise', kaptei: 'Kaptei', perfil: 'Perfil', configuracoes: 'Configurações' }[route]
+  const routeLabel = { publicacoes:'Publicações', planos:'Planos', 'link-qrcode': 'Seu Link, Seu QR Code', inicio: 'Dashboard', projetos: 'Projetos', portfolio: 'Meu portfólio', modelos: 'Modelos', 'portfolio-editar': 'Editar portfólio', github: 'GitHub', analise: 'Análise', kaptei: 'Kaptei', perfil: 'Perfil', configuracoes: 'Configurações' }[route]
   document.title = `${routeLabel} — FolioDev`
   if ($('#breadcrumb-page')) $('#breadcrumb-page').textContent = routeLabel
   if ($('#breadcrumb-section')) $('#breadcrumb-section').textContent = route === 'inicio' ? 'Início' : 'Painel'
@@ -511,6 +583,9 @@ function updateUserChrome() {
 }
 
 function bindActions() {
+  $('#model-search')?.addEventListener('input', event => { modelQuery = event.currentTarget.value; modelPage = 1; updateModelsResults() })
+  $('#model-category')?.addEventListener('change', event => { modelCategory = event.currentTarget.value; modelPage = 1; updateModelsResults() })
+  if ($('#models-results')) bindModelResults()
   $$('[data-interface-theme]').forEach(button => button.onclick = () => {
     const theme = button.dataset.interfaceTheme === 'dark' ? 'dark' : 'light'
     document.body.dataset.theme = theme

@@ -14,6 +14,7 @@ const mapProfile = row => row ? {
   website: row.website || '',
   avatar: row.avatar_url || '',
   published: Boolean(row.published),
+  selectedModel: row.selected_model || 'white',
   userId: row.user_id,
 } : null
 
@@ -77,6 +78,14 @@ export async function saveProfile(userId, profile, published) {
     published: Boolean(published),
     updated_at: new Date().toISOString(),
   }, { onConflict: 'user_id' })
+  if (error) throw error
+}
+
+export async function savePortfolioModel(userId, modelId) {
+  const { error } = await supabase.from('profiles').update({
+    selected_model: modelId,
+    updated_at: new Date().toISOString(),
+  }).eq('user_id', userId).select('user_id').single()
   if (error) throw error
 }
 
@@ -193,7 +202,7 @@ export async function loadPublicPortfolio(username) {
   if (!normalized) return null
   let { data: profileRow, error: profileError } = await supabase
     .from('profiles')
-    .select('user_id,name,username,role,bio,skills,linkedin,github,website,avatar_url,published')
+    .select('user_id,name,username,role,bio,skills,linkedin,github,website,avatar_url,published,selected_model')
     .eq('username', normalized)
     .eq('published', true)
     .maybeSingle()

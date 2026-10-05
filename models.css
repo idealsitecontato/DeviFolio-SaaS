@@ -1,0 +1,28 @@
+/* Catalog cards share the dashboard's light and dark tokens. */
+body.dashboard-app .models-page { padding-bottom: 48px; }
+body.dashboard-app .models-toolbar { display: flex; align-items: end; gap: 14px; margin: 24px 0 18px; }
+body.dashboard-app .models-toolbar .search-field { flex: 1; min-width: 180px; max-width: 460px; }
+body.dashboard-app .model-filter-label { display: grid; gap: 6px; color: var(--text-muted); font-size: 12px; font-weight: 600; }
+body.dashboard-app .model-filter-label select { min-height: 42px; min-width: 175px; padding: 0 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); }
+body.dashboard-app .models-count { margin: 0 0 16px; color: var(--text-muted); font-size: 13px; }
+body.dashboard-app .models-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+body.dashboard-app .model-card { min-width: 0; padding: 0 !important; overflow: hidden; border: 1px solid var(--border) !important; border-radius: 12px !important; background: var(--surface) !important; }
+body.dashboard-app .model-card.is-current { border-color: var(--text) !important; }
+body.dashboard-app .model-image { display: block; width: 100%; padding: 0; border: 0; background: var(--surface-muted); cursor: pointer; overflow: hidden; }
+body.dashboard-app .model-image img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; object-position: top; transition: transform var(--motion-normal) var(--ease); }
+body.dashboard-app .model-image:hover img { transform: scale(1.02); }
+body.dashboard-app .model-image:focus-visible { outline: 3px solid var(--text); outline-offset: -3px; }
+body.dashboard-app .model-card-content { display: flex; flex-direction: column; min-height: 190px; padding: 16px 18px 18px; }
+body.dashboard-app .model-category { width: fit-content; margin-bottom: 8px; padding: 4px 8px; border: 1px solid var(--border); border-radius: 999px; color: var(--text-muted); font-size: 11px; font-weight: 600; }
+body.dashboard-app .model-card h2 { margin: 0; color: var(--text); font-size: 17px; line-height: 1.3; }
+body.dashboard-app .model-card p { flex: 1; margin: 8px 0 18px; color: var(--text-muted); font-size: 13px; line-height: 1.45; }
+body.dashboard-app .model-card-actions { display: flex; justify-content: space-between; gap: 8px; }
+body.dashboard-app .model-card-actions button { flex: 1; min-width: 0; min-height: 38px; padding: 6px 10px; font-size: 12px; }
+body.dashboard-app .models-pages { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 28px; color: var(--text-muted); font-size: 13px; }
+body.dashboard-app .models-pages button { min-height: 38px; }
+body.dashboard-app .models-empty { padding: 32px; color: var(--text-muted); }
+body.dashboard-app .legacy-model-image { display: block; width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin: 12px 0; }
+body.dashboard-app .my-portfolio-preview .folio-showcase-card { border-top: 4px solid var(--portfolio-model-accent); }
+@media (max-width: 1120px) { body.dashboard-app .models-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 690px) { body.dashboard-app .models-toolbar { align-items: stretch; flex-direction: column; } body.dashboard-app .models-toolbar .search-field { max-width: none; } body.dashboard-app .model-filter-label select { width: 100%; } body.dashboard-app .models-grid { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { body.dashboard-app .model-image img { transition: none; } body.dashboard-app .model-image:hover img { transform: none; } }
