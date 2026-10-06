@@ -29,7 +29,7 @@ function showPanel(name, updateHash = false) {
     panel.hidden = !active
   })
   document.body.dataset.authView = selected
-  document.title = `${({login:'Entrar',cadastro:'Criar conta',recuperar:'Recuperar acesso',redefinir:'Nova senha'})[selected]} — WebFolio`
+  document.title = `${({login:'Entrar',cadastro:'Criar conta',recuperar:'Recuperar acesso',redefinir:'Nova senha'})[selected]} — Devifolio`
   clearMessage()
   if (updateHash) history.replaceState(null, '', `#${selected}`)
   if (updateHash) panels[selected].querySelector('h1')?.focus({ preventScroll: true })
@@ -313,6 +313,7 @@ try {
 
 document.querySelectorAll('.auth-panel h1').forEach(title => title.tabIndex = -1)
 document.querySelectorAll('input[type="password"]').forEach(input => {
+  if (input.id === 'login-senha') return
   const wrap = document.createElement('div'); wrap.className = 'password-field'
   input.replaceWith(wrap); wrap.append(input)
   const button = document.createElement('button'); button.type = 'button'; button.className = 'password-toggle'
