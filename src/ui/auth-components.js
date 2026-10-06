@@ -1,6 +1,6 @@
-import { folioDevMark } from './brand.js'
+import { folioDevLogo } from './brand.js'
 
-export const Logo = () => `<span class="auth-logo"><img src="${folioDevMark}" alt="" width="1260" height="1134"><span>Devifolio</span></span>`
+export const Logo = () => `<img class="auth-logo" src="${folioDevLogo}" alt="WebFolio" width="3189" height="573">`
 export function AuthInput(id, label, { type = 'text', autocomplete = '', minlength = '', maxlength = '', placeholder = '' } = {}) {
   return `<div class="auth-field"><label for="${id}">${label}</label><input id="${id}" name="${id}" type="${type}" autocomplete="${autocomplete}" ${minlength ? `minlength="${minlength}"` : ''} ${maxlength ? `maxlength="${maxlength}"` : ''} ${placeholder ? `placeholder="${placeholder}"` : ''} required></div>`
 }
@@ -12,7 +12,7 @@ export function SocialButton(provider, signup = false) {
 const social = signup => `<div class="auth-divider">${signup ? 'ou' : 'ou continue com'}</div><div class="auth-providers">${SocialButton('google', signup)}${SocialButton('github', signup)}</div>`
 export function AuthLayout() {
   return `<aside class="auth-right" aria-label="Seu portfólio de forma descomplicada"><div class="auth-story"><h2>Seu portfólio<br>de forma<br>descomplicada.</h2><div class="auth-integrations" aria-label="GitHub e Kaptei"><span class="auth-integration-github"><img src="/folio/auth-github-mark.png" alt="GitHub" width="72" height="72"></span><span class="auth-integration-k"><img src="/kaptei/kaptei-logo.png" alt="Kaptei" width="96" height="96"></span></div></div></aside>
-  <section class="auth-left"><div class="auth-form-wrap"><a class="auth-brand" href="/" aria-label="Devifolio, início">${Logo()}</a>
+  <section class="auth-left"><div class="auth-form-wrap"><a class="auth-brand" href="/" aria-label="WebFolio, início">${Logo()}</a>
   <div class="auth-panel" id="panel-login" aria-labelledby="login-title"><h1 id="login-title">Entrar</h1><p class="auth-sub">Entre com seus dados para acessar sua conta.</p><form id="form-login">
   ${AuthInput('login-email', 'E-mail', { type: 'email', autocomplete: 'email', maxlength: '254', placeholder: 'voce@email.com' })}
   ${AuthInput('login-senha', 'Senha', { type: 'password', autocomplete: 'current-password', placeholder: '••••••••' })}

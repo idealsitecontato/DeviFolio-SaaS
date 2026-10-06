@@ -110,3 +110,56 @@ body.auth-body[data-auth-view=cadastro] .auth-switch { margin-top: 12px; }
   body.auth-body[data-auth-view=cadastro] .auth-terms { font-size: 11px; }
 }
 @media (prefers-reduced-motion: reduce) { body.auth-body .button { transition: none; } }
+
+/* Final reference-scale adjustments for all auth views. */
+body.auth-body .auth-left { padding: 34px 28px 60px; }
+body.auth-body .auth-left::after { height: 11%; opacity: .55; }
+body.auth-body .auth-form-wrap,
+body.auth-body[data-auth-view] .auth-form-wrap { width: min(350px, 100%); }
+body.auth-body .auth-brand,
+body.auth-body[data-auth-view] .auth-brand { display: block; width: max-content; margin-bottom: 30px !important; }
+body.auth-body .auth-logo { display: block; width: clamp(160px, 13vw, 190px) !important; height: auto !important; object-fit: contain; }
+body.auth-body .auth-panel h1 { font-size: clamp(25px, 2vw, 30px); }
+body.auth-body .auth-sub { margin: 4px 0 21px; font-size: 13px; }
+body.auth-body .auth-panel form { gap: 14px; }
+body.auth-body .auth-field { gap: 5px; }
+body.auth-body .auth-field label { font-size: 12px; font-weight: 500; }
+body.auth-body input:not([type=checkbox]) { height: 42px; min-height: 42px; padding: 8px 13px; border-radius: 9px; font-size: 13px; }
+body.auth-body input[type=checkbox] { width: 17px; height: 17px; min-width: 17px; border-radius: 3px; }
+body.auth-body .auth-row-between { margin-top: -4px; font-size: 12px; }
+body.auth-body .auth-checkbox { gap: 8px; font-size: 12px; }
+body.auth-body .button { height: 44px; min-height: 44px; padding: 7px 13px; border-radius: 9px; font-size: 13px; }
+body.auth-body .auth-divider { gap: 10px; margin: 17px 0 14px; font-size: 12px; }
+body.auth-body .auth-providers { gap: 8px; }
+body.auth-body .auth-providers img { width: 20px; height: 20px; margin-right: 9px; }
+body.auth-body .auth-switch { margin-top: 19px; font-size: 12px; }
+body.auth-body .auth-story { padding: clamp(86px, 11vh, 126px) 25px 0 clamp(46px, 5vw, 85px); }
+body.auth-body .auth-story h2 { font-size: clamp(38px, 3vw, 56px); }
+body.auth-body .auth-integrations { gap: 14px; margin-top: 25px; padding-left: 5px; }
+body.auth-body .auth-integrations span { width: 64px; height: 64px; }
+body.auth-body[data-auth-view] .auth-integrations .auth-integration-github img { width: 51px; height: 51px; }
+body.auth-body .auth-integration-k img { width: 64px; height: 64px; }
+body.auth-body[data-auth-view=cadastro] .auth-left { padding-block: 24px 42px; }
+body.auth-body[data-auth-view=cadastro] .auth-brand { margin-bottom: 23px !important; }
+body.auth-body[data-auth-view=cadastro] .auth-sub { margin-bottom: 16px; }
+body.auth-body[data-auth-view=cadastro] form { gap: 10px; }
+body.auth-body[data-auth-view=cadastro] .auth-terms { gap: 8px; font-size: 11px; }
+body.auth-body[data-auth-view=cadastro] .auth-divider { margin: 13px 0 11px; }
+body.auth-body[data-auth-view=cadastro] .auth-switch { margin-top: 12px; }
+@media (max-width: 1000px) {
+  body.auth-body .auth-left,
+  body.auth-body[data-auth-view=cadastro] .auth-left { padding: 36px 24px 60px; }
+  body.auth-body[data-auth-view] .auth-form-wrap { width: min(350px, 100%); }
+}
+@media (max-width: 560px) {
+  body.auth-body .auth-left,
+  body.auth-body[data-auth-view=cadastro] .auth-left { padding: 28px 20px 45px; }
+  body.auth-body .auth-brand,
+  body.auth-body[data-auth-view=cadastro] .auth-brand { margin-bottom: 27px !important; }
+  body.auth-body .auth-logo { width: 155px !important; }
+  body.auth-body .auth-panel h1 { font-size: 25px; }
+  body.auth-body .auth-sub { font-size: 12px; }
+  body.auth-body .auth-row-between,
+  body.auth-body .auth-checkbox { font-size: 11px; }
+  body.auth-body[data-auth-view=cadastro] .auth-terms { font-size: 10px; }
+}

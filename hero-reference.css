@@ -63,3 +63,57 @@
   .landing-page .hero-preview { width: calc(100% - 22px); margin-top: 44px; border-radius: 15px 15px 0 0; }
 }
 @media (prefers-reduced-motion: reduce) { .landing-page .hero-copy, .landing-page .hero-preview { animation: none; transform: none; } }
+
+/* Reference-scale navigation and hero without page-level transforms. */
+.landing-page .landing-hero { height: max(720px, 100svh); }
+.landing-page .site-header { width: min(1260px, calc(100% - 56px)); }
+.landing-page .navbar { height: 78px; gap: 22px; }
+.landing-page .landing-brand { display: block; width: 158px; flex: none; }
+.landing-page .landing-brand img,
+.landing-page .site-footer .footer-grid .landing-brand img { display: block; width: 100%; height: auto; object-fit: contain; }
+.landing-page .desktop-nav { gap: clamp(16px, 1.6vw, 27px); font-size: 13px; }
+.landing-page .nav-actions { gap: 9px; }
+.landing-page .nav-actions a { min-height: 38px; padding: 0 13px; border-radius: 8px; font-size: 12px; }
+.landing-page .hero-content { height: calc(100% - 78px); }
+.landing-page .hero-copy { width: min(760px, calc(100% - 40px)); margin-top: 42px; }
+.landing-page .hero-eyebrow { margin-bottom: 18px; font-size: 13px; }
+.landing-page .hero-copy h1 { max-width: 760px; font-size: clamp(43px, 3.25vw, 58px); line-height: 1.04; }
+.landing-page .hero-description { max-width: 580px; margin: 20px auto 22px; font-size: clamp(15px, 1.08vw, 18px); line-height: 1.4; }
+.landing-page .hero-primary { min-height: 43px; padding: 0 23px; border-radius: 10px; font-size: 13px; }
+.landing-page .hero-preview { width: min(1180px, 68vw); margin-top: 30px; border-radius: 22px 22px 0 0; }
+.landing-page .site-footer .footer-grid .landing-brand { width: 145px; }
+@media (max-width: 1200px) {
+  .landing-page .site-header { width: calc(100% - 44px); }
+  .landing-page .landing-brand { width: 142px; }
+  .landing-page .desktop-nav { gap: 14px; font-size: 12px; }
+  .landing-page .navbar { gap: 16px; }
+}
+@media (max-width: 800px) {
+  .landing-page .landing-hero { height: 720px; }
+  .landing-page .navbar { height: 68px; }
+  .landing-page .hero-content { height: calc(100% - 68px); }
+  .landing-page .hero-copy { width: min(650px, calc(100% - 40px)); margin-top: 48px; }
+  .landing-page .hero-copy h1 { font-size: clamp(38px, 5.5vw, 48px); }
+  .landing-page .hero-preview { width: calc(100% - 48px); margin-top: 35px; border-radius: 18px 18px 0 0; }
+}
+@media (max-width: 560px) {
+  .landing-page .landing-hero { height: 640px; }
+  .landing-page .site-header { width: calc(100% - 32px); }
+  .landing-page .navbar { height: 62px; }
+  .landing-page .landing-brand { width: 118px; }
+  .landing-page .nav-actions a { min-height: 35px; padding-inline: 9px; font-size: 11px; }
+  .landing-page .hero-content { height: calc(100% - 62px); }
+  .landing-page .hero-copy { width: calc(100% - 32px); margin-top: 44px; }
+  .landing-page .hero-eyebrow { margin-bottom: 14px; font-size: 11px; }
+  .landing-page .hero-copy h1 { font-size: clamp(32px, 8.5vw, 42px); }
+  .landing-page .hero-description { max-width: 340px; margin: 17px auto 19px; font-size: 14px; }
+  .landing-page .hero-primary { min-height: 41px; padding-inline: 18px; font-size: 12px; }
+  .landing-page .hero-preview { width: calc(100% - 24px); margin-top: 30px; border-radius: 13px 13px 0 0; }
+}
+
+
+@media (max-width: 380px) {
+  .landing-page .navbar { gap: 6px; }
+  .landing-page .landing-brand { width: 105px; }
+  .landing-page .nav-actions a { padding-inline: 7px; font-size: 10px; white-space: nowrap; }
+}
