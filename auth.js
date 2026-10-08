@@ -10,6 +10,7 @@ const panels = {
 }
 
 let redirecting = false
+sessionStorage.removeItem('devifolio_google_auth_intent')
 const screenLoading = createScreenLoading({ shell: document.querySelector('.auth-shell'), loading: document.getElementById('auth-loading') })
 mountGooeySpinners()
 let supabasePromise
@@ -79,6 +80,7 @@ function friendlyError(error) {
 }
 
 function reportAuthError(action, error) {
+  screenLoading.hide()
   console.error(`[Devifolio Auth] ${action}`, {
     name: error?.name,
     code: error?.code,
@@ -101,7 +103,8 @@ function goToDashboard(onboarding = false) {
   if (redirecting) return
   redirecting = true
   const destination = 'dashboard.html' + (onboarding ? '?onboarding=1' : '') + '#inicio'
-  screenLoading.exitAuth(() => window.location.replace(destination), { duration: 4000 })
+  screenLoading.success(onboarding ? 'Tudo pronto!' : 'Entrando na WebFolio...')
+  window.setTimeout(() => window.location.replace(destination), 320)
 }
 
 document.querySelectorAll('[data-switch]').forEach(control => {
@@ -133,17 +136,23 @@ document.getElementById('form-login').addEventListener('submit', async event => 
   if (!event.currentTarget.reportValidity()) return
 
   setLoading(button, true, 'Entrando...')
+  screenLoading.show('Verificando suas informações...')
   try {
     const { setRememberMe } = await import('./src/lib/supabase.js')
     setRememberMe(document.getElementById('login-remember').checked)
     const supabase = await getSupabase()
+    screenLoading.show('Organizando sua conta...')
     const { data, error } = await supabase.auth.signInWithPassword({
       email: email.value.trim(),
       password: password.value,
     })
 
     if (error) return reportAuthError('Falha no login', error)
-    if (data.session) goToDashboard()
+    if (!data.session) throw new Error('A sessão não foi criada. Tente novamente.')
+    screenLoading.show('Preparando seu espaço...')
+    const verified = await supabase.auth.getSession()
+    if (verified.error || !verified.data.session) throw verified.error || new Error('A sessão não pôde ser confirmada.')
+    goToDashboard()
   } catch (error) {
     reportAuthError('Erro inesperado no login', error)
   } finally {
@@ -173,6 +182,7 @@ document.getElementById('form-cadastro').addEventListener('submit', async event 
   }
 
   setLoading(button, true, 'Criando conta...')
+  screenLoading.show('Criando sua conta...')
   try {
     const { setRememberMe } = await import('./src/lib/supabase.js')
     setRememberMe(true)
@@ -182,12 +192,17 @@ document.getElementById('form-cadastro').addEventListener('submit', async event 
       body: JSON.stringify({ name: name.value.trim(), email: email.value.trim(), password: password.value, confirmation: passwordConfirmation.value, terms: document.getElementById('cad-termos').checked }),
     })
     const data = await response.json()
-    if (!response.ok) { showMessage(data.error || 'Não foi possível concluir o cadastro.'); return }
+    if (!response.ok) { screenLoading.hide(); showMessage(data.error || 'Não foi possível concluir o cadastro.'); return }
+    screenLoading.show('Organizando seu espaço...')
     if (data.session) {
       const { error } = await supabase.auth.setSession(data.session)
       if (error) return reportAuthError('Falha ao iniciar a sessão', error)
+      screenLoading.show('Preparando seu portfólio...')
+      const verified = await supabase.auth.getSession()
+      if (verified.error || !verified.data.session) throw verified.error || new Error('A sessão não pôde ser confirmada.')
       return goToDashboard(true)
     }
+    screenLoading.hide()
     showMessage('Conta criada. Confirme seu e-mail para entrar.', 'success')
   } catch (error) {
     reportAuthError('Erro inesperado no cadastro', error)
@@ -220,14 +235,16 @@ document.querySelectorAll('[data-google-login]').forEach(button => {
     const signup = currentAuthView() === 'cadastro'
     if (signup && !document.getElementById('cad-termos').checked) { document.getElementById('cad-termos').reportValidity(); return }
     setLoading(button, true, 'Conectando...')
+    screenLoading.show(signup ? 'Criando sua conta...' : 'Verificando suas informações...')
     try {
       const { setRememberMe, isGoogleEnabled } = await import('./src/lib/supabase.js')
-      if (!await isGoogleEnabled()) { showMessage('O acesso com Google ainda precisa ser configurado. Use e-mail e senha ou GitHub.', 'error'); return }
+      if (!await isGoogleEnabled()) { screenLoading.hide(); showMessage('O acesso com Google ainda precisa ser configurado. Use e-mail e senha ou GitHub.', 'error'); return }
       setRememberMe(signup || document.getElementById('login-remember').checked)
       const supabase = await getSupabase()
+      sessionStorage.setItem('devifolio_google_auth_intent', signup ? 'cadastro' : 'login')
       const { error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: `${window.location.origin}/dashboard.html${signup ? '?onboarding=1' : ''}#inicio` } })
-      if (error) reportAuthError('Falha ao conectar Google', error)
-    } catch (error) { reportAuthError('Falha ao conectar Google', error) }
+      if (error) { sessionStorage.removeItem('devifolio_google_auth_intent'); reportAuthError('Falha ao conectar Google', error) }
+    } catch (error) { sessionStorage.removeItem('devifolio_google_auth_intent'); reportAuthError('Falha ao conectar Google', error) }
     finally { setLoading(button, false) }
   })
 })
@@ -288,14 +305,18 @@ async function completeGithubLogin() {
   }
 
   try {
-    showMessage('Concluindo login com GitHub...', 'success')
+    const fromSignup = sessionStorage.getItem('devifolio_auth_intent') === 'cadastro'
+    screenLoading.show(fromSignup ? 'Criando sua conta...' : 'Verificando suas informações...')
     const response = await fetch('/api/auth/github/session', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
     const payload = await response.json().catch(() => ({}))
     if (!response.ok) throw new Error(payload.error || 'Não foi possível concluir o login. Tente novamente.')
     const supabase = await getSupabase()
+    screenLoading.show(fromSignup ? 'Organizando seu espaço...' : 'Organizando sua conta...')
     const { error } = await supabase.auth.setSession({ access_token: payload.access_token, refresh_token: payload.refresh_token })
     if (error) throw error
-    const fromSignup = sessionStorage.getItem('devifolio_auth_intent') === 'cadastro'
+    screenLoading.show(fromSignup ? 'Preparando seu portfólio...' : 'Preparando seu espaço...')
+    const verified = await supabase.auth.getSession()
+    if (verified.error || !verified.data.session) throw verified.error || new Error('A sessão não pôde ser confirmada.')
     sessionStorage.removeItem('devifolio_auth_intent')
     goToDashboard(fromSignup)
   } catch (error) {

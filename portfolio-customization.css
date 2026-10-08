@@ -1,0 +1,57 @@
+.dashboard-app .my-portfolio-page{width:min(100%,1500px)}
+.dashboard-app .my-portfolio-layout{display:grid;grid-template-columns:minmax(0,1fr) 416px;align-items:start;gap:32px}
+.dashboard-app .my-portfolio-layout .my-portfolio-preview{min-width:0}
+.dashboard-app .my-portfolio-layout .folio-showcase-shell{max-width:none;background:var(--portfolio-background)!important;color:var(--portfolio-ink)!important;transition:background-color .2s,color .2s}
+.dashboard-app .my-portfolio-layout .folio-showcase-copy h2,.dashboard-app .my-portfolio-layout .folio-showcase-profile .folio-profile-metrics strong,.dashboard-app .my-portfolio-layout .folio-showcase-projects .folio-empty-projects h2{color:var(--portfolio-ink)!important}
+.dashboard-app .my-portfolio-layout .folio-showcase-copy :is(.folio-username,.folio-biography),.dashboard-app .my-portfolio-layout .folio-showcase-profile .folio-profile-metrics span{color:var(--portfolio-muted)!important}
+.dashboard-app .my-portfolio-layout .folio-showcase-projects :is(.folio-empty-projects,.public-project){background:var(--portfolio-card)!important;color:var(--portfolio-card-ink)!important;border-radius:var(--portfolio-radius)!important;transition:background-color .2s,border-radius .2s}
+.dashboard-app .my-portfolio-layout .folio-showcase-projects .folio-empty-projects :is(h2,p),.dashboard-app .my-portfolio-layout .folio-showcase-projects .public-project :is(h3,p){color:var(--portfolio-card-ink)!important}
+.dashboard-app .my-portfolio-layout .folio-showcase-projects .folio-empty-projects p{opacity:.78}
+.dashboard-app .my-portfolio-layout .folio-showcase-projects .folio-create-project,.dashboard-app .my-portfolio-layout .folio-showcase-projects .public-button{background:var(--portfolio-card-ink)!important;color:var(--portfolio-card)!important;border-color:var(--portfolio-card-ink)!important}
+.dashboard-app .my-portfolio-layout .folio-showcase-projects .public-project .project-content{background:transparent!important}
+.dashboard-app .my-portfolio-layout .folio-profile-divider{background:var(--portfolio-muted)!important;opacity:.2}
+.dashboard-app .my-portfolio-layout .folio-showcase-profile .folio-profile-metrics>div{border-color:var(--portfolio-muted)!important}
+.dashboard-app .folio-biography-row{display:flex;align-items:center;gap:7px;min-width:0}
+.dashboard-app .folio-biography-row[hidden],.dashboard-app .folio-biography-form[hidden]{display:none}
+.dashboard-app .folio-biography-row .biography-edit-button{width:26px;height:26px;min-width:26px;padding:4px;color:var(--portfolio-ink);border-radius:50%;background:transparent}
+.dashboard-app .folio-biography-row .biography-edit-button svg{width:15px;height:15px}
+.dashboard-app .folio-biography-form textarea{display:block;width:min(100%,520px);min-height:80px;padding:10px 12px;resize:vertical;border:1px solid #bfc4cb;border-radius:8px;background:#fff;color:#171717}
+.dashboard-app .folio-biography-form>div{display:flex;gap:8px;margin-top:8px}
+.dashboard-app .folio-biography-form button{min-height:34px;padding:0 12px}
+.dashboard-app .portfolio-customizer{overflow:hidden;border:1px solid var(--border,#dfe3e8);border-radius:15px;background:var(--surface,#fff);color:var(--text,#151515)}
+.dashboard-app .portfolio-customizer-head{display:flex;align-items:flex-start;gap:13px;padding:20px 19px 18px;border-bottom:1px solid var(--border,#dfe3e8)}
+.dashboard-app .portfolio-customizer-head>[data-icon]{width:23px;min-width:23px;height:23px;margin-top:1px}
+.dashboard-app .portfolio-customizer-head svg{width:23px;height:23px}
+.dashboard-app .portfolio-customizer-head h2{margin:0;font-size:19px;line-height:1.25;letter-spacing:-.025em;color:var(--text,#151515)}
+.dashboard-app .portfolio-customizer-head p{margin:6px 0 0;font-size:13px;line-height:1.4;color:var(--text-muted,#5b6470)}
+.dashboard-app .portfolio-customizer-body{padding:18px 19px 21px}
+.dashboard-app .portfolio-customizer-body h3{margin:0 0 11px;font-size:16px;color:var(--text,#151515)}
+.dashboard-app .portfolio-customizer fieldset{min-width:0;margin:0 0 23px;padding:0;border:0}
+.dashboard-app .portfolio-customizer legend{margin-bottom:12px;padding:0;font-size:13px;font-weight:700;color:var(--text,#151515)}
+.dashboard-app .portfolio-colors{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.dashboard-app .portfolio-color-option{width:33px;height:33px;min-width:33px;padding:0;border:1px solid #0002;border-radius:50%;background:var(--swatch);cursor:pointer;transition:transform .16s,box-shadow .16s}
+.dashboard-app .portfolio-color-option:hover{transform:scale(1.08)}
+.dashboard-app .portfolio-color-option.is-selected{outline:2px solid var(--text,#111);outline-offset:3px}
+.dashboard-app .portfolio-color-option:focus-visible,.dashboard-app .portfolio-shape-option:focus-visible{outline:3px solid #2864ec;outline-offset:3px}
+.dashboard-app .portfolio-customizer .portfolio-shapes{margin-bottom:25px}
+.dashboard-app .portfolio-shape-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.dashboard-app .portfolio-shape-option{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-height:103px;padding:11px 5px;border:1px solid var(--border,#dfe3e8);border-radius:10px;background:transparent;color:var(--text-muted,#59616b);font-size:12px;cursor:pointer}
+.dashboard-app .portfolio-shape-option.is-selected{border-color:var(--text,#111);color:var(--text,#111);box-shadow:inset 0 0 0 1px var(--text,#111)}
+.dashboard-app .portfolio-shape-icon{display:block;width:53px;height:36px;border:2px solid currentColor;border-radius:7px}
+.dashboard-app .portfolio-shape-icon.rounded{border-radius:14px}
+.dashboard-app .portfolio-shape-icon.square{border-radius:0}
+.dashboard-app .portfolio-save-button{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:45px;border:0;border-radius:8px;background:#151515;color:#fff;font-size:14px;font-weight:700;cursor:pointer}
+.dashboard-app .portfolio-save-button svg{width:19px;height:19px}
+.dashboard-app[data-theme="dark"] .portfolio-save-button{background:#f4f5f6;color:#16191d}
+.dashboard-app .profile-avatar-picker{border:0;padding:0;background:none;cursor:pointer;border-radius:50%}
+.dashboard-app .profile-avatar-picker:focus-visible{outline:3px solid #2864ec;outline-offset:4px}
+.customized-portfolio{background:var(--portfolio-background);color:var(--portfolio-ink);min-height:100dvh;transition:background-color .2s,color .2s}
+.customized-portfolio .public-nav,.customized-portfolio .public-footer,.customized-portfolio .profile-copy :is(h1,h2,p),.customized-portfolio .section-heading{color:var(--portfolio-ink)}
+.customized-portfolio .public-hero,.customized-portfolio .public-contact,.customized-portfolio .public-project{background:var(--portfolio-card);color:var(--portfolio-card-ink);border-radius:var(--portfolio-radius)}
+.customized-portfolio .public-hero .profile-copy :is(h1,h2,p),.customized-portfolio .public-project :is(h3,p),.customized-portfolio .public-contact :is(h2,p,span){color:var(--portfolio-card-ink)}
+.customized-portfolio .public-project .project-content{background:transparent}
+.customized-portfolio :is(.public-project,.public-contact) .public-button,.customized-portfolio .folio-empty-projects .folio-create-project{background:var(--portfolio-card-ink);color:var(--portfolio-card);border-color:var(--portfolio-card-ink)}
+.customized-portfolio .public-hero .profile-copy .bio{color:var(--portfolio-card-muted)}
+@media(max-width:1250px){.dashboard-app .my-portfolio-layout{grid-template-columns:minmax(0,1fr) 350px;gap:20px}.dashboard-app .portfolio-color-option{width:27px;height:27px;min-width:27px}}
+@media(max-width:1050px){.dashboard-app .my-portfolio-layout{grid-template-columns:1fr}.dashboard-app .portfolio-customizer{max-width:620px}.dashboard-app .portfolio-color-option{width:33px;height:33px;min-width:33px}}
+@media(max-width:440px){.dashboard-app .portfolio-customizer-head,.dashboard-app .portfolio-customizer-body{padding-left:15px;padding-right:15px}.dashboard-app .portfolio-colors{gap:5px}.dashboard-app .portfolio-color-option{width:27px;height:27px;min-width:27px}.dashboard-app .portfolio-shape-options{gap:6px}.dashboard-app .portfolio-shape-option{font-size:11px}}

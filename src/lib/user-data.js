@@ -1,8 +1,12 @@
 import { supabase } from './supabase.js'
+import { normalizeAppearance, decodePortfolioPreferences, encodePortfolioPreferences } from './portfolio-appearance.js'
 
 const isMissingSchema = error => error?.code === '42P01' || error?.code === '42703' || error?.code === 'PGRST204' || error?.code === 'PGRST205'
 
-const mapProfile = row => row ? {
+const mapProfile = row => {
+  if (!row) return null
+  const preferences = decodePortfolioPreferences(row.selected_model)
+  return {
   name: row.name || '',
   username: row.username || '',
   email: row.email || '',
@@ -14,9 +18,13 @@ const mapProfile = row => row ? {
   website: row.website || '',
   avatar: row.avatar_url || '',
   published: Boolean(row.published),
-  selectedModel: row.selected_model || 'white',
+  selectedModel: preferences.model,
+  portfolioBackground: preferences.appearance.background,
+  portfolioCards: preferences.appearance.cards,
+  portfolioShape: preferences.appearance.shape,
   userId: row.user_id,
-} : null
+  }
+}
 
 const mapProject = row => ({
   id: Number(row.id),
@@ -82,11 +90,33 @@ export async function saveProfile(userId, profile, published) {
 }
 
 export async function savePortfolioModel(userId, modelId) {
+  const { data: current, error: readError } = await supabase.from('profiles').select('selected_model').eq('user_id', userId).single()
+  if (readError) throw readError
+  const { appearance } = decodePortfolioPreferences(current.selected_model)
   const { error } = await supabase.from('profiles').update({
-    selected_model: modelId,
+    selected_model: encodePortfolioPreferences(modelId, appearance),
     updated_at: new Date().toISOString(),
   }).eq('user_id', userId).select('user_id').single()
   if (error) throw error
+}
+
+export async function savePortfolioAppearance(userId, appearance) {
+  const values = normalizeAppearance({ portfolioBackground: appearance.background, portfolioCards: appearance.cards, portfolioShape: appearance.shape })
+  const { data: current, error: readError } = await supabase.from('profiles').select('selected_model').eq('user_id', userId).single()
+  if (readError) throw readError
+  const { model } = decodePortfolioPreferences(current.selected_model)
+  const { data, error } = await supabase.from('profiles').update({
+    selected_model: encodePortfolioPreferences(model, values),
+    updated_at: new Date().toISOString(),
+  }).eq('user_id', userId).select('selected_model').single()
+  if (error) throw error
+  return decodePortfolioPreferences(data.selected_model).appearance
+}
+
+export async function saveProfileBiography(userId, bio) {
+  const { data, error } = await supabase.from('profiles').update({ bio, updated_at: new Date().toISOString() }).eq('user_id', userId).select('bio').single()
+  if (error) throw error
+  return data.bio
 }
 
 export async function saveProject(userId, project, sortOrder = 0) {

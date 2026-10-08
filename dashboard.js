@@ -8,6 +8,8 @@ import {
   removeProject,
   removeProjectImage,
   saveProfile,
+  savePortfolioAppearance,
+  saveProfileBiography,
   saveProject,
   saveSettings,
   uploadAvatar,
@@ -17,6 +19,7 @@ import {
 } from './src/lib/user-data.js'
 import QRCode from 'qrcode'
 import { createScreenLoading } from './screen-loading.js'
+import { portfolioColors, portfolioShapes, normalizeAppearance, appearanceStyle } from './src/lib/portfolio-appearance.js'
 import { mountGooeySpinners, UploadButton } from './src/ui/visual-components.js'
 import { portfolioFolders, projectLocation, nextSortOrder, orderedFolders, restorePortfolioFolders, planProjectMove, persistProjectMove } from './src/lib/project-location.js'
 import { planGithubImport, importedGithubProject } from './src/lib/github-import.js'
@@ -102,6 +105,9 @@ let visualPublications = { folders: {}, events: [] }
 let selectedFolderId = null
 let portfolioLayout = 'grid'
 let profileBannerRevision = ''
+let pendingAppearance = null
+let appearanceSaving = false
+let biographySaving = false
 let publicationHistoryExpanded = false
 const projectVisualType = project => /(?:^|[\s/_-])landing(?:[\s/_-]|$)/i.test(`${project.name} ${project.description || ''} ${project.link || ''}`) ? 'landing' : 'site'
 const projectTypeChip = project => {
@@ -265,23 +271,26 @@ function portfolioPreviewProject(project) {
 
 function portfolioManagerView() {
   const profile = state.profile
+  const appearance = pendingAppearance || normalizeAppearance(profile)
+  const colorOptions = (kind, selected) => Object.entries(portfolioColors).map(([key, color]) => `<button class="portfolio-color-option${key === selected ? ' is-selected' : ''}" type="button" data-appearance-kind="${kind}" data-appearance-value="${key}" aria-label="${color.label}" aria-pressed="${key === selected}" title="${color.label}" style="--swatch:${color.hex}"></button>`).join('')
+  const shapeOptions = Object.entries(portfolioShapes).map(([key, shape]) => `<button class="portfolio-shape-option${key === appearance.shape ? ' is-selected' : ''}" type="button" data-appearance-kind="shape" data-appearance-value="${key}" aria-pressed="${key === appearance.shape}"><span class="portfolio-shape-icon ${key}" aria-hidden="true"></span><span>${shape.label}</span></button>`).join('')
   const emptyPortfolioProjects = '<div class="empty-projects folio-empty-projects"><span class="folio-empty-folder" aria-hidden="true">▱</span><h2>Nenhum projeto encontrado</h2><p>Você ainda não desenvolveu nenhum projeto.<br>Crie um novo projeto para começar.</p><button class="primary-button folio-create-project" type="button" data-new-project>+ &nbsp;Criar projeto</button></div>'
   const banner = currentUser ? `${portfolioBannerUrl(currentUser.id)}${profileBannerRevision ? `?v=${profileBannerRevision}` : ''}` : ''
   const projects = state.projects.filter(project => project.status === 'published').sort((a, b) => a.sortOrder - b.sortOrder || a.id - b.id)
   const username = profile.username ? `@${profile.username.replace(/^@/, '')}` : '@usuario'
   const biography = profile.bio || profile.role || 'Adicione uma biografia para apresentar seu trabalho aos visitantes.'
   return `<section class="page-enter my-portfolio-page">${pageHead('Meu Portfólio', 'Prévia completa de como os visitantes verão seu portfólio.', '<a class="secondary-button" href="#inicio">← Voltar ao início</a>')}
-    <div class="portfolio-page my-portfolio-preview">
+    <div class="my-portfolio-layout"><div class="portfolio-page my-portfolio-preview" style="${appearanceStyle(appearance)}">
       <div class="portfolio-shell folio-showcase-shell"><article class="folio-showcase-card">
         <div class="my-portfolio-banner"><img class="public-banner-image" src="${esc(banner)}" alt="Banner do portfólio" onerror="this.hidden=true"><input id="profile-banner-file" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="icon-button banner-edit-button" type="button" data-upload-profile-banner aria-label="Editar banner"><span data-icon="edit"></span></button></div>
         <div class="folio-showcase-profile"><div class="public-avatar">${profile.avatar ? `<img src="${esc(profile.avatar)}" alt="Foto de ${esc(realName())}" onerror="this.src='${profilePlaceholderUrl}'">` : `<img src="${profilePlaceholderUrl}" alt="Ícone de usuário">`}<input id="avatar-file" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="icon-button avatar-edit-button" type="button" data-upload-avatar aria-label="Editar foto de perfil"><span data-icon="edit"></span></button></div>
-          <div class="folio-showcase-copy"><h2>${esc(realName())}</h2><p class="folio-username">${esc(username)}</p><p class="folio-biography">${esc(biography)}</p></div>
+          <div class="folio-showcase-copy"><h2>${esc(realName())}</h2><p class="folio-username">${esc(username)}</p><div class="folio-biography-row"><p class="folio-biography">${esc(biography)}</p><button class="icon-button biography-edit-button" type="button" data-edit-biography aria-label="Editar biografia"><span data-icon="edit"></span></button></div><form class="folio-biography-form" id="biography-form" hidden><textarea name="bio" maxlength="240" aria-label="Biografia">${esc(profile.bio)}</textarea><div><button type="button" class="secondary-button" data-cancel-biography>Cancelar</button><button type="submit" class="primary-button">Salvar</button></div></form></div>
           <div class="folio-profile-metrics" aria-label="Estatísticas do portfólio"><div><strong>${projects.length}</strong><span>Projetos</span></div><div><strong>—</strong><span>Clientes atendidos</span></div><div><strong>—</strong><span>No mercado</span></div></div>
         </div>
         <div class="folio-profile-divider" aria-hidden="true"></div>
         <section class="projects-section folio-showcase-projects">${projects.length ? `<div class="section-heading"><h2>Meus projetos</h2><span>${projects.length} projeto${projects.length === 1 ? '' : 's'}</span></div><div class="public-projects">${projects.map(portfolioPreviewProject).join('')}</div>` : emptyPortfolioProjects}</section>
       </article></div>
-    </div>
+    </div><aside class="portfolio-customizer" aria-label="Personalizar portfólio"><div class="portfolio-customizer-head"><span data-icon="palette"></span><div><h2>Personalizar portfólio</h2><p>Altere as cores e o formato dos cards do seu portfólio.</p></div></div><div class="portfolio-customizer-body"><h3>Cores</h3><fieldset><legend>Cor de fundo</legend><div class="portfolio-colors">${colorOptions('background', appearance.background)}</div></fieldset><fieldset><legend>Cor dos cards</legend><div class="portfolio-colors">${colorOptions('cards', appearance.cards)}</div></fieldset><fieldset class="portfolio-shapes"><legend>Formato do card</legend><div class="portfolio-shape-options">${shapeOptions}</div></fieldset><button class="portfolio-save-button" type="button" data-save-appearance><span data-icon="save"></span>Salvar alterações</button></div></aside></div>
   </section>`
 }
 function openPortfolioFolder(id) {
@@ -427,7 +436,7 @@ function profileView() {
   return `<section class="page-enter profile-page"><div class="card profile-showcase">
     <div class="profile-identity"><div class="profile-avatar-edit">${avatarMarkup()}<input id="avatar-file" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="icon-button avatar-edit-button" type="button" data-upload-avatar aria-label="Alterar foto de perfil"><span data-icon="edit"></span></button></div><h1>${esc(realName())}</h1></div>
     <div class="profile-stat-row"><div><strong>${portfolioCount}</strong><span>Portfólios</span></div><div><strong>${state.projects.length}</strong><span>Projetos</span></div><div><span>Usuário</span><strong class="profile-username">@${esc(profile.username || 'conta')}</strong></div></div>
-    <div class="profile-cards"><div class="card profile-edit-card profile-avatar-card"><div><h2>Avatar</h2><p>Esta é sua foto de perfil. Faça upload de uma imagem personalizada.</p><small>Um avatar é opcional, mas recomendado.</small></div><div class="profile-avatar-action">${avatarMarkup('avatar avatar-card-image')}<button type="button" class="primary-button" data-upload-avatar>Salvar</button></div></div>
+    <div class="profile-cards"><div class="card profile-edit-card profile-avatar-card"><div><h2>Avatar</h2><p>Esta é sua foto de perfil. Faça upload de uma imagem personalizada.</p><small>Um avatar é opcional, mas recomendado.</small></div><div class="profile-avatar-action"><button type="button" class="profile-avatar-picker" data-upload-avatar aria-label="Alterar foto de perfil">${avatarMarkup('avatar avatar-card-image')}</button></div></div>
     ${profileEditCard('Nome de exibição', 'Digite seu nome completo ou um nome de exibição.', 'name', profile.name)}
     ${profileEditCard('Nome de usuário', 'Este será o seu nome de usuário dentro da plataforma WebFolio.', 'username', profile.username, 'text', '<span class="profile-input-prefix">webfolio.dev/</span>')}
     ${profileEditCard('E-mail', 'Este é o e-mail associado à sua conta.', 'email', profile.email, 'email')}
@@ -605,6 +614,21 @@ function bindActions() {
   $('#password-form')?.addEventListener('submit', changePassword)
   $$('[data-upload-avatar]').forEach(button => button.addEventListener('click', () => $('#avatar-file')?.click()))
   $('#avatar-file')?.addEventListener('change', handleAvatarUpload)
+  $$('[data-appearance-kind]').forEach(button => button.addEventListener('click', () => {
+    pendingAppearance = { ...(pendingAppearance || normalizeAppearance(state.profile)), [button.dataset.appearanceKind]: button.dataset.appearanceValue }
+    render({ preserveScroll: true })
+  }))
+  $('[data-save-appearance]')?.addEventListener('click', saveAppearance)
+  $('[data-edit-biography]')?.addEventListener('click', () => {
+    $('.folio-biography-row').hidden = true
+    $('#biography-form').hidden = false
+    $('#biography-form textarea').focus()
+  })
+  $('[data-cancel-biography]')?.addEventListener('click', () => {
+    $('#biography-form').hidden = true
+    $('.folio-biography-row').hidden = false
+  })
+  $('#biography-form')?.addEventListener('submit', saveBiography)
   $('[data-upload-profile-banner]')?.addEventListener('click', () => $('#profile-banner-file')?.click())
   $('#profile-banner-file')?.addEventListener('change', handleProfileBannerUpload)
   $('[data-connect-github]')?.addEventListener('click', connectGithub)
@@ -752,6 +776,49 @@ async function savePortfolioForm(event) {
     toast('Portfólio atualizado com sucesso.')
     render()
   } catch (error) { reportError('Não foi possível salvar o portfólio.', error) } finally { setButtonLoading(button, false) }
+}
+
+async function saveAppearance() {
+  if (appearanceSaving || !pendingAppearance) return
+  appearanceSaving = true
+  const selected = { ...pendingAppearance }
+  screenLoading.show('Adicionando visual...')
+  try {
+    const resultPromise = savePortfolioAppearance(currentUser.id, selected).then(value => ({ value }), error => ({ error }))
+    await new Promise(resolve => window.setTimeout(resolve, 160))
+    screenLoading.show('Atualizando portfólio...')
+    const result = await resultPromise
+    if (result.error) throw result.error
+    const saved = result.value
+    Object.assign(state.profile, { portfolioBackground: saved.background, portfolioCards: saved.cards, portfolioShape: saved.shape })
+    if (JSON.stringify(pendingAppearance) === JSON.stringify(selected)) pendingAppearance = null
+    screenLoading.success('Portfólio atualizado.')
+    render({ preserveScroll: true })
+    await new Promise(resolve => window.setTimeout(resolve, motionDuration() ? 500 : 0))
+  } catch (error) {
+    reportError('Não foi possível salvar a aparência. Suas escolhas continuam na prévia.', error)
+  } finally {
+    screenLoading.hide()
+    appearanceSaving = false
+  }
+}
+
+async function saveBiography(event) {
+  event.preventDefault()
+  if (biographySaving) return
+  biographySaving = true
+  const form = event.currentTarget
+  const button = form.querySelector('[type="submit"]')
+  const bio = form.elements.bio.value.trim()
+  setButtonLoading(button, true, 'Salvando...')
+  try {
+    state.profile.bio = await saveProfileBiography(currentUser.id, bio)
+    toast('Biografia atualizada.')
+    render({ preserveScroll: true })
+  } catch (error) {
+    reportError('Não foi possível salvar a biografia.', error)
+    setButtonLoading(button, false)
+  } finally { biographySaving = false }
 }
 
 async function togglePublished() {
@@ -1266,9 +1333,12 @@ window.addEventListener('hashchange', renderWithTransition)
 async function bootstrap() {
   hydrateIcons()
   const entrance = screenLoading.enterDashboard(render)
+  const googleAuthIntent = sessionStorage.getItem('devifolio_google_auth_intent')
+  if (googleAuthIntent) screenLoading.show(googleAuthIntent === 'cadastro' ? 'Organizando seu espaço...' : 'Organizando sua conta...')
   const { data, error } = await supabase.auth.getSession()
-  if (error || !data.session) { entrance.abort(); location.replace('cadastro.html#login'); return }
+  if (error || !data.session) { sessionStorage.removeItem('devifolio_google_auth_intent'); entrance.abort(); location.replace('cadastro.html#login'); return }
   currentUser = data.session.user
+  if (googleAuthIntent) screenLoading.show(googleAuthIntent === 'cadastro' ? 'Preparando seu portfólio...' : 'Preparando seu espaço...')
   try { state.folderNames = JSON.parse(localStorage.getItem(`devifolio_folder_names_${currentUser.id}`) || '{}'); if (!state.folderNames || typeof state.folderNames !== 'object' || Array.isArray(state.folderNames)) state.folderNames = {} } catch { state.folderNames = {} }
   try { state.folderOrder = JSON.parse(localStorage.getItem(`devifolio_folder_order_${currentUser.id}`) || '[]'); if (!Array.isArray(state.folderOrder)) state.folderOrder = [] } catch { state.folderOrder = [] }
   try { state.hiddenFolders = JSON.parse(localStorage.getItem(`devifolio_hidden_folders_${currentUser.id}`) || '[]'); if (!Array.isArray(state.hiddenFolders)) state.hiddenFolders = [] } catch { state.hiddenFolders = [] }
@@ -1315,6 +1385,7 @@ async function bootstrap() {
     hydrateIcons($('#page-content'))
     $('[data-retry-workspace]')?.addEventListener('click',()=>location.reload())
     toast('Confira sua conexão e tente novamente.', 'error')
+    sessionStorage.removeItem('devifolio_google_auth_intent')
     bootstrapping = false
     entrance.ready()
     return
@@ -1324,6 +1395,12 @@ async function bootstrap() {
   if (onboardingRequested && !new URLSearchParams(location.search).has('github')) history.replaceState(null, '', `${location.pathname}${location.hash || '#inicio'}`)
   bootstrapping = false
   render()
+  if (googleAuthIntent) {
+    sessionStorage.removeItem('devifolio_google_auth_intent')
+    screenLoading.success(googleAuthIntent === 'cadastro' ? 'Tudo pronto!' : 'Entrando na WebFolio...')
+    window.setTimeout(() => entrance.ready(), 320)
+    return
+  }
   if (new URLSearchParams(location.search).has('github')) void showGithubCallbackResult()
   else entrance.ready()
 }
