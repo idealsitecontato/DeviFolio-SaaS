@@ -2,23 +2,18 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { portfolioColors, portfolioShapes, normalizeAppearance, appearanceStyle, decodePortfolioPreferences, encodePortfolioPreferences } from '../src/lib/portfolio-appearance.js'
 
-function contrast(foreground, background) {
-  const luminance = hex => {
-    const channels = hex.slice(1).match(/../g).map(value => parseInt(value, 16) / 255)
-    return channels.map(value => value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4)
-      .reduce((sum, value, index) => sum + value * [0.2126, 0.7152, 0.0722][index], 0)
-  }
-  const values = [luminance(foreground), luminance(background)].sort((a, b) => b - a)
-  return (values[0] + 0.05) / (values[1] + 0.05)
-}
-
-test('all nine palette choices retain readable text on portfolio and cards', () => {
+test('palette choices use the requested black or white portfolio text', () => {
   assert.equal(Object.keys(portfolioColors).length, 9)
+  const whiteText = new Set(['gray', 'black', 'blue', 'green', 'red', 'pink'])
   for (const [key, color] of Object.entries(portfolioColors)) {
-    assert.ok(contrast(color.ink, color.hex) >= 4.5, `${key} text contrast`)
+    const expected = whiteText.has(key) ? '#ffffff' : '#000000'
+    assert.equal(color.ink, expected, `${key} primary text`)
+    assert.equal(color.muted, expected, `${key} secondary text`)
     const style = appearanceStyle({ background: key, cards: key, shape: 'standard' })
     assert.match(style, new RegExp(`--portfolio-background:${color.hex}`))
     assert.match(style, new RegExp(`--portfolio-card:${color.hex}`))
+    assert.match(style, new RegExp(`--portfolio-card-action:${whiteText.has(key) ? '#ffffff' : '#000000'}`))
+    assert.match(style, new RegExp(`--portfolio-card-action-ink:${whiteText.has(key) ? '#000000' : '#ffffff'}`))
   }
 })
 

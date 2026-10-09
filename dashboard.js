@@ -586,6 +586,7 @@ function bindActions() {
   $('#portfolio-form')?.addEventListener('submit', savePortfolioForm)
   $('#my-portfolio-form')?.addEventListener('submit', savePortfolioForm)
   $$('[data-preview-project]').forEach(button => button.onclick = () => showPortfolioPreviewProject(Number(button.dataset.previewProject)))
+  $$('[data-add-project-cover]').forEach(button => button.onclick = () => projectModal(Number(button.dataset.addProjectCover)))
   $('[data-toggle-publish]')?.addEventListener('click', togglePublished)
   $('[data-manage-publication-history]')?.addEventListener('click', () => { publicationHistoryExpanded = !publicationHistoryExpanded; render({ preserveScroll: true }) })
   $$('[data-open-publication-id]').forEach(button => button.onclick = () => showPublicationEvent(button.dataset.openPublicationId))
