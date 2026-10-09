@@ -80,7 +80,7 @@ const icons = {
   refresh: '<path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/>', repo: '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M8 7h6"/>',
   bell: '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/>',
   shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
-  palette: '<path d="M12 3a9 9 0 0 0 0 18h1.5a2.5 2.5 0 0 0 0-5H12a1 1 0 0 1 0-2h2a7 7 0 0 0-2-11z"/>',
+  palette: '<path d="M12 3a9 9 0 1 0 0 18h1.4a2.4 2.4 0 0 0 0-4.8h-.8a1.6 1.6 0 0 1 0-3.2H15a6 6 0 0 0-3-10z"/><circle cx="7.5" cy="11" r=".8"/><circle cx="9" cy="6.8" r=".8"/><circle cx="14" cy="7" r=".8"/><circle cx="18" cy="10" r=".8"/>',
   lock: '<rect x="4" y="10" width="16" height="11"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',
   save: '<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/>',
   x: '<path d="m6 6 12 12M18 6 6 18"/>', trending: '<path d="m3 17 6-6 4 4 8-8"/><path d="M15 7h6v6"/>',
@@ -290,7 +290,7 @@ function portfolioManagerView() {
         <div class="folio-profile-divider" aria-hidden="true"></div>
         <section class="projects-section folio-showcase-projects">${projects.length ? `<div class="section-heading"><h2>Meus projetos</h2><span>${projects.length} projeto${projects.length === 1 ? '' : 's'}</span></div><div class="public-projects">${projects.map(portfolioPreviewProject).join('')}</div>` : emptyPortfolioProjects}</section>
       </article></div>
-    </div><aside class="portfolio-customizer" aria-label="Personalizar portfólio"><div class="portfolio-customizer-head"><span data-icon="palette"></span><div><h2>Personalizar portfólio</h2><p>Altere as cores e o formato dos cards do seu portfólio.</p></div></div><div class="portfolio-customizer-body"><h3>Cores</h3><fieldset><legend>Cor de fundo</legend><div class="portfolio-colors">${colorOptions('background', appearance.background)}</div></fieldset><fieldset><legend>Cor dos cards</legend><div class="portfolio-colors">${colorOptions('cards', appearance.cards)}</div></fieldset><fieldset class="portfolio-shapes"><legend>Formato do card</legend><div class="portfolio-shape-options">${shapeOptions}</div></fieldset><button class="portfolio-save-button" type="button" data-save-appearance><span data-icon="save"></span>Salvar alterações</button></div></aside></div>
+    </div><aside class="portfolio-customizer" aria-label="Personalizar portfólio"><div class="portfolio-customizer-head"><span class="portfolio-palette-icon" data-icon="palette"></span><div><h2>Personalizar portfólio</h2><p>Altere as cores e o formato dos cards do seu portfólio.</p></div></div><div class="portfolio-customizer-body"><h3>Cores</h3><fieldset><legend>Cor de fundo</legend><div class="portfolio-colors">${colorOptions('background', appearance.background)}</div></fieldset><fieldset><legend>Cor dos cards</legend><div class="portfolio-colors">${colorOptions('cards', appearance.cards)}</div></fieldset><fieldset class="portfolio-shapes"><legend>Formato do card</legend><div class="portfolio-shape-options">${shapeOptions}</div></fieldset><button class="portfolio-save-button" type="button" data-save-appearance><span data-icon="save"></span>Salvar alterações</button></div></aside></div>
   </section>`
 }
 function openPortfolioFolder(id) {
@@ -477,13 +477,9 @@ function publicationEventMenu(id) {
   $('[data-copy]', $('#modal-root'))?.addEventListener('click', button => copyText(button.currentTarget.dataset.copy))
 }
 
-function modelsView() {
-  return `<section class="page-enter models-page">${pageHead('Modelos', 'Estamos preparando novos modelos para o seu portfólio.')}<div class="models-empty-state" role="status"><span data-icon="edit" aria-hidden="true"></span><h2>Modelos em breve...</h2><p>Estamos preparando novos modelos para o seu portfólio.</p></div></section>`
-}
-
 function plansView(){return `<section class="page-enter plans-page">${pageHead('Planos','Compare os recursos disponíveis para seu portfólio.')}<p class="plans-availability">As assinaturas pagas estão em breve. Continue editando e publicando seu portfólio.</p><div class="devi-plan-grid">${renderPlanCards({internal:true})}</div><article class="card coupon-card"><h2>Tem um cupom?</h2><p>A validação e o pagamento serão ativados com os planos.</p><form id="coupon-form"><label for="coupon-code">Código do cupom</label><div><input id="coupon-code" placeholder="Digite o código"><button class="primary-button" type="submit">Aplicar</button><button class="secondary-button" type="reset">Remover</button></div><small id="coupon-feedback" role="status">Nenhum desconto aplicado.</small></form></article></section>`}
 
-const views = { publicacoes: publicationsView, planos: plansView, 'link-qrcode': linkQrView, inicio: homeView, projetos: projectsView, portfolio: portfolioManagerView, modelos: modelsView, 'portfolio-editar': portfolioEditorView, github: githubView, analise: analyticsView, kaptei: () => kapteiView(state.leads, state.leadsAvailable), perfil: profileView, configuracoes: settingsView }
+const views = { publicacoes: publicationsView, planos: plansView, 'link-qrcode': linkQrView, inicio: homeView, projetos: projectsView, portfolio: portfolioManagerView, 'portfolio-editar': portfolioEditorView, github: githubView, analise: analyticsView, kaptei: () => kapteiView(state.leads, state.leadsAvailable), perfil: profileView, configuracoes: settingsView }
 
 function render({ preserveScroll = false } = {}) {
   const requestedRoute = location.hash.slice(1)
@@ -497,7 +493,7 @@ function render({ preserveScroll = false } = {}) {
   document.body.classList.toggle('projects-route', route === 'projetos')
   document.body.classList.toggle('kaptei-route', route === 'kaptei')
   $('#page-content').innerHTML = views[route]()
-  const routeLabel = { publicacoes:'Publicações', planos:'Planos', 'link-qrcode': 'Seu Link, Seu QR Code', inicio: 'Dashboard', projetos: 'Projetos', portfolio: 'Meu portfólio', modelos: 'Modelos', 'portfolio-editar': 'Editar portfólio', github: 'GitHub', analise: 'Análise', kaptei: 'Kaptei', perfil: 'Perfil', configuracoes: 'Configurações' }[route]
+  const routeLabel = { publicacoes:'Publicações', planos:'Planos', 'link-qrcode': 'Seu Link, Seu QR Code', inicio: 'Dashboard', projetos: 'Projetos', portfolio: 'Meu portfólio', 'portfolio-editar': 'Editar portfólio', github: 'GitHub', analise: 'Análise', kaptei: 'Kaptei', perfil: 'Perfil', configuracoes: 'Configurações' }[route]
   document.title = `${routeLabel} — WebFolio`
   if ($('#breadcrumb-page')) $('#breadcrumb-page').textContent = routeLabel
   if ($('#breadcrumb-section')) $('#breadcrumb-section').textContent = route === 'inicio' ? 'Início' : 'Painel'
