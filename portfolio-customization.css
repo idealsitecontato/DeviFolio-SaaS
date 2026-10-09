@@ -1,6 +1,7 @@
 .dashboard-app .my-portfolio-page{width:min(100%,1500px)}
 .dashboard-app .my-portfolio-layout{display:grid;grid-template-columns:minmax(0,1fr) 416px;align-items:start;gap:32px}
 .dashboard-app .my-portfolio-layout .my-portfolio-preview{min-width:0}
+.dashboard-app .my-portfolio-layout .my-portfolio-preview{container-type:inline-size}
 .dashboard-app .my-portfolio-layout .folio-showcase-shell{max-width:none;background:var(--portfolio-background)!important;color:var(--portfolio-ink)!important;transition:background-color .2s,color .2s}
 .dashboard-app .my-portfolio-layout .folio-showcase-copy h2,.dashboard-app .my-portfolio-layout .folio-showcase-profile .folio-profile-metrics strong,.dashboard-app .my-portfolio-layout .folio-showcase-projects .folio-empty-projects h2{color:var(--portfolio-ink)!important}
 .dashboard-app .my-portfolio-layout .folio-showcase-copy :is(.folio-username,.folio-biography),.dashboard-app .my-portfolio-layout .folio-showcase-profile .folio-profile-metrics span{color:var(--portfolio-muted)!important}
@@ -15,7 +16,7 @@
 .dashboard-app .folio-biography-row[hidden],.dashboard-app .folio-biography-form[hidden]{display:none}
 .dashboard-app .folio-biography-row .biography-edit-button{width:26px;height:26px;min-width:26px;padding:4px;color:var(--portfolio-ink);border-radius:50%;background:transparent}
 .dashboard-app .folio-biography-row .biography-edit-button svg{width:15px;height:15px}
-.dashboard-app .folio-biography-form textarea{display:block;width:min(100%,520px);min-height:80px;padding:10px 12px;resize:vertical;border:1px solid #bfc4cb;border-radius:8px;background:#fff;color:#171717}
+.dashboard-app .folio-biography-form textarea{display:block;box-sizing:border-box;width:100%;min-width:0;min-height:112px;padding:12px 14px;resize:none;overflow:hidden;border:1px solid var(--border,#bfc4cb);border-radius:8px;background:var(--surface,#fff);color:var(--text,#171717);font:inherit;line-height:1.55;overflow-wrap:anywhere}
 .dashboard-app .folio-biography-form>div{display:flex;gap:8px;margin-top:8px}
 .dashboard-app .folio-biography-form button{min-height:34px;padding:0 12px}
 .dashboard-app .portfolio-customizer{overflow:hidden;border:1px solid var(--border,#dfe3e8);border-radius:15px;background:var(--surface,#fff);color:var(--text,#151515)}
@@ -84,6 +85,7 @@ html body.dashboard-app[data-theme] .my-portfolio-layout .my-portfolio-preview .
 
 .dashboard-app .folio-showcase-copy .folio-biography-row{
   align-items:flex-start;
+  width:100%;
   max-width:530px;
   margin-top:11px;
   gap:8px;
@@ -96,7 +98,9 @@ html body.dashboard-app[data-theme] .my-portfolio-layout .my-portfolio-preview .
   overflow-wrap:anywhere;
 }
 .dashboard-app .folio-biography-row .biography-edit-button{margin-top:0;flex:none}
-.dashboard-app .folio-biography-form{margin-top:10px;max-width:530px}
+.dashboard-app .folio-biography-form{box-sizing:border-box;width:100%;max-width:530px;min-width:0;margin-top:12px}
+.dashboard-app .folio-biography-form>div{flex-wrap:wrap}
+.dashboard-app .folio-showcase-copy{min-width:0;overflow-wrap:anywhere}
 .customized-portfolio .profile-copy .bio{max-width:560px;line-height:1.55;overflow-wrap:anywhere}
 .customized-portfolio .folio-profile-metrics :is(strong,span){color:var(--portfolio-ink)}
 
@@ -133,4 +137,41 @@ html body .portfolio-page.customized-portfolio .folio-empty-projects :is(h2,p){c
   .customized-portfolio .public-projects{grid-template-columns:1fr}
   .dashboard-app .my-portfolio-layout .folio-showcase-projects .public-project,
   .customized-portfolio .public-project{max-width:360px}
+}
+
+@container (max-width:900px){
+  .dashboard-app .folio-showcase-profile{grid-template-columns:minmax(0,1fr);gap:20px}
+  .dashboard-app .folio-showcase-profile .folio-profile-metrics{width:100%;max-width:560px}
+}
+
+/* Keep the selected palette readable independently of the interface theme. */
+html body.dashboard-app[data-theme] .my-portfolio-layout .folio-showcase-projects .section-heading :is(h2,span),
+html body.dashboard-app[data-theme] .my-portfolio-layout .folio-showcase-copy .biography-edit-button{
+  color:var(--portfolio-ink)!important;
+}
+html body.dashboard-app[data-theme] .my-portfolio-layout .folio-showcase-projects .public-project :is(h3,p,.tag),
+html body.dashboard-app[data-theme] .my-portfolio-layout .folio-showcase-projects .folio-empty-projects :is(h2,p){
+  color:var(--portfolio-card-ink)!important;
+}
+html body.dashboard-app[data-theme] .my-portfolio-layout .folio-showcase-projects .public-project .public-button,
+html body.dashboard-app[data-theme] .my-portfolio-layout .folio-showcase-projects .folio-empty-projects .folio-create-project{
+  background:var(--portfolio-card-ink)!important;
+  border-color:var(--portfolio-card-ink)!important;
+  color:var(--portfolio-card)!important;
+}
+html body.dashboard-app[data-theme] .portfolio-customizer :is(h2,h3,legend),
+html body.dashboard-app[data-theme] .portfolio-customizer .portfolio-palette-icon{
+  color:var(--text)!important;
+}
+html body.dashboard-app[data-theme] .portfolio-customizer :is(.portfolio-customizer-head p,.portfolio-shape-option){
+  color:var(--text-muted)!important;
+}
+html body.dashboard-app[data-theme] .portfolio-customizer .portfolio-shape-option.is-selected{
+  color:var(--text)!important;
+}
+html body.dashboard-app[data-theme] .portfolio-customizer .portfolio-save-button{
+  color:var(--action-text)!important;
+}
+html body.dashboard-app[data-theme="dark"] .portfolio-customizer .portfolio-save-button{
+  color:#16191d!important;
 }

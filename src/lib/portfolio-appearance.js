@@ -1,13 +1,13 @@
 export const portfolioColors = {
   white: { label: 'Branco', hex: '#ffffff', ink: '#151515', muted: '#555e68' },
-  gray: { label: 'Cinza', hex: '#858b90', ink: '#111827', muted: '#27313b' },
+  gray: { label: 'Cinza', hex: '#858b90', ink: '#111827', muted: '#18212c' },
   black: { label: 'Preto', hex: '#242424', ink: '#ffffff', muted: '#d5d7da' },
-  blue: { label: 'Azul', hex: '#245df5', ink: '#ffffff', muted: '#e5ebff' },
-  green: { label: 'Verde', hex: '#23a765', ink: '#081f13', muted: '#123c28' },
+  blue: { label: 'Azul', hex: '#245df5', ink: '#ffffff', muted: '#eef2ff' },
+  green: { label: 'Verde', hex: '#23a765', ink: '#081f13', muted: '#0b2d1b' },
   yellow: { label: 'Amarelo', hex: '#ffd43b', ink: '#25210b', muted: '#4d421b' },
   orange: { label: 'Laranja', hex: '#ff812c', ink: '#271407', muted: '#4a260d' },
-  red: { label: 'Vermelho', hex: '#f34d55', ink: '#240b0e', muted: '#4c1b20' },
-  pink: { label: 'Rosa', hex: '#d454b0', ink: '#230b1c', muted: '#4a1c3e' },
+  red: { label: 'Vermelho', hex: '#f34d55', ink: '#240b0e', muted: '#361217' },
+  pink: { label: 'Rosa', hex: '#d454b0', ink: '#230b1c', muted: '#2d0e25' },
 }
 
 export const portfolioShapes = { standard: { label: 'Padrão', radius: '14px' }, rounded: { label: 'Mais arredondado', radius: '26px' }, square: { label: 'Quadrado', radius: '0px' } }

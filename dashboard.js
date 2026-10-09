@@ -284,7 +284,7 @@ function portfolioManagerView() {
       <div class="portfolio-shell folio-showcase-shell"><article class="folio-showcase-card">
         <div class="my-portfolio-banner"><img class="public-banner-image" src="${esc(banner)}" alt="Banner do portfólio" onerror="this.hidden=true"><input id="profile-banner-file" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="icon-button banner-edit-button" type="button" data-upload-profile-banner aria-label="Editar banner"><span data-icon="edit"></span></button></div>
         <div class="folio-showcase-profile"><div class="public-avatar">${profile.avatar ? `<img src="${esc(profile.avatar)}" alt="Foto de ${esc(realName())}" onerror="this.src='${profilePlaceholderUrl}'">` : `<img src="${profilePlaceholderUrl}" alt="Ícone de usuário">`}<input id="avatar-file" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="icon-button avatar-edit-button" type="button" data-upload-avatar aria-label="Editar foto de perfil"><span data-icon="edit"></span></button></div>
-          <div class="folio-showcase-copy"><h2>${esc(realName())}</h2><p class="folio-username">${esc(username)}</p><div class="folio-biography-row"><p class="folio-biography">${esc(biography)}</p><button class="icon-button biography-edit-button" type="button" data-edit-biography aria-label="Editar biografia"><span data-icon="edit"></span></button></div><form class="folio-biography-form" id="biography-form" hidden><textarea name="bio" maxlength="240" aria-label="Biografia">${esc(profile.bio)}</textarea><div><button type="button" class="secondary-button" data-cancel-biography>Cancelar</button><button type="submit" class="primary-button">Salvar</button></div></form></div>
+          <div class="folio-showcase-copy"><h2>${esc(realName())}</h2><p class="folio-username">${esc(username)}</p><div class="folio-biography-row"><p class="folio-biography">${esc(biography)}</p><button class="icon-button biography-edit-button" type="button" data-edit-biography aria-label="Editar biografia"><span data-icon="edit"></span></button></div><form class="folio-biography-form" id="biography-form" hidden><textarea name="bio" rows="4" maxlength="240" aria-label="Biografia">${esc(profile.bio)}</textarea><div><button type="button" class="secondary-button" data-cancel-biography>Cancelar</button><button type="submit" class="primary-button">Salvar</button></div></form></div>
           <div class="folio-profile-metrics" aria-label="Estatísticas do portfólio"><div><strong>${projects.length}</strong><span>Projetos</span></div><div><strong>—</strong><span>Clientes atendidos</span></div><div><strong>—</strong><span>No mercado</span></div></div>
         </div>
         <div class="folio-profile-divider" aria-hidden="true"></div>
@@ -618,13 +618,16 @@ function bindActions() {
   $('[data-edit-biography]')?.addEventListener('click', () => {
     $('.folio-biography-row').hidden = true
     $('#biography-form').hidden = false
-    $('#biography-form textarea').focus()
+    const textarea = $('#biography-form textarea')
+    resizeBiographyField(textarea)
+    textarea.focus()
   })
   $('[data-cancel-biography]')?.addEventListener('click', () => {
     $('#biography-form').hidden = true
     $('.folio-biography-row').hidden = false
   })
   $('#biography-form')?.addEventListener('submit', saveBiography)
+  $('#biography-form textarea')?.addEventListener('input', event => resizeBiographyField(event.currentTarget))
   $('[data-upload-profile-banner]')?.addEventListener('click', () => $('#profile-banner-file')?.click())
   $('#profile-banner-file')?.addEventListener('change', handleProfileBannerUpload)
   $('[data-connect-github]')?.addEventListener('click', connectGithub)
@@ -798,6 +801,17 @@ async function saveAppearance() {
     appearanceSaving = false
   }
 }
+
+function resizeBiographyField(textarea) {
+  textarea.style.height = 'auto'
+  const style = window.getComputedStyle(textarea)
+  const borders = parseFloat(style.borderTopWidth) + parseFloat(style.borderBottomWidth)
+  textarea.style.height = `${Math.max(112, textarea.scrollHeight + borders)}px`
+}
+window.addEventListener('resize', () => {
+  const textarea = document.querySelector('#biography-form:not([hidden]) textarea')
+  if (textarea) resizeBiographyField(textarea)
+})
 
 async function saveBiography(event) {
   event.preventDefault()
@@ -1330,11 +1344,11 @@ async function bootstrap() {
   hydrateIcons()
   const entrance = screenLoading.enterDashboard(render)
   const googleAuthIntent = sessionStorage.getItem('devifolio_google_auth_intent')
-  if (googleAuthIntent) screenLoading.show(googleAuthIntent === 'cadastro' ? 'Organizando seu espaço...' : 'Organizando sua conta...')
+  if (googleAuthIntent) screenLoading.show('Organizando sua conta...')
   const { data, error } = await supabase.auth.getSession()
   if (error || !data.session) { sessionStorage.removeItem('devifolio_google_auth_intent'); entrance.abort(); location.replace('cadastro.html#login'); return }
   currentUser = data.session.user
-  if (googleAuthIntent) screenLoading.show(googleAuthIntent === 'cadastro' ? 'Preparando seu portfólio...' : 'Preparando seu espaço...')
+  if (googleAuthIntent) screenLoading.show('Organizando sua conta...')
   try { state.folderNames = JSON.parse(localStorage.getItem(`devifolio_folder_names_${currentUser.id}`) || '{}'); if (!state.folderNames || typeof state.folderNames !== 'object' || Array.isArray(state.folderNames)) state.folderNames = {} } catch { state.folderNames = {} }
   try { state.folderOrder = JSON.parse(localStorage.getItem(`devifolio_folder_order_${currentUser.id}`) || '[]'); if (!Array.isArray(state.folderOrder)) state.folderOrder = [] } catch { state.folderOrder = [] }
   try { state.hiddenFolders = JSON.parse(localStorage.getItem(`devifolio_hidden_folders_${currentUser.id}`) || '[]'); if (!Array.isArray(state.hiddenFolders)) state.hiddenFolders = [] } catch { state.hiddenFolders = [] }
@@ -1393,8 +1407,7 @@ async function bootstrap() {
   render()
   if (googleAuthIntent) {
     sessionStorage.removeItem('devifolio_google_auth_intent')
-    screenLoading.success(googleAuthIntent === 'cadastro' ? 'Tudo pronto!' : 'Entrando na WebFolio...')
-    window.setTimeout(() => entrance.ready(), 320)
+    entrance.ready()
     return
   }
   if (new URLSearchParams(location.search).has('github')) void showGithubCallbackResult()

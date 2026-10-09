@@ -1,4 +1,10 @@
 /* Shared login and signup layout matched to the supplied references. */
+body.auth-body[data-theme="dark"] .screen-loading {
+  --bg: #111316;
+  --text-muted: #c0c5ca;
+  --surface-inset: #292e34;
+  color: #f5f6f7;
+}
 body.auth-body {
   --auth-ink: #08090b;
   --auth-navy: #263658;

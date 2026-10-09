@@ -10,6 +10,8 @@ const panels = {
 }
 
 let redirecting = false
+try { document.body.dataset.theme = localStorage.getItem('foliodev_interface_theme') === 'dark' ? 'dark' : 'light' }
+catch { document.body.dataset.theme = 'light' }
 sessionStorage.removeItem('devifolio_google_auth_intent')
 const screenLoading = createScreenLoading({ shell: document.querySelector('.auth-shell'), loading: document.getElementById('auth-loading') })
 mountGooeySpinners()
@@ -103,8 +105,8 @@ function goToDashboard(onboarding = false) {
   if (redirecting) return
   redirecting = true
   const destination = 'dashboard.html' + (onboarding ? '?onboarding=1' : '') + '#inicio'
-  screenLoading.success(onboarding ? 'Tudo pronto!' : 'Entrando na WebFolio...')
-  window.setTimeout(() => window.location.replace(destination), 320)
+  sessionStorage.setItem('devifolio_google_auth_intent', onboarding ? 'cadastro' : 'login')
+  window.location.replace(destination)
 }
 
 document.querySelectorAll('[data-switch]').forEach(control => {
@@ -136,7 +138,7 @@ document.getElementById('form-login').addEventListener('submit', async event => 
   if (!event.currentTarget.reportValidity()) return
 
   setLoading(button, true, 'Entrando...')
-  screenLoading.show('Verificando suas informações...')
+  screenLoading.show('Organizando sua conta...')
   try {
     const { setRememberMe } = await import('./src/lib/supabase.js')
     setRememberMe(document.getElementById('login-remember').checked)
@@ -149,7 +151,6 @@ document.getElementById('form-login').addEventListener('submit', async event => 
 
     if (error) return reportAuthError('Falha no login', error)
     if (!data.session) throw new Error('A sessão não foi criada. Tente novamente.')
-    screenLoading.show('Preparando seu espaço...')
     const verified = await supabase.auth.getSession()
     if (verified.error || !verified.data.session) throw verified.error || new Error('A sessão não pôde ser confirmada.')
     goToDashboard()
@@ -182,7 +183,7 @@ document.getElementById('form-cadastro').addEventListener('submit', async event 
   }
 
   setLoading(button, true, 'Criando conta...')
-  screenLoading.show('Criando sua conta...')
+  screenLoading.show('Organizando sua conta...')
   try {
     const { setRememberMe } = await import('./src/lib/supabase.js')
     setRememberMe(true)
@@ -193,11 +194,9 @@ document.getElementById('form-cadastro').addEventListener('submit', async event 
     })
     const data = await response.json()
     if (!response.ok) { screenLoading.hide(); showMessage(data.error || 'Não foi possível concluir o cadastro.'); return }
-    screenLoading.show('Organizando seu espaço...')
     if (data.session) {
       const { error } = await supabase.auth.setSession(data.session)
       if (error) return reportAuthError('Falha ao iniciar a sessão', error)
-      screenLoading.show('Preparando seu portfólio...')
       const verified = await supabase.auth.getSession()
       if (verified.error || !verified.data.session) throw verified.error || new Error('A sessão não pôde ser confirmada.')
       return goToDashboard(true)
@@ -225,6 +224,7 @@ document.querySelectorAll('#github-login, #github-cadastro').forEach(button => {
     } catch (error) { reportAuthError('Falha ao preparar a sessão', error); return }
     button.disabled = true
     sessionStorage.setItem('devifolio_auth_intent', currentAuthView())
+    screenLoading.show('Organizando sua conta...')
     window.location.assign('/api/auth/github/start')
   })
 })
@@ -235,7 +235,7 @@ document.querySelectorAll('[data-google-login]').forEach(button => {
     const signup = currentAuthView() === 'cadastro'
     if (signup && !document.getElementById('cad-termos').checked) { document.getElementById('cad-termos').reportValidity(); return }
     setLoading(button, true, 'Conectando...')
-    screenLoading.show(signup ? 'Criando sua conta...' : 'Verificando suas informações...')
+    screenLoading.show('Organizando sua conta...')
     try {
       const { setRememberMe, isGoogleEnabled } = await import('./src/lib/supabase.js')
       if (!await isGoogleEnabled()) { screenLoading.hide(); showMessage('O acesso com Google ainda precisa ser configurado. Use e-mail e senha ou GitHub.', 'error'); return }
@@ -306,15 +306,13 @@ async function completeGithubLogin() {
 
   try {
     const fromSignup = sessionStorage.getItem('devifolio_auth_intent') === 'cadastro'
-    screenLoading.show(fromSignup ? 'Criando sua conta...' : 'Verificando suas informações...')
+    screenLoading.show('Organizando sua conta...')
     const response = await fetch('/api/auth/github/session', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
     const payload = await response.json().catch(() => ({}))
     if (!response.ok) throw new Error(payload.error || 'Não foi possível concluir o login. Tente novamente.')
     const supabase = await getSupabase()
-    screenLoading.show(fromSignup ? 'Organizando seu espaço...' : 'Organizando sua conta...')
     const { error } = await supabase.auth.setSession({ access_token: payload.access_token, refresh_token: payload.refresh_token })
     if (error) throw error
-    screenLoading.show(fromSignup ? 'Preparando seu portfólio...' : 'Preparando seu espaço...')
     const verified = await supabase.auth.getSession()
     if (verified.error || !verified.data.session) throw verified.error || new Error('A sessão não pôde ser confirmada.')
     sessionStorage.removeItem('devifolio_auth_intent')
