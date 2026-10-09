@@ -1,13 +1,28 @@
+function colorLuminance(hex) {
+  const channels = hex.slice(1).match(/../g).map(value => parseInt(value, 16) / 255)
+  const [red, green, blue] = channels.map(value => value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4)
+  return red * 0.2126 + green * 0.7152 + blue * 0.0722
+}
+
+export function foregroundFor(hex) {
+  return colorLuminance(hex) < 0.34 ? '#ffffff' : '#000000'
+}
+
+const paletteColor = (label, hex) => {
+  const ink = foregroundFor(hex)
+  return { label, hex, ink, muted: ink }
+}
+
 export const portfolioColors = {
-  white: { label: 'Branco', hex: '#ffffff', ink: '#000000', muted: '#000000' },
-  gray: { label: 'Cinza', hex: '#858b90', ink: '#ffffff', muted: '#ffffff' },
-  black: { label: 'Preto', hex: '#242424', ink: '#ffffff', muted: '#ffffff' },
-  blue: { label: 'Azul', hex: '#245df5', ink: '#ffffff', muted: '#ffffff' },
-  green: { label: 'Verde', hex: '#23a765', ink: '#ffffff', muted: '#ffffff' },
-  yellow: { label: 'Amarelo', hex: '#ffd43b', ink: '#000000', muted: '#000000' },
-  orange: { label: 'Laranja', hex: '#ff812c', ink: '#000000', muted: '#000000' },
-  red: { label: 'Vermelho', hex: '#f34d55', ink: '#ffffff', muted: '#ffffff' },
-  pink: { label: 'Rosa', hex: '#d454b0', ink: '#ffffff', muted: '#ffffff' },
+  white: paletteColor('Branco', '#ffffff'),
+  gray: paletteColor('Cinza', '#858b90'),
+  black: paletteColor('Preto', '#242424'),
+  blue: paletteColor('Azul', '#245df5'),
+  green: paletteColor('Verde', '#23a765'),
+  yellow: paletteColor('Amarelo', '#ffd43b'),
+  orange: paletteColor('Laranja', '#ff812c'),
+  red: paletteColor('Vermelho', '#f34d55'),
+  pink: paletteColor('Rosa', '#d454b0'),
 }
 
 export const portfolioShapes = { standard: { label: 'Padrão', radius: '14px' }, rounded: { label: 'Mais arredondado', radius: '26px' }, square: { label: 'Quadrado', radius: '0px' } }

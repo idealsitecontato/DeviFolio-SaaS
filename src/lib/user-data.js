@@ -1,5 +1,6 @@
 import { supabase } from './supabase.js'
 import { normalizeAppearance, decodePortfolioPreferences, encodePortfolioPreferences } from './portfolio-appearance.js'
+import { portfolioLeadPayload } from './portfolio-lead.js'
 
 const isMissingSchema = error => error?.code === '42P01' || error?.code === '42703' || error?.code === 'PGRST204' || error?.code === 'PGRST205'
 
@@ -266,13 +267,7 @@ export async function trackPublicEvent(userId, eventType, projectId = null, visi
 }
 
 export async function submitPortfolioLead(userId, lead) {
-  const { error } = await supabase.from('portfolio_leads').insert({
-    user_id: userId,
-    name: lead.name.trim(),
-    email: lead.email.trim(),
-    phone: lead.phone.trim(),
-    message: lead.message.trim(),
-  })
+  const { error } = await supabase.from('portfolio_leads').insert(portfolioLeadPayload(userId, lead))
   if (error) throw error
 }
 

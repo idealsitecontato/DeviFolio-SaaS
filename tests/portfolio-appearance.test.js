@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { portfolioColors, portfolioShapes, normalizeAppearance, appearanceStyle, decodePortfolioPreferences, encodePortfolioPreferences } from '../src/lib/portfolio-appearance.js'
+import { portfolioColors, portfolioShapes, normalizeAppearance, appearanceStyle, decodePortfolioPreferences, encodePortfolioPreferences, foregroundFor } from '../src/lib/portfolio-appearance.js'
 
 test('palette choices use the requested black or white portfolio text', () => {
   assert.equal(Object.keys(portfolioColors).length, 9)
@@ -15,6 +15,13 @@ test('palette choices use the requested black or white portfolio text', () => {
     assert.match(style, new RegExp(`--portfolio-card-action:${whiteText.has(key) ? '#ffffff' : '#000000'}`))
     assert.match(style, new RegExp(`--portfolio-card-action-ink:${whiteText.has(key) ? '#000000' : '#ffffff'}`))
   }
+})
+
+test('contrast is calculated from the real component color', () => {
+  assert.equal(foregroundFor('#f7f7f7'), '#000000')
+  assert.equal(foregroundFor('#171717'), '#ffffff')
+  assert.equal(foregroundFor('#23a765'), '#ffffff')
+  assert.equal(foregroundFor('#ff812c'), '#000000')
 })
 
 test('three shapes render distinct corners and invalid saved values use defaults', () => {
