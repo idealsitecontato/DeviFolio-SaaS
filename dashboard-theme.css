@@ -284,24 +284,25 @@ html body.dashboard-app[data-theme="dark"] .plans-page .devi-plan-card:not(.devi
 }
 
 html body.dashboard-app[data-theme="dark"] .my-portfolio-preview {
-  color: var(--text) !important;
+  color: var(--portfolio-ink) !important;
 }
 html body.dashboard-app[data-theme="dark"] .my-portfolio-preview .folio-showcase-copy h2,
-html body.dashboard-app[data-theme="dark"] .my-portfolio-preview .folio-showcase-profile .folio-profile-metrics strong,
-html body.dashboard-app[data-theme="dark"] .my-portfolio-preview .folio-showcase-projects .folio-empty-projects h2 {
-  color: var(--text) !important;
+html body.dashboard-app[data-theme="dark"] .my-portfolio-preview .folio-showcase-profile .folio-profile-metrics strong {
+  color: var(--portfolio-ink) !important;
 }
 html body.dashboard-app[data-theme="dark"] .my-portfolio-preview .folio-showcase-copy :is(.folio-username, .folio-biography),
-html body.dashboard-app[data-theme="dark"] .my-portfolio-preview .folio-showcase-profile .folio-profile-metrics span,
-html body.dashboard-app[data-theme="dark"] .my-portfolio-preview .folio-showcase-projects .folio-empty-projects p {
-  color: var(--text-muted) !important;
+html body.dashboard-app[data-theme="dark"] .my-portfolio-preview .folio-showcase-profile .folio-profile-metrics span {
+  color: var(--portfolio-muted) !important;
+}
+html body.dashboard-app[data-theme="dark"] .my-portfolio-preview .folio-showcase-projects .folio-empty-projects :is(h2, p) {
+  color: var(--portfolio-card-ink) !important;
 }
 html body.dashboard-app[data-theme="dark"] .my-portfolio-preview .folio-showcase-projects .folio-empty-projects {
-  background: var(--surface-muted) !important;
-  border-color: var(--border) !important;
+  background: var(--portfolio-card) !important;
+  border-color: var(--portfolio-card-muted) !important;
 }
-html body.dashboard-app[data-theme="dark"] .my-portfolio-preview :is(.folio-profile-divider, .folio-showcase-profile .folio-profile-metrics > div) {
-  border-color: var(--border) !important;
+html body.dashboard-app[data-theme="dark"] .my-portfolio-preview .folio-showcase-profile .folio-profile-metrics > div {
+  border-color: transparent !important;
 }
 
 html body.dashboard-app[data-theme="dark"] .analytics-page :is(.monthly-chart, .analytic-stat, .chart-card, .ranking-card) {

@@ -4,7 +4,7 @@ import { portfolioColors, portfolioShapes, normalizeAppearance, appearanceStyle,
 
 test('palette choices use the requested black or white portfolio text', () => {
   assert.equal(Object.keys(portfolioColors).length, 9)
-  const whiteText = new Set(['gray', 'black', 'blue', 'green', 'red', 'pink'])
+  const whiteText = new Set(['black', 'blue', 'green', 'red', 'pink'])
   for (const [key, color] of Object.entries(portfolioColors)) {
     const expected = whiteText.has(key) ? '#ffffff' : '#000000'
     assert.equal(color.ink, expected, `${key} primary text`)

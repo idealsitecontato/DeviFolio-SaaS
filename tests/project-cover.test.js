@@ -33,3 +33,33 @@ test('the public showcase is read only even for an authenticated owner', () => {
   })
   assert.doesNotMatch(markup, /data-edit-|data-upload-|data-new-project|Criar projeto/)
 })
+
+test('the portfolio uses its own avatar and keeps only the project count', () => {
+  const markup = portfolioShowcase({
+    profile:{ username:'isabella', bio:'Bio', avatar:'account.png', portfolioAvatar:'portfolio.png', userId:'owner-1' },
+    projects:[{ id:1, name:'Projeto', description:'', tech:'JavaScript', link:'', image:'' }],
+    name:'Isabella',
+    banner:'banner.webp',
+    placeholderUrl:'avatar.png',
+    appearance:{ background:'white', cards:'white', shape:'standard' },
+  })
+  assert.match(markup, /src="portfolio\.png"/)
+  assert.match(markup, /id="portfolio-avatar-file"/)
+  assert.match(markup, /data-upload-portfolio-avatar/)
+  assert.doesNotMatch(markup, /id="avatar-file"|data-upload-avatar/)
+  assert.doesNotMatch(markup, /Clientes atendidos|No mercado|folio-profile-divider/)
+  assert.match(markup, /<strong>1<\/strong><span>Projetos<\/span>/)
+})
+
+test('the account avatar is only a visual fallback for a portfolio without its own photo', () => {
+  const markup = portfolioShowcase({
+    profile:{ username:'isabella', bio:'Bio', avatar:'account.png', portfolioAvatar:'', userId:'owner-1' },
+    projects:[],
+    name:'Isabella',
+    banner:'banner.webp',
+    placeholderUrl:'avatar.png',
+    appearance:{ background:'white', cards:'white', shape:'standard' },
+    publicPage:true,
+  })
+  assert.match(markup, /src="account\.png"/)
+})

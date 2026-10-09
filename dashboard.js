@@ -13,6 +13,8 @@ import {
   saveProject,
   saveSettings,
   uploadAvatar,
+  uploadPortfolioAvatar,
+  updatePortfolioAvatar,
   portfolioBannerUrl,
   uploadPortfolioBanner,
   uploadProjectImage,
@@ -599,6 +601,8 @@ function bindActions() {
   $('#password-form')?.addEventListener('submit', changePassword)
   $$('[data-upload-avatar]').forEach(button => button.addEventListener('click', () => $('#avatar-file')?.click()))
   $('#avatar-file')?.addEventListener('change', handleAvatarUpload)
+  $('[data-upload-portfolio-avatar]')?.addEventListener('click', () => $('#portfolio-avatar-file')?.click())
+  $('#portfolio-avatar-file')?.addEventListener('change', handlePortfolioAvatarUpload)
   $$('[data-appearance-kind]').forEach(button => button.addEventListener('click', () => {
     pendingAppearance = { ...(pendingAppearance || normalizeAppearance(state.profile)), [button.dataset.appearanceKind]: button.dataset.appearanceValue }
     render({ preserveScroll: true })
@@ -917,6 +921,21 @@ async function handleAvatarUpload(event) {
     toast('Foto atualizada.')
     render()
   } catch (error) { reportError('Não foi possível enviar a foto.', error) } finally { setButtonLoading(button, false) }
+}
+
+async function handlePortfolioAvatarUpload(event) {
+  const file = event.currentTarget.files?.[0]
+  if (!file) return
+  if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 3 * 1024 * 1024) return toast('Use uma imagem JPG, PNG ou WebP de até 3 MB.', 'error')
+  const button = $('[data-upload-portfolio-avatar]')
+  setButtonLoading(button, true, 'Enviando...')
+  try {
+    const uploadedAvatar = await uploadPortfolioAvatar(currentUser.id, file)
+    const portfolioAvatar = await updatePortfolioAvatar(currentUser.id, uploadedAvatar)
+    state.profile.portfolioAvatar = portfolioAvatar
+    toast('Foto do portfólio atualizada.')
+    render({ preserveScroll: true })
+  } catch (error) { reportError('Não foi possível enviar a foto do portfólio.', error) } finally { setButtonLoading(button, false) }
 }
 
 async function handleProfileBannerUpload(event) {

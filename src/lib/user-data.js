@@ -18,6 +18,7 @@ const mapProfile = row => {
   github: row.github || '',
   website: row.website || '',
   avatar: row.avatar_url || '',
+  portfolioAvatar: row.portfolio_avatar_url || '',
   published: Boolean(row.published),
   selectedModel: preferences.model,
   portfolioBackground: preferences.appearance.background,
@@ -177,6 +178,27 @@ export async function uploadAvatar(userId, file) {
   return `${data.publicUrl}?v=${Date.now()}`
 }
 
+export async function uploadPortfolioAvatar(userId, file) {
+  const extension = file.name.split('.').pop()?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg'
+  const path = `${userId}/portfolio/avatar.${extension}`
+  const { error } = await supabase.storage.from('avatars').upload(path, file, {
+    upsert: true,
+    contentType: file.type,
+    cacheControl: '3600',
+  })
+  if (error) throw error
+  const { data } = supabase.storage.from('avatars').getPublicUrl(path)
+  return `${data.publicUrl}?v=${Date.now()}`
+}
+
+export async function updatePortfolioAvatar(userId, avatarUrl) {
+  const { data, error } = await supabase.from('profiles')
+    .update({ portfolio_avatar_url: avatarUrl, updated_at: new Date().toISOString() })
+    .eq('user_id', userId).select('portfolio_avatar_url').single()
+  if (error) throw error
+  return data.portfolio_avatar_url
+}
+
 export function portfolioBannerUrl(userId) {
   return supabase.storage.from('avatars').getPublicUrl(`${userId}/banner`).data.publicUrl
 }
@@ -233,14 +255,19 @@ export async function loadPublicPortfolio(username) {
   if (!normalized) return null
   let { data: profileRow, error: profileError } = await supabase
     .from('profiles')
-    .select('user_id,name,username,role,bio,skills,linkedin,github,website,avatar_url,published,selected_model')
+    .select('user_id,name,username,role,bio,skills,linkedin,github,website,avatar_url,portfolio_avatar_url,published,selected_model')
     .eq('username', normalized)
     .eq('published', true)
     .maybeSingle()
   if (profileError?.code === '42703') {
-    const legacy = await supabase.from('profiles')
-      .select('user_id,name,username,role,bio,skills,linkedin,github,website,avatar_url,published')
+    let legacy = await supabase.from('profiles')
+      .select('user_id,name,username,role,bio,skills,linkedin,github,website,avatar_url,published,selected_model')
       .eq('username', normalized).eq('published', true).maybeSingle()
+    if (legacy.error?.code === '42703') {
+      legacy = await supabase.from('profiles')
+        .select('user_id,name,username,role,bio,skills,linkedin,github,website,avatar_url,published')
+        .eq('username', normalized).eq('published', true).maybeSingle()
+    }
     profileRow = legacy.data
     profileError = legacy.error
   }

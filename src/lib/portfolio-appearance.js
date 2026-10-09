@@ -8,21 +8,20 @@ export function foregroundFor(hex) {
   return colorLuminance(hex) < 0.34 ? '#ffffff' : '#000000'
 }
 
-const paletteColor = (label, hex) => {
-  const ink = foregroundFor(hex)
+const paletteColor = (label, hex, ink = foregroundFor(hex)) => {
   return { label, hex, ink, muted: ink }
 }
 
 export const portfolioColors = {
-  white: paletteColor('Branco', '#ffffff'),
-  gray: paletteColor('Cinza', '#858b90'),
-  black: paletteColor('Preto', '#242424'),
-  blue: paletteColor('Azul', '#245df5'),
-  green: paletteColor('Verde', '#23a765'),
-  yellow: paletteColor('Amarelo', '#ffd43b'),
-  orange: paletteColor('Laranja', '#ff812c'),
-  red: paletteColor('Vermelho', '#f34d55'),
-  pink: paletteColor('Rosa', '#d454b0'),
+  white: paletteColor('Branco', '#ffffff', '#000000'),
+  gray: paletteColor('Cinza', '#858b90', '#000000'),
+  black: paletteColor('Preto', '#242424', '#ffffff'),
+  blue: paletteColor('Azul', '#245df5', '#ffffff'),
+  green: paletteColor('Verde', '#23a765', '#ffffff'),
+  yellow: paletteColor('Amarelo', '#ffd43b', '#000000'),
+  orange: paletteColor('Laranja', '#ff812c', '#000000'),
+  red: paletteColor('Vermelho', '#f34d55', '#ffffff'),
+  pink: paletteColor('Rosa', '#d454b0', '#ffffff'),
 }
 
 export const portfolioShapes = { standard: { label: 'Padrão', radius: '14px' }, rounded: { label: 'Mais arredondado', radius: '26px' }, square: { label: 'Quadrado', radius: '0px' } }

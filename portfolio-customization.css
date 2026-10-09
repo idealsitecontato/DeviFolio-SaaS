@@ -10,7 +10,6 @@
 .dashboard-app .my-portfolio-layout .folio-showcase-projects .folio-empty-projects p{opacity:1}
 .dashboard-app .my-portfolio-layout .folio-showcase-projects .folio-create-project,.dashboard-app .my-portfolio-layout .folio-showcase-projects .public-button{background:var(--portfolio-card-ink)!important;color:var(--portfolio-card)!important;border-color:var(--portfolio-card-ink)!important}
 .dashboard-app .my-portfolio-layout .folio-showcase-projects .public-project .project-content{background:transparent!important}
-.dashboard-app .my-portfolio-layout .folio-profile-divider{background:var(--portfolio-muted)!important;opacity:.2}
 .dashboard-app .my-portfolio-layout .folio-showcase-profile .folio-profile-metrics>div{border-color:var(--portfolio-muted)!important}
 .dashboard-app .folio-biography-row{display:flex;align-items:center;gap:7px;min-width:0}
 .dashboard-app .folio-biography-row[hidden],.dashboard-app .folio-biography-form[hidden]{display:none}

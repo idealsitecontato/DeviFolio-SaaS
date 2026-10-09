@@ -63,7 +63,8 @@ function renderPage() {
   document.querySelector('meta[name="description"]').content=description
   document.querySelector('meta[property="og:title"]').content=document.title
   document.querySelector('meta[property="og:description"]').content=description
-  if(profile.avatar)document.querySelector('meta[property="og:image"]').content=profile.avatar
+  const socialImage = profile.portfolioAvatar || profile.avatar
+  if(socialImage)document.querySelector('meta[property="og:image"]').content=socialImage
   const contact = portfolioContactMarkup()
   const footerLinks = [profileLink('GitHub', profile.github), profileLink('LinkedIn', profile.linkedin), profileLink('Meu site', profile.website)].filter(Boolean).join('')
   root.innerHTML = `<article class="public-portfolio-page customized-portfolio" style="${appearanceStyle(appearance)}">${showcase}${contact}${footerLinks ? `<nav class="public-portfolio-links profile-links" aria-label="Links profissionais">${footerLinks}</nav>` : ''}</article>`
