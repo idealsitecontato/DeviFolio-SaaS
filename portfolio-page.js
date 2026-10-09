@@ -12,6 +12,7 @@ import {
 import { mountGooeySpinners, UploadButton } from './src/ui/visual-components.js'
 import { folioDevLogo } from './src/ui/brand.js'
 import { normalizeAppearance, appearanceStyle } from './src/lib/portfolio-appearance.js'
+import { portfolioShowcase } from './src/ui/portfolio-showcase.js'
 import './src/lib/build-version.js'
 
 const root = document.getElementById('portfolio-root')
@@ -57,33 +58,22 @@ function profileLink(label, value) {
   return url ? `<a href="${esc(url)}" target="_blank" rel="noopener" data-profile-link>${label}</a>` : ''
 }
 
-function projectCard(project, ownerId) {
-  const projectUrl = normalizeUrl(project.link)
-  return `<article class="public-project"><div class="project-image">${project.image ? `<img src="${esc(project.image)}" alt="Capa de ${esc(project.name)}" loading="lazy" width="540" height="300">` : `<span>${esc(project.name.slice(0, 2).toUpperCase())}</span>`}</div><div class="project-content"><h3>${esc(project.name)}</h3><p>${esc(project.description || 'Conheça este projeto.')}</p>${project.tech?`<div class="tag-row">${project.tech.split(',').filter(Boolean).map(tech=>`<span class="tag mono">${esc(tech.trim())}</span>`).join('')}</div>`:''}<div class="project-actions">${projectUrl ? `<a class="public-button" href="${esc(projectUrl)}" target="_blank" rel="noopener" data-project-link="${project.id}" data-owner="${ownerId}">Acessar</a>` : `<button class="public-button" type="button" data-view-project="${project.id}">Acessar</button>`}<button class="public-button secondary" type="button" data-view-project="${project.id}">Ver</button></div></div></article>`
-}
-
 function renderPage() {
   const { profile, projects } = portfolio
-  const emptyProject = `<div class="empty-projects folio-empty-projects"><span class="folio-empty-folder" aria-hidden="true">▱</span><h2>Nenhum projeto encontrado</h2><p>Você ainda não desenvolveu nenhum projeto.<br>Crie um novo projeto para começar.</p>${isOwner ? '<a href="/dashboard.html#projetos" class="folio-create-project">+ &nbsp;Criar projeto</a>' : ''}</div>`
-  const profileMetrics = !projects.length ? `<div class="folio-profile-metrics"><div><strong>0</strong><span>Projetos</span></div><div><strong>${[profile.github, profile.linkedin, profile.website].filter(Boolean).length}</strong><span>Links profissionais</span></div><div><strong>${profile.role ? '1' : '0'}</strong><span>Área de atuação</span></div></div>` : ''
   const name = profile.name || profile.username
-  const avatar = profile.avatar || placeholderUrl
   const banner = `${portfolioBannerUrl(profile.userId)}${bannerRevision ? `?v=${bannerRevision}` : ''}`
+  const appearance = normalizeAppearance(profile)
+  const showcase = portfolioShowcase({ profile, projects, name, banner, placeholderUrl, appearance, publicPage:true, owner:isOwner })
   document.title = `${folderId ? folderLabel || 'Portfólio secundário' : name} — WebFolio`
   const description=profile.bio || `Projetos de ${name}. Portfólio criado com WebFolio.`
   document.querySelector('meta[name="description"]').content=description
   document.querySelector('meta[property="og:title"]').content=document.title
   document.querySelector('meta[property="og:description"]').content=description
   if(profile.avatar)document.querySelector('meta[property="og:image"]').content=profile.avatar
-  root.innerHTML = `<article class="portfolio-page customized-portfolio" style="${appearanceStyle(normalizeAppearance(profile))}"><header class="public-nav"><a href="${isOwner ? '/dashboard.html#inicio' : '/'}" aria-label="${isOwner ? 'Voltar ao início do painel' : 'Voltar ao WebFolio'}">${isOwner ? '← Voltar ao início' : '← WebFolio'}</a><a href="/cadastro.html#cadastro" class="nav-action">Criar meu portfólio</a></header><div class="portfolio-shell"><section class="public-hero"><img class="public-banner-image" src="${esc(banner)}" alt="" aria-hidden="true">${isOwner ? '<button class="portfolio-edit-button banner-edit-button" type="button" data-edit-banner aria-label="Editar banner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4z"/></svg></button>' : ''}<div class="profile-header"><div class="public-avatar"><img src="${esc(avatar)}" alt="${profile.avatar ? `Foto de ${esc(name)}` : 'Ícone de usuário'}" width="112" height="112">${isOwner ? '<button class="portfolio-edit-button avatar-edit-button" type="button" data-edit-avatar aria-label="Editar foto de perfil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4z"/></svg></button>' : ''}</div><div class="profile-copy"><h1>${esc(name)}</h1><p class="folio-username">@${esc(profile.username)}</p>${profile.role ? `<h2>${esc(profile.role)}</h2>` : ''}${profile.bio ? `<p class="bio">${esc(profile.bio)}</p>` : ''}<nav class="profile-links">${profileLink('GitHub', profile.github)}${profileLink('LinkedIn', profile.linkedin)}${profileLink('Meu site', profile.website)}</nav></div>${profileMetrics}</div></section><section class="projects-section"><div class="section-heading"><h2>Meus projetos</h2><span>${projects.length} projeto${projects.length === 1 ? '' : 's'}</span></div>${projects.length ? `<div class="public-projects">${projects.map(project => projectCard(project, profile.userId)).join('')}</div>` : emptyProject}</section>${!isOwner ? `<section class="public-contact" aria-labelledby="contact-title"><div><span>VAMOS CONVERSAR</span><h2 id="contact-title">Gostou do meu trabalho?</h2><p>Envie uma mensagem sobre seu projeto. Seu contato chega diretamente ao meu painel.</p></div><form id="portfolio-contact-form"><label>Nome<input name="name" maxlength="100" minlength="2" required autocomplete="name"></label><label>E-mail<input name="email" type="email" maxlength="254" required autocomplete="email"></label><label>Telefone<input name="phone" type="tel" maxlength="40" autocomplete="tel"></label><label>Mensagem<textarea name="message" maxlength="2000" rows="4" placeholder="Conte um pouco sobre o que você precisa"></textarea></label><label class="contact-honeypot" aria-hidden="true">Site<input name="website" tabindex="-1" autocomplete="off"></label><button class="public-button" type="submit">Enviar contato</button><p role="status" aria-live="polite"></p></form></section>` : ''}</div><footer class="public-footer"><a href="/" aria-label="Criado com WebFolio"><span class="folio-brand"><img src="${brandUrl}" alt="WebFolio" width="3189" height="573"></span></a><span>Trabalho de ${esc(name)}.</span></footer></article>`
-
-  const bannerImage = root.querySelector('.public-banner-image')
-  bannerImage.addEventListener('load', () => root.querySelector('.public-hero')?.classList.add('has-banner'))
-  bannerImage.addEventListener('error', () => bannerImage.remove())
-  if (bannerImage.complete && bannerImage.naturalWidth) root.querySelector('.public-hero')?.classList.add('has-banner')
-  root.querySelector('.public-avatar > img').addEventListener('error', event => {
-    if (event.currentTarget.src !== placeholderUrl) event.currentTarget.src = placeholderUrl
-  })
+  const contact = isOwner ? '' : `<section class="public-contact" aria-labelledby="contact-title"><div><span>VAMOS CONVERSAR</span><h2 id="contact-title">Gostou do meu trabalho?</h2><p>Envie uma mensagem sobre seu projeto. Seu contato chega diretamente ao meu painel.</p></div><form id="portfolio-contact-form"><label>Nome<input name="name" maxlength="100" minlength="2" required autocomplete="name"></label><label>E-mail<input name="email" type="email" maxlength="254" required autocomplete="email"></label><label>Telefone<input name="phone" type="tel" maxlength="40" autocomplete="tel"></label><label>Mensagem<textarea name="message" maxlength="2000" rows="4" placeholder="Conte um pouco sobre o que você precisa"></textarea></label><label class="contact-honeypot" aria-hidden="true">Site<input name="website" tabindex="-1" autocomplete="off"></label><button class="public-button" type="submit">Enviar contato</button><p role="status" aria-live="polite"></p></form></section>`
+  const footerLinks = [profileLink('GitHub', profile.github), profileLink('LinkedIn', profile.linkedin), profileLink('Meu site', profile.website)].filter(Boolean).join('')
+  const returnLink = isOwner ? '/dashboard.html#inicio' : '/'
+  root.innerHTML = `<article class="public-portfolio-page customized-portfolio" style="${appearanceStyle(appearance)}">${showcase}${contact}<footer class="public-footer"><a href="${returnLink}" aria-label="${isOwner ? 'Voltar ao início do painel' : 'Voltar ao WebFolio'}"><span class="folio-brand"><img src="${brandUrl}" alt="WebFolio" width="3189" height="573"></span></a>${footerLinks ? `<nav class="profile-links" aria-label="Links profissionais">${footerLinks}</nav>` : ''}<a href="/cadastro.html#cadastro" class="nav-action">Criar meu portfólio</a></footer></article>`
 
   root.querySelectorAll('[data-project-link]').forEach(link => link.addEventListener('click', () => {
     if (!isOwner) trackPublicEvent(profile.userId, 'project_view', Number(link.dataset.projectLink), visitorId())

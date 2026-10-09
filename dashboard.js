@@ -19,7 +19,8 @@ import {
 } from './src/lib/user-data.js'
 import QRCode from 'qrcode'
 import { createScreenLoading } from './screen-loading.js'
-import { portfolioColors, portfolioShapes, normalizeAppearance, appearanceStyle } from './src/lib/portfolio-appearance.js'
+import { portfolioColors, portfolioShapes, normalizeAppearance } from './src/lib/portfolio-appearance.js'
+import { portfolioShowcase } from './src/ui/portfolio-showcase.js'
 import { mountGooeySpinners, UploadButton } from './src/ui/visual-components.js'
 import { portfolioFolders, projectLocation, nextSortOrder, orderedFolders, restorePortfolioFolders, planProjectMove, persistProjectMove } from './src/lib/project-location.js'
 import { planGithubImport, importedGithubProject } from './src/lib/github-import.js'
@@ -81,7 +82,6 @@ const icons = {
   bell: '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/>',
   shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
   palette: '<path d="M12 3a9 9 0 1 0 0 18h1.4a2.4 2.4 0 0 0 0-4.8h-.8a1.6 1.6 0 0 1 0-3.2H15a6 6 0 0 0-3-10z"/><circle cx="7.5" cy="11" r=".8"/><circle cx="9" cy="6.8" r=".8"/><circle cx="14" cy="7" r=".8"/><circle cx="18" cy="10" r=".8"/>',
-  'portfolio-palette': '<path d="M12 2.5a9.5 9.5 0 1 0 0 19h1.5a2.5 2.5 0 0 0 0-5h-.7a1.7 1.7 0 0 1 0-3.4h2a6.4 6.4 0 0 0-2.8-10.6Z"/><circle cx="7" cy="10" r=".7"/><circle cx="9.4" cy="6.5" r=".7"/><circle cx="14" cy="6.8" r=".7"/><circle cx="17.5" cy="10" r=".7"/>',
   lock: '<rect x="4" y="10" width="16" height="11"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',
   save: '<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/>',
   x: '<path d="m6 6 12 12M18 6 6 18"/>', trending: '<path d="m3 17 6-6 4 4 8-8"/><path d="M15 7h6v6"/>',
@@ -265,33 +265,16 @@ function previewMarkup() {
   return `<div class="public-preview">${profile.avatar ? `<div class="preview-avatar"><img src="${esc(profile.avatar)}" alt="Foto de ${esc(profile.name)}"></div>` : '<div class="preview-avatar preview-avatar-empty"><span data-icon="user"></span></div>'}${profile.name ? `<p class="preview-kicker">PORTFÓLIO</p><h2 data-preview="name">${esc(profile.name)}</h2>` : '<p class="preview-empty-copy">Adicione seu nome para visualizar a prévia.</p>'}${profile.role ? `<h3 data-preview="role">${esc(profile.role)}</h3>` : ''}${profile.bio ? `<p data-preview="bio">${esc(profile.bio)}</p>` : ''}<div class="preview-skills" data-preview="skills">${profile.skills.split(',').filter(Boolean).map(item => `<span>${esc(item.trim())}</span>`).join('')}</div>${publishedProjects.length ? `<div class="preview-project-list">${publishedProjects.slice(0, 3).map(project => `<span>${esc(project.name)}</span>`).join('')}</div>` : '<div class="preview-empty-copy">Nenhum projeto publicado.</div>'}</div>`
 }
 
-function portfolioPreviewProject(project) {
-  const url = normalizeExternalUrl(project.link)
-  return `<article class="public-project my-portfolio-project"><div class="project-image">${project.image ? `<img src="${esc(project.image)}" alt="Capa de ${esc(project.name)}" loading="lazy" draggable="false">` : `<span>${esc(project.name.slice(0, 2).toUpperCase())}</span>`}</div><div class="project-content"><h3>${esc(project.name)}</h3><p>${esc(project.description || 'Conheça este projeto.')}</p>${project.tech ? `<div class="tag-row">${project.tech.split(',').filter(Boolean).map(item => `<span class="tag mono">${esc(item.trim())}</span>`).join('')}</div>` : ''}<div class="project-actions">${url ? `<a class="public-button" href="${esc(url)}" target="_blank" rel="noopener">Acessar</a>` : `<button class="public-button" type="button" data-preview-project="${project.id}">Acessar</button>`}<button class="public-button secondary" type="button" data-preview-project="${project.id}">Ver</button></div></div></article>`
-}
-
 function portfolioManagerView() {
   const profile = state.profile
   const appearance = pendingAppearance || normalizeAppearance(profile)
   const colorOptions = (kind, selected) => Object.entries(portfolioColors).map(([key, color]) => `<button class="portfolio-color-option${key === selected ? ' is-selected' : ''}" type="button" data-appearance-kind="${kind}" data-appearance-value="${key}" aria-label="${color.label}" aria-pressed="${key === selected}" title="${color.label}" style="--swatch:${color.hex}"></button>`).join('')
   const shapeOptions = Object.entries(portfolioShapes).map(([key, shape]) => `<button class="portfolio-shape-option${key === appearance.shape ? ' is-selected' : ''}" type="button" data-appearance-kind="shape" data-appearance-value="${key}" aria-pressed="${key === appearance.shape}"><span class="portfolio-shape-icon ${key}" aria-hidden="true"></span><span>${shape.label}</span></button>`).join('')
-  const emptyPortfolioProjects = '<div class="empty-projects folio-empty-projects"><span class="folio-empty-folder" aria-hidden="true">▱</span><h2>Nenhum projeto encontrado</h2><p>Você ainda não desenvolveu nenhum projeto.<br>Crie um novo projeto para começar.</p><button class="primary-button folio-create-project" type="button" data-new-project>+ &nbsp;Criar projeto</button></div>'
   const banner = currentUser ? `${portfolioBannerUrl(currentUser.id)}${profileBannerRevision ? `?v=${profileBannerRevision}` : ''}` : ''
   const projects = state.projects.filter(project => project.status === 'published').sort((a, b) => a.sortOrder - b.sortOrder || a.id - b.id)
-  const username = profile.username ? `@${profile.username.replace(/^@/, '')}` : '@usuario'
-  const biography = profile.bio || profile.role || 'Adicione uma biografia para apresentar seu trabalho aos visitantes.'
+  const showcase = portfolioShowcase({ profile, projects, name:realName(), banner, placeholderUrl:profilePlaceholderUrl, appearance })
   return `<section class="page-enter my-portfolio-page">${pageHead('Meu Portfólio', 'Prévia completa de como os visitantes verão seu portfólio.', '<a class="secondary-button" href="#inicio">← Voltar ao início</a>')}
-    <div class="my-portfolio-layout"><div class="portfolio-page my-portfolio-preview" style="${appearanceStyle(appearance)}">
-      <div class="portfolio-shell folio-showcase-shell"><article class="folio-showcase-card">
-        <div class="my-portfolio-banner"><img class="public-banner-image" src="${esc(banner)}" alt="Banner do portfólio" onerror="this.hidden=true"><input id="profile-banner-file" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="icon-button banner-edit-button" type="button" data-upload-profile-banner aria-label="Editar banner"><span data-icon="edit"></span></button></div>
-        <div class="folio-showcase-profile"><div class="public-avatar">${profile.avatar ? `<img src="${esc(profile.avatar)}" alt="Foto de ${esc(realName())}" onerror="this.src='${profilePlaceholderUrl}'">` : `<img src="${profilePlaceholderUrl}" alt="Ícone de usuário">`}<input id="avatar-file" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="icon-button avatar-edit-button" type="button" data-upload-avatar aria-label="Editar foto de perfil"><span data-icon="edit"></span></button></div>
-          <div class="folio-showcase-copy"><h2>${esc(realName())}</h2><p class="folio-username">${esc(username)}</p><div class="folio-biography-row"><p class="folio-biography">${esc(biography)}</p><button class="icon-button biography-edit-button" type="button" data-edit-biography aria-label="Editar biografia"><span data-icon="edit"></span></button></div><form class="folio-biography-form" id="biography-form" hidden><textarea name="bio" rows="4" maxlength="240" aria-label="Biografia">${esc(profile.bio)}</textarea><div><button type="button" class="secondary-button" data-cancel-biography>Cancelar</button><button type="submit" class="primary-button">Salvar</button></div></form></div>
-          <div class="folio-profile-metrics" aria-label="Estatísticas do portfólio"><div><strong>${projects.length}</strong><span>Projetos</span></div><div><strong>—</strong><span>Clientes atendidos</span></div><div><strong>—</strong><span>No mercado</span></div></div>
-        </div>
-        <div class="folio-profile-divider" aria-hidden="true"></div>
-        <section class="projects-section folio-showcase-projects">${projects.length ? `<div class="section-heading"><h2>Meus projetos</h2><span>${projects.length} projeto${projects.length === 1 ? '' : 's'}</span></div><div class="public-projects">${projects.map(portfolioPreviewProject).join('')}</div>` : emptyPortfolioProjects}</section>
-      </article></div>
-    </div><aside class="portfolio-customizer" aria-label="Personalizar portfólio"><div class="portfolio-customizer-head"><span class="portfolio-palette-icon" data-icon="portfolio-palette" aria-hidden="true"></span><div><h2>Personalizar portfólio</h2><p>Altere as cores e o formato dos cards do seu portfólio.</p></div></div><div class="portfolio-customizer-body"><h3>Cores</h3><fieldset><legend>Cor de fundo</legend><div class="portfolio-colors">${colorOptions('background', appearance.background)}</div></fieldset><fieldset><legend>Cor dos cards</legend><div class="portfolio-colors">${colorOptions('cards', appearance.cards)}</div></fieldset><fieldset class="portfolio-shapes"><legend>Formato do card</legend><div class="portfolio-shape-options">${shapeOptions}</div></fieldset><button class="portfolio-save-button" type="button" data-save-appearance><span data-icon="save"></span>Salvar alterações</button></div></aside></div>
+    <div class="my-portfolio-layout">${showcase}<aside class="portfolio-customizer" aria-label="Personalizar portfólio"><div class="portfolio-customizer-head"><span class="portfolio-palette-icon" aria-hidden="true"></span><div><h2>Personalizar portfólio</h2><p>Altere as cores e o formato dos cards do seu portfólio.</p></div></div><div class="portfolio-customizer-body"><h3>Cores</h3><fieldset><legend>Cor de fundo</legend><div class="portfolio-colors">${colorOptions('background', appearance.background)}</div></fieldset><fieldset><legend>Cor dos cards</legend><div class="portfolio-colors">${colorOptions('cards', appearance.cards)}</div></fieldset><fieldset class="portfolio-shapes"><legend>Formato do card</legend><div class="portfolio-shape-options">${shapeOptions}</div></fieldset><button class="portfolio-save-button" type="button" data-save-appearance><span data-icon="save"></span>Salvar alterações</button></div></aside></div>
   </section>`
 }
 function openPortfolioFolder(id) {

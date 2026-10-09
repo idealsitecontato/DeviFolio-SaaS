@@ -40,5 +40,5 @@ export function normalizeAppearance(profile = {}) {
 export function appearanceStyle(appearance) {
   const background = portfolioColors[appearance.background]
   const cards = portfolioColors[appearance.cards]
-  return `--portfolio-background:${background.hex};--portfolio-ink:${background.ink};--portfolio-muted:${background.muted};--portfolio-card:${cards.hex};--portfolio-card-ink:${cards.ink};--portfolio-card-muted:${cards.muted};--portfolio-radius:${portfolioShapes[appearance.shape].radius}`
+  return `--portfolio-background:${background.hex};--portfolio-ink:${background.ink};--portfolio-muted:${background.muted};--portfolio-card:${cards.hex};--portfolio-card-ink:${cards.ink};--portfolio-card-muted:${cards.muted};--portfolio-logo-filter:${background.ink === '#ffffff' ? 'brightness(0) invert(1)' : 'brightness(0)'};--portfolio-radius:${portfolioShapes[appearance.shape].radius}`
 }
